@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<script src="docx.js"></script>
+<script src="drive.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="用品清單">
+<meta name="theme-color" content="#5C9A45">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+html,body{height:100%;overflow:hidden}
+body{margin:0;background:#F5F4EE;color:#1F2320;font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#3E7530;text-decoration:none}a:hover{color:#5C9A45}
+*{box-sizing:border-box}
+input,select,button,textarea{font-family:inherit}
+::selection{background:#D8EBC4}
+</style>
+<template id="__bundler_thumbnail">
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#E3F0D5"/><g fill="#5C9A45"><rect x="60" y="52" width="80" height="100" rx="4"/><rect x="72" y="70" width="56" height="6" fill="#E3F0D5"/><rect x="72" y="86" width="56" height="6" fill="#E3F0D5"/><rect x="72" y="102" width="34" height="6" fill="#E3F0D5"/></g><circle cx="140" cy="140" r="26" fill="#3E7530"/><g fill="#E3F0D5"><rect x="128" y="132" width="24" height="17" rx="3"/><circle cx="140" cy="141" r="5" fill="#3E7530"/><rect x="134" y="128" width="12" height="5" rx="2"/></g></svg>
+</template>
+<style>
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</helmet>
+
+<div style="display:contents">
+
+  <div style="display:none">
+    <img src="logo-small.png" alt="線東大眾護理之家" style="height:52px;width:auto;display:block">
+    <div style="font:600 11px/1 'Barlow Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4E8C3C">互動原型 · v1 · 手機優先</div>
+    <h1 style="margin:0;font:600 34px/1.05 'Barlow Condensed','Noto Sans TC',sans-serif;letter-spacing:.01em">住民用品清單 — 拍照製表程式</h1>
+    <p style="margin:0;max-width:760px;font-size:14.5px;line-height:1.65;color:#45483F;text-wrap:pretty">用手機填表頭 → 一鍵加常用品項 → 現場拍照 → 自動排版成跟現在一樣的 Word 清單並自動命名。物品同時寫進雲端資料庫，之後增減、退住核對歸還都從同一筆資料走。</p>
+  </div>
+
+  <div style="display:contents">
+
+    <div style="display:none">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">流程</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border-top:1px solid rgba(31,35,32,.16)">
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">01</span><span style="font-size:13.5px;line-height:1.5">選住民（或新建）－ 姓名中英文、床號自動帶入</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">02</span><span style="font-size:13.5px;line-height:1.5">品項：常用一鍵加入、可自訂、數量 ±</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">03</span><span style="font-size:13.5px;line-height:1.5">拍照：張數不限、可刪可補、可標到品項</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">04</span><span style="font-size:13.5px;line-height:1.5">預覽：Word 版面所見即所得、檔名可改</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">05</span><span style="font-size:13.5px;line-height:1.5">匯出 .docx ＋ 存雲端硬碟資料庫</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">06</span><span style="font-size:13.5px;line-height:1.5">退住：逐項核對歸還、記錄誰點收</span></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">我做的假設</div>
+        <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.55;color:#45483F">
+          <li>不再手寫表單，紙本表頭欄位全部搬成輸入</li>
+          <li>照片直接叫手機相機，不經相簿也行</li>
+          <li>日期預設今天（民國），可改</li>
+          <li>檔名自動產生但可事後編輯</li>
+          <li>雲端硬碟＝唯一資料庫：物品增減直接改同一筆</li>
+          <li>資料夾以姓名認人、名為「床號 姓名」；換房自動改名，舊檔跟著走</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">跳到畫面</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          <sc-for list="{{ jumps }}" as="j" hint-placeholder-count="6">
+            <button type="button" onClick="{{ j.go }}" style="padding:5px 9px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;border-radius:10px;font-size:12.5px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ j.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div style="position:fixed;inset:0;display:flex;flex-direction:column">
+
+      <div style="flex:1;min-height:0;background:#FCFCF9;display:flex;flex-direction:column;overflow:hidden;position:relative">
+
+        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;font:500 12px 'Barlow',sans-serif;color:#6A6E62;border-bottom:1px solid rgba(31,35,32,.1)">
+          <img src="logo-small.png" alt="線東大眾護理之家" style="height:22px;width:auto;display:block">
+          <span>{{ syncLabel }}</span>
+        </div>
+
+        <div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(31,35,32,.16)">
+          <button type="button" onClick="{{ back }}" style="width:30px;height:30px;flex:none;border-radius:10px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font-size:15px;line-height:1;cursor:pointer;display:{{ backDisplay }}" style-hover="background:#E3F0D5;border-color:#5C9A45">‹</button>
+          <button type="button" onClick="{{ goHub }}" title="回到選擇物品／消耗品的主選單" style="height:30px;flex:none;padding:0 10px;border-radius:10px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font:600 12.5px/1 'Barlow Condensed','Noto Sans TC',sans-serif;cursor:pointer;white-space:nowrap;display:{{ backDisplay }}" style-hover="background:#E3F0D5;border-color:#5C9A45">⌂ 主選單</button>
+          <div style="flex:1;min-width:0">
+            <div style="font:600 17px/1.15 'Barlow Condensed','Noto Sans TC',sans-serif">{{ title }}</div>
+            <div style="font-size:11.5px;color:#8A8E80;margin-top:2px">{{ subtitle }}</div>
+          </div>
+          <div style="font:600 11px 'Barlow Condensed',sans-serif;letter-spacing:.1em;color:#4E8C3C">{{ stepLabel }}</div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:16px">
+
+          <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:1fr;gap:14px;padding-top:6px">
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                </div>
+              </sc-if>
+              <button type="button" onClick="{{ goItems }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(31,35,32,.18);background:#fff;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4E8C3C">01</span>
+                <span style="font:600 22px/1.2 'Barlow Condensed','Noto Sans TC',sans-serif">住民用品清單</span>
+                <span style="font-size:13px;line-height:1.65;color:#6A6E62">家屬帶來的隨身物品逐件登記、拍照、製表存雲端。退住時逐項核對歸還。</span>
+              </button>
+              <button type="button" onClick="{{ goConsum }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(31,35,32,.18);background:#fff;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4E8C3C">02</span>
+                <span style="font:600 22px/1.2 'Barlow Condensed','Noto Sans TC',sans-serif">消耗品及食品</span>
+                <span style="font-size:13px;line-height:1.65;color:#6A6E62">拍照自動加上日期與住民姓名，直接分享到 LINE 群組；可設定何時提醒家屬再帶來。</span>
+              </button>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCHome }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasConsumErr }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:11px;border:1px solid #B4553C;background:#FBEEE9;font-size:12.5px;line-height:1.6;color:#8F3F2C;border-radius:10px">{{ consumErr }}</div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:8px">
+                  <input value="{{ cQuery }}" onChange="{{ onCQuery }}" placeholder="查詢：床號 / 姓名 / 品項 / 日期" style="flex:1;min-width:0;padding:11px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                  <button type="button" onClick="{{ clearCQuery }}" style="flex:none;padding:11px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">清除</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="flex:1;min-width:0;font-size:11.5px;color:#8A8E80">{{ cResultCount }}</span>
+                  <button type="button" onClick="{{ refreshConsum }}" style="padding:3px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;color:#3E7530">↻ 重新整理</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ cSearching }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <sc-if value="{{ noCResult }}" hint-placeholder-val="{{ false }}">
+                    <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">找不到符合的登記紀錄</div>
+                  </sc-if>
+                  <sc-for list="{{ cResults }}" as="r" hint-placeholder-count="0">
+                    <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                      <span style="display:flex;flex-direction:column;gap:4px">
+                        <span style="font-size:15px;font-weight:500">{{ r.title }}</span>
+                        <span style="font-size:13.5px;line-height:1.6;color:#3F443C">{{ r.items }}</span>
+                        <span style="font-size:11.5px;color:#8A8E80">{{ r.meta }}</span>
+                      </span>
+                      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                        <span style="font-size:12px;color:{{ r.photoNoteFg }}">{{ r.photoNote }}</span>
+                        <sc-if value="{{ r.canOpen }}" hint-placeholder-val="{{ false }}">
+                          <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(92,154,69,.45);background:#F4FAEE;color:#3E7530;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ r.toggleLabel }}</button>
+                        </sc-if>
+                      </div>
+                      <sc-if value="{{ r.loading }}" hint-placeholder-val="{{ false }}">
+                        <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">從雲端讀取照片…</div>
+                      </sc-if>
+                      <sc-if value="{{ r.hasErr }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #B4553C;background:#FBEEE9;border-radius:10px">
+                          <span style="font-size:12.5px;line-height:1.6;color:#8F3F2C">{{ r.errMsg }}</span>
+                          <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #B4553C;background:#B4553C;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#8F3F2C">重試</button>
+                        </div>
+                      </sc-if>
+                      <sc-if value="{{ r.empty }}" hint-placeholder-val="{{ false }}">
+                        <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">雲端已經找不到這批照片</div>
+                      </sc-if>
+                      <sc-if value="{{ r.loaded }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                          <sc-for list="{{ r.photos }}" as="p" hint-placeholder-count="0">
+                            <span style="display:flex;flex-direction:column;gap:4px">
+                              <span style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</span>
+                              <span style="font-size:10.5px;color:#8A8E80">{{ p.label }}</span>
+                            </span>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ showBrowse }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">今天要提醒的住民</span>
+                <sc-if value="{{ noDue }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">今天沒有要提醒的住民</div>
+                </sc-if>
+                <sc-for list="{{ dueList }}" as="r" hint-placeholder-count="0">
+                  <div style="display:flex;gap:10px;align-items:center;padding:12px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:10px">
+                    <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <span style="font-size:14.5px;font-weight:500">{{ r.title }}</span>
+                      <span style="font-size:11.5px;color:#7A6432">{{ r.sub }}</span>
+                    </span>
+                    <button type="button" onClick="{{ r.done }}" style="flex:none;padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A0721F">已提醒</button>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">最近登記</span>
+                <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">還沒有消耗品登記紀錄</div>
+                </sc-if>
+                <sc-for list="{{ recentConsum }}" as="r" hint-placeholder-count="0">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:11px 12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                        <span style="font-size:14px;font-weight:500">{{ r.title }}</span>
+                        <span style="font-size:11.5px;color:#8A8E80">{{ r.sub }}</span>
+                      </span>
+                      <sc-if value="{{ r.notConfirming }}" hint-placeholder-val="{{ true }}">
+                        <button type="button" onClick="{{ r.ask }}" style="flex:none;padding:5px 10px;border:1px solid rgba(196,85,47,.5);background:transparent;color:#A8431F;font-size:12px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC;border-color:#C4552F">刪除</button>
+                      </sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                      <span style="font-size:12px;color:{{ r.photoNoteFg }}">{{ r.photoNote }}</span>
+                      <sc-if value="{{ r.canOpen }}" hint-placeholder-val="{{ false }}">
+                        <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(92,154,69,.45);background:#F4FAEE;color:#3E7530;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ r.toggleLabel }}</button>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ r.loading }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">從雲端讀取照片…</div>
+                    </sc-if>
+                    <sc-if value="{{ r.hasErr }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #B4553C;background:#FBEEE9;border-radius:10px">
+                        <span style="font-size:12.5px;line-height:1.6;color:#8F3F2C">{{ r.errMsg }}</span>
+                        <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #B4553C;background:#B4553C;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#8F3F2C">重試</button>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.empty }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">雲端已經找不到這批照片</div>
+                    </sc-if>
+                    <sc-if value="{{ r.loaded }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                        <sc-for list="{{ r.photos }}" as="p" hint-placeholder-count="0">
+                          <span style="display:flex;flex-direction:column;gap:4px">
+                            <span style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</span>
+                            <span style="font-size:10.5px;color:#8A8E80">{{ p.label }}</span>
+                          </span>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ r.confirming }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
+                        <span style="font-size:12.5px;line-height:1.6;color:#5A2E1C">{{ r.delMsg }}</span>
+                        <div style="display:flex;gap:6px">
+                          <button type="button" onClick="{{ r.del }}" style="padding:7px 13px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">確定刪除</button>
+                          <button type="button" onClick="{{ r.cancel }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px">不要</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCNew }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px">
+                <label style="font-size:12px;color:#3E7530">選擇住民</label>
+                <select value="{{ cRosterSel }}" onChange="{{ onCRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background-color:#fff;color:#1F2320;font-size:15px;border-radius:10px">{{ cRosterOptionEls }}</select>
+                <span style="font-size:12px;color:#6A6E62">{{ cCaptionPreview }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">登記日期</label>
+                <input type="date" value="{{ cDateIso }}" onChange="{{ onCDateIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:15px;border-radius:10px">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">品項 · 點一下加入</span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ cPresets }}" as="c" hint-placeholder-count="6">
+                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:8px">
+                  <input value="{{ cCustom }}" onChange="{{ onCCustom }}" placeholder="其他品項" style="flex:1;min-width:0;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                  <button type="button" onClick="{{ addCCustom }}" style="flex:none;padding:10px 16px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">加入</button>
+                </div>
+                <sc-if value="{{ noCItems }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:18px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">尚未加入品項</div>
+                </sc-if>
+                <sc-for list="{{ cItems }}" as="it" hint-placeholder-count="0">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                      <span style="flex:1;min-width:0;font-size:14.5px">{{ it.label }}</span>
+                      <button type="button" onClick="{{ it.dec }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">−</button>
+                      <span style="flex:none;min-width:22px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ it.qty }}</span>
+                      <button type="button" onClick="{{ it.inc }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">＋</button>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                      <label style="flex:none;font-size:12px;color:#6A6E62">有效期限（選填）</label>
+                      <input type="date" value="{{ it.expiryIso }}" onChange="{{ it.onExpiry }}" style="flex:1;min-width:0;padding:8px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:14px;border-radius:10px">
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">何時提醒家屬再帶來（選填）</span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ remindQuick }}" as="q" hint-placeholder-count="5">
+                    <button type="button" onClick="{{ q.set }}" style="padding:7px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ q.label }}</button>
+                  </sc-for>
+                </div>
+                <input type="date" value="{{ cRemindIso }}" onChange="{{ onCRemindIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:15px;border-radius:10px">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCPhotos }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="padding:11px 12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px;font-size:13px;line-height:1.65;color:#3E7530">每張照片下方會加上：{{ cCaptionPreview }}</div>
+              <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:1px dashed rgba(92,154,69,.55);background:#F4FAEE;color:#3E7530;font-size:14.5px;cursor:pointer;border-radius:10px">
+                ＋ 拍照或選相片
+                <input type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onCFiles }}" style="display:none">
+              </label>
+              <sc-if value="{{ noCShots }}" hint-placeholder-val="{{ true }}">
+                <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">還沒有照片</div>
+              </sc-if>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <sc-for list="{{ cShots }}" as="p" hint-placeholder-count="0">
+                  <div style="position:relative;border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">
+                    {{ p.thumb }}
+                    <button type="button" onClick="{{ p.del }}" style="position:absolute;top:6px;right:6px;width:26px;height:26px;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:14px;line-height:1;cursor:pointer;border-radius:10px">×</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isCDone }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="padding:11px 12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px;font-size:13px;line-height:1.65;color:#3E7530">{{ cSummary }}</div>
+              <div style="padding:10px 12px;border:1px solid {{ cSaveBorder }};background:{{ cSaveBg }};color:{{ cSaveFg }};border-radius:10px;font-size:13px;line-height:1.6">{{ cSaveMsg }}</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <sc-for list="{{ cStamped }}" as="p" hint-placeholder-count="1">
+                  <div style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <sc-if value="{{ hasDbError }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid #B4553C;background:#FBEEE9;padding:11px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:13px;font-weight:500;color:#8F3F2C">雲端資料庫連線失敗</div>
+                  <div style="font-size:12px;line-height:1.5;color:#45483F;word-break:break-all">{{ dbError }}</div>
+                  <button type="button" onClick="{{ retryDb }}" style="align-self:flex-start;padding:6px 11px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:12.5px;cursor:pointer">重試</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                </div>
+              </sc-if>
+              <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="搜尋床號或姓名" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">住民物品資料庫</span>
+                  <button type="button" onClick="{{ toggleLeft }}" style="padding:3px 8px;border:1px solid {{ leftBtnBorder }};background:{{ leftBtnBg }};color:{{ leftBtnFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">{{ leftBtnLabel }}</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="display:flex;gap:4px">
+                    <button type="button" onClick="{{ byBed }}" style="padding:3px 8px;border:1px solid {{ sortBedBorder }};background:{{ sortBedBg }};color:{{ sortBedFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45">房號</button>
+                    <button type="button" onClick="{{ byDate }}" style="padding:3px 8px;border:1px solid {{ sortDateBorder }};background:{{ sortDateBg }};color:{{ sortDateFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45">建立日</button>
+                  </div>
+                  <span style="font-size:11.5px;color:#8A8E80">{{ residentCount }} 位</span>
+                  <button type="button" onClick="{{ refreshDb }}" disabled="{{ refreshing }}" style="padding:3px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45;color:#3E7530">{{ refreshLabel }}</button>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-if value="{{ noResidents }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:26px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;line-height:1.6;color:#8A8E80">{{ emptyMsg }}</div>
+                </sc-if>
+                <sc-for list="{{ visibleResidents }}" as="r" hint-placeholder-count="4">
+                  <button type="button" onClick="{{ r.open }}" style="width:100%;text-align:left;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
+                    <span style="flex:none;width:52px;font:600 16px/1 'Barlow Condensed',sans-serif;color:#3E7530">{{ r.bed }}</span>
+                    <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                      <span style="font-size:14.5px;font-weight:500">{{ r.name }}</span>
+                      <span style="font-size:11.5px;color:#8A8E80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.summary }}</span>
+                    </span>
+                    <span style="flex:none;font-size:11.5px;color:#4E8C3C">{{ r.itemCount }} 件 ›</span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isBasic }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <sc-if value="{{ hasRoster }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                    <label style="font-size:12px;color:#3E7530">從住民名單帶入</label>
+                    <button type="button" onClick="{{ refreshRoster }}" style="flex:none;padding:2px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45;color:#3E7530">↻ 重新讀取</button>
+                  </div>
+                  <select value="{{ rosterSel }}" onChange="{{ onRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background-color:#fff;color:#1F2320;font-size:15px;border-radius:10px">{{ rosterOptionEls }}</select>
+                  <sc-if value="{{ hasDup }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:10px">
+                      <span style="font-size:13px;line-height:1.6;color:#5A4318">{{ dupMsg }}</span>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button type="button" onClick="{{ openDup }}" style="padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A0721F">看舊紀錄</button>
+                        <button type="button" onClick="{{ dismissDup }}" style="padding:6px 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">繼續新增</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ hasBedDiff }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(31,35,32,.22);background:#fff;border-radius:10px">
+                      <span style="font-size:13px;line-height:1.6">{{ bedDiffMsg }}</span>
+                      <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button type="button" onClick="{{ useNewBed }}" style="padding:6px 12px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">用名單床號</button>
+                        <button type="button" onClick="{{ keepOldBed }}" style="padding:6px 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">維持舊床號</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ hasRosterNote }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:12px;color:#6A6E62">{{ rosterNote }}</span>
+                  </sc-if>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">住民姓名（中文）</label>
+                <input value="{{ draftName }}" onChange="{{ onName }}" placeholder="例：呂勝雄" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">英文名</label>
+                <input value="{{ draftEn }}" onChange="{{ onEn }}" placeholder="例：Sheng Syong" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <label style="font-size:12px;color:#6A6E62">床號</label>
+                  <input value="{{ draftBed }}" onChange="{{ onBed }}" placeholder="506-1" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <label style="font-size:12px;color:#6A6E62">日期（民國）</label>
+                  <input value="{{ draftDate }}" onChange="{{ onDate }}" placeholder="115.7.28" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">製表日（民國）— 用在檔名</label>
+                <input value="{{ draftMakeDate }}" onChange="{{ onMakeDate }}" placeholder="115.8.03" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <label style="font-size:12px;color:#6A6E62">點收人員身份（可多選）</label>
+                <div style="display:flex;gap:8px">
+                  <sc-for list="{{ receiverOpts }}" as="o" hint-placeholder-count="3">
+                    <button type="button" onClick="{{ o.toggle }}" style="flex:1;padding:10px 4px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};font-size:13.5px;cursor:pointer;border-radius:10px">{{ o.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">點收人</label>
+                <input value="{{ draftReceiverName }}" onChange="{{ onReceiverName }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isItems }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">常用品項 · 點一下加入</span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ commonItems }}" as="c" hint-placeholder-count="10">
+                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">衣物 · 點一下加入</span>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ clothesItems }}" as="c" hint-placeholder-count="12">
+                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <input value="{{ customItem }}" onChange="{{ onCustomItem }}" placeholder="自訂品項名稱" style="flex:1;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                <button type="button" onClick="{{ addCustom }}" style="flex:none;padding:0 16px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#3E7530">加入</button>
+              </div>
+              <div style="height:1px;background:rgba(31,35,32,.16)"></div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">本次清單</span>
+                  <span style="font-size:11.5px;color:#8A8E80">{{ draftItemCount }} 項</span>
+                </div>
+                <sc-if value="{{ draftEmpty }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:22px 12px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80">還沒有品項 — 從上面常用品項點選，或自訂</div>
+                </sc-if>
+                <sc-for list="{{ draftItems }}" as="it" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(31,35,32,.16);background:#fff">
+                    <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
+                    <button type="button" onClick="{{ it.dec }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#E3F0D5">−</button>
+                    <span style="width:44px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ it.qtyLabel }}</span>
+                    <button type="button" onClick="{{ it.inc }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#E3F0D5">＋</button>
+                    <button type="button" onClick="{{ it.remove }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.16);background:transparent;color:#8A8E80;font-size:13px;line-height:1;cursor:pointer" style-hover="color:#1F2320;border-color:#1F2320">✕</button>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isPhotos }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;gap:8px">
+                <label for="camInput" style="flex:1;padding:13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14.5px;text-align:center;cursor:pointer" style-hover="background:#3E7530">開相機拍照</label>
+                <label for="fileInput" style="flex:none;padding:13px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14.5px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">從相簿</label>
+              </div>
+              <input id="camInput" type="file" accept="image/*" capture="environment" multiple="{{ true }}" onChange="{{ onPickPhoto }}" style="display:none">
+              <input id="fileInput" type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onPickPhoto }}" style="display:none">
+              <div style="font-size:12.5px;color:#8A8E80;line-height:1.5">Word 是橫式一頁六格：第 1 頁左上放打字清單、其餘 5 格放照片；超過 5 張自動續頁，第 2 頁起每頁 6 張，檔名的「共 N 頁」會自動算。</div>
+              <sc-if value="{{ noPhotos }}" hint-placeholder-val="{{ false }}">
+                <div style="height:200px;border:1px dashed rgba(31,35,32,.28);display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,#F1F0E8 0 8px,#E8E7DE 8px 16px);font:12px ui-monospace,Menlo,monospace;color:#6A6E62">尚無照片 — 物品照 / 表單照</div>
+              </sc-if>
+              <sc-if value="{{ hasPhotos }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <sc-for list="{{ photos }}" as="p" hint-placeholder-count="0">
+                  <div style="display:flex;flex-direction:column;gap:6px;border:1px solid rgba(31,35,32,.16);background:#fff;padding:6px">
+                    <div style="position:relative;height:120px;background:repeating-linear-gradient(45deg,#F1F0E8 0 8px,#E8E7DE 8px 16px);overflow:hidden">
+                      {{ p.thumb }}
+                      <button type="button" onClick="{{ p.remove }}" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border:1px solid rgba(31,35,32,.3);background:rgba(255,255,255,.9);font-size:12px;line-height:1;cursor:pointer">✕</button>
+                    </div>
+                    <select value="{{ p.tag }}" onChange="{{ p.setTag }}" style="width:100%;padding:6px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:12.5px;border-radius:10px">
+                      <sc-for list="{{ tagOpts }}" as="t" hint-placeholder-count="3">
+                        <option value="{{ t.value }}">{{ t.label }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                </sc-for>
+              </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">檔名（可改）</label>
+                <textarea value="{{ fileName }}" onChange="{{ onFileName }}" rows="2" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:12.5px;line-height:1.5;border-radius:10px;resize:none"></textarea>
+                <button type="button" onClick="{{ resetFileName }}" style="align-self:flex-start;padding:5px 9px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">重新自動產生</button>
+              </div>
+              <div style="font-size:11.5px;color:#8A8E80">A4 橫式六格 · 共 {{ totalPages }} 頁 · {{ photoCount }} 張照片</div>
+              <div style="border:1px solid rgba(31,35,32,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+                <div style="grid-column:1 / -1;font-size:9px;font-weight:700;padding:0 2px 5px;word-break:break-all;line-height:1.3">{{ fileName }}</div>
+                <div style="border:1px solid #1F2320;padding:4px;display:flex;flex-direction:column;gap:0;min-height:150px">
+                <div style="text-align:center;font:600 9px/1.4 'Noto Sans TC',sans-serif;padding-bottom:3px">住民用品清單</div>
+                <div style="border:1px solid #1F2320;font-size:6.5px;line-height:1.45">
+                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">住民姓名（中英文）：{{ previewName }}</div>
+                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">住民床號：{{ previewBed }}　日期：{{ previewDate }}</div>
+                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">點收人員：{{ previewReceivers }}</div>
+                  <div style="padding:4px 3px;border-bottom:1px solid #1F2320">簽章：<span style="color:#8f2f2f">{{ previewReceiverName }}</span></div>
+                  <div style="display:grid;grid-template-columns:1fr 40px">
+                    <div style="padding:2px 3px;text-align:center;border-right:1px solid #1F2320;border-bottom:1px solid #1F2320">分類</div>
+                    <div style="padding:2px 3px;text-align:center;border-bottom:1px solid #1F2320">數量</div>
+                  </div>
+                  <sc-for list="{{ previewRows }}" as="row" hint-placeholder-count="3">
+                    <div style="display:grid;grid-template-columns:1fr 40px;border-bottom:1px solid #1F2320">
+                      <div style="padding:2px 3px;border-right:1px solid #1F2320;min-height:11px">{{ row.name }}</div>
+                      <div style="padding:2px 3px;text-align:center">{{ row.qty }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                </div>
+                <sc-for list="{{ pageCells }}" as="c" hint-placeholder-count="5">
+                  <div style="border:1px solid #1F2320;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ extraPages }}" as="pg" hint-placeholder-count="0">
+                <div style="border:1px solid rgba(31,35,32,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+                  <div style="grid-column:1 / -1;font-size:9px;font-weight:700;padding:0 2px 5px;line-height:1.3">{{ pg.label }}</div>
+                  <sc-for list="{{ pg.cells }}" as="c" hint-placeholder-count="6">
+                    <div style="border:1px solid #1F2320;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
+                  </sc-for>
+                </div>
+              </sc-for>
+
+              <div style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62;padding-top:4px">匯出前核對</div>
+              <div style="border:1px solid #1F2320;font-size:13.5px;line-height:1.55;background:#fff">
+                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">住民姓名（中英文）：<span style="font-weight:500">{{ previewName }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">住民床號：<span style="font-weight:500">{{ previewBed }}</span>　日期：<span style="font-weight:500">{{ previewDate }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">製表日：<span style="font-weight:500">{{ previewMakeDate }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">點收人員：{{ previewReceivers }}</div>
+                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">點收人：<span style="font-weight:500;color:#8f2f2f">{{ previewReceiverName }}</span></div>
+                <div style="display:grid;grid-template-columns:1fr 96px">
+                  <div style="padding:6px 10px;text-align:center;border-right:1px solid #1F2320;border-bottom:1px solid #1F2320;color:#6A6E62">分類</div>
+                  <div style="padding:6px 10px;text-align:center;border-bottom:1px solid #1F2320;color:#6A6E62">數量</div>
+                </div>
+                <sc-for list="{{ previewItemRows }}" as="row" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:1fr 96px;border-bottom:1px solid rgba(31,35,32,.25)">
+                    <div style="padding:8px 10px;border-right:1px solid rgba(31,35,32,.25)">{{ row.name }}</div>
+                    <div style="padding:8px 10px;text-align:center">{{ row.qty }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-size:12px;color:#8A8E80;line-height:1.5">{{ driveHint }}</div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px;padding-top:24px;align-items:center;text-align:center">
+              <div style="width:56px;height:56px;border:1px solid #5C9A45;display:flex;align-items:center;justify-content:center;font-size:26px;color:#5C9A45">✓</div>
+              <div style="font:600 20px 'Barlow Condensed','Noto Sans TC',sans-serif">清單已產生</div>
+              <div style="font-size:13.5px;line-height:1.6;color:#45483F;max-width:290px;word-break:break-all">{{ fileName }}.docx</div>
+              <div style="width:100%;border:1px solid rgba(31,35,32,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;font-size:13px">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">雲端硬碟</span><span>{{ driveMsg }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">存放位置</span><span style="text-align:right">用品清單 / {{ previewBed }} {{ previewNameShort }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">物品資料庫</span><span>已更新 {{ draftItemCount }} 項</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">照片</span><span>{{ photoCount }} 張 · 共 {{ totalPages }} 頁</span></div>
+              </div>
+              <sc-if value="{{ hasDriveLink }}" hint-placeholder-val="{{ false }}">
+                <a href="{{ driveLink }}" target="_blank" rel="noopener" style="font-size:13px;border-bottom:1px solid #5C9A45">在雲端硬碟開啟</a>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isResident }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="border:1px solid rgba(31,35,32,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+                  <div style="font:600 19px 'Barlow Condensed','Noto Sans TC',sans-serif">{{ curBed }}　{{ curName }}</div>
+                  <div style="flex:none;display:flex;gap:6px">
+                    <button type="button" onClick="{{ startMove }}" style="padding:5px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">換房</button>
+                    <button type="button" onClick="{{ fixPhotos }}" title="從垃圾桶還原照片後按這裡，重新編號並清掉重複" style="padding:5px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">整理照片</button>
+                  </div>
+                </div>
+                <div style="font-size:12px;color:#8A8E80">最後更新 {{ curUpdated }}</div>
+                <sc-if value="{{ movingBed }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;padding-top:2px">
+                    <input value="{{ newBed }}" onChange="{{ onNewBed }}" placeholder="新床號，例：510-2" style="flex:1;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                    <button type="button" onClick="{{ confirmMove }}" style="flex:none;padding:0 14px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#3E7530">確定</button>
+                    <button type="button" onClick="{{ cancelMove }}" style="flex:none;padding:0 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#E3F0D5">取消</button>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">現有物品</span>
+                <sc-for list="{{ curItems }}" as="it" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;border:1px solid {{ it.border }};background:#fff">
+                    <div style="display:flex;align-items:center;gap:8px;padding:9px 10px">
+                      <button type="button" onClick="{{ it.toggleOpen }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:0;border:0;background:transparent;cursor:pointer;text-align:left">
+                        <span style="font-size:14.5px;color:#1F2320">{{ it.name }}</span>
+                        <span style="font-size:11px;color:#8A8E80">{{ it.photoCountLabel }} ▾</span>
+                      </button>
+                      <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
+                      <button type="button" onClick="{{ it.startFix }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">修正</button>
+                      <button type="button" onClick="{{ it.startTake }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">取回</button>
+                    </div>
+                    <sc-if value="{{ it.fixing }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:10px;padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F1F0E8">
+                        <div style="font-size:12.5px;line-height:1.55;color:#6A6E62">誤登記修正 — 改品名或數量會直接更新雲端資料庫，並記一筆異動；「取回」才是家屬帶回。</div>
+                        <div style="display:flex;flex-direction:column;gap:5px">
+                          <label style="font-size:11.5px;color:#8A8E80">品名</label>
+                          <input value="{{ fixName }}" onChange="{{ onFixName }}" style="width:100%;padding:9px 11px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center">
+                          <span style="font-size:13px;color:#6A6E62;flex:none">數量</span>
+                          <button type="button" onClick="{{ fixDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:10px">−</button>
+                          <span style="width:34px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ fixQty }}</span>
+                          <button type="button" onClick="{{ fixInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:10px">＋</button>
+                        </div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                          <button type="button" onClick="{{ it.saveFix }}" style="padding:8px 14px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">儲存修正</button>
+                          <button type="button" onClick="{{ it.cancelFix }}" style="padding:8px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">取消</button>
+                          <sc-if value="{{ it.confirming }}" hint-placeholder-val="{{ false }}">
+                            <span style="flex:1;min-width:100%;display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
+                              <span style="font-size:12.5px;line-height:1.6;color:#5A2E1C">{{ it.delMsg }}</span>
+                              <span style="display:flex;gap:6px">
+                                <button type="button" onClick="{{ it.doDelete }}" style="padding:7px 13px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">確定刪除</button>
+                                <button type="button" onClick="{{ it.cancelDelete }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px">不要</button>
+                              </span>
+                            </span>
+                          </sc-if>
+                          <sc-if value="{{ it.notConfirming }}" hint-placeholder-val="{{ true }}">
+                            <button type="button" onClick="{{ it.askDelete }}" style="padding:8px 14px;border:1px solid #C4552F;background:transparent;color:#A8431F;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC">刪除這筆</button>
+                          </sc-if>
+                        </div>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F4F9EC">
+                        <sc-if value="{{ it.hasShots }}" hint-placeholder-val="{{ false }}">
+                          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                            <sc-for list="{{ it.shots }}" as="sh" hint-placeholder-count="0">
+                              <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+                        <sc-if value="{{ it.noShots }}" hint-placeholder-val="{{ false }}">
+                          <div style="font-size:12.5px;line-height:1.5;color:#8A8E80">尚無照片 — 重新製表並在拍照頁把照片標到「{{ it.name }}」，之後這裡就看得到。</div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+                    <sc-if value="{{ it.taking }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F4F9EC">
+                        <div style="font-size:12.5px;color:#6A6E62">家屬帶回 — 只取回這一件，會記一筆異動並更新清單；這件的照片會一起移除</div>
+                        <sc-if value="{{ it.multi }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;gap:8px;align-items:center">
+                          <span style="font-size:13px;color:#6A6E62;flex:none">數量</span>
+                          <button type="button" onClick="{{ takeDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer">−</button>
+                          <span style="width:34px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ takeQty }}</span>
+                          <button type="button" onClick="{{ takeInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer">＋</button>
+                          <span style="font-size:12.5px;color:#8A8E80;flex:1">/ 現有 {{ it.qtyLabel }}</span>
+                        </div>
+                        </sc-if>
+                        <input value="{{ takeBy }}" onChange="{{ onTakeBy }}" placeholder="帶回者（例：長女 呂小姐）" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                        <input value="{{ takeMaker }}" onChange="{{ onTakeMaker }}" placeholder="點收人（會印在新清單上）" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                        <div style="display:flex;gap:8px">
+                          <button type="button" onClick="{{ confirmTake }}" style="flex:1;padding:10px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#3E7530">確定帶回</button>
+                          <button type="button" onClick="{{ cancelTake }}" style="flex:none;padding:10px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#E3F0D5">取消</button>
+                        </div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ hasGroupShots }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">合照</span>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                    <sc-for list="{{ groupShots }}" as="sh" hint-placeholder-count="0">
+                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ photosLoading }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#8A8E80">照片載入中…</div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">增減紀錄</span>
+                <sc-for list="{{ curLog }}" as="l" hint-placeholder-count="3">
+                  <div style="display:grid;grid-template-columns:64px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid rgba(31,35,32,.12);font-size:12.5px">
+                    <span style="color:#8A8E80">{{ l.date }}</span>
+                    <span>{{ l.text }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ isReturn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <div style="font-size:13px;color:#45483F;line-height:1.6">勾選這次帶回的品項，沒勾的會留著等下次清點。完成後產生歸還清單存進該住民資料夾，並依狀況把資料夾移進「已退住」或「已退住(物品未完全歸還)」。</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ returnItems }}" as="it" hint-placeholder-count="3">
+                  <button type="button" onClick="{{ it.toggle }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:11px 10px;border:1px solid {{ it.border }};background:{{ it.bg }};cursor:pointer;border-radius:10px">
+                    <span style="flex:none;width:20px;height:20px;border:1px solid {{ it.mark }};display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ it.mark }}">{{ it.check }}</span>
+                    <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
+                    <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
+                  </button>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">歸還給（家屬 / 代理人）</label>
+                <input value="{{ returnTo }}" onChange="{{ onReturnTo }}" placeholder="例：長女 呂小姐" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <label style="font-size:12px;color:#6A6E62">點收人</label>
+                <input value="{{ returnBy }}" onChange="{{ onReturnBy }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+              </div>
+              <div style="border:1px solid rgba(31,35,32,.16);background:#fff;padding:11px;font-size:13px;line-height:1.6">已核對歸還 <span style="font-weight:700;color:#3E7530">{{ returnedCount }}</span> / {{ returnTotal }} 項</div>
+            </div>
+          </sc-if>
+
+        </div>
+
+        <div style="flex:none;border-top:1px solid rgba(31,35,32,.16);padding:12px 16px;display:{{ ctaDisplay }};gap:8px;background:#F1F0E8">
+          <button type="button" onClick="{{ secondaryAction }}" style="flex:none;padding:12px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ secondaryLabel }}</button>
+          <button type="button" onClick="{{ primaryAction }}" style="flex:1;padding:12px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:15px;cursor:pointer;border-radius:10px" style-hover="background:#3E7530;border-color:#3E7530">{{ primaryLabel }}</button>
+        </div>
+
+        <sc-if value="{{ hasViewer }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:rgba(31,35,32,.92);display:flex;flex-direction:column;z-index:5">
+            <div style="flex:none;display:flex;justify-content:flex-end;padding:12px">
+              <button type="button" onClick="{{ closeViewer }}" style="padding:7px 13px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:13px;cursor:pointer">關閉</button>
+            </div>
+            <div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:0 12px 20px">{{ viewerImg }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:16px;right:16px;bottom:76px;padding:11px 13px;background:#22301C;color:#fff;font-size:13px;line-height:1.4;animation:toastIn .18s ease-out">{{ toast }}</div>
+        </sc-if>
+
+      </div>
+    </div>
+
+    <div style="display:none">
+      <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">下一步可以做</div>
+      <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:9px;font-size:13.5px;line-height:1.55;color:#45483F">
+        <li>真的產出 .docx（版面、字體、頁數與現在完全一致）</li>
+        <li>接 Google Drive：自動建「用品清單 / 床號 姓名」資料夾</li>
+        <li>住民名單匯入，床號姓名下拉選、不用打字</li>
+        <li>手指簽名板取代蓋章欄</li>
+        <li>退住歸還清單另一份文件模板</li>
+        <li>離線可用，回到 Wi-Fi 再同步</li>
+      </ul>
+      <div style="margin-top:6px;font-size:12.5px;color:#8A8E80;line-height:1.55">跟我說要調整流程、欄位或畫面的哪一段，我直接改這個原型。</div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;institutionName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;線東大眾護理之家&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;driveEndpoint&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;雲端設定&quot;},&quot;driveFolderId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;雲端設定&quot;},&quot;rosterSheetId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;1GqHGNkMonvWF9FAUyb8dVe8hU1HqaDmxzs94rjC1LSE&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;住民名單（唯讀參考）&quot;},&quot;rosterSheetName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;住民床位總表&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;住民名單（唯讀參考）&quot;}}">
+const COMMON = [
+  {name:'老花眼鏡',unit:'支'},{name:'眼鏡盒',unit:'個'},{name:'假牙',unit:'副'},{name:'假牙盒',unit:'個'},
+  {name:'助行器',unit:'台'},{name:'輪椅',unit:'台'},{name:'手機',unit:'支'},{name:'充電器',unit:'組'},
+  {name:'健保卡',unit:'張'},{name:'印章',unit:'個'},{name:'手錶',unit:'支'},{name:'收音機',unit:'台'},
+  {name:'保溫杯',unit:'個'},{name:'棉被',unit:'件'},{name:'拖鞋',unit:'雙'},
+  {name:'助聽器',unit:'個'},{name:'念珠',unit:'串'}
+];
+const CLOTHES = [
+  {name:'短袖上衣',unit:'件'},{name:'長袖上衣',unit:'件'},{name:'背心',unit:'件'},
+  {name:'外套',unit:'件'},{name:'毛衣',unit:'件'},{name:'睡衣',unit:'套'},
+  {name:'短褲',unit:'件'},{name:'長褲',unit:'件'},{name:'內衣',unit:'件'},
+  {name:'內褲',unit:'件'},{name:'襪子',unit:'雙'},{name:'圍兜',unit:'件'},
+  {name:'帽子',unit:'頂'},{name:'圍巾',unit:'條'},{name:'毛巾',unit:'條'},
+  {name:'浴巾',unit:'條'},{name:'鞋子',unit:'雙'},{name:'衣物',unit:'件'}
+];
+const pad2c = n => (n < 10 ? '0' + n : String(n));
+const CONSUM_PRESETS = ['水果', '餅乾', '飲品', '保健食品', '尿布', '衛生紙'];
+const UNIT = {};
+COMMON.concat(CLOTHES).forEach(c => UNIT[c.name] = c.unit);
+
+class Component extends DCLogic {
+  state = {
+    screen: 'hub',
+    query: '',
+    customItem: '',
+    toast: '',
+    cur: 0,
+    driveState: '', driveLink: '', driveError: '', lastFile: '', lastPages: 1,
+    dbState: 'loading', dbError: '', showLeft: false,
+    openItem: -1, viewer: '', photosState: '',
+    fixIdx: -1, fixName: '', fixQty: 1, confirmDel: -1,
+    movingBed: false, newBed: '', pendingCount: 0, sortBy: 'bed',
+    roster: [], rosterState: '', rosterError: '', rosterSel: '', cRosterSel: '',
+    cDraft: null, cPhotos: [], cStamped: [], cSaving: false, cSaved: false,
+    consum: [], consumState: '', consumError: '', cDelId: -1,
+    dupIdx: -1, dupBed: '', dupOldBed: '',
+    takeIdx: -1, takeQty: 1, takeBy: '', takeMaker: '',
+    returnTo: '',
+    returnBy: '',
+    returned: {},
+    fileNameEdited: null,
+    draft: null,
+    residents: [],
+    photos: []
+  };
+
+  today() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, '0');
+    return (d.getFullYear() - 1911) + '.' + p(d.getMonth() + 1) + '.' + p(d.getDate());
+  }
+  rocCompact(v) {
+    const parts = String(v || '').split('.').map(x => x.trim()).filter(x => x !== '');
+    if (parts.length < 3) return String(v || '').replace(/\./g, '');
+    return parts[0] + String(parts[1]).padStart(2, '0') + String(parts[2]).padStart(2, '0');
+  }
+  maker() { return ''; }
+  newDraft(r) {
+    return {
+      name: r ? r.name : '', en: r ? r.en : '', bed: r ? r.bed : '',
+      date: this.today(), makeDate: this.today(), receivers: ['前櫃檯'], receiverName: '', maker: '',
+      items: []
+    };
+  }
+  // ── 每一件都是獨立的一筆（短袖上衣 ×3 → 三筆，各自有照片、可單獨取回）──
+  seqOf(uid) { const m = /#(\d+)$/.exec(uid || ''); return m ? Number(m[1]) : 0; }
+  splitItems(items) {
+    const src = items || [], mx = {};
+    src.forEach(it => { if (it.uid) mx[it.name] = Math.max(mx[it.name] || 0, this.seqOf(it.uid)); });
+    const out = [];
+    src.forEach(it => {
+      if (it.uid) { out.push(Object.assign({}, it, {qty: 1})); return; }
+      const q = Math.max(1, Number(it.qty) || 1);
+      for (let k = 0; k < q; k++) {
+        const n = (mx[it.name] || 0) + 1; mx[it.name] = n;
+        out.push({name: it.name, qty: 1, unit: it.unit || '個', uid: it.name + '#' + n});
+      }
+    });
+    return out;
+  }
+  // 舊資料照片只標了品名 → 依序分配給該品名的每一件
+  retagPhotos(shots, items) {
+    const byName = {};
+    (items || []).forEach(it => { if (it.uid) (byName[it.name] = byName[it.name] || []).push(it.uid); });
+    const used = {};
+    return (shots || []).map(p => {
+      const o = typeof p === 'string' ? {url: p, tag: '__all'} : Object.assign({}, p);
+      const list = byName[o.tag || ''];
+      if (list && list.length) { const k = used[o.tag] || 0; used[o.tag] = k + 1; o.tag = list[Math.min(k, list.length - 1)]; }
+      return o;
+    });
+  }
+  // 名單寫「2F-205-1」，資料庫一律存「205-1」，比對與填入前先去掉樓層前綴
+  normBed(bed) { return String(bed || '').trim().replace(/^\s*\d+\s*F\s*[-–—]?\s*/i, ''); }
+
+  // 205-1 → 205001，房號與床位都納入排序
+  bedOrder(bed) {
+    const m = /(\d+)(?:\D+(\d+))?/.exec(this.normBed(bed));
+    if (!m) return 9e9;
+    return Number(m[1]) * 1000 + (m[2] ? Number(m[2]) : 0);
+  }
+  // 建立時間＝最舊一筆紀錄的日期（log 由新到舊）
+  createdOf(r) {
+    const log = r.log || [];
+    return (log.length ? log[log.length - 1].date : '') || r.updated || '';
+  }
+  // 民國 115.7.28 → 1150728
+  dateOrder(d) {
+    const p = String(d || '').split('.');
+    if (p.length < 3) return 0;
+    return Number(p[0]) * 10000 + Number(p[1]) * 100 + Number(p[2]);
+  }
+  circled(n) { return n >= 1 && n <= 20 ? '①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳'.charAt(n - 1) : '(' + n + ')'; }
+  // 同品名有多件時，標上①②③以便分辨
+  itemLabels(items) {
+    const total = {}, seen = {};
+    (items || []).forEach(it => { total[it.name] = (total[it.name] || 0) + 1; });
+    return (items || []).map(it => {
+      const k = (seen[it.name] || 0) + 1; seen[it.name] = k;
+      return total[it.name] > 1 ? it.name + ' ' + this.circled(k) : it.name;
+    });
+  }
+  // 清單頁摘要：同品名併成「短袖上衣 ×3」
+  summarize(items) {
+    const order = [], n = {};
+    (items || []).forEach(it => { if (n[it.name] === undefined) { order.push(it.name); n[it.name] = 0; } n[it.name]++; });
+    return order.map(k => n[k] > 1 ? k + ' ×' + n[k] : k).join('、');
+  }
+  normalizeResident(r) {
+    const items = this.splitItems(r.items);
+    return Object.assign({}, r, {items: items, photos: this.retagPhotos(r.photos, items)});
+  }
+  d() { return this.state.draft || this.newDraft(null); }
+  setDraft(patch) { this.setState(s => ({draft: Object.assign({}, s.draft || this.newDraft(null), patch), fileNameEdited: s.fileNameEdited})); }
+  go(screen) { this.setState({screen: screen, toast: ''}); }
+  flash(msg) { this.setState({toast: msg}); clearTimeout(this._t); this._t = setTimeout(() => this.setState({toast: ''}), 2200); }
+
+  autoName() {
+    const d = this.d();
+    const en = d.en ? '(' + d.en + ')' : '';
+    return (d.name || '姓名') + en + '  製表-' + this.rocCompact(d.makeDate || d.date) + ' ' + (d.receiverName || '') + '(共 ' + this.pageCount() + ' 頁)';
+  }
+  pageCount() {
+    const n = this.state.photos.length;
+    return n <= 5 ? 1 : 1 + Math.ceil((n - 5) / 6);
+  }
+  fileName() { return this.state.fileNameEdited !== null ? this.state.fileNameEdited : this.autoName(); }
+
+  addItem(name, unit) {
+    const d = this.d();
+    const items = d.items.slice();
+    const i = items.findIndex(x => x.name === name);
+    if (i >= 0) items[i] = Object.assign({}, items[i], {qty: items[i].qty + 1});
+    else items.push({name: name, qty: 1, unit: unit || UNIT[name] || '個'});
+    this.setDraft({items: items});
+  }
+  bumpDraft(idx, delta) {
+    const items = this.d().items.slice();
+    const q = items[idx].qty + delta;
+    if (q <= 0) items.splice(idx, 1); else items[idx] = Object.assign({}, items[idx], {qty: q});
+    this.setDraft({items: items});
+  }
+  commit() {
+    const d = this.d();
+    const name = this.fileName();
+    let rec = null;
+    this.setState(s => {
+      const rs = s.residents.slice();
+      // 先找在住的同床同名；找不到再找已退住的同名（＝重新入住）
+      let i = rs.findIndex(r => !r.left && r.bed === d.bed && r.name === d.name);
+      if (i < 0) i = rs.findIndex(r => r.left && r.name === d.name);
+      const readmit = i >= 0 && !!rs[i].left;
+      const merged = i >= 0 ? this.splitItems(rs[i].items) : [];
+      const seq = {}, tagMap = {};
+      merged.forEach(x => { seq[x.name] = Math.max(seq[x.name] || 0, this.seqOf(x.uid)); });
+      d.items.forEach(it => {
+        const q = Math.max(1, Number(it.qty) || 1);
+        for (let k = 1; k <= q; k++) {
+          const n = (seq[it.name] || 0) + 1; seq[it.name] = n;
+          tagMap[it.name + '#' + k] = it.name + '#' + n;
+          merged.push({name: it.name, qty: 1, unit: it.unit || '個', uid: it.name + '#' + n});
+        }
+      });
+      const logText = '新增 ' + d.items.map(it => it.name + ' ×' + it.qty).join('、') + '（' + (d.receiverName || d.receivers.join('/')) + '點收，' + d.maker + '製表）';
+      const entry = {date: d.date, text: logText};
+      const shots = s.photos.map(p => ({url: p.url, tag: tagMap[p.tag] || p.tag || '__all'}));
+      if (i >= 0) {
+        const extra = readmit ? [{date: d.date, text: '重新入住 — 床號 ' + d.bed + '，先前退住紀錄封存於下'}] : [];
+        // 舊住民再次登記：雲端照片是「舊的＋這次新增的」，清掉本機快取讓物品紀錄頁重新抓完整的一份
+        rs[i] = Object.assign({}, rs[i], {bed: d.bed, en: d.en || rs[i].en, items: merged, updated: d.date,
+          demo: false, left: false, leaveDate: '', partial: false, photosLoaded: false,
+          photos: [], lastReceiver: d.receiverName, log: [entry].concat(extra, rs[i].log)});
+      }
+      else { rs.unshift({bed: d.bed, name: d.name, en: d.en, updated: d.date, items: merged, photos: shots, photosLoaded: true, lastReceiver: d.receiverName, log: [entry]}); i = 0; }
+      rec = rs[i];
+      return {residents: rs, cur: i, screen: 'done'};
+    });
+    this.flash('產生 ' + name + '.docx…');
+    this.makeAndSave(d, name, rec);
+  }
+
+  async finishLeave() {
+    const s = this.state, r = s.residents[s.cur];
+    if (!r) return;
+    if (!s.returnBy.trim()) { this.flash('請填點收人'); return; }
+    const leaveMaker = s.returnBy.trim();
+    const today = this.today();
+    const labels = this.itemLabels(r.items);
+    const items = r.items.map((it, i) => ({
+      name: (labels[i] || it.name) + (s.returned[i] ? '（已歸還）' : '（未歸還）'),
+      qty: it.qty, unit: it.unit
+    }));
+    const d = {bed: r.bed, name: r.name, en: r.en, date: today, makeDate: today,
+      receivers: ['前櫃檯'], receiverName: s.returnBy.trim(), maker: leaveMaker, items: items};
+    if (r.demo) {
+      this.setState({screen: 'home', returned: {}, returnTo: '', returnBy: ''});
+      this.flash('示範住民，未寫入雲端');
+      return;
+    }
+    this.flash('產生退住歸還清單…');
+    try {
+      const m = await this.lib('DocxLib');
+      const drive0 = await this.lib('DriveLib');
+      let shots = r.photos || [];
+      if (!shots.length) {
+        try {
+          shots = await drive0.loadPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), bed: r.bed, name: r.name});
+        } catch (e) { shots = []; }
+      }
+      const urls = shots.map(p => (typeof p === 'string' ? p : p.url));
+      const fileName = r.name + '(' + r.en + ')  退住歸還-' + this.rocCompact(today) + ' ' + leaveMaker + '(共 ' + m.pageCount(urls.length) + ' 頁)';
+      const built = await m.buildDocx(Object.assign({}, d, {fileName: fileName}), urls);
+      const drive = await this.lib('DriveLib');
+      const root = this.root();
+      await drive.saveToDrive({endpoint: this.endpoint(), rootFolderId: root, bed: r.bed, name: r.name, blob: built.blob, fileName: built.fileName});
+      // 已歸還的品項移出清單，剩下的留著等下次清點
+      const kept = r.items.filter((it, i) => !s.returned[i]);
+      const backCount = r.items.length - kept.length;
+      const complete = kept.length === 0;
+      const arc = await drive.archiveResident({endpoint: this.endpoint(), rootFolderId: root,
+        bed: r.bed, name: r.name, leaveDate: today, complete: complete});
+      this.setState(st => {
+        const rs = st.residents.slice();
+        const nr = Object.assign({}, rs[st.cur], {left: true, leaveDate: today, updated: today,
+          items: kept, partial: !complete, lastReceiver: leaveMaker});
+        nr.log = [{date: today, text: (complete ? '退住封存 — 全數歸還 ' : '退住封存（未完全歸還）— 本次歸還 ') +
+          backCount + '/' + r.items.length + ' 項' + (complete ? '' : '，尚餘 ' + kept.length + ' 項') + '，' +
+          (st.returnTo.trim() ? '交給 ' + st.returnTo.trim() + '，' : '') + leaveMaker + '點收'}].concat(nr.log);
+        rs[st.cur] = nr;
+        return {residents: rs, screen: 'home', showLeft: true, returned: {}, returnTo: '', returnBy: ''};
+      });
+      const done = this.state.residents[s.cur];
+      await this.syncResident(done);
+      this.flash('已封存至「' + (arc.archiveFolder || '已退住') + ' / ' + arc.folder + '」');
+    } catch (e) {
+      this.flash('退住封存失敗：' + (e.message || e));
+    }
+  }
+
+  takeBack() {
+    const s = this.state, cur = s.residents[s.cur];
+    const it = cur && cur.items[s.takeIdx];
+    if (!it) return;
+    if (!s.takeBy.trim()) { this.flash('請填帶回者'); return; }
+    if (!s.takeMaker.trim()) { this.flash('請填點收人'); return; }
+    const maker = s.takeMaker.trim();
+    const n = Math.min(s.takeQty, it.qty);
+    this.setState(st => {
+      const rs = st.residents.slice();
+      const r = Object.assign({}, rs[st.cur], {lastReceiver: maker});
+      const items = r.items.slice();
+      const left = items[st.takeIdx].qty - n;
+      if (left <= 0) items.splice(st.takeIdx, 1);
+      else items[st.takeIdx] = Object.assign({}, items[st.takeIdx], {qty: left});
+      r.items = items;
+      r.updated = this.today();
+      r.log = [{date: this.today(), text: '家屬帶回 ' + (this.itemLabels(rs[st.cur].items)[st.takeIdx] || it.name) + '（' + st.takeBy.trim() +
+        '，' + maker + '點收）'}].concat(r.log);
+      rs[st.cur] = r;
+      return {residents: rs, takeIdx: -1, takeQty: 1, takeBy: '', takeMaker: ''};
+    });
+    this.flash((this.itemLabels(cur.items)[s.takeIdx] || it.name) + ' 已記為家屬帶回，重出清單中…');
+    this.syncCurrent();
+    setTimeout(() => this.resyncList('家屬帶回 ' + it.name + ' ×' + n, maker), 0);
+  }
+
+  // 從雲端硬碟垃圾桶還原照片後：重新編號、清掉重複，再抓回本機
+  async fixPhotos() {
+    const s = this.state, r = s.residents[s.cur];
+    if (!r) return;
+    if (r.demo) { this.flash('示範住民，無雲端資料夾'); return; }
+    this.flash('整理雲端照片編號…');
+    try {
+      const drive = await this.lib('DriveLib');
+      const res = await drive.renumberPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), bed: r.bed, name: r.name});
+      if (res.error) throw new Error(res.error);
+      const shots = await drive.loadPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), bed: r.bed, name: r.name});
+      this.setState(st => {
+        const rs = st.residents.slice();
+        rs[st.cur] = Object.assign({}, rs[st.cur], {photos: shots, photosLoaded: true});
+        return {residents: rs};
+      });
+      this.flash('已整理 ' + (res.renumbered || 0) + ' 張照片' + (res.dropped ? '，移除 ' + res.dropped + ' 張重複' : ''));
+    } catch (e) {
+      this.flash('整理照片失敗：' + (e.message || e));
+    }
+  }
+
+  // 住民頁開啟時，把雲端照片抓回來（只抓一次）
+  async ensurePhotos(idx) {
+    const r = this.state.residents[idx];
+    if (!r || r.demo || r.left || (r.photos && r.photos.length) || r.photosLoaded) return;
+    this.setState({photosState: 'loading'});
+    try {
+      const drive = await this.lib('DriveLib');
+      const shots = await drive.loadPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), bed: r.bed, name: r.name});
+      this.setState(st => {
+        const rs = st.residents.slice();
+        rs[idx] = Object.assign({}, rs[idx], {photos: this.retagPhotos(shots, rs[idx].items), photosLoaded: true});
+        return {residents: rs, photosState: shots.length ? 'ok' : 'none'};
+      });
+    } catch (e) {
+      this.setState({photosState: 'error'});
+    }
+  }
+
+  // 只留下「合照」與仍在清單上的品項照片
+  keepPhotos(shots, items) {
+    const names = [];
+    (items || []).forEach(it => { names.push(it.name); if (it.uid) names.push(it.uid); });
+    return (shots || []).filter(p => {
+      const tag = typeof p === 'string' ? '__all' : (p.tag || '__all');
+      return tag === '__all' || names.indexOf(tag) >= 0;
+    });
+  }
+
+  // 物品有增減後，用資料庫最新內容重出一份清單存回雲端硬碟
+  async resyncList(reason, maker) {
+    const st = this.state, r = st.residents[st.cur];
+    if (!r) return;
+    if (r.demo) { this.flash('示範住民，未寫入雲端'); return; }
+    if (r.left) { this.flash('已退住住民，不再更新雲端清單'); return; }
+    const today = this.today();
+    const d = {bed: r.bed, name: r.name, en: r.en, date: today, makeDate: today,
+      receivers: ['前櫃檯'], receiverName: maker || r.lastReceiver || '',
+      maker: maker || r.lastReceiver || '', items: r.items};
+    try {
+      const m = await this.lib('DocxLib');
+      const drive = await this.lib('DriveLib');
+      // 這裡是 replace 上傳：一定要拿到雲端完整的照片，否則會把沒帶到的舊照片刪掉
+      let shots = r.photos || [];
+      if (!r.photosLoaded || !shots.length) {
+        try {
+          const cloud = await drive.loadPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), bed: r.bed, name: r.name});
+          if (cloud.length) shots = cloud;
+        } catch (e) {
+          this.flash('讀不到雲端照片，已取消更新以免刪到舊照片');
+          return;
+        }
+      }
+      shots = this.keepPhotos(shots, this.state.residents[this.state.cur].items);
+      const urls = shots.map(p => (typeof p === 'string' ? p : p.url));
+      const pages = m.pageCount(urls.length);
+      const built = await m.buildDocx(Object.assign({}, d, {fileName: m.autoFileName(d, pages)}), urls);
+      const res = await drive.saveToDrive({
+        endpoint: this.endpoint(),
+        rootFolderId: this.root(),
+        bed: r.bed, name: r.name, blob: built.blob, fileName: built.fileName,
+        photos: await m.shrinkAll(shots), photoMode: 'replace'
+      });
+      this.setState(st => {
+        const rs = st.residents.slice();
+        rs[st.cur] = Object.assign({}, rs[st.cur], {photos: shots});
+        return {residents: rs, driveLink: res.webViewLink || ''};
+      });
+      this.flash('雲端清單已更新（' + reason + '）');
+    } catch (e) {
+      this.flash('雲端清單更新失敗：' + (e.message || e));
+    }
+  }
+
+  async moveResident() {
+    const s = this.state, cur = s.residents[s.cur];
+    const bed = String(s.newBed || '').trim();
+    if (!cur || !bed) { this.flash('請輸入新床號'); return; }
+    if (bed === cur.bed) { this.setState({movingBed: false}); return; }
+    const from = cur.bed;
+    this.setState(st => {
+      const rs = st.residents.slice();
+      const r = Object.assign({}, rs[st.cur], {bed: bed, updated: this.today()});
+      r.log = [{date: this.today(), text: '換房 ' + from + ' → ' + bed}].concat(r.log);
+      rs[st.cur] = r;
+      return {residents: rs, movingBed: false, newBed: ''};
+    });
+    this.flash('已換房 ' + from + ' → ' + bed);
+    this.syncCurrent();
+    if (cur.demo) return;
+    try {
+      const drive = await this.lib('DriveLib');
+      const res = await drive.renameFolder({
+        endpoint: this.endpoint(),
+        rootFolderId: this.root(),
+        bed: bed, name: cur.name
+      });
+      this.flash('雲端資料夾已更名為「' + res.folder + '」');
+    } catch (e) {
+      this.flash('床號已改，但雲端資料夾更名失敗：' + (e.message || e));
+    }
+  }
+
+  root() { return this.props.driveFolderId || '1I-5e060RVqVc7kaVHdDBf1-MquajEYkH'; }
+
+  // ================= 消耗品及食品 =================
+  newCDraft() {
+    return {bed: '', name: '', en: '', date: this.today(), items: [], custom: '', expiry: '', remindDate: ''};
+  }
+  cd() { return this.state.cDraft || this.newCDraft(); }
+  setCDraft(patch) { this.setState(s => ({cDraft: Object.assign({}, s.cDraft || this.newCDraft(), patch)})); }
+
+  // 民國 115.9.5 ←→ Date
+  rocToDate(str) {
+    const p = String(str || '').split('.');
+    if (p.length < 3) return null;
+    const d = new Date(Number(p[0]) + 1911, Number(p[1]) - 1, Number(p[2]));
+    return isNaN(d.getTime()) ? null : d;
+  }
+  dateToRoc(d) { return (d.getFullYear() - 1911) + '.' + pad2c(d.getMonth() + 1) + '.' + pad2c(d.getDate()); }
+  rocToIso(str) {
+    const d = this.rocToDate(str);
+    return d ? d.getFullYear() + '-' + pad2c(d.getMonth() + 1) + '-' + pad2c(d.getDate()) : '';
+  }
+  isoToRoc(v) {
+    if (!v) return '';
+    const p = String(v).split('-');
+    return this.dateToRoc(new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])));
+  }
+  plusDays(n) { const d = new Date(); d.setDate(d.getDate() + n); return this.dateToRoc(d); }
+
+  // 在照片下方壓一條半透明底，寫上日期／中文名／英文名
+  burnCaption(url, lines) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const maxW = 1400;
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        const base = Math.max(20, Math.round(w * 0.042));
+        const pad = Math.round(base * 0.55);
+        const barH = pad * 2 + base * lines.length + Math.round(base * 0.22) * (lines.length - 1);
+        ctx.fillStyle = 'rgba(0,0,0,.56)';
+        ctx.fillRect(0, h - barH, w, barH);
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#fff';
+        let y = h - barH + pad;
+        lines.forEach((ln, i) => {
+          ctx.font = (i === 0 ? '600 ' : '') + base + 'px "Noto Sans TC", sans-serif';
+          ctx.fillText(ln, pad, y);
+          y += base + Math.round(base * 0.22);
+        });
+        resolve(cv.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => resolve(url);
+      img.src = url;
+    });
+  }
+
+  captionLines() {
+    const d = this.cd();
+    return [d.date, d.name, d.en].filter(Boolean);
+  }
+
+  // 品項文字：每項後面帶自己的效期，例如「尿布 ×2（效期 115.12.01）、水果（效期 115.10.05）」
+  consumItemText(items) {
+    return (items || []).map(x =>
+      x.name + (x.qty > 1 ? ' ×' + x.qty : '') + (x.expiry ? '（效期 ' + x.expiry + '）' : '')
+    ).join('、');
+  }
+  // 整批的「有效期限」欄記最接近到期的那一項，方便一眼看到最急的
+  earliestConsumExpiry(items) {
+    const es = (items || []).map(x => x && x.expiry).filter(Boolean);
+    if (!es.length) return '';
+    return es.slice().sort((a, b) => this.dateOrder(a) - this.dateOrder(b))[0];
+  }
+
+  async previewCaptions() {
+    const shots = this.state.cPhotos || [];
+    if (!shots.length) { this.flash('請先拍照'); return; }
+    this.flash('加字中…');
+    const lines = this.captionLines();
+    const out = [];
+    for (const p of shots) out.push(await this.burnCaption(p.url, lines));
+    this.setState({cStamped: out, screen: 'cDone', cSaved: false});
+    this.saveConsum();   // 加完字就直接存，不讓同仁有機會漏掉
+  }
+
+  async shareStamped() {
+    const urls = this.state.cStamped || [];
+    if (!urls.length) return;
+    try {
+      const files = await Promise.all(urls.map(async (u, i) => {
+        const blob = await (await fetch(u)).blob();
+        return new File([blob], (this.cd().name || '消耗品') + '_' + (i + 1) + '.jpg', {type: 'image/jpeg'});
+      }));
+      if (navigator.canShare && navigator.canShare({files: files})) {
+        await navigator.share({files: files, title: this.cd().name});
+        return;
+      }
+      throw new Error('不支援分享');
+    } catch (e) {
+      // 分享不支援就逐張下載，讓同仁自己貼
+      (this.state.cStamped || []).forEach((u, i) => {
+        const a = document.createElement('a');
+        a.href = u; a.download = (this.cd().name || '消耗品') + '_' + (i + 1) + '.jpg';
+        document.body.appendChild(a); a.click(); a.remove();
+      });
+      this.flash('已下載到手機，請自行貼到 LINE');
+    }
+  }
+
+  async saveConsum() {
+    const d = this.cd(), urls = this.state.cStamped || [];
+    if (!d.name) { this.flash('請先選住民'); return; }
+    this.setState({cSaving: true});
+    this.flash('存進雲端…');
+    try {
+      const drive = await this.lib('DriveLib');
+      const photos = urls.map(u => ({data: String(u).split(',')[1]}));
+      await drive.saveConsumable({
+        endpoint: this.endpoint(), rootFolderId: this.root(),
+        bed: d.bed, name: d.name, en: d.en, date: d.date,
+        itemText: this.consumItemText(d.items),
+        expiry: this.earliestConsumExpiry(d.items), remindDate: d.remindDate, photos: photos
+      });
+      this.setState({cSaving: false, cSaved: true});
+      this.dropPending('consum:' + d.date, d.name);
+      this.flash('已存進雲端「消耗品 / ' + d.bed + ' ' + d.name + '」');
+      this.loadConsum(true);
+    } catch (e) {
+      // 跟物品清單同一套待補上傳機制，失敗不會無聲消失
+      this.addPending({kind: 'consum', bed: 'consum:' + d.date, name: d.name,
+        consum: Object.assign({}, d, {photos: urls.map(u => ({data: String(u).split(',')[1]}))}),
+        err: String(e.message || e)});
+      this.setState({cSaving: false, cSaved: false});
+      this.flash('存雲端失敗，已列入待補上傳');
+    }
+  }
+
+  async loadConsum(force) {
+    if (this.state.consumState === 'loading') return;
+    if (!force && (this.state.consum || []).length) return;
+    this.setState({consumState: 'loading'});
+    try {
+      const drive = await this.lib('DriveLib');
+      const rows = await drive.loadConsumables({endpoint: this.endpoint(), rootFolderId: this.root()});
+      this.setState({consum: rows, consumState: 'ok'});
+    } catch (e) {
+      this.setState({consumState: 'error', consumError: String(e.message || e)});
+    }
+  }
+
+  async delConsum(rowId) {
+    try {
+      const drive = await this.lib('DriveLib');
+      const res = await drive.deleteConsumable({endpoint: this.endpoint(), rootFolderId: this.root(), rowId: rowId});
+      this.setState({cDelId: -1});
+      this.flash(res.noStamp ? '已刪除紀錄，但這是舊資料，照片需自行到雲端刪除'
+        : '已刪除這筆登記與 ' + (res.photosTrashed || 0) + ' 張照片');
+      // 刪列會讓後面的 rowId 位移，一定要重抓
+      this.loadConsum(true);
+    } catch (e) { this.flash('刪除失敗：' + (e.message || e)); }
+  }
+
+  // 一筆紀錄的照片檢視狀態（查詢結果與最近登記共用）
+  photoProps(r) {
+    const s = this.state;
+    const cache = s.cPhotoCache || {};
+    const purged = r.photoState === '已清除';
+    const list = cache[r.rowId] || [];
+    const open = s.cPhotoOpen === r.rowId;
+    const loading = s.cPhotoLoading === r.rowId;
+    const err = (s.cPhotoErrs || {})[r.rowId] || '';
+    const settled = open && !loading && !err && !!cache[r.rowId];
+    return {
+      photoNote: purged ? '已超過照片保留時限（六個月），所以沒有照片'
+        : r.photoCount ? r.photoCount + ' 張照片' : '這筆沒有照片',
+      photoNoteFg: purged ? '#A8431F' : (r.photoCount ? '#3E7530' : '#8A8E80'),
+      canOpen: !purged && !!r.photoCount,
+      open: open,
+      toggleLabel: open ? '收起照片' : '看照片',
+      toggle: () => this.openCPhotos(r),
+      loading: loading,
+      loaded: settled && list.length > 0,
+      empty: settled && list.length === 0,
+      hasErr: open && !loading && !!err,
+      errMsg: '讀取失敗：' + err + '（可能是後端還沒重新部署）',
+      retry: () => {
+        this.setState(st => ({
+          cPhotoOpen: -1,
+          cPhotoErrs: Object.assign({}, st.cPhotoErrs, {[r.rowId]: ''})
+        }), () => this.openCPhotos(r));
+      },
+      photos: list.map((p, i) => ({
+        img: React.createElement('a',
+          {href: p.url, target: '_blank', rel: 'noopener', style: {display: 'block'}},
+          React.createElement('img', {src: p.src, alt: p.name,
+            style: {width: '100%', height: 120, objectFit: 'cover', display: 'block', background: '#EDEBE2'}})),
+        label: '第 ' + (i + 1) + ' 張 · 點開原圖'
+      }))
+    };
+  }
+
+  // 點「看照片」才去雲端抓，抓過就留在記憶體
+  async openCPhotos(row) {
+    const cache = this.state.cPhotoCache || {};
+    if (this.state.cPhotoOpen === row.rowId) { this.setState({cPhotoOpen: -1}); return; }
+    this.setState({cPhotoOpen: row.rowId});
+    if (cache[row.rowId]) return;
+    this.setState(s => ({cPhotoLoading: row.rowId, cPhotoErrs: Object.assign({}, s.cPhotoErrs, {[row.rowId]: ''})}));
+    try {
+      const drive = await this.lib('DriveLib');
+      const photos = await drive.loadConsumPhotos({
+        endpoint: this.endpoint(), rootFolderId: this.root(),
+        bed: row.bed, name: row.name, stamp: row.stamp
+      });
+      this.setState(s => ({
+        cPhotoCache: Object.assign({}, s.cPhotoCache, {[row.rowId]: photos}),
+        cPhotoLoading: -1
+      }));
+    } catch (e) {
+      // 失敗不進快取，否則會被誤讀成「照片不存在」，且重新部署後端後也解不開
+      this.setState(s => ({
+        cPhotoLoading: -1,
+        cPhotoErrs: Object.assign({}, s.cPhotoErrs, {[row.rowId]: String(e.message || e)})
+      }));
+      this.flash('讀取照片失敗：' + (e.message || e));
+    }
+  }
+
+  async doneConsum(rowId) {
+    try {
+      const drive = await this.lib('DriveLib');
+      await drive.markConsumDone({endpoint: this.endpoint(), rootFolderId: this.root(), rowId: rowId});
+      this.setState(s => ({consum: s.consum.map(r => r.rowId === rowId ? Object.assign({}, r, {done: true}) : r)}));
+      this.flash('已標記提醒完成');
+    } catch (e) { this.flash('更新失敗：' + (e.message || e)); }
+  }
+
+  rosterId() { return this.props.rosterSheetId || '1GqHGNkMonvWF9FAUyb8dVe8hU1HqaDmxzs94rjC1LSE'; }
+  rosterTab() { return this.props.rosterSheetName || '住民床位總表'; }
+
+  // 只在新增清單時用：載入另一套系統的住民名單供挑選
+  // 名單快取存在這台手機，下次一進登記頁就先秒顯示，不用等雲端
+  rosterCacheKey() { return 'roster_cache_' + this.rosterId() + '_' + this.rosterTab(); }
+  loadRosterCache() {
+    try { return JSON.parse(localStorage.getItem(this.rosterCacheKey()) || '[]') || []; }
+    catch (e) { return []; }
+  }
+  saveRosterCache(list) {
+    try { localStorage.setItem(this.rosterCacheKey(), JSON.stringify(list || [])); } catch (e) {}
+  }
+
+  async ensureRoster() {
+    if (!this.rosterId()) return;
+    // 先用手機上次存的名單讓下拉立刻有東西可選（可以馬上選人），雲端最新版在背景默默補上
+    if (!this.state.roster.length) {
+      const cached = this.loadRosterCache();
+      if (cached.length) this.setState({roster: cached, rosterState: 'ok'});
+    }
+    // 同一次開 App 內，雲端抓成功一次就不再重抓
+    if (this._rosterLoading || this._rosterFresh) return;
+    this._rosterLoading = true;
+    if (!this.state.roster.length) this.setState({rosterState: 'loading'});
+    try {
+      const drive = await this.lib('DriveLib');
+      const list = await drive.loadRoster({endpoint: this.endpoint(), rosterSheetId: this.rosterId(),
+        rosterSheetName: this.rosterTab()});
+      this._rosterFresh = true;
+      if (list.length) { this.setState({roster: list, rosterState: 'ok'}); this.saveRosterCache(list); }
+      else if (!this.state.roster.length) this.setState({rosterState: 'empty'});
+    } catch (e) {
+      // 抓失敗但手機已有舊名單就沿用，不清空、不擋畫面
+      if (!this.state.roster.length) this.setState({rosterState: 'error', rosterError: String(e.message || e)});
+    }
+    this._rosterLoading = false;
+  }
+
+  // 名單有些是「呂勝雄 Sheng Syong」寫在同一格，拆成中文名與英文名
+  splitName(raw) {
+    const t = String(raw || '').trim();
+    const zh = (t.match(/[\u4e00-\u9fff]+/g) || []).join('');
+    const en = t.replace(/[\u4e00-\u9fff]+/g, ' ').replace(/[（）()]/g, ' ').replace(/\s+/g, ' ').trim();
+    return {zh: zh || t, en: en};
+  }
+
+  pickRoster(p) {
+    const s = this.state;
+    const sp = this.splitName(p.name);
+    const name = sp.zh, en = (p.en || '').trim() || sp.en;
+    const bed = this.normBed(p.bed);
+    const idx = s.residents.findIndex(r => !r.left && r.name === name);
+    const dup = idx >= 0 ? s.residents[idx] : null;
+    this.setDraft({name: name, en: en, bed: bed || this.d().bed});
+    this.setState({
+      // 已在資料庫：提醒並提供跳到舊紀錄；床號不同時另外問要不要改
+      dupIdx: dup ? idx : -1,
+      dupBed: dup && bed && this.normBed(dup.bed) !== bed ? bed : '',
+      dupOldBed: dup ? dup.bed : ''
+    });
+  }
+
+  async refreshRoster() {
+    this.setState({roster: [], rosterState: '', rosterSel: ''});
+    this._rosterLoading = false;
+    this._rosterFresh = false;   // 強制重新向雲端抓最新名單
+    await this.ensureRoster();
+    this.flash('名單已重新讀取');
+  }
+
+  // 等 helmet 裡的腳本載完（打包成單檔時會晚一點才執行）
+  lib(name) {
+    if (window[name]) return Promise.resolve(window[name]);
+    return new Promise((res, rej) => {
+      let n = 0;
+      const t = setInterval(() => {
+        if (window[name]) { clearInterval(t); res(window[name]); }
+        else if (++n > 120) { clearInterval(t); rej(new Error(name + ' 載入失敗')); }
+      }, 50);
+    });
+  }
+
+  async componentDidMount() {
+    // 只在第一次啟動時從 localStorage 還原；已在記憶體的佇列較完整（含照片），不要蓋掉
+    if (!this._pending) { this._pending = this.loadPending(); this.setState({pendingCount: this._pending.length}); }
+    try {
+      const drive = await this.lib('DriveLib');
+      const list = await drive.loadResidents({endpoint: this.endpoint(), rootFolderId: this.root()});
+      if (list.length) {
+        let rs = list.map(r => this.normalizeResident(Object.assign({photos: []}, r)));
+        // 還沒上傳成功的住民，雲端查不到，補回清單以免同仁以為資料不見了
+        (this._pending || []).forEach(p => {
+          if (p.rec && !rs.some(r => r.name === p.rec.name && !r.left)) {
+            rs.unshift(this.normalizeResident(Object.assign({photos: []}, p.rec, {unsynced: true})));
+          }
+        });
+        this.setState({residents: rs, cur: 0, dbState: 'loaded'});
+        this.flash('已載入雲端資料庫（' + list.length + ' 位）');
+      } else {
+        this.setState({dbState: 'empty'});
+      }
+    } catch (e) {
+      this.setState({dbState: 'error', dbError: String(e.message || e)});
+      this.flash('雲端連線失敗：' + (e.message || e));
+    }
+  }
+
+  // 把一位住民寫回雲端資料庫（示範資料不寫）
+  async syncResident(r) {
+    if (!r || r.demo) return;
+    try {
+      const drive = await this.lib('DriveLib');
+      await drive.saveResident({endpoint: this.endpoint(), rootFolderId: this.root(),
+        resident: {bed: r.bed, name: r.name, en: r.en, left: !!r.left, leaveDate: r.leaveDate || '',
+          updated: r.updated, items: r.items, log: r.log}});
+      this.setState({dbState: 'saved'});
+    } catch (e) {
+      this.setState({dbState: 'error', dbError: String(e.message || e)});
+      this.flash('資料庫同步失敗：' + (e.message || e));
+    }
+  }
+
+  // ---- 誤登記修正：改品名／改數量／刪掉整筆 ----
+  applyFix(i, patch) {
+    const s = this.state, cur = s.residents[s.cur];
+    if (!cur || !cur.items[i]) return;
+    const old = cur.items[i];
+    const items = cur.items.slice();
+    items[i] = Object.assign({}, old, patch);
+    const bits = [];
+    if (patch.name && patch.name !== old.name) bits.push(old.name + ' → ' + patch.name);
+    if (patch.qty && Number(patch.qty) !== Number(old.qty)) bits.push('數量 ' + old.qty + ' → ' + patch.qty);
+    if (!bits.length) { this.setState({fixIdx: -1}); return; }
+    this.commitItems(items, '修正登記：' + bits.join('、'));
+  }
+
+  deleteItem(i) {
+    const s = this.state, cur = s.residents[s.cur];
+    if (!cur || !cur.items[i]) return;
+    const gone = cur.items[i];
+    const key = gone.uid || gone.name;
+    const items = cur.items.filter((_, j) => j !== i);
+    // 照片一起清掉，避免留下對不到物品的孤兒照片
+    this.commitItems(items, '刪除誤登記：' + gone.name + ' ' + gone.qty + ' ' + gone.unit, key);
+  }
+
+  commitItems(items, logText, dropTag) {
+    this.setState(st => {
+      const rs = st.residents.slice();
+      const r = Object.assign({}, rs[st.cur]);
+      r.items = items;
+      r.updated = this.today();
+      r.log = [{date: this.today(), text: logText}].concat(r.log || []);
+      if (dropTag) r.photos = (r.photos || []).filter(p => (p.tag || '__all') !== dropTag);
+      rs[st.cur] = r;
+      return {residents: rs, fixIdx: -1, openItem: -1, confirmDel: -1};
+    }, () => {
+      this.syncCurrent();
+      this.flash(logText);
+    });
+  }
+
+  syncCurrent() {
+    clearTimeout(this._dbT);
+    this._dbT = setTimeout(() => {
+      const s = this.state;
+      this.syncResident(s.residents[s.cur]);
+    }, 400);
+  }
+
+  endpoint() {
+    return this.props.driveEndpoint || 'https://script.google.com/macros/s/AKfycbwN0nILIfWhTlZAgOUnuVt9TuvaLAJG3RRPMA7XDQWS5-c2Up8rghz7mU89_Ez6GsjT/exec';
+  }
+
+  docData(d, name) {
+    return {bed: d.bed, name: d.name, en: d.en, date: d.date, makeDate: d.makeDate || d.date,
+      receivers: d.receivers, receiverName: d.receiverName, maker: d.receiverName,
+      items: d.items, fileName: name};
+  }
+
+  async makeAndSave(d, name, rec) {
+    let shots = [];
+    try {
+      const m = await this.lib('DocxLib');
+      const built = await m.buildDocx(this.docData(d, name), this.state.photos.map(p => p.url));
+      this.setState({lastFile: built.fileName, lastPages: built.pages});
+      const endpoint = this.endpoint();
+      if (!endpoint) {
+        await m.downloadDocx(this.docData(d, name), this.state.photos.map(p => p.url));
+        this.setState({driveState: 'off'});
+        this.flash(built.fileName + ' 已下載（共 ' + built.pages + ' 頁）');
+        return;
+      }
+      this.setState({driveState: 'saving'});
+      const drive = await this.lib('DriveLib');
+      shots = await m.shrinkAll(this.state.photos.map(p => ({url: p.url, tag: p.tag || '__all'})));
+      const res = await drive.saveToDrive({
+        endpoint: endpoint,
+        rootFolderId: this.root(),
+        bed: d.bed, name: d.name, blob: built.blob, fileName: built.fileName,
+        photos: shots, photoMode: 'append',
+        record: rec ? {bed: rec.bed, name: rec.name, en: rec.en, left: !!rec.left,
+          leaveDate: rec.leaveDate || '', updated: rec.updated, items: rec.items, log: rec.log} : null
+      });
+      this.setState({driveState: 'saved', driveLink: res.webViewLink || ''});
+      if (res.dbSaved) this.setState({dbState: 'saved'});
+      else { const s2 = this.state; await this.syncResident(rec || s2.residents[s2.cur]); }
+      this.dropPending(d.bed, d.name);
+      this.flash('已存進雲端硬碟：' + d.bed + ' ' + d.name);
+    } catch (e) {
+      // 上傳失敗：進待補上傳清單（首頁會一直顯示，不會被吃掉）
+      this.addPending({bed: d.bed, name: d.name, fileName: name, draft: d,
+        rec: rec, photos: shots, err: String(e.message || e)});
+      this.setState({driveState: 'error', driveError: String(e.message || e)});
+      this.flash('存雲端失敗，已列入待補上傳');
+      try {
+        const m = await this.lib('DocxLib');
+        await m.downloadDocx(this.docData(d, name), this.state.photos.map(p => p.url));
+      } catch (e2) { this.flash('產生 .docx 失敗，請再試一次'); }
+    }
+  }
+
+  // ---- 待補上傳（上傳失敗時不讓資料無聲消失）----
+  pendingKey() { return 'wpqueue-v1'; }
+  loadPending() {
+    try { return JSON.parse(localStorage.getItem(this.pendingKey()) || '[]'); } catch (e) { return []; }
+  }
+  writePending(list) {
+    this._pending = list;
+    try { localStorage.setItem(this.pendingKey(), JSON.stringify(list)); }
+    catch (e) {
+      // 照片太多塞不進 localStorage：至少留下紀錄，重試時只補資料庫那筆
+      try { localStorage.setItem(this.pendingKey(), JSON.stringify(list.map(p => Object.assign({}, p, {photos: [], tooBig: true})))); } catch (e2) {}
+    }
+    this.setState({pendingCount: list.length});
+  }
+  addPending(entry) {
+    const list = (this._pending || this.loadPending()).filter(p => !(p.bed === entry.bed && p.name === entry.name));
+    list.push(entry);
+    this.writePending(list);
+  }
+  dropPending(bed, name) {
+    const list = (this._pending || this.loadPending()).filter(p => !(p.bed === bed && p.name === name));
+    this.writePending(list);
+  }
+  async retryPending() {
+    const list = (this._pending || this.loadPending()).slice();
+    if (!list.length) return;
+    this.flash('重新上傳 ' + list.length + ' 筆…');
+    const m = await this.lib('DocxLib');
+    const drive = await this.lib('DriveLib');
+    let ok = 0, fail = 0, lastErr = '';
+    for (const p of list) {
+      try {
+        if (p.kind === 'consum') {
+          const c = p.consum || {};
+          await drive.saveConsumable({
+            endpoint: this.endpoint(), rootFolderId: this.root(),
+            bed: c.bed, name: c.name, en: c.en, date: c.date,
+            itemText: this.consumItemText(c.items),
+            expiry: this.earliestConsumExpiry(c.items), remindDate: c.remindDate, photos: c.photos || []
+          });
+          this.dropPending(p.bed, p.name);
+          ok++;
+          continue;
+        }
+        // shrinkAll 存下來的是 {data, tag}，要轉回 data URL 才進得了文件
+        const urls = (p.photos || []).map(x => x.url || (x.data ? 'data:image/jpeg;base64,' + x.data : x));
+        const built = await m.buildDocx(this.docData(p.draft, p.fileName), urls);
+        const res = await drive.saveToDrive({
+          endpoint: this.endpoint(), rootFolderId: this.root(),
+          bed: p.bed, name: p.name, blob: built.blob, fileName: built.fileName,
+          photos: p.photos && p.photos.length ? p.photos : null, photoMode: 'append',
+          record: p.rec ? {bed: p.rec.bed, name: p.rec.name, en: p.rec.en, left: !!p.rec.left,
+            leaveDate: p.rec.leaveDate || '', updated: p.rec.updated, items: p.rec.items, log: p.rec.log} : null
+        });
+        if (!res.dbSaved && p.rec) await this.syncResident(p.rec);
+        this.dropPending(p.bed, p.name);
+        ok++;
+      } catch (e) { fail++; lastErr = String(e.message || e); }
+    }
+    const lost = list.filter(p => p.tooBig).length;
+    this.flash(fail ? ('補傳 ' + ok + ' 筆，仍失敗 ' + fail + ' 筆：' + lastErr)
+      : ('已補傳 ' + ok + ' 筆' + (lost ? '，其中 ' + lost + ' 筆缺照片頁，請重新拍照登記' : '，雲端同步完成')));
+    if (!fail) this.componentDidMount();
+  }
+
+  onFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    const add = files.map(f => ({url: URL.createObjectURL(f), tag: '__all'}));
+    this.setState(s => ({photos: s.photos.concat(add)}));
+    e.target.value = '';
+  };
+
+  renderVals() {
+    const s = this.state;
+    const d = this.d();
+    const cur = s.residents[s.cur] || s.residents[0];
+    const scr = s.screen;
+    const titles = {
+      hub: ['線東大眾護理之家', '選擇要登記的類型'],
+      cHome: ['消耗品及食品', '拍照加註 · 提醒補貨'],
+      cNew: ['登記消耗品', '選住民 · 品項 · 提醒日'],
+      cPhotos: ['拍照', '每張都會加上同一組字'],
+      cDone: ['加字完成', '分享到 LINE 或存雲端'],
+      home: ['住民用品清單', '手機拍照製表 · 雲端資料庫'],
+      basic: ['清單表頭', '姓名 / 床號 / 日期 / 點收'],
+      items: ['品項與數量', '常用一鍵加入'],
+      photos: ['拍照', '張數不限，可刪可補'],
+      preview: ['文件預覽', '與 Word 版面一致'],
+      done: ['完成', '已存入雲端硬碟'],
+      resident: [cur ? cur.name + ' 的物品' : '住民物品', '資料庫即時增減'],
+      ret: ['退住歸還核對', '逐項核對 · 記錄點收人']
+    };
+    const steps = {basic: 'STEP 1/4', items: 'STEP 2/4', photos: 'STEP 3/4', preview: 'STEP 4/4'};
+    const t = titles[scr] || titles.home;
+    const cdraft = this.cd();
+
+    const primary = {
+      hub: ['', () => {}],
+      cHome: ['＋ 登記消耗品', () => { this.setState({cDraft: this.newCDraft(), cPhotos: [], cStamped: [], cRosterSel: '', screen: 'cNew'}); this.ensureRoster(); }],
+      cNew: ['下一步：拍照', () => {
+        const cdd = this.cd();
+        if (!cdd.name) { this.flash('請先選住民'); return; }
+        if (!cdd.items.length) { this.flash('至少加入一個品項'); return; }
+        this.go('cPhotos');
+      }],
+      cPhotos: ['加上日期姓名', () => this.previewCaptions()],
+      cDone: ['分享到 LINE', () => this.shareStamped()],
+      home: ['＋ 新增清單', () => { this.setState({draft: this.newDraft(null), photos: [], fileNameEdited: null, screen: 'basic', rosterSel: '', dupIdx: -1, dupBed: '', dupOldBed: ''}); this.ensureRoster(); }],
+      basic: ['下一步：品項', () => {
+        if (!d.name || !d.bed) { this.flash('請先填姓名與床號'); return; }
+        if (!String(d.receiverName || '').trim()) { this.flash('請填點收人'); return; }
+        this.go('items');
+      }],
+      items: ['下一步：拍照', () => { if (!d.items.length) { this.flash('至少加入一項物品'); return; } this.go('photos'); }],
+      photos: ['預覽文件', () => this.go('preview')],
+      preview: ['製表並存進雲端硬碟', () => this.commit()],
+      done: ['回住民清單', () => this.go('home')],
+      resident: (cur && cur.left && (cur.items || []).length > 0)
+        ? ['繼續清點歸還', () => this.setState({screen: 'ret', returned: {}})]
+        : ['以此住民新增清單', () => { this.setState({draft: this.newDraft(cur), photos: [], fileNameEdited: null, screen: 'basic'}); }],
+      ret: ['完成退住並封存', () => this.finishLeave()]
+    }[scr] || ['繼續', () => {}];
+
+    const secondary = {
+      hub: ['', () => {}],
+      cHome: ['回主選單', () => this.go('hub')],
+      cNew: ['取消', () => this.go('cHome')],
+      cPhotos: ['上一步', () => this.go('cNew')],
+      // 存好之後這顆改成「再記一筆」，開一筆全新的空白登記（跟消耗品首頁「＋登記消耗品」一樣）；
+      // 還沒存成功／失敗時維持「存進雲端」讓同仁重按。
+      cDone: s.cSaved
+        ? ['＋ 再記一筆', () => { this.setState({cDraft: this.newCDraft(), cPhotos: [], cStamped: [], cRosterSel: '', screen: 'cNew'}); this.ensureRoster(); }]
+        : ['存進雲端', () => this.saveConsum()],
+      home: ['搜尋清空', () => this.setState({query: ''})],
+      basic: ['取消', () => this.go('home')],
+      items: ['上一步', () => this.go('basic')],
+      photos: ['上一步', () => this.go('items')],
+      preview: ['上一步', () => this.go('photos')],
+      done: ['看物品紀錄', () => { this.go('resident'); this.ensurePhotos(this.state.cur); }],
+      resident: ['退住核對', () => this.setState({screen: 'ret', returned: {}})],
+      ret: ['返回', () => this.go('resident')]
+    }[scr] || ['返回', () => this.go('home')];
+
+    const q = s.query.trim();
+    const showLeft = !!s.showLeft;
+    const visible = s.residents
+      .filter(r => showLeft ? r.left : !r.left)
+      .filter(r => !q || r.bed.indexOf(q) >= 0 || r.name.indexOf(q) >= 0 || (r.en || '').toLowerCase().indexOf(q.toLowerCase()) >= 0)
+      .slice()
+      .sort((a, b) => s.sortBy === 'bed' ? this.bedOrder(a.bed) - this.bedOrder(b.bed) : this.dateOrder(this.createdOf(b)) - this.dateOrder(this.createdOf(a)));
+    const leftCount = s.residents.filter(r => r.left).length;
+
+    const tagOpts = [{value: '__all', label: '全部品項（合照）'}];
+    d.items.forEach(it => {
+      const q = Math.max(1, Number(it.qty) || 1);
+      for (let k = 1; k <= q; k++) {
+        tagOpts.push({value: it.name + '#' + k, label: q > 1 ? it.name + ' ' + this.circled(k) : it.name});
+      }
+    });
+    const tagLabel = (v) => {
+      if (v === '__all') return '全部品項';
+      const hit = tagOpts.filter(o => o.value === v)[0];
+      return hit ? hit.label : String(v).replace(/#\d+$/, '');
+    };
+
+    const returnedCount = (cur ? cur.items : []).filter((it, i) => s.returned[i]).length;
+
+    return {
+      instName: this.props.institutionName ?? '線東大眾護理之家',
+      syncLabel: {loading: '連線中…', loaded: '雲端已載入', saved: '雲端已同步', empty: '資料庫空的', error: '雲端連線失敗'}[s.dbState] || '雲端已同步',
+      title: t[0], subtitle: t[1], stepLabel: steps[scr] || '',
+      isHome: scr === 'home', isBasic: scr === 'basic', isItems: scr === 'items',
+      isPhotos: scr === 'photos', isPreview: scr === 'preview', isDone: scr === 'done',
+      isResident: scr === 'resident', isReturn: scr === 'ret',
+      back: () => this.go({hub: 'hub', home: 'hub', cHome: 'hub', cNew: 'cHome', cPhotos: 'cNew', cDone: 'cPhotos', ret: 'resident'}[scr] || 'home'),
+      goHub: () => this.go('hub'),
+      isHub: scr === 'hub', isCHome: scr === 'cHome', isCNew: scr === 'cNew',
+      isCPhotos: scr === 'cPhotos', isCDone: scr === 'cDone',
+      ctaDisplay: scr === 'hub' ? 'none' : 'flex',
+      backDisplay: scr === 'hub' ? 'none' : 'block',
+      primaryLabel: primary[0], primaryAction: primary[1],
+      secondaryLabel: secondary[0], secondaryAction: secondary[1],
+      toast: s.toast, hasToast: !!s.toast,
+
+      jumps: [
+        {label: '住民清單', go: () => this.go('home')},
+        {label: '表頭', go: () => { if (!s.draft) this.setState({draft: this.newDraft(null)}); this.go('basic'); }},
+        {label: '品項', go: () => { if (!s.draft) this.setState({draft: this.newDraft(this.state.residents[0])}); this.go('items'); }},
+        {label: '拍照', go: () => this.go('photos')},
+        {label: '預覽', go: () => this.go('preview')},
+        {label: '物品紀錄', go: () => { this.go('resident'); this.ensurePhotos(this.state.cur); }},
+        {label: '退住核對', go: () => this.setState({screen: 'ret', returned: {}})}
+      ],
+
+      hasPending: s.pendingCount > 0,
+      pendingMsg: s.pendingCount + ' 筆登記還沒上傳到雲端（'
+        + (this._pending || []).map(p => (p.kind === 'consum' ? '消耗品 · ' : '清單 · ') + p.name).join('、')
+        + '）。資料留在這台手機，按重新上傳即可補上。'
+        + ((this._pending || []).some(p => p.tooBig) ? '　⚠ 其中有幾筆照片太多，重開 App 後照片已無法保留，補傳的清單不會有照片頁，請重新拍照登記那幾筆。' : ''),
+      retryPending: () => this.retryPending(),
+      hasDbError: s.dbState === 'error', dbError: s.dbError,
+      retryDb: () => { this.setState({dbState: 'loading', dbError: ''}); this.componentDidMount(); },
+      refreshing: s.dbState === 'loading',
+      refreshLabel: s.dbState === 'loading' ? '讀取中…' : '↻ 重新整理',
+      refreshDb: () => {
+        if (this.state.dbState === 'loading') return;
+        this.setState({dbState: 'loading', dbError: '', query: ''});
+        this.flash('重新讀取雲端資料庫…');
+        this.componentDidMount();
+      },
+      query: s.query, onQuery: (e) => this.setState({query: e.target.value}),
+      sortBed: s.sortBy === 'bed', sortDate: s.sortBy === 'date',
+      sortBedBg: s.sortBy === 'bed' ? '#5C9A45' : 'transparent',
+      sortBedFg: s.sortBy === 'bed' ? '#fff' : '#6A6E62',
+      sortBedBorder: s.sortBy === 'bed' ? '#5C9A45' : 'rgba(31,35,32,.22)',
+      sortDateBg: s.sortBy === 'date' ? '#5C9A45' : 'transparent',
+      sortDateFg: s.sortBy === 'date' ? '#fff' : '#6A6E62',
+      sortDateBorder: s.sortBy === 'date' ? '#5C9A45' : 'rgba(31,35,32,.22)',
+      byBed: () => this.setState({sortBy: 'bed'}),
+      byDate: () => this.setState({sortBy: 'date'}),
+      residentCount: visible.length,
+      noResidents: visible.length === 0,
+      emptyMsg: q
+        ? '找不到符合「' + q + '」的住民'
+        : (showLeft
+            ? '目前沒有已退住的住民'
+            : '目前沒有在住住民 — 按下方「＋ 新增清單」建立' + (leftCount ? '，或點上面「已退住」查看封存名單' : '')),
+      leftBtnLabel: showLeft ? '← 在住住民' : '已退住 ' + leftCount,
+      leftBtnBg: showLeft ? '#5C9A45' : 'transparent',
+      leftBtnFg: showLeft ? '#fff' : '#6A6E62',
+      leftBtnBorder: showLeft ? '#5C9A45' : 'rgba(31,35,32,.22)',
+      toggleLeft: () => this.setState({showLeft: !showLeft, query: ''}),
+      visibleResidents: visible.map((r) => ({
+        bed: r.left ? ((r.items || []).length > 0 ? '未歸還' : '已退住') : r.bed,
+        name: r.name + '（' + r.en + '）' + (r.unsynced ? ' · 未上傳' : ''), itemCount: r.items.length,
+        summary: r.left
+          ? ((r.items || []).length > 0
+              ? r.leaveDate + ' 退住 · 尚餘 ' + this.summarize(r.items)
+              : '已於 ' + r.leaveDate + ' 退住，物品全數歸還')
+          : ((s.sortBy === 'date' ? this.createdOf(r) + ' 建立 · ' : '') + (this.summarize(r.items) || '尚無物品')),
+        open: () => { const idx = s.residents.indexOf(r); this.setState({cur: idx, screen: 'resident', openItem: -1}); this.ensurePhotos(idx); }
+      })),
+
+      // ---- 主選單 ----
+      goItems: () => { this.go('home'); },
+      goConsum: () => { this.go('cHome'); this.loadConsum(); this.ensureRoster(); },
+
+      // ---- 消耗品 ----
+      cRosterSel: s.cRosterSel,
+      cRosterOptionEls: [React.createElement('option', {key: '', value: ''},
+          s.rosterState === 'ok' ? '— 選擇住民（' + s.roster.length + ' 位）—' : '— 尚未載入名單 —')]
+        .concat(s.roster.slice().sort((a, b) => this.bedOrder(a.bed) - this.bedOrder(b.bed))
+          .map((p, i) => React.createElement('option', {key: i, value: String(i)},
+            (p.bed ? this.normBed(p.bed) + '　' : '') + this.splitName(p.name).zh))),
+      onCRosterSel: (e) => {
+        const v = e.target.value;
+        this.setState({cRosterSel: v});
+        if (v === '') return;
+        const p = this.state.roster.slice().sort((a, b) => this.bedOrder(a.bed) - this.bedOrder(b.bed))[Number(v)];
+        if (!p) return;
+        const sp = this.splitName(p.name);
+        this.setCDraft({name: sp.zh, en: (p.en || '').trim() || sp.en, bed: this.normBed(p.bed)});
+      },
+      cName: cdraft.name, cEn: cdraft.en, cBed: cdraft.bed, cDate: cdraft.date,
+      onCDate: (e) => this.setCDraft({date: e.target.value}),
+      cDateIso: this.rocToIso(cdraft.date),
+      onCDateIso: (e) => this.setCDraft({date: this.isoToRoc(e.target.value)}),
+      cPresets: CONSUM_PRESETS.map(nm => ({label: nm, add: () => {
+        const items = this.cd().items.slice();
+        const i = items.findIndex(x => x.name === nm);
+        if (i >= 0) items[i] = Object.assign({}, items[i], {qty: items[i].qty + 1});
+        else items.push({name: nm, qty: 1});
+        this.setCDraft({items: items});
+      }})),
+      cCustom: cdraft.custom, onCCustom: (e) => this.setCDraft({custom: e.target.value}),
+      addCCustom: () => {
+        const nm = String(this.cd().custom || '').trim();
+        if (!nm) return;
+        this.setCDraft({items: this.cd().items.concat([{name: nm, qty: 1}]), custom: ''});
+      },
+      cItems: cdraft.items.map((it, i) => ({
+        label: it.name, qty: it.qty,
+        inc: () => { const a = this.cd().items.slice(); a[i] = Object.assign({}, a[i], {qty: a[i].qty + 1}); this.setCDraft({items: a}); },
+        dec: () => { const a = this.cd().items.slice(); if (a[i].qty <= 1) a.splice(i, 1); else a[i] = Object.assign({}, a[i], {qty: a[i].qty - 1}); this.setCDraft({items: a}); },
+        // 每個品項自己的有效期限（畫面用西元、存進去轉民國）
+        expiryIso: this.rocToIso(it.expiry),
+        onExpiry: (e) => { const a = this.cd().items.slice(); a[i] = Object.assign({}, a[i], {expiry: this.isoToRoc(e.target.value)}); this.setCDraft({items: a}); }
+      })),
+      noCItems: cdraft.items.length === 0,
+      cRemind: cdraft.remindDate, onCRemind: (e) => this.setCDraft({remindDate: e.target.value}),
+      // 日曆選日期：畫面上用西元，存進去一律轉民國
+      cRemindIso: (() => {
+        const dd = this.rocToDate(cdraft.remindDate);
+        return dd ? dd.getFullYear() + '-' + pad2c(dd.getMonth() + 1) + '-' + pad2c(dd.getDate()) : '';
+      })(),
+      onCRemindIso: (e) => {
+        const v = e.target.value;
+        if (!v) { this.setCDraft({remindDate: ''}); return; }
+        const p = v.split('-');
+        this.setCDraft({remindDate: this.dateToRoc(new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2])))});
+      },
+      remindQuick: [7, 14, 30, 60].map(n => ({label: n + ' 天後', set: () => this.setCDraft({remindDate: this.plusDays(n)})}))
+        .concat([{label: '清除', set: () => this.setCDraft({remindDate: ''})}]),
+
+      cShots: (s.cPhotos || []).map((p, i) => ({
+        thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 130, objectFit: 'cover', display: 'block'}}),
+        del: () => this.setState(st => ({cPhotos: st.cPhotos.filter((_, j) => j !== i)}))})),
+      noCShots: (s.cPhotos || []).length === 0,
+      onCFiles: (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const add = files.map(f => ({url: URL.createObjectURL(f)}));
+        this.setState(st => ({cPhotos: st.cPhotos.concat(add)}));
+        e.target.value = '';
+      },
+      cCaptionPreview: this.captionLines().join('　/　'),
+      cStamped: (s.cStamped || []).map(u => ({
+        img: React.createElement('img', {src: u, alt: '', style: {width: '100%', height: 'auto', display: 'block'}})})),
+      cSaving: s.cSaving,
+      cSaveMsg: s.cSaving ? '存進雲端中…' : (s.cSaved ? '✓ 已存進雲端硬碟與試算表' : '⚠ 尚未存進雲端，請按下方「存進雲端」'),
+      cSaveBg: s.cSaved ? '#F4FAEE' : (s.cSaving ? '#F1F0E8' : '#FDF1EC'),
+      cSaveBorder: s.cSaved ? 'rgba(92,154,69,.35)' : (s.cSaving ? 'rgba(31,35,32,.16)' : '#C4552F'),
+      cSaveFg: s.cSaved ? '#3E7530' : (s.cSaving ? '#6A6E62' : '#A8431F'),
+      saveConsum: () => this.saveConsum(),
+      cSummary: cdraft.items.map(x => x.name + (x.qty > 1 ? ' ×' + x.qty : '')).join('、'),
+
+      consumLoading: s.consumState === 'loading',
+      consumErr: s.consumState === 'error' ? '消耗品紀錄讀取失敗：' + s.consumError : '',
+      hasConsumErr: s.consumState === 'error',
+      refreshConsum: () => this.loadConsum(true),
+      dueList: (() => {
+        const today = this.dateOrder(this.today());
+        return (s.consum || [])
+          .filter(r => !r.done && r.remindDate && this.dateOrder(r.remindDate) <= today)
+          .sort((a, b) => this.dateOrder(a.remindDate) - this.dateOrder(b.remindDate))
+          .map(r => ({
+            title: (r.bed ? r.bed + '　' : '') + r.name,
+            sub: r.remindDate + ' 該提醒 · ' + (r.itemText || '—'),
+            done: () => this.doneConsum(r.rowId)
+          }));
+      })(),
+      noDue: !(s.consum || []).some(r => !r.done && r.remindDate && this.dateOrder(r.remindDate) <= this.dateOrder(this.today())),
+      recentConsum: (s.consum || []).slice(-8).reverse().map(r => Object.assign(this.photoProps(r), {
+        title: (r.bed ? r.bed + '　' : '') + r.name,
+        sub: r.date + ' · ' + (r.itemText || '—') + (r.remindDate ? ' · 提醒 ' + r.remindDate : ''),
+        confirming: s.cDelId === r.rowId,
+        notConfirming: s.cDelId !== r.rowId,
+        ask: () => this.setState({cDelId: r.rowId}),
+        cancel: () => this.setState({cDelId: -1}),
+        del: () => this.delConsum(r.rowId),
+        delMsg: '確定刪除 ' + r.name + ' 在 ' + r.date + ' 的這筆登記？'
+          + (r.photoState === '已清除' ? '（照片已於六個月後自動清除，只剩紀錄）'
+             : r.stamp ? '這次登記的 ' + r.photoCount + ' 張雲端照片會一起丟進垃圾桶。'
+             : '（舊資料沒有批次編號，照片要自行到雲端硬碟刪除）')
+      })),
+
+      noRecent: (s.consum || []).length === 0,
+
+      // ---- 查詢消耗品紀錄（直接放在消耗品首頁） ----
+      cSearching: !!String(s.cQuery || '').trim(),
+      showBrowse: !String(s.cQuery || '').trim(),
+      cQuery: s.cQuery || '',
+      onCQuery: (e) => this.setState({cQuery: e.target.value}),
+      clearCQuery: () => this.setState({cQuery: ''}),
+      cResults: (() => {
+        const q = String(s.cQuery || '').trim().toLowerCase();
+        const cache = s.cPhotoCache || {};
+        return (s.consum || [])
+          .filter(r => {
+            if (!q) return true;
+            return [r.bed, r.name, r.en, r.itemText, r.date, r.expiry, r.remindDate]
+              .join(' ').toLowerCase().indexOf(q) >= 0;
+          })
+          .sort((a, b) => this.dateOrder(b.date) - this.dateOrder(a.date))
+          .slice(0, 60)
+          .map(r => Object.assign({
+            title: (r.bed ? r.bed + '　' : '') + r.name + (r.en ? '（' + r.en + '）' : ''),
+            items: r.itemText || '—',
+            meta: '登記 ' + r.date
+              + (r.expiry ? ' · 有效期限 ' + r.expiry : '')
+              + (r.remindDate ? ' · 提醒 ' + r.remindDate + (r.done ? '（已提醒）' : '') : '')
+          }, this.photoProps(r)));
+      })(),
+      cResultCount: (() => {
+        const q = String(s.cQuery || '').trim();
+        const n = (s.consum || []).length;
+        return q ? '符合「' + q + '」的紀錄' : '共 ' + n + ' 筆紀錄';
+      })(),
+      noCResult: (() => {
+        const q = String(s.cQuery || '').trim().toLowerCase();
+        return !(s.consum || []).some(r => {
+          if (!q) return true;
+          return [r.bed, r.name, r.en, r.itemText, r.date, r.expiry, r.remindDate]
+            .join(' ').toLowerCase().indexOf(q) >= 0;
+        });
+      })(),
+
+      hasRoster: !!this.rosterId(),
+      refreshRoster: () => this.refreshRoster(),
+      hasDup: s.dupIdx >= 0,
+      dupMsg: s.dupIdx >= 0
+        ? (s.residents[s.dupIdx] ? s.residents[s.dupIdx].name + ' 已經在物品資料庫裡（' + s.dupOldBed + '，' + s.residents[s.dupIdx].items.length + ' 件）。繼續新增會把這次的物品累加上去。' : '')
+        : '',
+      openDup: () => { const i = s.dupIdx; this.setState({cur: i, screen: 'resident', openItem: -1, dupIdx: -1}); this.ensurePhotos(i); },
+      dismissDup: () => this.setState({dupIdx: -1, dupBed: ''}),
+      hasBedDiff: !!s.dupBed,
+      bedDiffMsg: '名單上的床號是 ' + s.dupBed + '，舊紀錄是 ' + s.dupOldBed + '，要改成名單上的嗎？',
+      useNewBed: () => { this.setDraft({bed: s.dupBed}); this.setState({dupBed: ''}); },
+      keepOldBed: () => { this.setDraft({bed: s.dupOldBed}); this.setState({dupBed: ''}); },
+      rosterNote: {loading: '讀取住民名單…', error: '名單讀取失敗：' + s.rosterError, empty: '名單是空的'}[s.rosterState] || '',
+      hasRosterNote: s.rosterState === 'loading' || s.rosterState === 'error' || s.rosterState === 'empty',
+      rosterSel: s.rosterSel,
+      rosterPlaceholder: s.rosterState === 'ok' ? '— 選擇住民（' + s.roster.length + ' 位）—' : '— 尚未載入名單 —',
+      // option 內只能放純文字，所以直接建元素，不用模板的洞
+      rosterOptionEls: [React.createElement('option', {key: '', value: ''},
+          s.rosterState === 'ok' ? '— 選擇住民（' + s.roster.length + ' 位）—' : '— 尚未載入名單 —')]
+        .concat(s.roster
+          .slice()
+          .sort((a, b) => this.bedOrder(a.bed) - this.bedOrder(b.bed))
+          .map((p, i) => React.createElement('option', {key: i, value: String(i)},
+            (p.bed ? this.normBed(p.bed) + '　' : '') + this.splitName(p.name).zh
+              + (((p.en || '').trim() || this.splitName(p.name).en) ? '（' + ((p.en || '').trim() || this.splitName(p.name).en) + '）' : '')))),
+      onRosterSel: (e) => {
+        const v = e.target.value;
+        this.setState({rosterSel: v});
+        if (v === '') return;
+        const sorted = this.state.roster.slice().sort((a, b) => this.bedOrder(a.bed) - this.bedOrder(b.bed));
+        const p = sorted[Number(v)];
+        if (p) this.pickRoster(p);
+      },
+      draftName: d.name, onName: (e) => this.setDraft({name: e.target.value}),
+      draftEn: d.en, onEn: (e) => this.setDraft({en: e.target.value}),
+      draftBed: d.bed, onBed: (e) => this.setDraft({bed: e.target.value}),
+      draftDate: d.date, onDate: (e) => this.setDraft({date: e.target.value}),
+      draftMakeDate: d.makeDate || d.date, onMakeDate: (e) => this.setDraft({makeDate: e.target.value}),
+      draftMaker: d.receiverName,
+      draftReceiverName: d.receiverName, onReceiverName: (e) => this.setDraft({receiverName: e.target.value}),
+      receiverOpts: ['前櫃檯', '護理人員', '照服人員'].map(label => {
+        const on = d.receivers.indexOf(label) >= 0;
+        return {
+          label: label,
+          bg: on ? '#5C9A45' : 'transparent', fg: on ? '#fff' : '#1F2320',
+          border: on ? '#5C9A45' : 'rgba(31,35,32,.22)',
+          toggle: () => this.setDraft({receivers: on ? d.receivers.filter(x => x !== label) : d.receivers.concat([label])})
+        };
+      }),
+
+      commonItems: COMMON.map(c => ({label: c.name, add: () => this.addItem(c.name, c.unit)})),
+      clothesItems: CLOTHES.map(c => ({label: c.name, add: () => this.addItem(c.name, c.unit)})),
+      customItem: s.customItem, onCustomItem: (e) => this.setState({customItem: e.target.value}),
+      addCustom: () => { const v = s.customItem.trim(); if (!v) return; this.addItem(v, '個'); this.setState({customItem: ''}); },
+      draftItems: d.items.map((it, i) => ({
+        name: it.name, qtyLabel: it.qty + ' ' + it.unit,
+        inc: () => this.bumpDraft(i, 1), dec: () => this.bumpDraft(i, -1),
+        remove: () => { const items = d.items.slice(); items.splice(i, 1); this.setDraft({items: items}); }
+      })),
+      draftItemCount: d.items.length, draftEmpty: d.items.length === 0,
+
+      onPickPhoto: this.onFiles,
+      noPhotos: s.photos.length === 0, hasPhotos: s.photos.length > 0, photoCount: s.photos.length,
+      tagOpts: tagOpts,
+      photos: s.photos.map((p, i) => ({
+        url: p.url, tag: p.tag, tagLabel: tagLabel(p.tag),
+        thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: '100%', objectFit: 'cover', display: 'block'}}),
+        thumbSmall: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 88, objectFit: 'cover', display: 'block'}}),
+        setTag: (e) => { const ph = s.photos.slice(); ph[i] = Object.assign({}, ph[i], {tag: e.target.value}); this.setState({photos: ph}); },
+        remove: () => { const ph = s.photos.slice(); ph.splice(i, 1); this.setState({photos: ph}); }
+      })),
+
+      fileName: this.fileName(),
+      onFileName: (e) => this.setState({fileNameEdited: e.target.value}),
+      resetFileName: () => this.setState({fileNameEdited: null}),
+      previewName: (d.name || '—') + (d.en ? ' ' + d.en : ''),
+      previewNameShort: d.name || '—',
+      previewBed: d.bed || '—', previewDate: d.date,
+      previewReceivers: ['前櫃檯', '護理人員', '照服人員'].map(x => (d.receivers.indexOf(x) >= 0 ? '☑ ' : '☐ ') + x).join('　'),
+      previewReceiverName: d.receiverName || '（未簽）',
+      previewItemRows: d.items.map(it => ({name: it.name, qty: it.qty + ' ' + it.unit})),
+      previewMakeDate: d.makeDate || d.date,
+      previewRows: d.items.map(it => ({name: it.name, qty: it.qty + ' ' + it.unit}))
+        .concat(Array.from({length: Math.max(0, 10 - d.items.length)}, () => ({name: '', qty: ''}))),
+      pageCells: Array.from({length: 5}, (_, i) => ({
+        body: s.photos[i]
+          ? React.createElement('img', {src: s.photos[i].url, alt: '', style: {maxWidth: '100%', maxHeight: 142, objectFit: 'contain', display: 'block'}})
+          : ''
+      })),
+      totalPages: this.pageCount(),
+      driveMsg: {saving: '上傳中…', saved: '已上傳', off: '未設定連結，改為下載', error: '上傳失敗：' + s.driveError}[s.driveState] || '尚未上傳',
+      driveOk: s.driveState === 'saved', driveLink: s.driveLink, hasDriveLink: !!s.driveLink,
+      driveHint: (this.props.driveEndpoint ?? 'x') ? '存進「用品清單 / ' + (d.bed || '床號') + ' ' + (d.name || '姓名') + '」' : '尚未設定 Apps Script 網址 — 目前只會下載到裝置',
+      extraPages: Array.from({length: this.pageCount() - 1}, (_, pg) => ({
+        label: '第 ' + (pg + 2) + ' 頁',
+        cells: Array.from({length: 6}, (_, i) => {
+          const ph = s.photos[5 + pg * 6 + i];
+          return {body: ph ? React.createElement('img', {src: ph.url, alt: '', style: {maxWidth: '100%', maxHeight: 142, objectFit: 'contain', display: 'block'}}) : ''};
+        })
+      })),
+
+      curBed: cur ? cur.bed : '', curName: cur ? cur.name + '（' + cur.en + '）' : '', curUpdated: cur ? cur.updated : '',
+      movingBed: s.movingBed, newBed: s.newBed,
+      startMove: () => this.setState({movingBed: true, newBed: cur ? cur.bed : ''}),
+      fixPhotos: () => this.fixPhotos(),
+      cancelMove: () => this.setState({movingBed: false, newBed: ''}),
+      onNewBed: (e) => this.setState({newBed: e.target.value}),
+      confirmMove: () => this.moveResident(),
+      curItems: (cur ? cur.items : []).map((it, i) => {
+        const key = it.uid || it.name;
+        const shots = (cur.photos || []).filter(p => (p.tag || '__all') === key);
+        const labels = this.itemLabels(cur.items);
+        return {
+        name: labels[i] || it.name, qtyLabel: it.qty + ' ' + it.unit,
+        photoCountLabel: shots.length ? shots.length + ' 張' : '無照片',
+        open: s.openItem === i,
+        toggleOpen: () => this.setState({openItem: s.openItem === i ? -1 : i}),
+        shots: shots.map(p => ({thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 72, objectFit: 'cover', display: 'block'}}), view: () => this.setState({viewer: p.url})})),
+        hasShots: shots.length > 0, noShots: shots.length === 0,
+        taking: s.takeIdx === i, border: s.takeIdx === i ? '#5C9A45' : 'rgba(31,35,32,.16)',
+        multi: (Number(it.qty) || 1) > 1,
+        startTake: () => this.setState({takeIdx: i, takeQty: 1, takeBy: '', takeMaker: '', fixIdx: -1, confirmDel: -1}),
+        fixing: s.fixIdx === i,
+        startFix: () => this.setState({fixIdx: s.fixIdx === i ? -1 : i, fixName: it.name, fixQty: Number(it.qty) || 1, takeIdx: -1, confirmDel: -1}),
+        confirming: s.confirmDel === i,
+        notConfirming: s.confirmDel !== i,
+        askDelete: () => this.setState({confirmDel: i}),
+        cancelDelete: () => this.setState({confirmDel: -1}),
+        doDelete: () => this.deleteItem(i),
+        saveFix: () => this.applyFix(i, {name: String(s.fixName || '').trim() || it.name, qty: Math.max(1, Number(s.fixQty) || 1)}),
+        cancelFix: () => this.setState({fixIdx: -1}),
+        delMsg: '確定刪除「' + it.name + '」？這筆會從清單與資料庫移除，照片一併清掉。'
+      };
+      }),
+      groupShots: (cur ? (cur.photos || []) : []).filter(p => (p.tag || '__all') === '__all')
+        .map(p => ({thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 76, objectFit: 'cover', display: 'block'}}), view: () => this.setState({viewer: p.url})})),
+      hasGroupShots: (cur ? (cur.photos || []) : []).some(p => (p.tag || '__all') === '__all'),
+      photosLoading: s.photosState === 'loading',
+      viewer: s.viewer, hasViewer: !!s.viewer,
+      viewerImg: s.viewer ? React.createElement('img', {src: s.viewer, alt: '', style: {maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block'}}) : '',
+      closeViewer: () => this.setState({viewer: ''}),
+      takeQty: s.takeQty,
+      takeInc: () => this.setState(st => {
+        const max = cur && cur.items[st.takeIdx] ? cur.items[st.takeIdx].qty : 1;
+        return {takeQty: Math.min(max, st.takeQty + 1)};
+      }),
+      takeDec: () => this.setState(st => ({takeQty: Math.max(1, st.takeQty - 1)})),
+      fixName: s.fixName, onFixName: (e) => this.setState({fixName: e.target.value}),
+      fixQty: s.fixQty,
+      fixInc: () => this.setState(st => ({fixQty: Math.min(20, (Number(st.fixQty) || 1) + 1)})),
+      fixDec: () => this.setState(st => ({fixQty: Math.max(1, (Number(st.fixQty) || 1) - 1)})),
+      takeBy: s.takeBy, onTakeBy: (e) => this.setState({takeBy: e.target.value}),
+      takeMaker: s.takeMaker, onTakeMaker: (e) => this.setState({takeMaker: e.target.value}),
+      cancelTake: () => this.setState({takeIdx: -1}),
+      confirmTake: () => this.takeBack(),
+      curLog: (cur ? cur.log : []).map(l => ({date: l.date, text: l.text})),
+
+      returnItems: (cur ? cur.items : []).map((it, i) => {
+        const on = !!s.returned[i];
+        const rlabels = this.itemLabels(cur.items);
+        return {
+          name: rlabels[i] || it.name, qtyLabel: it.qty + ' ' + it.unit,
+          check: on ? '✓' : '', mark: on ? '#3E7530' : 'rgba(31,35,32,.35)',
+          bg: on ? '#eef6ff' : '#fff', border: on ? '#5C9A45' : 'rgba(31,35,32,.16)',
+          toggle: () => this.setState(st => { const r = Object.assign({}, st.returned); r[i] = !r[i]; return {returned: r}; })
+        };
+      }),
+      returnedCount: returnedCount, returnTotal: cur ? cur.items.length : 0,
+      returnTo: s.returnTo, onReturnTo: (e) => this.setState({returnTo: e.target.value}),
+      returnBy: s.returnBy, onReturnBy: (e) => this.setState({returnBy: e.target.value})
+    };
+  }
+}
+
+</script>
+<!--PREFILL_USER-->
+<script>
+(function(){
+  var NAME=""; try{ NAME=(localStorage.getItem("handover_name")||"").trim(); }catch(e){}
+  if(!NAME) return;
+  var SEL=['input[placeholder*="點收並製表"]'];
+  var done=[];
+  function seen(el){ return done.indexOf(el)>=0; }
+  function tick(){
+    for(var i=0;i<SEL.length;i++){
+      var list; try{ list=document.querySelectorAll(SEL[i]); }catch(e){ continue; }
+      for(var j=0;j<list.length;j++){
+        var el=list[j];
+        if(seen(el)) continue;
+        if((el.value||"").trim()!==""){ continue; }
+        try{ var p=(el.tagName==="TEXTAREA")?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+          Object.getOwnPropertyDescriptor(p,"value").set.call(el, NAME);
+        }catch(e){ el.value=NAME; }
+        el.dispatchEvent(new Event("input",{bubbles:true}));
+        el.dispatchEvent(new Event("change",{bubbles:true}));
+        if((el.value||"").trim()===NAME) done.push(el);
+      }
+    }
+  }
+  setInterval(tick, 400);
+  if(document.readyState!=="loading") tick();
+  document.addEventListener("DOMContentLoaded",tick);
+})();
+</script>
+</body>
+</html>
