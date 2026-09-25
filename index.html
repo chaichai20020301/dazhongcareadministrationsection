@@ -281,7 +281,23 @@
         var k = cards[i].getAttribute("data-key");
         cards[i].style.display = (allow.indexOf(k)>=0) ? "" : "none";
       }
+      balanceGrid();
     }
+    /* 依「目前顯示張數」與視窗寬度，把卡片排成平均的列，避免落單 */
+    function balanceGrid(){
+      var grid = document.querySelector("#app .grid"); if(!grid) return;
+      var n = 0, cs = grid.querySelectorAll(".card[data-key]");
+      for(var i=0;i<cs.length;i++){ if(cs[i].style.display!=="none") n++; }
+      if(!n){ return; }
+      var w = window.innerWidth, c;
+      if(w < 560) c = 1;
+      else if(w < 860) c = Math.min(n, 2);
+      else c = (n===4) ? 2 : Math.min(n, 3);   /* 4張→2欄(2+2)；其餘最多3欄 */
+      grid.style.gridTemplateColumns = "repeat(" + c + ",minmax(0,1fr))";
+      grid.style.maxWidth = (c*360 + (c-1)*20) + "px";
+      grid.style.margin = "0 auto";
+    }
+    window.addEventListener("resize", function(){ balanceGrid(); });
 
     function lsGet(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
     function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
