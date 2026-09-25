@@ -272,20 +272,45 @@
   }
 
   // ── 照片 ──
-  function togglePhotos(row){
-    var key = row.rowId;
-    if(state.photoOpen[key]){ state.photoOpen[key]=false; renderConsum(); return; }
+  // 共用照片開關：key 命名空間避免功能A/B 撞號；loader 回傳 [{src}]；rerender 指定重繪哪一區
+  function togglePhoto(key, loader, rerender){
+    if(state.photoOpen[key]){ state.photoOpen[key]=false; rerender(); return; }
     state.photoOpen[key]=true;
-    if(state.photoCache[key]){ renderConsum(); return; }
-    state.photoState[key]='loading'; renderConsum();
-    api({action:'consumPhotos', bed:row.bed, resident:row.name, stamp:row.stamp})
-      .then(function(o){
-        var photos = (o.photos||[]).map(function(p){
-          return { name:p.name, url:p.url,
-            src: p.data ? ('data:'+(p.mime||'image/jpeg')+';base64,'+p.data) : '' };
-        });
-        state.photoCache[key]=photos; state.photoState[key]='ok'; renderConsum();
-      }).catch(function(){ state.photoState[key]='error'; renderConsum(); });
+    if(state.photoCache[key]){ rerender(); return; }
+    state.photoState[key]='loading'; rerender();
+    loader().then(function(photos){ state.photoCache[key]=photos; state.photoState[key]='ok'; rerender(); })
+      .catch(function(){ state.photoState[key]='error'; rerender(); });
+  }
+  // 消耗品照片：既有 consumPhotos（回傳含 base64 data）
+  function photosConsum(row){ return function(){
+    return api({action:'consumPhotos', bed:row.bed, resident:row.name, stamp:row.stamp}).then(function(o){
+      return (o.photos||[]).map(function(p){
+        return { src: p.data ? ('data:'+(p.mime||'image/jpeg')+';base64,'+p.data) : (p.url||'') };
+      });
+    });
+  }; }
+  // 住民用品照片：完整版本來就有的 photos action（回傳 {data:base64, tag}）
+  function photosResident(r){ return function(){
+    return api({action:'photos', bed:r.bed, resident:r.name}).then(function(o){
+      return (o.photos||[]).map(function(p){ return { src: 'data:image/jpeg;base64,' + (p.data||p) }; });
+    });
+  }; }
+  // 把照片區（讀取中／失敗／無／縮圖）掛到卡片
+  function appendPhotoArea(card, key){
+    if(!state.photoOpen[key]) return;
+    var st=state.photoState[key];
+    if(st==='loading'){ var l=document.createElement('div'); l.className='load'; l.textContent=t('photoLoading'); card.appendChild(l); return; }
+    if(st==='error'){ var e=document.createElement('div'); e.className='banner err'; e.textContent=t('photoFail'); card.appendChild(e); return; }
+    var ph=state.photoCache[key]||[];
+    if(!ph.length){ var n=document.createElement('div'); n.className='load'; n.textContent=t('noPhotos'); card.appendChild(n); return; }
+    var g=document.createElement('div'); g.className='thumbs';
+    ph.forEach(function(p,i){
+      var d=document.createElement('div'); d.className='t'; var src=p.src||p.url;
+      d.innerHTML='<img src="'+esc(src)+'" alt=""><span>'+(i+1)+'</span>';
+      d.onclick=function(){ openLightbox(src); };
+      g.appendChild(d);
+    });
+    card.appendChild(g);
   }
   function openLightbox(src){
     var lb=document.getElementById('lightbox'); document.getElementById('lbimg').src=src; lb.classList.add('on');
@@ -345,7 +370,14 @@
         act.appendChild(b);
         if(!name()){ var h=document.createElement('span'); h.className='hint'; h.textContent=t('noName'); act.appendChild(h); }
       }
+      // 看該住民用品清單的照片（縮圖＋點開放大）
+      var pkey='R:'+r.name;
+      var pb=document.createElement('button'); pb.className='btn ghost';
+      pb.textContent = state.photoOpen[pkey] ? t('hidePhotos') : t('viewPhotos');
+      pb.onclick=function(){ togglePhoto(pkey, photosResident(r), renderConfirm); };
+      act.appendChild(pb);
       c.appendChild(act);
+      appendPhotoArea(c, pkey);
       box.appendChild(c);
     });
   }
@@ -370,35 +402,17 @@
       c.innerHTML=head+items+meta;
       var purged = r.photoState==='已清除';
       var act=document.createElement('div'); act.className='actions';
+      var ckey='C:'+r.rowId;
       if(purged){
         var pg=document.createElement('span'); pg.className='hint'; pg.textContent=t('photoPurged'); act.appendChild(pg);
       } else if(r.photoCount){
         var b=document.createElement('button'); b.className='btn ghost';
-        b.textContent=(state.photoOpen[r.rowId]?t('hidePhotos'):t('viewPhotos'))+' ('+r.photoCount+')';
-        b.onclick=function(){ togglePhotos(r); };
+        b.textContent=(state.photoOpen[ckey]?t('hidePhotos'):t('viewPhotos'))+' ('+r.photoCount+')';
+        b.onclick=function(){ togglePhoto(ckey, photosConsum(r), renderConsum); };
         act.appendChild(b);
       }
       c.appendChild(act);
-      if(state.photoOpen[r.rowId]){
-        var st=state.photoState[r.rowId];
-        if(st==='loading'){ var l=document.createElement('div'); l.className='load'; l.textContent=t('photoLoading'); c.appendChild(l); }
-        else if(st==='error'){ var e=document.createElement('div'); e.className='banner err'; e.textContent=t('photoFail'); c.appendChild(e); }
-        else {
-          var ph=state.photoCache[r.rowId]||[];
-          if(!ph.length){ var n=document.createElement('div'); n.className='load'; n.textContent=t('noPhotos'); c.appendChild(n); }
-          else {
-            var g=document.createElement('div'); g.className='thumbs';
-            ph.forEach(function(p,i){
-              var t1=document.createElement('div'); t1.className='t';
-              var src=p.src||p.url;
-              t1.innerHTML='<img src="'+esc(src)+'" alt=""><span>'+(i+1)+'</span>';
-              t1.onclick=function(){ openLightbox(src); };
-              g.appendChild(t1);
-            });
-            c.appendChild(g);
-          }
-        }
-      }
+      appendPhotoArea(c, ckey);
       box.appendChild(c);
     });
   }
