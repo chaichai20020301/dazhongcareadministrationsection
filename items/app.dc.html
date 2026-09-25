@@ -1183,7 +1183,7 @@ class Component extends DCLogic {
         endpoint: this.endpoint(),
         rootFolderId: this.root(),
         bed: r.bed, name: r.name, blob: built.blob, fileName: built.fileName,
-        photos: await m.shrinkAll(shots), photoMode: 'replace'
+        photos: await m.shrinkAll(shots), photoMode: 'replace', preferActive: true
       });
       this.setState(st => {
         const rs = st.residents.slice();
@@ -1668,7 +1668,7 @@ class Component extends DCLogic {
         endpoint: endpoint,
         rootFolderId: this.root(),
         bed: d.bed, name: d.name, blob: built.blob, fileName: built.fileName,
-        photos: shots, photoMode: 'append',
+        photos: shots, photoMode: 'append', preferActive: true,
         record: rec ? {bed: rec.bed, name: rec.name, en: rec.en, left: !!rec.left,
           leaveDate: rec.leaveDate || '', updated: rec.updated, items: rec.items, log: rec.log} : null
       });
@@ -1740,7 +1740,7 @@ class Component extends DCLogic {
         const res = await drive.saveToDrive({
           endpoint: this.endpoint(), rootFolderId: this.root(),
           bed: p.bed, name: p.name, blob: built.blob, fileName: built.fileName,
-          photos: p.photos && p.photos.length ? p.photos : null, photoMode: 'append',
+          photos: p.photos && p.photos.length ? p.photos : null, photoMode: 'append', preferActive: true,
           record: p.rec ? {bed: p.rec.bed, name: p.rec.name, en: p.rec.en, left: !!p.rec.left,
             leaveDate: p.rec.leaveDate || '', updated: p.rec.updated, items: p.rec.items, log: p.rec.log} : null
         });

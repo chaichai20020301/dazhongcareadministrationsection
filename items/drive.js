@@ -48,13 +48,14 @@ const toBase64 = blob => new Promise((res, rej) => {
   fr.readAsDataURL(blob);
 });
 
-async function saveToDrive({ endpoint, rootFolderId, bed, name, blob, fileName, photos, record, photoMode }) {
+async function saveToDrive({ endpoint, rootFolderId, bed, name, blob, fileName, photos, record, photoMode, preferActive }) {
   return post(endpoint, {
     rootFolderId, bed, resident: name, fileName,
     data: await toBase64(blob),
     photos: photos || null,  // 有給才寫入雲端照片
     photoMode: photoMode || 'append',  // append=只加新照片；replace=整批覆蓋
-    record: record || null   // 同一次請求就寫進資料庫，避免只建資料夾沒建資料列
+    record: record || null,  // 同一次請求就寫進資料庫，避免只建資料夾沒建資料列
+    preferActive: !!preferActive  // true=一般登記/再入住，找不到就開新資料夾，不沿用已退住的
   });
 }
 
