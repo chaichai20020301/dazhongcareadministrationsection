@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>住民物品・消耗品（護理／照服）</title>
+<style>
+  :root{
+    --bg:#F5F4EE; --ink:#1F2320; --sub:#45483F; --sub2:#6A6E62; --sub3:#8A8E80;
+    --green:#3E7530; --green2:#5C9A45; --gl:#E3F0D5; --gl2:#F4FAEE; --gd:#D8EBC4;
+    --line:rgba(31,35,32,.16); --line2:rgba(31,35,32,.22);
+    --warn:#A8431F; --warnbg:#FDF1EC; --warnln:#C4552F;
+    --err:#8F3F2C; --errbg:#FBEEE9; --errln:#B4553C;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",Roboto,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px 40px}
+  header{position:sticky;top:0;z-index:3;background:var(--bg);
+    display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);
+    margin:0 -16px 16px}
+  h1{flex:1;min-width:0;margin:0;font-size:17px;font-weight:700;line-height:1.2}
+  .langs{flex:none;display:flex;gap:4px}
+  .langs button{padding:5px 9px;border:1px solid var(--line2);background:transparent;color:var(--sub);
+    font-size:12.5px;line-height:1;cursor:pointer;border-radius:9px}
+  .langs button.on{background:var(--green);border-color:var(--green);color:#fff}
+  h2{margin:22px 0 10px;font-size:13px;letter-spacing:.08em;color:var(--sub2);
+    text-transform:uppercase;font-weight:700}
+  .card{border:1px solid var(--line);background:#fff;border-radius:12px;padding:13px 14px;margin-bottom:10px}
+  .row{display:flex;align-items:baseline;gap:10px}
+  .bed{flex:none;min-width:52px;font-weight:700;color:var(--green);font-size:15px}
+  .nm{flex:1;min-width:0;font-weight:600}
+  .en{color:var(--sub3);font-weight:400;font-size:13px}
+  .items{margin-top:6px;color:var(--sub);font-size:13.5px;line-height:1.55}
+  .meta{margin-top:4px;color:var(--sub3);font-size:12px}
+  .btn{display:inline-block;padding:8px 15px;border-radius:10px;border:1px solid var(--green2);
+    background:var(--green2);color:#fff;font-size:14px;cursor:pointer}
+  .btn:hover{background:var(--green);border-color:var(--green)}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:var(--gl2);color:var(--green);border-color:rgba(92,154,69,.5)}
+  .btn.ghost:hover{background:var(--gl)}
+  .ok{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:10px;
+    background:var(--gl2);border:1px solid rgba(92,154,69,.45);color:var(--green);font-size:12.5px}
+  .actions{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hint{color:var(--warn);font-size:12.5px}
+  .empty{padding:20px 14px;border:1px dashed var(--line2);border-radius:12px;text-align:center;
+    color:var(--sub3);font-size:13px}
+  .banner{padding:11px 12px;border-radius:10px;font-size:13px;line-height:1.55;margin-bottom:10px}
+  .banner.warn{background:var(--warnbg);border:1px solid var(--warnln);color:#5A2E1C}
+  .banner.err{background:var(--errbg);border:1px solid var(--errln);color:var(--err)}
+  .thumbs{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .thumbs .t{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#EDEBE2;cursor:pointer}
+  .thumbs .t img{width:100%;height:120px;object-fit:cover;display:block}
+  .thumbs .t span{display:block;font-size:10.5px;color:var(--sub3);padding:3px 6px}
+  .load{padding:12px;border:1px dashed var(--line2);border-radius:10px;text-align:center;
+    color:var(--sub3);font-size:12.5px}
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .toolbar .who{flex:1;min-width:0;font-size:12.5px;color:var(--sub2)}
+  .refresh{padding:4px 9px;border:1px solid var(--line2);background:transparent;color:var(--sub2);
+    font-size:12px;cursor:pointer;border-radius:9px}
+  .lightbox{position:fixed;inset:0;background:rgba(31,35,32,.92);z-index:9;display:none;
+    align-items:center;justify-content:center;flex-direction:column;padding:14px}
+  .lightbox.on{display:flex}
+  .lightbox img{max-width:100%;max-height:82vh;object-fit:contain;border-radius:8px}
+  .lightbox .x{align-self:flex-end;margin-bottom:10px;padding:7px 14px;border:1px solid rgba(255,255,255,.5);
+    background:transparent;color:#fff;border-radius:10px;font-size:14px;cursor:pointer}
+  .toast{position:fixed;left:16px;right:16px;bottom:18px;max-width:688px;margin:0 auto;
+    background:#22301C;color:#fff;font-size:13px;padding:11px 13px;border-radius:10px;
+    z-index:8;display:none}
+  .toast.on{display:block}
+</style>
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<div class="wrap">
+  <header>
+    <h1 id="title"></h1>
+    <div class="langs" id="langs"></div>
+  </header>
+
+  <section id="secConfirm">
+    <h2 id="hConfirm"></h2>
+    <div class="toolbar">
+      <span class="who" id="whoConfirm"></span>
+      <button class="refresh" id="refreshR"></button>
+    </div>
+    <div id="listR"></div>
+  </section>
+
+  <section id="secConsum">
+    <h2 id="hConsum"></h2>
+    <div class="toolbar">
+      <span class="who" id="whoConsum"></span>
+      <button class="refresh" id="refreshC"></button>
+    </div>
+    <div id="listC"></div>
+  </section>
+</div>
+
+<div class="lightbox" id="lightbox"><button class="x" id="lbx"></button><img id="lbimg" alt=""></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ── 設定：打同一支物品後端 /exec；可用 localStorage 覆寫 ──
+  var ENDPOINT = localStorage.getItem('items_endpoint') ||
+    'https://script.google.com/macros/s/AKfycbwN0nILIfWhTlZAgOUnuVt9TuvaLAJG3RRPMA7XDQWS5-c2Up8rghz7mU89_Ez6GsjT/exec';
+  var ROOT = localStorage.getItem('items_root') || '1I-5e060RVqVc7kaVHdDBf1-MquajEYkH';
+
+  // ── 三語字典（只翻本頁 UI，住民／品項等資料照原文）──
+  var I18N = {
+    zh: {
+      title:'住民物品・消耗品', hConfirm:'住民用品清單確認', hConsum:'消耗品最近登記',
+      who:'確認人：', noName:'請先在入口網登入姓名後再確認', role:'身份：',
+      refresh:'↻ 重新整理', loading:'讀取中…', empty:'目前沒有資料',
+      loadFail:'讀取失敗，請按重新整理再試一次', retry:'重試',
+      items:'物品：', none:'（無品項）', confirm:'確認清單無誤',
+      confirming:'確認中…', confirmed:'已確認', at:'於', by:'',
+      needConfirm:'尚未確認', reconfirmNote:'（清單有更新，需重新確認）',
+      viewPhotos:'看照片', hidePhotos:'收起', photoLoading:'讀取照片中…',
+      photoFail:'照片讀取失敗，可能後端還沒重新部署，請稍後再試', noPhotos:'這批沒有照片',
+      photoPurged:'已超過照片保留時限（六個月），沒有照片',
+      regDate:'登記', expiry:'效期', close:'關閉',
+      roleNurse:'護理', roleCare:'照服', roleAdmin:'行政',
+      confirmOk:'已確認：', confirmErr:'確認失敗：'
+    },
+    id: {
+      title:'Barang & Habis Pakai', hConfirm:'Konfirmasi Daftar Barang Penghuni', hConsum:'Registrasi Barang Habis Pakai Terbaru',
+      who:'Pengonfirmasi: ', noName:'Silakan login nama di portal dulu sebelum konfirmasi', role:'Peran: ',
+      refresh:'↻ Muat ulang', loading:'Memuat…', empty:'Belum ada data',
+      loadFail:'Gagal memuat, tekan muat ulang', retry:'Coba lagi',
+      items:'Barang: ', none:'(tidak ada)', confirm:'Konfirmasi daftar benar',
+      confirming:'Mengonfirmasi…', confirmed:'Terkonfirmasi', at:'pada', by:'oleh ',
+      needConfirm:'Belum dikonfirmasi', reconfirmNote:'(daftar diperbarui, konfirmasi ulang)',
+      viewPhotos:'Lihat foto', hidePhotos:'Tutup', photoLoading:'Memuat foto…',
+      photoFail:'Gagal memuat foto, backend mungkin belum di-deploy', noPhotos:'Tidak ada foto',
+      photoPurged:'Melewati batas simpan (6 bulan), tidak ada foto',
+      regDate:'Terdaftar', expiry:'Kedaluwarsa', close:'Tutup',
+      roleNurse:'Perawat', roleCare:'Pengasuh', roleAdmin:'Admin',
+      confirmOk:'Terkonfirmasi: ', confirmErr:'Gagal konfirmasi: '
+    },
+    vi: {
+      title:'Đồ dùng & Vật tư', hConfirm:'Xác nhận danh sách đồ dùng', hConsum:'Đăng ký vật tư gần đây',
+      who:'Người xác nhận: ', noName:'Vui lòng đăng nhập tên ở cổng trước khi xác nhận', role:'Vai trò: ',
+      refresh:'↻ Tải lại', loading:'Đang tải…', empty:'Chưa có dữ liệu',
+      loadFail:'Tải thất bại, hãy tải lại', retry:'Thử lại',
+      items:'Đồ dùng: ', none:'(không có)', confirm:'Xác nhận danh sách đúng',
+      confirming:'Đang xác nhận…', confirmed:'Đã xác nhận', at:'lúc', by:'bởi ',
+      needConfirm:'Chưa xác nhận', reconfirmNote:'(danh sách đã cập nhật, cần xác nhận lại)',
+      viewPhotos:'Xem ảnh', hidePhotos:'Ẩn', photoLoading:'Đang tải ảnh…',
+      photoFail:'Tải ảnh thất bại, backend có thể chưa triển khai', noPhotos:'Không có ảnh',
+      photoPurged:'Quá hạn lưu (6 tháng), không có ảnh',
+      regDate:'Đăng ký', expiry:'HSD', close:'Đóng',
+      roleNurse:'Điều dưỡng', roleCare:'Hộ lý', roleAdmin:'Hành chính',
+      confirmOk:'Đã xác nhận: ', confirmErr:'Xác nhận thất bại: '
+    }
+  };
+
+  var LANGS = [['zh','中'],['id','ID'],['vi','VI']];
+  var state = {
+    lang: (function(){ var l = localStorage.getItem('portal_lang'); return I18N[l] ? l : 'zh'; })(),
+    residents:null, errR:false, loadingR:true,
+    consum:null, errC:false, loadingC:true,
+    photoOpen:{}, photoState:{}, photoCache:{}, confirmingName:null
+  };
+  function t(k){ return (I18N[state.lang] && I18N[state.lang][k]) || I18N.zh[k] || k; }
+  function name(){ return (localStorage.getItem('handover_name') || '').trim(); }
+  function roleKey(){ return (localStorage.getItem('portal_role') || '').trim(); }
+  function roleLabel(){
+    var r = roleKey();
+    if (r === 'nurse') return t('roleNurse');
+    if (r === 'care') return t('roleCare');
+    if (r === 'admin') return t('roleAdmin');
+    return '';
+  }
+  // 存進試算表的身份一律用中文，方便行政閱讀（與顯示語言無關）
+  function roleForSheet(){
+    var r = roleKey();
+    if (r === 'nurse') return '護理';
+    if (r === 'care') return '照服';
+    if (r === 'admin') return '行政';
+    return r || '';
+  }
+
+  // ── 網路：POST text/plain（避開 CORS preflight），逾時重試一次 ──
+  function api(payload){
+    payload = Object.assign({ rootFolderId: ROOT }, payload);
+    var attempt = function(n){
+      var ctrl = ('AbortController' in window) ? new AbortController() : null;
+      var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 45000) : null;
+      return fetch(ENDPOINT, {
+        method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload), signal: ctrl ? ctrl.signal : undefined
+      }).then(function(r){
+        if(timer) clearTimeout(timer);
+        if(!r.ok) throw new Error('連線失敗 '+r.status);
+        return r.text();
+      }).then(function(txt){
+        var o; try{ o=JSON.parse(txt); }catch(e){ throw new Error('雲端回應異常'); }
+        if(o && o.error) throw new Error(o.error);
+        return o;
+      }).catch(function(e){
+        if(timer) clearTimeout(timer);
+        if(n<1) return new Promise(function(res){ setTimeout(res,1200); }).then(function(){ return attempt(n+1); });
+        throw e;
+      });
+    };
+    return attempt(0);
+  }
+
+  var esc = function(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+
+  // items 是 [{name,qty,unit,uid}] 一件一列 → 依品名彙總數量
+  function itemSummary(items){
+    if(!items || !items.length) return '';
+    var map = {}, order = [];
+    items.forEach(function(it){
+      var nm = String(it.name||'').replace(/#\d+$/,'');
+      if(!(nm in map)){ map[nm]=0; order.push(nm); }
+      map[nm] += Math.max(1, Number(it.qty)||1);
+    });
+    return order.map(function(nm){ return map[nm]>1 ? nm+' ×'+map[nm] : nm; }).join('、');
+  }
+
+  function toast(msg){
+    var el = document.getElementById('toast');
+    el.textContent = msg; el.classList.add('on');
+    clearTimeout(toast._t); toast._t = setTimeout(function(){ el.classList.remove('on'); }, 3200);
+  }
+
+  // ── 載入 ──
+  function loadResidents(){
+    state.loadingR = true; state.errR = false; renderConfirm();
+    api({action:'load'}).then(function(o){
+      state.residents = (o.residents||[]).filter(function(r){ return !r.left; });
+      state.loadingR = false; renderConfirm();
+    }).catch(function(){ state.loadingR=false; state.errR=true; renderConfirm(); });
+  }
+  function loadConsum(){
+    state.loadingC = true; state.errC = false; renderConsum();
+    api({action:'consumLoad'}).then(function(o){
+      var rows = (o.rows||[]).slice().sort(function(a,b){ return dord(b.date)-dord(a.date); });
+      state.consum = rows.slice(0,12);
+      state.loadingC = false; renderConsum();
+    }).catch(function(){ state.loadingC=false; state.errC=true; renderConsum(); });
+  }
+  function dord(d){ // 民國 115.9.5 → 可比較數字
+    var p = String(d||'').split('.'); if(p.length<3) return 0;
+    return (Number(p[0])||0)*10000 + (Number(p[1])||0)*100 + (Number(p[2])||0);
+  }
+
+  // ── 確認 ──
+  function doConfirm(resName){
+    if(!name()){ toast(t('noName')); return; }
+    state.confirmingName = resName; renderConfirm();
+    api({action:'confirm', resident:resName, confirmedBy:name(), confirmedRole:roleForSheet()})
+      .then(function(o){
+        state.confirmingName = null;
+        var r = (state.residents||[]).filter(function(x){ return x.name===resName; })[0];
+        if(r){ r.confirmedBy=o.confirmedBy; r.confirmedRole=o.confirmedRole; r.confirmedAt=o.confirmedAt; }
+        toast(t('confirmOk')+resName);
+        renderConfirm();
+      }).catch(function(e){
+        state.confirmingName = null;
+        toast(t('confirmErr')+(e.message||e)); renderConfirm();
+      });
+  }
+
+  // ── 照片 ──
+  function togglePhotos(row){
+    var key = row.rowId;
+    if(state.photoOpen[key]){ state.photoOpen[key]=false; renderConsum(); return; }
+    state.photoOpen[key]=true;
+    if(state.photoCache[key]){ renderConsum(); return; }
+    state.photoState[key]='loading'; renderConsum();
+    api({action:'consumPhotos', bed:row.bed, resident:row.name, stamp:row.stamp})
+      .then(function(o){
+        var photos = (o.photos||[]).map(function(p){
+          return { name:p.name, url:p.url,
+            src: p.data ? ('data:'+(p.mime||'image/jpeg')+';base64,'+p.data) : '' };
+        });
+        state.photoCache[key]=photos; state.photoState[key]='ok'; renderConsum();
+      }).catch(function(){ state.photoState[key]='error'; renderConsum(); });
+  }
+  function openLightbox(src){
+    var lb=document.getElementById('lightbox'); document.getElementById('lbimg').src=src; lb.classList.add('on');
+  }
+
+  // ── 畫面 ──
+  function renderChrome(){
+    document.documentElement.lang = state.lang==='zh'?'zh-Hant':state.lang;
+    document.getElementById('title').textContent = t('title');
+    document.getElementById('hConfirm').textContent = t('hConfirm');
+    document.getElementById('hConsum').textContent = t('hConsum');
+    document.getElementById('refreshR').textContent = t('refresh');
+    document.getElementById('refreshC').textContent = t('refresh');
+    document.getElementById('lbx').textContent = t('close');
+    var who = document.getElementById('whoConfirm');
+    var nm = name();
+    who.innerHTML = t('who') + (nm ? esc(nm) + (roleLabel()?'（'+esc(roleLabel())+'）':'') : '<span class="hint">'+esc(t('noName'))+'</span>');
+    document.getElementById('whoConsum').textContent = '';
+    var lw = document.getElementById('langs'); lw.innerHTML='';
+    LANGS.forEach(function(p){
+      var b=document.createElement('button'); b.textContent=p[1];
+      if(p[0]===state.lang) b.className='on';
+      b.onclick=function(){ state.lang=p[0]; try{localStorage.setItem('portal_lang',p[0]);}catch(e){} renderAll(); };
+      lw.appendChild(b);
+    });
+  }
+
+  function renderConfirm(){
+    var box=document.getElementById('listR'); box.innerHTML='';
+    if(state.loadingR){ box.innerHTML='<div class="load">'+esc(t('loading'))+'</div>'; return; }
+    if(state.errR){
+      box.innerHTML='<div class="banner err">'+esc(t('loadFail'))+'</div>';
+      var rb=document.createElement('button'); rb.className='btn ghost'; rb.textContent=t('retry');
+      rb.onclick=loadResidents; box.appendChild(rb); return;
+    }
+    var list=state.residents||[];
+    if(!list.length){ box.innerHTML='<div class="empty">'+esc(t('empty'))+'</div>'; return; }
+    list.forEach(function(r){
+      var c=document.createElement('div'); c.className='card';
+      var head='<div class="row"><span class="bed">'+esc(r.bed||'')+'</span>'+
+        '<span class="nm">'+esc(r.name||'')+(r.en?' <span class="en">'+esc(r.en)+'</span>':'')+'</span></div>';
+      var sum=itemSummary(r.items);
+      var itemsHtml='<div class="items">'+esc(t('items'))+(sum?esc(sum):esc(t('none')))+'</div>';
+      c.innerHTML=head+itemsHtml;
+      var act=document.createElement('div'); act.className='actions';
+      if(r.confirmedBy){
+        var ok=document.createElement('span'); ok.className='ok';
+        ok.textContent='✓ '+t('confirmed')+'：'+r.confirmedBy+(r.confirmedRole?'（'+r.confirmedRole+'）':'')+
+          '　'+t('at')+' '+r.confirmedAt;
+        act.appendChild(ok);
+      } else {
+        var b=document.createElement('button'); b.className='btn';
+        var busy = state.confirmingName===r.name;
+        b.textContent = busy ? t('confirming') : t('confirm');
+        b.disabled = busy || !name();
+        b.onclick=function(){ doConfirm(r.name); };
+        act.appendChild(b);
+        if(!name()){ var h=document.createElement('span'); h.className='hint'; h.textContent=t('noName'); act.appendChild(h); }
+      }
+      c.appendChild(act);
+      box.appendChild(c);
+    });
+  }
+
+  function renderConsum(){
+    var box=document.getElementById('listC'); box.innerHTML='';
+    if(state.loadingC){ box.innerHTML='<div class="load">'+esc(t('loading'))+'</div>'; return; }
+    if(state.errC){
+      box.innerHTML='<div class="banner err">'+esc(t('loadFail'))+'</div>';
+      var rb=document.createElement('button'); rb.className='btn ghost'; rb.textContent=t('retry');
+      rb.onclick=loadConsum; box.appendChild(rb); return;
+    }
+    var list=state.consum||[];
+    if(!list.length){ box.innerHTML='<div class="empty">'+esc(t('empty'))+'</div>'; return; }
+    list.forEach(function(r){
+      var c=document.createElement('div'); c.className='card';
+      var head='<div class="row"><span class="bed">'+esc(r.bed||'')+'</span>'+
+        '<span class="nm">'+esc(r.name||'')+'</span></div>';
+      var items='<div class="items">'+esc(r.itemText||t('none'))+'</div>';
+      var meta='<div class="meta">'+esc(t('regDate'))+' '+esc(r.date||'')+
+        (r.expiry?' · '+esc(t('expiry'))+' '+esc(r.expiry):'')+'</div>';
+      c.innerHTML=head+items+meta;
+      var purged = r.photoState==='已清除';
+      var act=document.createElement('div'); act.className='actions';
+      if(purged){
+        var pg=document.createElement('span'); pg.className='hint'; pg.textContent=t('photoPurged'); act.appendChild(pg);
+      } else if(r.photoCount){
+        var b=document.createElement('button'); b.className='btn ghost';
+        b.textContent=(state.photoOpen[r.rowId]?t('hidePhotos'):t('viewPhotos'))+' ('+r.photoCount+')';
+        b.onclick=function(){ togglePhotos(r); };
+        act.appendChild(b);
+      }
+      c.appendChild(act);
+      if(state.photoOpen[r.rowId]){
+        var st=state.photoState[r.rowId];
+        if(st==='loading'){ var l=document.createElement('div'); l.className='load'; l.textContent=t('photoLoading'); c.appendChild(l); }
+        else if(st==='error'){ var e=document.createElement('div'); e.className='banner err'; e.textContent=t('photoFail'); c.appendChild(e); }
+        else {
+          var ph=state.photoCache[r.rowId]||[];
+          if(!ph.length){ var n=document.createElement('div'); n.className='load'; n.textContent=t('noPhotos'); c.appendChild(n); }
+          else {
+            var g=document.createElement('div'); g.className='thumbs';
+            ph.forEach(function(p,i){
+              var t1=document.createElement('div'); t1.className='t';
+              var src=p.src||p.url;
+              t1.innerHTML='<img src="'+esc(src)+'" alt=""><span>'+(i+1)+'</span>';
+              t1.onclick=function(){ openLightbox(src); };
+              g.appendChild(t1);
+            });
+            c.appendChild(g);
+          }
+        }
+      }
+      box.appendChild(c);
+    });
+  }
+
+  function renderAll(){ renderChrome(); renderConfirm(); renderConsum(); }
+
+  document.getElementById('refreshR').onclick=loadResidents;
+  document.getElementById('refreshC').onclick=loadConsum;
+  document.getElementById('lbx').onclick=function(){ document.getElementById('lightbox').classList.remove('on'); };
+  document.getElementById('lightbox').onclick=function(e){ if(e.target.id==='lightbox') this.classList.remove('on'); };
+
+  renderAll();
+  loadResidents();
+  loadConsum();
+})();
+</script>
+</body>
+</html>
