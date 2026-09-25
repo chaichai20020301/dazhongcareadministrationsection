@@ -275,6 +275,9 @@
       care:  ["visit","items","pricing","repair"]                  /* 照服：同護理 */
     };
     var ROLE_LABEL = { admin:"行政", nurse:"護理", care:"照服" };
+    /* 卡片預設連結；ROLE_HREF 可讓某身份的某張卡改連別的頁（例：照服的探視卡→簡化今日名單頁） */
+    var DEFAULT_HREF = { visit:"visit/index.html", items:"items/index.html", handover:"admin/index.html", car:"car/index.html", pricing:"pricing/index.html", repair:"repair/index.html" };
+    var ROLE_HREF = { care: { visit:"visit-today/index.html" } };
     /* ===== 多語系（入口頁）===== */
     var LANG_KEY = "portal_lang";
     var CUR_NAME = "", CUR_ROLE = "";
@@ -299,6 +302,8 @@
       for(var i=0;i<cards.length;i++){
         var k = cards[i].getAttribute("data-key");
         cards[i].style.display = (allow.indexOf(k)>=0) ? "" : "none";
+        var ov = (ROLE_HREF[role]||{})[k];
+        if(DEFAULT_HREF[k]) cards[i].setAttribute("href", ov || DEFAULT_HREF[k]);
       }
       balanceGrid();
     }

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>今日探視名單</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#f1ede5;font-family:'Noto Sans TC',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+button{font-family:inherit;cursor:pointer}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ld{display:inline-block;vertical-align:middle;width:16px;height:16px;border:2px solid #e0dbd1;border-top-color:#4f8c3a;border-radius:50%;animation:spin .9s linear infinite}
+.card{animation:riseIn .3s ease both}
+.langbtn{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;padding:5px 10px;border-radius:20px;font:700 12px 'Noto Sans TC';opacity:.7}
+.langbtn.on{background:#fff;color:#4f8c3a;opacity:1;border-color:#fff}
+#app-bg{min-height:100vh;padding:22px 14px 60px}
+#app-shell{max-width:560px;margin:0 auto}
+@media (min-width:768px){#app-bg{padding:36px 20px 72px}#app-shell{max-width:640px}}
+@media (min-width:1024px){#app-shell{max-width:680px}}
+</style>
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<div id="app-bg">
+<div id="app-shell">
+<div style="background:#faf8f4;border:1px solid #e7e1d6;border-radius:8px;overflow:hidden;box-shadow:0 6px 26px rgba(79,140,58,.10)">
+<div style="padding:22px 22px 20px;background:#4f8c3a;color:#fff">
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+<div>
+<div id="t-title" style="font:700 22px/1.3 'Noto Serif TC';color:#fff">今日探視名單</div>
+<div id="t-sub" style="margin-top:5px;font:300 13.5px/1.7 'Noto Sans TC';color:#e2f0d3">今天預約前來探視的家屬</div>
+</div>
+<div style="display:flex;gap:5px;flex:none">
+<button class="langbtn" data-lang="zh">中</button>
+<button class="langbtn" data-lang="id">ID</button>
+<button class="langbtn" data-lang="vi">VI</button>
+</div>
+</div>
+<div id="t-date" style="margin-top:14px;font:700 15px 'Noto Sans TC';color:#fff"></div>
+</div>
+<div style="padding:16px 16px 20px">
+<div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 12px">
+<div id="t-count" style="font:700 13px 'Noto Sans TC';color:#7d766c"></div>
+<button id="btn-refresh" style="border:1px solid #e0dbd1;background:#fff;color:#4f8c3a;padding:7px 14px;border-radius:20px;font:700 12.5px 'Noto Sans TC'"></button>
+</div>
+<div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
+</div>
+</div>
+<div id="sync" style="margin-top:16px;text-align:center;font:400 11px 'Noto Sans TC';color:#c6bfb2;letter-spacing:.08em"></div>
+</div>
+</div>
+<script>
+(function(){
+  var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
+  var CODE = "0804";
+  try { var hc = localStorage.getItem("handover_code"); if (hc) CODE = hc; } catch(e){}
+
+  var I18N = {
+    zh: { title:"今日探視名單", sub:"今天預約前來探視的家屬", resident:"住民", time:"時段", family:"家屬",
+          empty:"今日尚無探視預約", loading:"讀取中…", offline:"連線失敗，請稍後再試",
+          refresh:"重新整理", count:function(n){return "共 "+n+" 筆";}, synced:"已更新 " , locale:"zh-TW" },
+    id: { title:"Daftar Kunjungan Hari Ini", sub:"Keluarga yang berkunjung hari ini", resident:"Penghuni", time:"Waktu", family:"Keluarga",
+          empty:"Belum ada kunjungan hari ini", loading:"Memuat…", offline:"Gagal terhubung, coba lagi",
+          refresh:"Muat ulang", count:function(n){return "Total "+n;}, synced:"Diperbarui ", locale:"id-ID" },
+    vi: { title:"Danh sách thăm hôm nay", sub:"Người nhà đến thăm hôm nay", resident:"Người cao tuổi", time:"Giờ", family:"Người nhà",
+          empty:"Hôm nay chưa có lượt thăm", loading:"Đang tải…", offline:"Kết nối thất bại, thử lại",
+          refresh:"Tải lại", count:function(n){return "Tổng "+n;}, synced:"Đã cập nhật ", locale:"vi-VN" }
+  };
+
+  var lang = "zh";
+  try { var pl = localStorage.getItem("portal_lang"); if (pl && I18N[pl]) lang = pl; } catch(e){}
+
+  var $ = function(id){ return document.getElementById(id); };
+  var esc = function(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); };
+  var cache = null; // 上次成功抓到的資料
+
+  function normDate(str){
+    if(!str) return "";
+    var d = new Date(str);
+    if(!isNaN(d.getTime())) return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    var s = String(str).replace(/\//g,"-").trim().split("-");
+    if(s.length===3) return s[0]+"-"+s[1].padStart(2,"0")+"-"+s[2].padStart(2,"0");
+    return String(str);
+  }
+  function normTime(str){
+    if(!str) return "";
+    var s = String(str).trim().replace(/：/g,":");
+    if(s.indexOf(" ")>=0) s = s.split(" ")[1];
+    var p = s.split(":");
+    if(p.length>=2) return p[0].replace(/^0/,"")+":"+p[1];
+    return s;
+  }
+  function todayStr(){
+    var d = new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+
+  function applyStaticText(){
+    var T = I18N[lang];
+    document.documentElement.lang = T.locale;
+    document.title = T.title;
+    $("t-title").innerText = T.title;
+    $("t-sub").innerText = T.sub;
+    $("btn-refresh").innerText = T.refresh;
+    // 今天日期（在地化）
+    try { $("t-date").innerText = new Intl.DateTimeFormat(T.locale, {year:"numeric",month:"long",day:"numeric",weekday:"long"}).format(new Date()); }
+    catch(e){ $("t-date").innerText = todayStr(); }
+    // 語言鈕狀態
+    var btns = document.querySelectorAll(".langbtn");
+    for(var i=0;i<btns.length;i++){ btns[i].className = "langbtn" + (btns[i].getAttribute("data-lang")===lang ? " on" : ""); }
+  }
+
+  function render(){
+    var T = I18N[lang];
+    var list = $("list");
+    if(cache === null){
+      list.innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:9px"><span class="ld"></span><span style="font:400 14px \'Noto Sans TC\';color:#b6ae9f">'+esc(T.loading)+'</span></div>';
+      $("t-count").innerText = "";
+      return;
+    }
+    var today = todayStr();
+    var rows = cache.filter(function(r){ return normDate(r.date || r["預約日期"]) === today; })
+      .sort(function(a,b){ return normTime(a.time||a["預約時段"]).localeCompare(normTime(b.time||b["預約時段"]), undefined, {numeric:true}); });
+    $("t-count").innerText = T.count(rows.length);
+    if(!rows.length){
+      list.innerHTML = '<div style="padding:40px 20px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 15px \'Noto Sans TC\';color:#b6ae9f">'+esc(T.empty)+'</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(r){
+      var name = esc(r.residentName || r.name || "");
+      var fam = esc(r.familyName || "");
+      var time = esc(r.time || r["預約時段"] || "");
+      return '<div class="card" style="display:flex;gap:13px;padding:15px;background:#fff;border:1px solid #e7e1d6;border-radius:6px;align-items:center">'
+        + '<div style="width:64px;padding:10px 0;background:#eef5e6;border-radius:6px;text-align:center;font:700 16px \'Noto Serif TC\';color:#4f8c3a;flex:none">'+time+'</div>'
+        + '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">'
+          + '<div style="font:700 18px \'Noto Sans TC\';color:#2a2926;word-break:break-all">'+name+'</div>'
+          + (fam ? '<div style="font:400 13.5px \'Noto Sans TC\';color:#857e73">'+esc(T.family)+'：'+fam+'</div>' : '')
+        + '</div></div>';
+    }).join("");
+  }
+
+  function setSync(text, err){
+    $("sync").innerText = text;
+    $("sync").style.color = err ? "#a8763c" : "#c6bfb2";
+  }
+
+  var fetching = false;
+  function load(){
+    if(fetching) return;
+    fetching = true;
+    var T = I18N[lang];
+    if(cache === null) render();
+    fetch(SCRIPT_URL + "?pwd=" + encodeURIComponent(CODE) + "&t=" + Date.now())
+      .then(function(res){ return res.json(); })
+      .then(function(data){
+        cache = data.records || [];
+        render();
+        var now = new Date();
+        setSync(T.synced + now.toLocaleTimeString(T.locale, {hour:"2-digit",minute:"2-digit"}), false);
+      })
+      .catch(function(){
+        setSync(T.offline, true);
+        if(cache === null){
+          $("list").innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 14px \'Noto Sans TC\';color:#a8763c">'+esc(T.offline)+'</div>';
+        }
+      })
+      .then(function(){ fetching = false; });
+  }
+
+  // 語言切換（同時寫回 portal_lang，讓入口頁一致）
+  var btns = document.querySelectorAll(".langbtn");
+  for(var i=0;i<btns.length;i++){
+    btns[i].onclick = function(){
+      lang = this.getAttribute("data-lang");
+      try { localStorage.setItem("portal_lang", lang); } catch(e){}
+      applyStaticText(); render(); load();
+    };
+  }
+  $("btn-refresh").onclick = load;
+
+  applyStaticText();
+  load();
+})();
+</script>
+</body>
+</html>
