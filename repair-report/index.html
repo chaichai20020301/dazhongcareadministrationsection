@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>維修報修（護理／照服）</title>
+<style>
+  :root{
+    --bg:#F5F4EE; --ink:#1F2320; --sub:#45483F; --sub2:#6A6E62; --sub3:#8A8E80;
+    --green:#3E7530; --green2:#5C9A45; --gl:#E3F0D5; --gl2:#F4FAEE; --gd:#D8EBC4;
+    --line:rgba(31,35,32,.16); --line2:rgba(31,35,32,.22);
+    --amber:#C07817; --amberbg:#FBF3E2;
+    --red:#B4402F; --redbg:#FBEEE9;
+    --err:#8F3F2C; --errbg:#FBEEE9; --errln:#B4553C;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC","PingFang TC",Roboto,sans-serif;
+    font-size:15px;line-height:1.6;-webkit-text-size-adjust:100%}
+  .wrap{max-width:640px;margin:0 auto;padding:0 16px 48px}
+  header{position:sticky;top:0;z-index:3;background:var(--bg);
+    display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line);
+    margin:0 -16px 18px}
+  h1{flex:1;min-width:0;margin:0;font-size:17px;font-weight:700;line-height:1.2}
+  h1 .sub{display:block;font-size:11.5px;font-weight:500;color:var(--sub3);margin-top:1px}
+  .langs{flex:none;display:flex;gap:4px}
+  .langs button{padding:5px 9px;border:1px solid var(--line2);background:transparent;color:var(--sub);
+    font-size:12.5px;line-height:1;cursor:pointer;border-radius:9px}
+  .langs button.on{background:var(--green);border-color:var(--green);color:#fff}
+
+  .field{margin-bottom:16px}
+  label{display:block;font-size:13px;font-weight:700;color:var(--sub);margin:0 0 7px}
+  label .req{color:var(--red);font-weight:700;margin-left:3px}
+  input,select,textarea{width:100%;font-size:16px;font-family:inherit;color:var(--ink);
+    border:1px solid var(--line2);border-radius:11px;padding:12px 13px;background:#fff;-webkit-appearance:none;appearance:none}
+  select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236A6E62' stroke-width='2'><path d='M3 5l4 4 4-4'/></svg>");
+    background-repeat:no-repeat;background-position:right 13px center;padding-right:36px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px rgba(92,154,69,.15)}
+  textarea{resize:vertical;min-height:92px;line-height:1.55}
+
+  .seg{display:flex;gap:8px}
+  .seg button{flex:1;border:1px solid var(--line2);background:#fff;border-radius:11px;padding:11px 6px;
+    font-size:14.5px;font-weight:700;color:var(--sub2);cursor:pointer;line-height:1.2}
+  .seg button .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;background:#ccc}
+  .seg button[data-v="緊急"] .dot{background:#D64533}
+  .seg button[data-v="一般"] .dot{background:#E0A21B}
+  .seg button[data-v="低"] .dot{background:#4E9A45}
+  .seg button.on[data-v="緊急"]{background:var(--redbg);border-color:#D64533;color:#8F2E22}
+  .seg button.on[data-v="一般"]{background:var(--amberbg);border-color:#E0A21B;color:#8A5A12}
+  .seg button.on[data-v="低"]{background:var(--gl2);border-color:var(--green2);color:var(--green)}
+
+  .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:8px}
+  .photos .p{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#EDEBE2}
+  .photos .p img{width:100%;height:100%;object-fit:cover;display:block}
+  .photos .p .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border:0;border-radius:6px;
+    background:rgba(25,28,25,.62);color:#fff;font-size:13px;line-height:24px;text-align:center;cursor:pointer}
+  .addp{aspect-ratio:1;border:1px dashed var(--line2);border-radius:10px;background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--sub3);font-size:12px;font-weight:600;cursor:pointer}
+  .addp .ic{font-size:20px;line-height:1}
+
+  .btn{display:block;width:100%;padding:15px;border-radius:12px;border:0;
+    background:var(--green2);color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+  .btn:hover{background:var(--green)}
+  .btn:disabled{opacity:.55;cursor:default}
+  .hint{color:var(--sub3);font-size:12px;margin-top:6px}
+
+  .banner{padding:11px 13px;border-radius:11px;font-size:13.5px;line-height:1.55;margin-bottom:14px;display:none}
+  .banner.err{display:block;background:var(--errbg);border:1px solid var(--errln);color:var(--err)}
+
+  /* 成功畫面 */
+  .done{text-align:center;padding:44px 18px}
+  .done .ico{width:66px;height:66px;border-radius:50%;background:var(--gl);color:var(--green);
+    font-size:34px;line-height:66px;margin:0 auto 16px}
+  .done h2{margin:0 0 6px;font-size:20px;color:var(--green)}
+  .done p{margin:0 0 22px;color:var(--sub2);font-size:14px}
+  .done .no{display:inline-block;font-family:ui-monospace,Menlo,monospace;background:#fff;border:1px solid var(--line);
+    border-radius:8px;padding:4px 12px;color:var(--sub);margin-bottom:22px;font-size:14px}
+</style>
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<div class="wrap">
+  <header>
+    <h1 id="title">維修報修<span class="sub" id="subtitle">線東大眾護理之家</span></h1>
+    <div class="langs" id="langs"></div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<script>
+"use strict";
+/* ─────────────────────────────────────────────────────────
+   維修報修（護理／照服簡化頁）— 單檔自帶、三語、無外部相依
+   送出打維修完整版同一支 /exec（action:upload），值存中文
+   ───────────────────────────────────────────────────────── */
+
+// 後端（與維修完整版相同）；可用 localStorage 覆寫
+var ENDPOINT = localStorage.getItem('repair_endpoint') ||
+  'https://script.google.com/macros/s/AKfycbwKWNcegoY9JxOjjp8kuNvTw9mhbtHnDkhXyR3glfYRK8Al19nW1ta0zrdie4R8FW-n3w/exec';
+var ROOT = localStorage.getItem('repair_root') || '1zVC4RGZOrBvfG0ohcX1LZQdJoQfupXx3';
+
+/* ── 介面字典 ── */
+var I18N = {
+  zh:{ title:'維修報修', subtitle:'線東大眾護理之家',
+       reporter:'報修人', reporterPh:'你的姓名',
+       dept:'部門', priority:'急迫程度', location:'地點', category:'設備／類別',
+       pUrgent:'緊急', pNormal:'一般', pLow:'低',
+       desc:'問題描述', descPh:'例：三樓走廊日光燈不亮、閃爍',
+       photo:'現場照片', optional:'（選填）', addPhoto:'拍照／選圖',
+       choose:'請選擇…',
+       submit:'送出報修', sending:'送出中…',
+       okTitle:'報修已送出', okMsg:'謝謝！總務會盡快處理。', again:'再報一張',
+       eReporter:'請填報修人', eDept:'請選部門', eLoc:'請選地點', eCat:'請選設備／類別', eDesc:'請填問題描述',
+       eSend:'送出失敗，請確認網路後再試一次' },
+  id:{ title:'Lapor Perbaikan', subtitle:'Panti Jompo Dazhong Xiandong',
+       reporter:'Pelapor', reporterPh:'Nama Anda',
+       dept:'Departemen', priority:'Tingkat Urgensi', location:'Lokasi', category:'Peralatan / Kategori',
+       pUrgent:'Darurat', pNormal:'Biasa', pLow:'Rendah',
+       desc:'Deskripsi Masalah', descPh:'Contoh: lampu koridor lantai 3 mati/berkedip',
+       photo:'Foto Lokasi', optional:'(opsional)', addPhoto:'Ambil / Pilih Foto',
+       choose:'Silakan pilih…',
+       submit:'Kirim Laporan', sending:'Mengirim…',
+       okTitle:'Laporan Terkirim', okMsg:'Terima kasih! Bagian umum akan segera menangani.', again:'Lapor Lagi',
+       eReporter:'Isi nama pelapor', eDept:'Pilih departemen', eLoc:'Pilih lokasi', eCat:'Pilih peralatan/kategori', eDesc:'Isi deskripsi masalah',
+       eSend:'Gagal mengirim, periksa koneksi lalu coba lagi' },
+  vi:{ title:'Báo hỏng sửa chữa', subtitle:'Viện dưỡng lão Dazhong Xiandong',
+       reporter:'Người báo', reporterPh:'Tên của bạn',
+       dept:'Bộ phận', priority:'Mức độ khẩn', location:'Địa điểm', category:'Thiết bị / Loại',
+       pUrgent:'Khẩn cấp', pNormal:'Bình thường', pLow:'Thấp',
+       desc:'Mô tả sự cố', descPh:'VD: đèn hành lang tầng 3 không sáng/nhấp nháy',
+       photo:'Ảnh hiện trường', optional:'(tùy chọn)', addPhoto:'Chụp / Chọn ảnh',
+       choose:'Vui lòng chọn…',
+       submit:'Gửi báo hỏng', sending:'Đang gửi…',
+       okTitle:'Đã gửi báo hỏng', okMsg:'Cảm ơn! Bộ phận tổng vụ sẽ xử lý sớm.', again:'Báo tiếp',
+       eReporter:'Nhập tên người báo', eDept:'Chọn bộ phận', eLoc:'Chọn địa điểm', eCat:'Chọn thiết bị/loại', eDesc:'Nhập mô tả sự cố',
+       eSend:'Gửi thất bại, kiểm tra mạng rồi thử lại' }
+};
+
+/* ── 選項（顯示三語、送出值存中文 v）── */
+var OPTS = {
+  dept:[
+    {v:'護理組', zh:'護理組', id:'Tim Keperawatan', vi:'Tổ Điều dưỡng'},
+    {v:'照服組', zh:'照服組', id:'Tim Pengasuh', vi:'Tổ Hộ lý'},
+    {v:'行政組', zh:'行政組', id:'Tim Administrasi', vi:'Tổ Hành chính'},
+    {v:'營養/廚房', zh:'營養/廚房', id:'Gizi / Dapur', vi:'Dinh dưỡng / Bếp'},
+    {v:'社工', zh:'社工', id:'Pekerja Sosial', vi:'Công tác xã hội'},
+    {v:'復健', zh:'復健', id:'Rehabilitasi', vi:'Phục hồi chức năng'},
+    {v:'其他', zh:'其他', id:'Lainnya', vi:'Khác'}
+  ],
+  location:[
+    {v:'一樓護理站', zh:'一樓護理站', id:'Ners Stasiun Lt.1', vi:'Trạm điều dưỡng tầng 1'},
+    {v:'二樓護理站', zh:'二樓護理站', id:'Ners Stasiun Lt.2', vi:'Trạm điều dưỡng tầng 2'},
+    {v:'三樓護理站', zh:'三樓護理站', id:'Ners Stasiun Lt.3', vi:'Trạm điều dưỡng tầng 3'},
+    {v:'住民房間', zh:'住民房間', id:'Kamar Penghuni', vi:'Phòng người cao tuổi'},
+    {v:'公共衛浴', zh:'公共衛浴', id:'Toilet / Kamar Mandi Umum', vi:'Nhà vệ sinh chung'},
+    {v:'廚房', zh:'廚房', id:'Dapur', vi:'Nhà bếp'},
+    {v:'餐廳', zh:'餐廳', id:'Ruang Makan', vi:'Phòng ăn'},
+    {v:'洗衣間', zh:'洗衣間', id:'Ruang Cuci', vi:'Phòng giặt'},
+    {v:'電梯', zh:'電梯', id:'Lift', vi:'Thang máy'},
+    {v:'走廊', zh:'走廊', id:'Koridor', vi:'Hành lang'},
+    {v:'大廳', zh:'大廳', id:'Lobi', vi:'Sảnh'},
+    {v:'辦公室', zh:'辦公室', id:'Kantor', vi:'Văn phòng'},
+    {v:'庫房', zh:'庫房', id:'Gudang', vi:'Kho'},
+    {v:'屋頂/戶外', zh:'屋頂/戶外', id:'Atap / Luar Ruangan', vi:'Sân thượng / Ngoài trời'},
+    {v:'其他', zh:'其他', id:'Lainnya', vi:'Khác'}
+  ],
+  category:[
+    {v:'水電', zh:'水電', id:'Air & Listrik', vi:'Điện nước'},
+    {v:'照明燈具', zh:'照明燈具', id:'Lampu / Penerangan', vi:'Đèn chiếu sáng'},
+    {v:'冷氣/空調', zh:'冷氣/空調', id:'AC / Pendingin', vi:'Máy lạnh / Điều hòa'},
+    {v:'熱水器/鍋爐', zh:'熱水器/鍋爐', id:'Pemanas Air / Boiler', vi:'Máy nước nóng / Nồi hơi'},
+    {v:'門窗/門鎖', zh:'門窗/門鎖', id:'Pintu / Jendela / Kunci', vi:'Cửa / Cửa sổ / Khóa'},
+    {v:'病床/氣墊床', zh:'病床/氣墊床', id:'Tempat Tidur / Kasur Angin', vi:'Giường bệnh / Nệm hơi'},
+    {v:'輪椅/助行器', zh:'輪椅/助行器', id:'Kursi Roda / Alat Bantu Jalan', vi:'Xe lăn / Khung tập đi'},
+    {v:'管路/給皂機', zh:'管路/給皂機', id:'Pipa / Dispenser Sabun', vi:'Đường ống / Bình xà phòng'},
+    {v:'家具', zh:'家具', id:'Furnitur', vi:'Nội thất'},
+    {v:'資訊/網路/電話', zh:'資訊/網路/電話', id:'IT / Internet / Telepon', vi:'CNTT / Mạng / Điện thoại'},
+    {v:'消防/警報', zh:'消防/警報', id:'Pemadam / Alarm', vi:'PCCC / Báo động'},
+    {v:'電梯', zh:'電梯', id:'Lift', vi:'Thang máy'},
+    {v:'漏水/排水', zh:'漏水/排水', id:'Bocor / Drainase', vi:'Rò rỉ / Thoát nước'},
+    {v:'其他', zh:'其他', id:'Lainnya', vi:'Khác'}
+  ]
+};
+
+var LANGS = [['zh','中'],['id','ID'],['vi','VI']];
+var state = {
+  lang: (function(){ var l=localStorage.getItem('portal_lang'); return I18N[l]?l:'zh'; })(),
+  submitting:false, done:null, err:''
+};
+var f = { reporter:'', dept:'', priority:'一般', location:'', category:'', desc:'', photos:[] };
+// 預填報修人
+f.reporter = (localStorage.getItem('handover_name')||'').trim();
+
+function t(k){ return (I18N[state.lang]&&I18N[state.lang][k]) || I18N.zh[k] || k; }
+function optLabel(o){ return o[state.lang]||o.zh; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function pad2(n){ return n<10?'0'+n:''+n; }
+function pad3(n){ return n<10?'00'+n:(n<100?'0'+n:''+n); }
+function rocDate(d){ return (d.getFullYear()-1911)+'/'+pad2(d.getMonth()+1)+'/'+pad2(d.getDate()); }
+function rocDateTime(d){ return rocDate(d)+' '+pad2(d.getHours())+':'+pad2(d.getMinutes()); }
+function ticketPrefix(){ var d=new Date(); return 'R'+(d.getFullYear()-1911)+pad2(d.getMonth()+1)+'-'; }
+
+/* ── 網路：POST text/plain（避開 CORS preflight），逾時＋重試一次 ── */
+function api(payload){
+  payload = Object.assign({ rootFolderId: ROOT }, payload);
+  var attempt = function(n){
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 60000) : null;
+    return fetch(ENDPOINT, {
+      method:'POST', redirect:'follow', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload), signal: ctrl?ctrl.signal:undefined
+    }).then(function(r){
+      if(timer) clearTimeout(timer);
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      return r.text();
+    }).then(function(txt){
+      var o; try{ o=JSON.parse(txt); }catch(e){ throw new Error('bad json'); }
+      if(o && o.error) throw new Error(o.error);
+      return o;
+    }).catch(function(e){
+      if(timer) clearTimeout(timer);
+      if(n<1) return new Promise(function(res){ setTimeout(res,1200); }).then(function(){ return attempt(n+1); });
+      throw e;
+    });
+  };
+  return attempt(0);
+}
+
+/* ── 照片壓縮成 JPEG base64 ── */
+function fileToJpeg(file, maxW){
+  maxW=maxW||1280;
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onload=function(){
+      var w=img.width,h=img.height; if(w>maxW){ h=Math.round(h*maxW/w); w=maxW; }
+      var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      resolve(cv.toDataURL('image/jpeg',0.82).split(',')[1]);
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); reject(); };
+    img.src=url;
+  });
+}
+
+/* ── 畫面 ── */
+function renderLangs(){
+  var w=document.getElementById('langs'); w.innerHTML='';
+  LANGS.forEach(function(p){
+    var b=document.createElement('button'); b.textContent=p[1];
+    if(p[0]===state.lang) b.className='on';
+    b.onclick=function(){ state.lang=p[0]; try{localStorage.setItem('portal_lang',p[0]);}catch(e){} renderAll(); };
+    w.appendChild(b);
+  });
+}
+
+function optionsHtml(kind, cur){
+  var html='<option value=""'+(cur?'':' selected')+' disabled>'+esc(t('choose'))+'</option>';
+  OPTS[kind].forEach(function(o){
+    html+='<option value="'+esc(o.v)+'"'+(o.v===cur?' selected':'')+'>'+esc(optLabel(o))+'</option>';
+  });
+  return html;
+}
+
+function renderForm(){
+  var m=document.getElementById('main');
+  m.innerHTML=
+    '<div class="banner" id="err"></div>'+
+    '<div class="field"><label>'+esc(t('reporter'))+'<span class="req">＊</span></label>'+
+      '<input id="f_reporter" placeholder="'+esc(t('reporterPh'))+'" value="'+esc(f.reporter)+'"></div>'+
+    '<div class="field"><label>'+esc(t('dept'))+'</label><select id="f_dept">'+optionsHtml('dept',f.dept)+'</select></div>'+
+    '<div class="field"><label>'+esc(t('priority'))+'<span class="req">＊</span></label>'+
+      '<div class="seg" id="f_seg">'+
+        ['緊急','一般','低'].map(function(v){
+          var lbl = v==='緊急'?t('pUrgent'):(v==='低'?t('pLow'):t('pNormal'));
+          return '<button type="button" data-v="'+v+'" class="'+(f.priority===v?'on':'')+'"><span class="dot"></span>'+esc(lbl)+'</button>';
+        }).join('')+
+      '</div></div>'+
+    '<div class="field"><label>'+esc(t('location'))+'<span class="req">＊</span></label><select id="f_location">'+optionsHtml('location',f.location)+'</select></div>'+
+    '<div class="field"><label>'+esc(t('category'))+'<span class="req">＊</span></label><select id="f_category">'+optionsHtml('category',f.category)+'</select></div>'+
+    '<div class="field"><label>'+esc(t('desc'))+'<span class="req">＊</span></label>'+
+      '<textarea id="f_desc" placeholder="'+esc(t('descPh'))+'">'+esc(f.desc)+'</textarea></div>'+
+    '<div class="field"><label>'+esc(t('photo'))+' <span style="color:var(--sub3);font-weight:500">'+esc(t('optional'))+'</span></label>'+
+      '<div class="photos" id="f_photos"></div></div>'+
+    '<button class="btn" id="f_submit">'+esc(t('submit'))+'</button>';
+
+  document.getElementById('f_reporter').oninput=function(e){ f.reporter=e.target.value; };
+  document.getElementById('f_dept').onchange=function(e){ f.dept=e.target.value; };
+  document.getElementById('f_location').onchange=function(e){ f.location=e.target.value; };
+  document.getElementById('f_category').onchange=function(e){ f.category=e.target.value; };
+  document.getElementById('f_desc').oninput=function(e){ f.desc=e.target.value; };
+  document.querySelectorAll('#f_seg button').forEach(function(b){
+    b.onclick=function(){ document.querySelectorAll('#f_seg button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); f.priority=b.dataset.v; };
+  });
+  document.getElementById('f_submit').onclick=submit;
+  renderPhotos();
+  if(state.err){ var e=document.getElementById('err'); e.textContent=state.err; e.classList.add('err'); }
+}
+
+function renderPhotos(){
+  var box=document.getElementById('f_photos'); if(!box) return;
+  box.innerHTML=f.photos.map(function(b64,i){
+    return '<div class="p"><img src="data:image/jpeg;base64,'+b64+'"><button type="button" class="x" data-i="'+i+'">✕</button></div>';
+  }).join('')+
+  '<label class="addp"><span class="ic">＋</span>'+esc(t('addPhoto'))+'<input type="file" accept="image/*" capture="environment" multiple style="display:none"></label>';
+  var inp=box.querySelector('input[type=file]');
+  inp.onchange=function(){
+    var files=Array.prototype.slice.call(inp.files); if(!files.length) return;
+    Promise.all(files.map(function(x){return fileToJpeg(x);})).then(function(b64s){ b64s.forEach(function(b){ f.photos.push(b); }); renderPhotos(); });
+  };
+  box.querySelectorAll('.x').forEach(function(b){ b.onclick=function(){ f.photos.splice(Number(b.dataset.i),1); renderPhotos(); }; });
+}
+
+function renderDone(){
+  var m=document.getElementById('main');
+  m.innerHTML=
+    '<div class="done">'+
+      '<div class="ico">✓</div>'+
+      '<h2>'+esc(t('okTitle'))+'</h2>'+
+      '<p>'+esc(t('okMsg'))+'</p>'+
+      '<div class="no">'+esc(state.done)+'</div><br>'+
+      '<button class="btn" id="d_again" style="max-width:260px;margin:0 auto">'+esc(t('again'))+'</button>'+
+    '</div>';
+  document.getElementById('d_again').onclick=function(){
+    // 保留報修人，其餘清空
+    f={ reporter:f.reporter, dept:'', priority:'一般', location:'', category:'', desc:'', photos:[] };
+    state.done=null; state.err=''; renderForm(); window.scrollTo(0,0);
+  };
+}
+
+function renderAll(){
+  document.documentElement.lang = state.lang==='zh'?'zh-Hant':state.lang;
+  document.getElementById('title').childNodes[0].nodeValue = t('title');
+  document.getElementById('subtitle').textContent = t('subtitle');
+  document.title = t('title');
+  renderLangs();
+  if(state.done) renderDone(); else renderForm();
+}
+
+function showErr(msg){ state.err=msg; var e=document.getElementById('err'); if(e){ e.textContent=msg; e.classList.add('err'); window.scrollTo(0,0);} }
+
+function submit(){
+  if(state.submitting || !document.getElementById('f_reporter')) return;
+  // 讀最新值
+  f.reporter=(document.getElementById('f_reporter').value||'').trim();
+  f.desc=(document.getElementById('f_desc').value||'').trim();
+  state.err='';
+  if(!f.reporter) return showErr(t('eReporter'));
+  if(!f.location) return showErr(t('eLoc'));
+  if(!f.category) return showErr(t('eCat'));
+  if(!f.desc) return showErr(t('eDesc'));
+
+  state.submitting=true;
+  var btn=document.getElementById('f_submit'); btn.disabled=true; btn.textContent=t('sending');
+  var now=new Date();
+  // 先取單號，再送出（與完整版一致）
+  api({action:'nextSeq'}).then(function(res){
+    var seq=(res&&res.nextSeq)||1;
+    var no=ticketPrefix()+pad3(seq);
+    var pIcon=f.priority==='緊急'?'🔴 緊急':(f.priority==='低'?'🟢 低':'🟡 一般');
+    var hasPhoto=f.photos.length>0;
+    var notify='🔧'+(f.priority==='緊急'?'【緊急】':' ')+'維修報修 '+no+'｜'+f.location+'・'+f.category+
+      '\n\n報修單號：'+no+
+      '\n急迫程度：'+pIcon+
+      '\n報修時間：'+rocDateTime(now)+
+      '\n部　　門：'+(f.dept||'—')+
+      '\n地　　點：'+f.location+
+      '\n設備類別：'+f.category+
+      '\n報 修 人：'+f.reporter+
+      '\n\n📝 問題描述\n'+f.desc+
+      (hasPhoto?'\n\n📎 現況照請見附件':'');
+    var ticket={
+      no:no, date:rocDate(now), reporter:f.reporter, org:'', dept:f.dept, location:f.location,
+      category:f.category, desc:f.desc, priority:f.priority, status:'待處理',
+      assignee:'', method:'', vendor:'', cost:'', doneDate:'', note:'',
+      updated:rocDateTime(now),
+      log:[{t:rocDateTime(now), who:f.reporter, act:'建立報修單'}]
+    };
+    var photos=f.photos.map(function(b){ return {data:b, stage:'before'}; });
+    return api({action:'upload', ticketNo:no, ticket:ticket, photos:photos, photoMode:'append',
+                notifyText:notify, notifyPhoto:hasPhoto, notifyStage:'before'})
+      .then(function(){ state.submitting=false; state.done=no; renderDone(); window.scrollTo(0,0); });
+  }).catch(function(){
+    state.submitting=false;
+    btn.disabled=false; btn.textContent=t('submit');
+    showErr(t('eSend'));
+  });
+}
+
+renderAll();
+</script>
+</body>
+</html>
