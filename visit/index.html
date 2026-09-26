@@ -591,13 +591,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
 
       // ---- 房間隔離 ----
       const splitNames = (raw) => String(raw || "").split(/[&＆與和,，、+＋]/).map(n => n.trim()).filter(Boolean);
+      // 姓名正規化：去掉括號拼音（如「黃國進(Guo Jin)」→「黃國進」）與空白，讓家屬打的中文名也能對上資料庫名字
+      const normName = (s) => String(s || "").replace(/[（(][^）)]*[）)]/g, "").replace(/\s+/g, "").trim();
       // 回傳被隔離而擋下的清單：[{name, room, reason, end, date}]，date 為觸發的探視日期
       function findIsolationBlocks(rawName, dates) {
         const names = splitNames(rawName);
         const out = [];
         names.forEach(nm => {
+          const nmN = normName(nm);
           blockedNames.forEach(b => {
-            if (b.name !== nm) return;
+            if (!nmN || normName(b.name) !== nmN) return;
             dates.forEach(dt => {
               const nDt = normalizeDateStr(dt);
               if (nDt >= normalizeDateStr(b.start) && nDt <= normalizeDateStr(b.end)) {
