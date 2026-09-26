@@ -268,6 +268,8 @@
     /* 與各系統共用的瀏覽器記憶鍵（勿更動，行政交班系統靠這兩個鍵免登入） */
     var CODE_KEY = "handover_code", NAME_KEY = "handover_name";
     var ROLE_KEY = "portal_role";
+    /* 本機構固定值：維修系統等後端有跨機構資料，靠這個鍵讀本站對應的機構名稱 */
+    var ORG_KEY = "handover_org", ORG_VALUE = "線東大眾護理之家";
     /* 各身份可看到的卡片（改這裡就好；卡片 data-key：visit/items/handover/car/pricing/repair） */
     var ROLE_CARDS = {
       admin: ["visit","items","handover","car","pricing","repair"],   /* 行政：全部 */
@@ -375,7 +377,7 @@
       verifyCode(code).then(function(ok){
         btn.disabled = false;
         if(ok){
-          lsSet(CODE_KEY, code); lsSet(NAME_KEY, name); lsSet(ROLE_KEY, role);
+          lsSet(CODE_KEY, code); lsSet(NAME_KEY, name); lsSet(ROLE_KEY, role); lsSet(ORG_KEY, ORG_VALUE);
           msg.textContent = "";
           showApp(name, role);
         }else{
@@ -401,6 +403,7 @@
       applyLang(curLang());
       var code = lsGet(CODE_KEY), name = lsGet(NAME_KEY);
       if(code && name){
+        lsSet(ORG_KEY, ORG_VALUE);  // 補寫入：確保舊登入的裝置也有機構值
         showApp(name, lsGet(ROLE_KEY) || "admin");  // 先放行，體驗順暢
         verifyCode(code).then(function(ok){
           if(!ok) doLogout();    // 通行碼已變更才擋回登入
