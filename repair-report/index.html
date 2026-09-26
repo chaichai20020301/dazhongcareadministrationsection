@@ -188,9 +188,10 @@ var state = {
   lang: (function(){ var l=localStorage.getItem('portal_lang'); return I18N[l]?l:'zh'; })(),
   submitting:false, done:null, err:''
 };
-var f = { reporter:'', dept:'', priority:'一般', location:'', category:'', desc:'', photos:[] };
-// 預填報修人
+var f = { reporter:'', org:'', dept:'', priority:'一般', location:'', category:'', desc:'', photos:[] };
+// 預填報修人／機構（機構為入口網固定寫入的單一機構值，無 UI）
 f.reporter = (localStorage.getItem('handover_name')||'').trim();
+f.org = (localStorage.getItem('handover_org')||'').trim();
 
 function t(k){ return (I18N[state.lang]&&I18N[state.lang][k]) || I18N.zh[k] || k; }
 function optLabel(o){ return o[state.lang]||o.zh; }
@@ -360,8 +361,9 @@ function submit(){
     var no=ticketPrefix()+pad3(seq);
     var pIcon=f.priority==='緊急'?'🔴 緊急':(f.priority==='低'?'🟢 低':'🟡 一般');
     var hasPhoto=f.photos.length>0;
-    var notify='🔧'+(f.priority==='緊急'?'【緊急】':' ')+'維修報修 '+no+'｜'+f.location+'・'+f.category+
-      '\n\n報修單號：'+no+
+    var notify='🔧'+(f.priority==='緊急'?'【緊急】':' ')+'維修報修 '+no+'｜'+(f.org?f.org+'・':'')+f.location+'・'+f.category+
+      '\n\n'+(f.org?'機　　構：'+f.org+'\n':'')+
+      '報修單號：'+no+
       '\n急迫程度：'+pIcon+
       '\n報修時間：'+rocDateTime(now)+
       '\n部　　門：'+(f.dept||'—')+
@@ -371,7 +373,7 @@ function submit(){
       '\n\n📝 問題描述\n'+f.desc+
       (hasPhoto?'\n\n📎 現況照請見附件':'');
     var ticket={
-      no:no, date:rocDate(now), reporter:f.reporter, org:'', dept:f.dept, location:f.location,
+      no:no, date:rocDate(now), reporter:f.reporter, org:f.org, dept:f.dept, location:f.location,
       category:f.category, desc:f.desc, priority:f.priority, status:'待處理',
       assignee:'', method:'', vendor:'', cost:'', doneDate:'', note:'',
       updated:rocDateTime(now),
