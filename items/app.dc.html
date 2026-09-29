@@ -755,13 +755,35 @@ input,select,button,textarea{font-family:inherit}
               <div style="font-size:13px;color:#45483F;line-height:1.6">勾選這次帶回的品項，沒勾的會留著等下次清點。完成後產生歸還清單存進該住民資料夾，並依狀況把資料夾移進「已退住」或「已退住(物品未完全歸還)」。</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <sc-for list="{{ returnItems }}" as="it" hint-placeholder-count="3">
-                  <button type="button" onClick="{{ it.toggle }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:11px 10px;border:1px solid {{ it.border }};background:{{ it.bg }};cursor:pointer;border-radius:10px">
-                    <span style="flex:none;width:20px;height:20px;border:1px solid {{ it.mark }};display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ it.mark }}">{{ it.check }}</span>
-                    <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
-                    <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
-                  </button>
+                  <div style="display:flex;flex-direction:column;border:1px solid {{ it.border }};background:{{ it.bg }};border-radius:10px;overflow:hidden">
+                    <button type="button" onClick="{{ it.toggle }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:11px 10px;border:0;background:transparent;cursor:pointer">
+                      <span style="flex:none;width:20px;height:20px;border:1px solid {{ it.mark }};display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ it.mark }}">{{ it.check }}</span>
+                      <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
+                      <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
+                    </button>
+                    <sc-if value="{{ it.hasShots }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:0 10px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                        <sc-for list="{{ it.shots }}" as="sh" hint-placeholder-count="0">
+                          <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
+                        </sc-for>
+                      </div>
+                    </sc-if>
+                  </div>
                 </sc-for>
               </div>
+              <sc-if value="{{ photosLoading }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#8A8E80">照片載入中…</div>
+              </sc-if>
+              <sc-if value="{{ hasGroupShots }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">合照</span>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                    <sc-for list="{{ groupShots }}" as="sh" hint-placeholder-count="0">
+                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
               <div style="display:flex;flex-direction:column;gap:6px">
                 <label style="font-size:12px;color:#6A6E62">歸還給（家屬 / 代理人）</label>
                 <input value="{{ returnTo }}" onChange="{{ onReturnTo }}" placeholder="例：長女 呂小姐" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
@@ -1124,9 +1146,10 @@ class Component extends DCLogic {
   }
 
   // 住民頁開啟時，把雲端照片抓回來（只抓一次）
-  async ensurePhotos(idx) {
+  async ensurePhotos(idx, includeLeft) {
     const r = this.state.residents[idx];
-    if (!r || r.demo || r.left || (r.photos && r.photos.length) || r.photosLoaded) return;
+    // 退住核對頁要看照片：includeLeft=true 時連已退住（分次歸還）住民也抓
+    if (!r || r.demo || (!includeLeft && r.left) || (r.photos && r.photos.length) || r.photosLoaded) return;
     this.setState({photosState: 'loading'});
     try {
       const drive = await this.lib('DriveLib');
@@ -1809,7 +1832,7 @@ class Component extends DCLogic {
       preview: ['製表並存進雲端硬碟', () => this.commit()],
       done: ['回住民清單', () => this.go('home')],
       resident: (cur && cur.left && (cur.items || []).length > 0)
-        ? ['繼續清點歸還', () => this.setState({screen: 'ret', returned: {}})]
+        ? ['繼續清點歸還', () => { this.setState({screen: 'ret', returned: {}}); this.ensurePhotos(this.state.cur, true); }]
         : ['以此住民新增清單', () => { this.setState({draft: this.newDraft(cur), photos: [], fileNameEdited: null, screen: 'basic'}); }],
       ret: ['完成退住並封存', () => this.finishLeave()]
     }[scr] || ['繼續', () => {}];
@@ -1830,7 +1853,7 @@ class Component extends DCLogic {
       photos: ['上一步', () => this.go('items')],
       preview: ['上一步', () => this.go('photos')],
       done: ['看物品紀錄', () => { this.go('resident'); this.ensurePhotos(this.state.cur); }],
-      resident: ['退住核對', () => this.setState({screen: 'ret', returned: {}})],
+      resident: ['退住核對', () => { this.setState({screen: 'ret', returned: {}}); this.ensurePhotos(this.state.cur, true); }],
       ret: ['返回', () => this.go('resident')]
     }[scr] || ['返回', () => this.go('home')];
 
@@ -1882,7 +1905,7 @@ class Component extends DCLogic {
         {label: '拍照', go: () => this.go('photos')},
         {label: '預覽', go: () => this.go('preview')},
         {label: '物品紀錄', go: () => { this.go('resident'); this.ensurePhotos(this.state.cur); }},
-        {label: '退住核對', go: () => this.setState({screen: 'ret', returned: {}})}
+        {label: '退住核對', go: () => { this.setState({screen: 'ret', returned: {}}); this.ensurePhotos(this.state.cur, true); }}
       ],
 
       hasPending: s.pendingCount > 0,
@@ -2248,11 +2271,16 @@ class Component extends DCLogic {
       returnItems: (cur ? cur.items : []).map((it, i) => {
         const on = !!s.returned[i];
         const rlabels = this.itemLabels(cur.items);
+        const rkey = it.uid || it.name;
+        const rshots = (cur.photos || []).filter(p => (p.tag || '__all') === rkey);
         return {
           name: rlabels[i] || it.name, qtyLabel: it.qty + ' ' + it.unit,
           check: on ? '✓' : '', mark: on ? '#3E7530' : 'rgba(31,35,32,.35)',
           bg: on ? '#eef6ff' : '#fff', border: on ? '#5C9A45' : 'rgba(31,35,32,.16)',
-          toggle: () => this.setState(st => { const r = Object.assign({}, st.returned); r[i] = !r[i]; return {returned: r}; })
+          toggle: () => this.setState(st => { const r = Object.assign({}, st.returned); r[i] = !r[i]; return {returned: r}; }),
+          // 退住核對時一併看照片：點縮圖用全螢幕檢視器放大（與詳情頁同一套）
+          hasShots: rshots.length > 0,
+          shots: rshots.map(p => ({thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 72, objectFit: 'cover', display: 'block'}}), view: () => this.setState({viewer: p.url})}))
         };
       }),
       returnedCount: returnedCount, returnTotal: cur ? cur.items.length : 0,
