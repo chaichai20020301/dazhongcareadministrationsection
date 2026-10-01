@@ -206,7 +206,8 @@
         <button class="btn btn-ghost" onclick="openPaiche()">🚐 產生派車單</button>
         <button class="btn btn-primary" onclick="openForm()">＋ 新增預約</button>
       </span>
-      <span id="ha-clinic" style="display:none;gap:10px">
+      <span id="ha-clinic" style="display:none;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-ghost" onclick="openClinicPaiche()">🚐 產生派車單</button>
         <button class="btn btn-primary" onclick="openClinicForm()">＋ 新增派車</button>
       </span>
     </div>
@@ -516,6 +517,7 @@
         case 'deleteClinic': return {id:args[0]};
         case 'generateDailyReport': return {month:args[0]};
         case 'generatePaiche': return {date:args[0]};
+        case 'generateClinicPaiche': return {date:args[0]};
         default: return args[0]||{};
       }
     }
@@ -534,7 +536,7 @@
       var self={_s:null,_f:null,
         withSuccessHandler:function(f){this._s=f;return this},
         withFailureHandler:function(f){this._f=f;return this}};
-      ['getConfig','listReservations','searchClients','addReservation','updateReservation','deleteReservation','generateDailyReport','generatePaiche','listClinic','addClinic','updateClinic','deleteClinic'].forEach(function(name){
+      ['getConfig','listReservations','searchClients','addReservation','updateReservation','deleteReservation','generateDailyReport','generatePaiche','listClinic','addClinic','updateClinic','deleteClinic','generateClinicPaiche'].forEach(function(name){
         self[name]=function(){var args=[].slice.call(arguments);
           _callApi(name,args).then(function(d){if(self._s)self._s(d)})
             .catch(function(e){if(self._f)self._f({message:String((e&&e.message)||e)})});
@@ -836,6 +838,21 @@
         this.disabled=true;this.textContent='產生中…';
         RUN().withSuccessHandler(function(nm){$('ov2-go').disabled=false;$('ov2-go').textContent='產生派車單';closeOv2();toast('已產生分頁：'+nm)})
           .withFailureHandler(function(e){$('ov2-go').disabled=false;$('ov2-go').textContent='產生派車單';toast('失敗：'+e.message,true)}).generatePaiche(d);
+      };
+      $('ov2').className='overlay on';
+    }
+    function openClinicPaiche(){
+      $('ov2-title').textContent='產生機構門診派車單';
+      var d=$('cf-date').value||todayISO();
+      $('ov2-field').innerHTML='<label style="font-size:12px;color:#40564b">選擇日期</label>'+
+        '<input type="date" id="ov2-input" value="'+d+'">';
+      $('ov2-hint').textContent='依「門診派車」資料，在試算表中產生／覆寫當日門診派車單分頁（依車輛分區、依出發時間排序，躺床者標色）。';
+      $('ov2-go').textContent='產生派車單';
+      $('ov2-go').onclick=function(){
+        var dd=$('ov2-input').value;if(!dd){toast('請選日期',true);return}
+        this.disabled=true;this.textContent='產生中…';
+        RUN().withSuccessHandler(function(nm){$('ov2-go').disabled=false;$('ov2-go').textContent='產生派車單';closeOv2();toast('已產生分頁：'+nm)})
+          .withFailureHandler(function(e){$('ov2-go').disabled=false;$('ov2-go').textContent='產生派車單';toast('失敗：'+e.message,true)}).generateClinicPaiche(dd);
       };
       $('ov2').className='overlay on';
     }
