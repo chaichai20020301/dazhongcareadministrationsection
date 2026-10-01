@@ -60,6 +60,12 @@
   .toolbar .who{flex:1;min-width:0;font-size:12.5px;color:var(--sub2)}
   .refresh{padding:4px 9px;border:1px solid var(--line2);background:transparent;color:var(--sub2);
     font-size:12px;cursor:pointer;border-radius:9px}
+  .searchbox{display:flex;gap:8px;margin-bottom:10px}
+  .searchbox input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line2);
+    background:#fff;color:var(--ink);font-size:15px;border-radius:10px}
+  .searchbox button{flex:none;padding:0 13px;border:1px solid var(--line2);background:transparent;
+    color:var(--sub2);font-size:13px;cursor:pointer;border-radius:10px}
+  .searchbox button:hover{border-color:var(--green2);color:var(--green)}
   .lightbox{position:fixed;inset:0;background:rgba(31,35,32,.92);z-index:9;display:none;
     align-items:center;justify-content:center;flex-direction:column;padding:14px}
   .lightbox.on{display:flex}
@@ -85,6 +91,10 @@
     <div class="toolbar">
       <span class="who" id="whoConfirm"></span>
       <button class="refresh" id="refreshR"></button>
+    </div>
+    <div class="searchbox">
+      <input id="searchR" type="text" autocomplete="off">
+      <button id="clearR" type="button"></button>
     </div>
     <div id="listR"></div>
   </section>
@@ -126,7 +136,8 @@
       photoPurged:'已超過照片保留時限（六個月），沒有照片',
       regDate:'登記', expiry:'效期', close:'關閉',
       roleNurse:'護理', roleCare:'照服', roleAdmin:'行政',
-      confirmOk:'已確認：', confirmErr:'確認失敗：'
+      confirmOk:'已確認：', confirmErr:'確認失敗：',
+      searchPh:'搜尋住民：中文姓名或拼音', clear:'清除', noMatch:'找不到符合的住民'
     },
     id: {
       title:'Barang & Habis Pakai', hConfirm:'Konfirmasi Daftar Barang Penghuni', hConsum:'Registrasi Barang Habis Pakai Terbaru',
@@ -141,7 +152,8 @@
       photoPurged:'Melewati batas simpan (6 bulan), tidak ada foto',
       regDate:'Terdaftar', expiry:'Kedaluwarsa', close:'Tutup',
       roleNurse:'Perawat', roleCare:'Pengasuh', roleAdmin:'Admin',
-      confirmOk:'Terkonfirmasi: ', confirmErr:'Gagal konfirmasi: '
+      confirmOk:'Terkonfirmasi: ', confirmErr:'Gagal konfirmasi: ',
+      searchPh:'Cari penghuni: nama Mandarin atau romanisasi', clear:'Hapus', noMatch:'Tidak ada penghuni yang cocok'
     },
     vi: {
       title:'Đồ dùng & Vật tư', hConfirm:'Xác nhận danh sách đồ dùng', hConsum:'Đăng ký vật tư gần đây',
@@ -156,14 +168,15 @@
       photoPurged:'Quá hạn lưu (6 tháng), không có ảnh',
       regDate:'Đăng ký', expiry:'HSD', close:'Đóng',
       roleNurse:'Điều dưỡng', roleCare:'Hộ lý', roleAdmin:'Hành chính',
-      confirmOk:'Đã xác nhận: ', confirmErr:'Xác nhận thất bại: '
+      confirmOk:'Đã xác nhận: ', confirmErr:'Xác nhận thất bại: ',
+      searchPh:'Tìm cư dân: tên tiếng Trung hoặc phiên âm', clear:'Xóa', noMatch:'Không tìm thấy cư dân phù hợp'
     }
   };
 
   var LANGS = [['zh','中'],['id','ID'],['vi','VI']];
   var state = {
     lang: (function(){ var l = localStorage.getItem('portal_lang'); return I18N[l] ? l : 'zh'; })(),
-    residents:null, errR:false, loadingR:true,
+    residents:null, errR:false, loadingR:true, queryR:'',
     consum:null, errC:false, loadingC:true,
     photoOpen:{}, photoState:{}, photoCache:{}, confirmingName:null
   };
@@ -325,6 +338,9 @@
     document.getElementById('refreshR').textContent = t('refresh');
     document.getElementById('refreshC').textContent = t('refresh');
     document.getElementById('lbx').textContent = t('close');
+    var sr = document.getElementById('searchR'); sr.placeholder = t('searchPh');
+    if(sr.value !== state.queryR) sr.value = state.queryR;
+    document.getElementById('clearR').textContent = t('clear');
     var who = document.getElementById('whoConfirm');
     var nm = name();
     who.innerHTML = t('who') + (nm ? esc(nm) + (roleLabel()?'（'+esc(roleLabel())+'）':'') : '<span class="hint">'+esc(t('noName'))+'</span>');
@@ -348,6 +364,12 @@
     }
     var list=state.residents||[];
     if(!list.length){ box.innerHTML='<div class="empty">'+esc(t('empty'))+'</div>'; return; }
+    // 依中文姓名／羅馬拼音（英文名）／床號過濾
+    var q=(state.queryR||'').trim().toLowerCase();
+    if(q){ list=list.filter(function(r){
+      return [r.name, r.en, r.bed].join(' ').toLowerCase().indexOf(q) >= 0;
+    }); }
+    if(!list.length){ box.innerHTML='<div class="empty">'+esc(t('noMatch'))+'</div>'; return; }
     list.forEach(function(r){
       var c=document.createElement('div'); c.className='card';
       var head='<div class="row"><span class="bed">'+esc(r.bed||'')+'</span>'+
@@ -421,6 +443,9 @@
 
   document.getElementById('refreshR').onclick=loadResidents;
   document.getElementById('refreshC').onclick=loadConsum;
+  // 住民搜尋：輸入即時過濾（只重繪清單，不動輸入框焦點）
+  document.getElementById('searchR').oninput=function(e){ state.queryR=e.target.value; renderConfirm(); };
+  document.getElementById('clearR').onclick=function(){ state.queryR=''; var sr=document.getElementById('searchR'); sr.value=''; sr.focus(); renderConfirm(); };
   document.getElementById('lbx').onclick=function(){ document.getElementById('lightbox').classList.remove('on'); };
   document.getElementById('lightbox').onclick=function(e){ if(e.target.id==='lightbox') this.classList.remove('on'); };
 
