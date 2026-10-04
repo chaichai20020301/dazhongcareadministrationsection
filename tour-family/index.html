@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>線東大眾護理之家 · 預約參訪</title>
+<meta name="description" content="線東大眾護理之家 機構介紹與線上預約參訪">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f8ee; --card:#fffffb; --ink:#26302a; --sub:#65705f; --line:#e1e8d6;
+  --g1:#4a8a2e; --g2:#8cc151; --g3:#e8f2da; --warm:#3ba58c; --warm2:#eaf4ec; --red:#b4412f; --teal:#3ba58c;
+  --r:18px; --sh:0 10px 34px rgba(74,138,46,.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3{font-family:'Noto Serif TC','Noto Sans TC',serif;line-height:1.35}
+a{color:var(--g1)}
+button,input,select,textarea{font-family:inherit;font-size:16px}
+img{max-width:100%;display:block}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+/* progress + nav */
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--g2),var(--teal));z-index:70}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;transition:.35s;padding:calc(8px + env(safe-area-inset-top)) 0 8px;background:rgba(255,255,251,.94);backdrop-filter:blur(10px);box-shadow:0 2px 14px rgba(0,0,0,.06)}
+nav.solid{box-shadow:0 4px 20px rgba(74,138,46,.14)}
+nav::after{content:'';position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--g2),var(--teal))}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;text-decoration:none}
+.brand img{height:40px;width:auto}
+@media (min-width:700px){.brand img{height:46px}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;border-radius:999px;padding:12px 26px;font-weight:700;letter-spacing:.06em;transition:transform .2s,box-shadow .2s,background .2s;text-decoration:none}
+.btn:active{transform:scale(.97)}
+.btn-main{background:linear-gradient(135deg,#7dbb3f,#3f8a35 70%,#2f9a7e);color:#fff;box-shadow:0 8px 22px rgba(74,138,46,.38)}
+.btn-main:hover{filter:brightness(1.07);transform:translateY(-2px)}
+.btn-g{background:var(--g1);color:#fff;box-shadow:0 8px 22px rgba(74,138,46,.3)}
+.btn-g:hover{background:#3d7625;transform:translateY(-2px)}
+.btn-ghost{background:transparent;border:2px solid var(--line);color:var(--sub)}
+.btn-sm{padding:8px 18px;font-size:14px}
+
+/* hero */
+.hero{position:relative;min-height:calc(100svh + 56px);display:flex;align-items:center;color:#fff;overflow:hidden;background:#2a5a2c}
+.hero-slides{position:absolute;inset:0}
+.hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background-size:cover;background-position:center}
+.hero-slide.on{opacity:1;animation:kb 12s ease-out forwards}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.09)}}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,50,28,.55),rgba(18,50,28,.3) 45%,rgba(18,50,28,.78))}
+.hero .wrap{position:relative;z-index:2;padding-top:110px;padding-bottom:90px}
+.hero small{display:inline-block;background:rgba(255,255,255,.16);backdrop-filter:blur(6px);padding:5px 16px;border-radius:99px;letter-spacing:.2em;font-size:13px;margin-bottom:18px}
+.hero h1{font-size:clamp(34px,7vw,64px);font-weight:900;letter-spacing:.06em;text-shadow:0 4px 24px rgba(0,0,0,.35)}
+.hero p{max-width:540px;margin:18px 0 30px;font-size:clamp(16px,2.4vw,19px);opacity:.95}
+.hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero .btn-ghost{border-color:rgba(255,255,255,.7);color:#fff}
+.scroll-hint{position:absolute;bottom:84px;left:50%;transform:translateX(-50%);z-index:2;width:26px;height:42px;border:2px solid rgba(255,255,255,.8);border-radius:14px}
+.scroll-hint::after{content:"";position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:sc 1.6s infinite}
+@keyframes sc{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
+.ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.75);font:700 14px 'Noto Sans TC';letter-spacing:.2em}
+
+/* sections */
+section{padding:84px 0;position:relative}
+.eyebrow{color:var(--warm);font-weight:700;letter-spacing:.3em;font-size:13px;margin-bottom:8px}
+.title{font-size:clamp(26px,4.6vw,40px);font-weight:900;margin-bottom:14px}
+.lead{color:var(--sub);max-width:640px;font-size:17px}
+.reveal{opacity:0;transform:translateY(34px);transition:opacity .8s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.hero-slide.on{animation:none}}
+
+/* stats */
+.stats{margin-top:-56px;position:relative;z-index:5;padding:0}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.stat{padding:26px 10px;text-align:center;border-right:1px solid var(--line)}
+.stat:last-child{border:none}
+.stat b{display:block;font:900 clamp(28px,5vw,42px) 'Noto Serif TC';color:var(--g1)}
+.stat span{color:var(--sub);font-size:14px}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:center}
+.about-img{aspect-ratio:4/5;border-radius:var(--r);background:linear-gradient(135deg,#92c55f,#3f8a5a);box-shadow:var(--sh);position:relative;overflow:hidden;background-size:cover;background-position:center}
+.about-img{background-position:68% center}
+.about-img::before{content:"";position:absolute;inset:14px;border:2px solid rgba(255,255,255,.5);border-radius:calc(var(--r) - 6px)}
+.vals{display:grid;gap:14px;margin-top:24px}
+.val{display:flex;gap:14px;align-items:flex-start}
+.val i{flex:none;width:44px;height:44px;border-radius:14px;background:var(--g3);display:grid;place-items:center;font-style:normal;font-size:22px}
+.val b{display:block}
+.val span{color:var(--sub);font-size:15px}
+
+/* services */
+#services{background:var(--card)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:36px}
+.svc{background:var(--bg);border-radius:var(--r);padding:28px 24px;transition:.3s;border:1px solid transparent}
+.svc:hover{transform:translateY(-6px);box-shadow:var(--sh);border-color:var(--g3);background:#fff}
+.svc i{font-style:normal;font-size:34px;display:block;margin-bottom:10px;transition:transform .4s}
+.svc:hover i{transform:scale(1.2) rotate(-6deg)}
+.svc h3{font-size:19px;margin-bottom:6px}
+.svc p{color:var(--sub);font-size:15px}
+
+/* who / env */
+.types{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 22px}
+.types span{background:var(--g3);color:#2f6b27;font-weight:700;padding:9px 20px;border-radius:99px;border:1.5px solid #cfe2b8;transition:.25s}
+.types span:hover{background:var(--g1);color:#fff;transform:translateY(-3px)}
+.who-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.who-item{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:15.5px}
+.who-item::before{content:"✓";flex:none;width:24px;height:24px;border-radius:50%;background:var(--g1);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:900;margin-top:2px}
+.env-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:34px 0}
+.env-card{background:var(--card);border-radius:var(--r);padding:22px 18px;border:1px solid var(--line);transition:.3s}
+.env-card:hover{transform:translateY(-5px);box-shadow:var(--sh);border-color:var(--g2)}
+.env-card i{font-style:normal;font-size:30px;display:block;margin-bottom:6px}
+.env-card h3{font-size:17px;margin-bottom:8px}
+.env-card ul{list-style:none;font-size:14px;color:var(--sub)}
+.env-card li{padding-left:16px;position:relative;margin-bottom:5px}
+.env-card li::before{content:"";position:absolute;left:0;top:.65em;width:7px;height:7px;border-radius:50%;background:var(--g2)}
+@media (max-width:860px){.env-grid{grid-template-columns:1fr 1fr}.who-grid{grid-template-columns:1fr}}
+@media (max-width:560px){.env-grid{grid-template-columns:1fr}}
+/* illus */
+.illus{display:block;margin:30px auto 0;width:min(520px,100%);height:auto;filter:drop-shadow(0 10px 22px rgba(74,138,46,.18))}
+/* gallery */
+.gal{margin-top:34px;position:relative}
+.gal-track{display:flex;transition:transform .6s cubic-bezier(.3,.7,.2,1)}
+.gal-view{overflow:hidden;border-radius:var(--r);box-shadow:var(--sh)}
+.gal-item{flex:0 0 100%;aspect-ratio:16/9;background-size:cover;background-position:center;position:relative}
+.gal-item span{position:absolute;left:20px;bottom:18px;color:#fff;font:700 18px 'Noto Serif TC';text-shadow:0 2px 12px rgba(0,0,0,.5)}
+.gal-item::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(0,0,0,.45))}
+.gal-item span{z-index:2}
+.gal-nav{position:absolute;top:50%;width:44px;height:44px;border-radius:50%;border:none;background:rgba(255,255,255,.9);box-shadow:0 4px 14px rgba(0,0,0,.2);cursor:pointer;font-size:18px;transform:translateY(-50%);z-index:3}
+.gal-nav.p{left:12px}.gal-nav.n{right:12px}
+.dots{display:flex;justify-content:center;gap:8px;margin-top:14px}
+.dots b{width:8px;height:8px;border-radius:99px;background:#d5cfc2;cursor:pointer;transition:.3s}
+.dots b.on{width:26px;background:var(--g1)}
+
+/* timeline */
+#day{background:linear-gradient(180deg,var(--bg),#e4f0d6)}
+.tl{position:relative;margin-top:40px;padding-left:34px}
+.tl::before{content:"";position:absolute;left:11px;top:6px;bottom:6px;width:3px;background:var(--line);border-radius:3px}
+.tl-fill{position:absolute;left:11px;top:6px;width:3px;height:0;background:linear-gradient(var(--g2),var(--teal));border-radius:3px;transition:height .15s}
+.tl-item{position:relative;background:var(--card);border-radius:var(--r);padding:18px 22px;margin-bottom:16px;box-shadow:0 4px 18px rgba(0,0,0,.05)}
+.tl-item::before{content:"";position:absolute;left:-30px;top:24px;width:15px;height:15px;border-radius:50%;background:#fff;border:3px solid var(--line);transition:.4s}
+.tl-item.in::before{border-color:var(--g1);background:var(--g1);box-shadow:0 0 0 6px var(--g3)}
+.tl-item time{color:var(--warm);font-weight:900;letter-spacing:.1em;font-size:15px}
+.tl-item h3{font-size:18px}
+.tl-item p{color:var(--sub);font-size:15px}
+
+/* pricing */
+.rooms{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:34px}
+.room{background:var(--card);border-radius:var(--r);padding:22px 10px;text-align:center;border:2px solid var(--line);transition:.3s}
+.room:hover{border-color:var(--g2);transform:translateY(-5px);box-shadow:var(--sh)}
+.room h3{font-size:18px}
+.room b{display:block;font:900 24px 'Noto Serif TC';color:var(--g1);margin-top:6px}
+.room span{font-size:13px;color:var(--sub)}
+.note-box{margin-top:18px;background:var(--warm2);border-radius:14px;padding:14px 18px;font-size:14px;color:#2f6b4f}
+
+/* steps */
+#flow{background:var(--card)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:36px;counter-reset:s}
+.step{background:var(--bg);border-radius:var(--r);padding:26px 20px;position:relative;counter-increment:s}
+.step::before{content:counter(s);position:absolute;top:-16px;left:20px;width:36px;height:36px;border-radius:50%;background:var(--g1);color:#fff;display:grid;place-items:center;font:900 17px 'Noto Serif TC';box-shadow:0 6px 14px rgba(74,138,46,.4)}
+.step h3{font-size:17px;margin:8px 0 4px}
+.step p{font-size:14.5px;color:var(--sub)}
+
+/* faq */
+.faq{margin-top:30px;max-width:780px}
+.qa{background:var(--card);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid var(--line)}
+.qa button{width:100%;text-align:left;background:none;border:none;padding:16px 20px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;gap:10px;color:var(--ink)}
+.qa button::after{content:"+";font-size:22px;color:var(--g1);transition:transform .3s;line-height:1}
+.qa.open button::after{transform:rotate(45deg)}
+.qa div{max-height:0;overflow:hidden;transition:max-height .4s ease;color:var(--sub);padding:0 20px;font-size:15px}
+.qa.open div{padding-bottom:16px}
+
+/* contact / final cta */
+.final{background:linear-gradient(135deg,#6aae3c,#3f8a35 55%,#2f8f78);color:#fff;text-align:center;border-radius:28px;padding:56px 22px;position:relative;overflow:hidden}
+.final::before,.final::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.07)}
+.final::before{width:280px;height:280px;left:-90px;top:-90px}
+.final::after{width:200px;height:200px;right:-60px;bottom:-70px}
+.final h2{font-size:clamp(24px,4vw,36px);position:relative}
+.final p{opacity:.92;margin:10px 0 24px;position:relative}
+.contact{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.contact div{background:var(--card);border-radius:var(--r);padding:20px;border:1px solid var(--line)}
+.contact b{display:block;color:var(--g1);margin-bottom:2px}
+footer{text-align:center;color:var(--sub);font-size:13px;padding:30px 20px 110px}
+
+/* floating cta */
+#fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:55;transform:translateY(120px);transition:transform .4s}
+#fab.show{transform:none}
+
+/* ===== booking overlay ===== */
+#ov{position:fixed;inset:0;background:var(--bg);z-index:100;display:none;flex-direction:column}
+#ov.open{display:flex;animation:ovIn .35s ease}
+@keyframes ovIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+.ov-top{background:var(--card);border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+.ov-top .row{max-width:640px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.ov-top h2{font-size:18px}
+.x{border:none;background:var(--bg);width:38px;height:38px;border-radius:50%;font-size:20px;cursor:pointer;color:var(--sub)}
+.stepper{max-width:640px;margin:12px auto 0;display:flex;gap:6px}
+.stepper i{flex:1;height:6px;border-radius:6px;background:var(--line);transition:.4s}
+.stepper i.on{background:var(--g1)}
+.stepper-lb{max-width:640px;margin:6px auto 0;font-size:13px;color:var(--sub);display:flex;justify-content:space-between}
+.ov-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.ov-in{max-width:640px;margin:0 auto;padding:22px 18px 40px}
+.pane{display:none}
+.pane.on{display:block;animation:pIn .4s ease}
+@keyframes pIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+.pane h3{font-size:22px;margin-bottom:4px}
+.pane .hint{color:var(--sub);font-size:14.5px;margin-bottom:18px}
+.fld{margin-bottom:16px}
+.fld>label{display:block;font-weight:700;font-size:14.5px;margin-bottom:6px}
+.fld>label em{color:var(--red);font-style:normal;margin-left:3px}
+.fld small{color:var(--sub);font-size:13px;display:block;margin-top:4px}
+.fi,.sel,.ta{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);transition:.2s;-webkit-appearance:none;appearance:none}
+.sel{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b675d' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.ta{min-height:96px;resize:vertical}
+.fi:focus,.sel:focus,.ta:focus{outline:none;border-color:var(--g1);box-shadow:0 0 0 4px var(--g3)}
+.fld.err .fi,.fld.err .sel,.fld.err .ta{border-color:var(--red);background:#fff6f4;animation:shake .35s}
+.fld.err .msg{display:block}
+.msg{display:none;color:var(--red);font-size:13px;margin-top:4px}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;width:100%;height:100%;margin:0}
+.chip span{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:1.5px solid var(--line);border-radius:99px;background:#fff;transition:.2s;font-size:15px}
+.chip input:checked+span{background:var(--g3);border-color:var(--g1);color:#2f6b27;font-weight:700}
+.chip input:focus-visible+span{box-shadow:0 0 0 4px var(--g3)}
+.chip i{font-style:normal;color:var(--warm);font-size:12px}
+.roomsel{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.roomsel .chip span{display:flex;flex-direction:column;border-radius:14px;width:100%;text-align:center;padding:10px 4px;line-height:1.4}
+.roomsel .chip span b{font-size:12.5px;color:var(--sub);font-weight:500}
+.roomsel .chip input:checked+span b{color:#2f6b27}
+.est{position:sticky;bottom:0;margin:20px -18px -40px;padding:14px 18px calc(14px + env(safe-area-inset-bottom));background:rgba(255,253,248,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.est .tot{display:flex;justify-content:space-between;align-items:baseline}
+.est .tot b{font:900 26px 'Noto Serif TC';color:var(--g1)}
+.est small{display:block;color:var(--sub);font-size:12.5px;line-height:1.5;margin-top:2px}
+.cond{display:none}.cond.show{display:block;animation:pIn .3s}
+details.opt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:14px}
+details.opt summary{font-weight:700;cursor:pointer;list-style:none;display:flex;justify-content:space-between}
+details.opt summary::after{content:"＋";color:var(--g1)}
+details.opt[open] summary::after{content:"－"}
+details.opt .inner{margin-top:14px}
+.sum{background:var(--card);border-radius:14px;border:1px solid var(--line);padding:6px 18px;margin-bottom:18px}
+.sum div{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line);font-size:15px}
+.sum div:last-child{border:none}
+.sum span{color:var(--sub);flex:none}
+.sum b{text-align:right;font-weight:500;word-break:break-all}
+.consent{background:#f3f7e9;border:1px solid #dbe8c5;border-radius:14px;padding:16px;font-size:14px;color:#44563a}
+.consent label{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-weight:700;cursor:pointer}
+.consent input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--g1)}
+.consent ul{padding-left:18px;margin-top:6px}
+.nav-row{display:flex;gap:10px;margin-top:24px}
+.nav-row .btn{flex:1}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+.ok{text-align:center;padding:40px 10px}
+.ok svg{width:96px;height:96px}
+.ok circle{stroke:var(--g1);stroke-width:4;fill:none;stroke-dasharray:260;stroke-dashoffset:260;animation:dr .7s ease forwards}
+.ok path{stroke:var(--g1);stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:dr .5s .6s ease forwards}
+@keyframes dr{to{stroke-dashoffset:0}}
+.ok h3{margin:16px 0 8px;font-size:24px}
+.spin{width:16px;height:16px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spn .8s linear infinite}
+@keyframes spn{to{transform:rotate(360deg)}}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#2b2a26;color:#fff;padding:12px 22px;border-radius:99px;z-index:200;display:none;font-size:14.5px;max-width:90vw;text-align:center}
+
+@media (max-width:860px){
+  .about-grid{grid-template-columns:1fr}.about-img{aspect-ratio:16/10}
+  .svc-grid{grid-template-columns:1fr 1fr}
+  .rooms{grid-template-columns:repeat(3,1fr)}
+  .steps{grid-template-columns:1fr 1fr;gap:26px 14px}
+  .contact{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  section{padding:60px 0}
+  .stat-grid{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
+  .svc-grid{grid-template-columns:1fr}
+  .rooms{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .gal-item{aspect-ratio:4/3}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+
+<nav id="nav"><div class="wrap">
+  <a class="brand" href="#top" aria-label="線東大眾護理之家"><img src="logo.png" alt="線東大眾護理之家"></a>
+  <button class="btn btn-main btn-sm" onclick="openBook()">預約參訪</button>
+</div></nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-slides" id="heroSlides"></div>
+  <div class="wrap">
+    <small class="reveal in" id="heroTag"></small>
+    <h1 class="reveal in d1" id="heroTitle"></h1>
+    <p class="reveal in d2" id="heroSub"></p>
+    <div class="cta reveal in d3">
+      <button class="btn btn-main" onclick="openBook()">我想預約參訪 →</button>
+      <a class="btn btn-ghost" href="#about">先看看機構介紹</a>
+    </div>
+  </div>
+  <div class="scroll-hint"></div>
+</header>
+
+<div class="stats wrap"><div class="stat-grid reveal" id="stats"></div></div>
+
+<section id="about"><div class="wrap about-grid">
+  <div class="about-img reveal" id="aboutImg"><div class="ph" style="height:100%" id="aboutPh">機構照片</div></div>
+  <div>
+    <div class="eyebrow reveal">ABOUT US</div>
+    <h2 class="title reveal d1" id="aboutTitle"></h2>
+    <p class="lead reveal d2" id="aboutText"></p>
+    <div class="vals" id="vals"></div>
+  </div>
+</div></section>
+
+<section id="services"><div class="wrap">
+  <div class="eyebrow reveal">SERVICES</div>
+  <h2 class="title reveal d1">專業照護，細心陪伴</h2>
+  <p class="lead reveal d2">從日常起居到專業護理，我們用專業與耐心，守護每一位長輩。</p>
+  <div class="svc-grid" id="svcs"></div>
+</div></section>
+
+<section id="who"><div class="wrap">
+  <div class="eyebrow reveal">WHO WE SERVE</div>
+  <h2 class="title reveal d1">適合哪些長輩</h2>
+  <p class="lead reveal d2">24 小時住宿式服務，依長輩的需要提供不同的入住型態。</p>
+  <div class="types reveal d2" id="types"></div>
+  <div class="who-grid" id="whoList"></div>
+</div></section>
+
+<section id="env"><div class="wrap">
+  <div class="eyebrow reveal">ENVIRONMENT</div>
+  <h2 class="title reveal d1">舒適、安全、像家一樣的空間</h2>
+  <div class="env-grid" id="envList"></div>
+  <div class="gal reveal d2">
+    <div class="gal-view"><div class="gal-track" id="galTrack"></div></div>
+    <button class="gal-nav p" aria-label="上一張" onclick="gal(-1)">‹</button>
+    <button class="gal-nav n" aria-label="下一張" onclick="gal(1)">›</button>
+    <div class="dots" id="galDots"></div>
+  </div>
+</div></section>
+
+<section id="day"><div class="wrap">
+  <div class="eyebrow reveal">DAILY CARE</div>
+  <h2 class="title reveal d1">我們的照顧專業，在每一天的生活中</h2>
+  <p class="lead reveal d2">不只是生活照顧，更是生活管家，提供整合性與人性化的照護服務。</p>
+  <img class="illus reveal" id="illus" alt="" src="img/illus-life.png">
+  <div class="tl" id="tl"><div class="tl-fill" id="tlFill"></div></div>
+</div></section>
+
+<section id="price"><div class="wrap">
+  <div class="eyebrow reveal">PRICING</div>
+  <h2 class="title reveal d1">房型與費用參考</h2>
+  <p class="lead reveal d2">以下為各房型每月基本費用，實際費用會依長輩的照護需求（如管路、尿布等）另行評估。</p>
+  <div class="rooms" id="rooms"></div>
+  <div class="note-box reveal" id="priceNote"></div>
+</div></section>
+
+<section id="flow"><div class="wrap">
+  <div class="eyebrow reveal">HOW IT WORKS</div>
+  <h2 class="title reveal d1">從參訪到入住，只要四步</h2>
+  <div class="steps" id="steps"></div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="eyebrow reveal">FAQ</div>
+  <h2 class="title reveal d1">家屬常見問題</h2>
+  <div class="faq" id="faqs"></div>
+</div></section>
+
+<section style="padding-top:20px"><div class="wrap">
+  <div class="final reveal">
+    <h2>歡迎親自來看看</h2>
+    <p>留下聯絡資料，我們的行政人員會盡快與您聯繫，安排參訪時間。</p>
+    <button class="btn btn-main" onclick="openBook()">預約參訪 →</button>
+  </div>
+  <div class="contact" id="contact"></div>
+</div></section>
+
+<footer><img src="logo.png" alt="線東大眾護理之家" style="height:44px;margin:0 auto 10px">© 線東大眾護理之家　｜　您所填寫的資料僅用於參訪預約與入住評估</footer>
+
+<div id="fab"><button class="btn btn-main" onclick="openBook()">📅 預約參訪</button></div>
+
+<!-- BOOKING -->
+<div id="ov" role="dialog" aria-modal="true" aria-label="預約參訪">
+  <div class="ov-top">
+    <div class="row"><div style="display:flex;align-items:center;gap:10px"><img src="logo.png" alt="" style="height:30px"><h2 id="ovTitle" style="font-size:16px;color:var(--g1)">預約參訪</h2></div><button class="x" onclick="closeBook()" aria-label="關閉">✕</button></div>
+    <div class="stepper" id="stepper"><i></i><i></i><i></i><i></i></div>
+    <div class="stepper-lb"><span id="stLb"></span><span id="stNo"></span></div>
+  </div>
+  <div class="ov-body"><div class="ov-in">
+  <form id="f" novalidate autocomplete="on" onsubmit="return false">
+    <div class="hp"><label>網站<input type="text" name="website" id="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <!-- 1 -->
+    <div class="pane on" data-p="1">
+      <h3>您的聯絡方式</h3>
+      <p class="hint">方便我們與您確認參訪時間。</p>
+      <div class="g2">
+        <div class="fld"><label>您的姓名<em>*</em></label><input class="fi" name="visitorName" autocomplete="name"><span class="msg">請填寫姓名</span></div>
+        <div class="fld"><label>與長者關係<em>*</em></label>
+          <select class="sel" name="relation"><option value="">請選擇</option><option>子女</option><option>配偶</option><option>孫輩</option><option>兄弟姊妹</option><option>其他親屬</option><option>朋友</option><option>本人</option><option>其他</option></select><span class="msg">請選擇關係</span></div>
+      </div>
+      <div class="g2">
+        <div class="fld"><label>手機<em>*</em></label><input class="fi" name="mobile" inputmode="tel" autocomplete="tel" placeholder="0912-345-678"><span class="msg">請填寫正確的手機號碼</span></div>
+        <div class="fld"><label>住家電話</label><input class="fi" name="phone" inputmode="tel" placeholder="選填"></div>
+      </div>
+      <div class="fld"><label>Email</label><input class="fi" name="email" type="email" inputmode="email" autocomplete="email" placeholder="選填，填寫後會寄送預約確認信"><span class="msg">Email 格式不正確</span></div>
+      <div class="g2">
+        <div class="fld"><label>希望參訪日期<em>*</em></label><input class="fi" type="date" name="wantDate" id="wantDate"><span class="msg">請選擇今天以後的日期</span></div>
+        <div class="fld"><label>希望時段<em>*</em></label>
+          <select class="sel" name="wantSlot"><option value="">請選擇</option><option>上午</option><option>下午</option><option>都可以</option></select><span class="msg">請選擇時段</span></div>
+      </div>
+      <small style="color:var(--sub)">※ 送出後由行政人員來電確認，實際時段以確認為準。</small>
+    </div>
+
+    <!-- 2 -->
+    <div class="pane" data-p="2">
+      <h3>長輩的基本資料</h3>
+      <p class="hint">讓我們事先了解，參訪時能更貼近您的需要。</p>
+      <div class="fld"><label>長輩姓名<em>*</em></label><input class="fi" name="elderName"><span class="msg">請填寫長輩姓名</span></div>
+      <div class="g2">
+        <div class="fld"><label>性別<em>*</em></label>
+          <div class="chips"><label class="chip"><input type="radio" name="gender" value="男"><span>男</span></label><label class="chip"><input type="radio" name="gender" value="女"><span>女</span></label></div><span class="msg">請選擇性別</span></div>
+        <div class="fld"><label>年齡<em>*</em></label><input class="fi" name="age" type="number" inputmode="numeric" min="0" max="120" placeholder="歲"><span class="msg">請填寫年齡</span></div>
+      </div>
+      <div class="fld"><label>目前看診醫院</label><input class="fi" name="hospital" placeholder="選填，例如：彰化基督教醫院"></div>
+      <div class="fld"><label>入住原因與目前狀況</label><textarea class="ta" name="reason" placeholder="選填。例如：出院後需要專業護理、家中無人照顧、有哪些慢性病…"></textarea></div>
+    </div>
+
+    <!-- 3 -->
+    <div class="pane" data-p="3">
+      <h3>照護需求 <small style="font-weight:400;color:var(--sub);font-size:14px">（選填）</small></h3>
+      <p class="hint">不確定的可以直接跳過，之後由我們與您討論。</p>
+      <div class="fld"><label>目前的身體狀況（可複選）</label><div class="chips" id="condChips"></div></div>
+      <div class="fld cond" id="condOtherBox"><label>其他狀況說明</label><input class="fi" name="condNote" placeholder="請簡述"></div>
+      <div class="fld"><label>想了解的房型</label><div class="roomsel" id="roomSel"></div></div>
+      <details class="opt"><summary>更多照護細節（可跳過）</summary><div class="inner">
+        <div class="g2">
+          <div class="fld"><label>入住身份</label><select class="sel" name="identity"><option value="">不確定</option><option>一般</option><option>中低收入戶</option><option>低收入戶</option></select></div>
+          <div class="fld"><label>移動能力</label><select class="sel" name="mobility"><option value="">不確定</option><option>可自行行走</option><option>需輔具</option><option>輪椅</option><option>臥床</option></select></div>
+          <div class="fld"><label>進食方式</label><select class="sel" name="feeding"><option value="">不確定</option><option>自行口食</option><option>鼻胃管灌食</option><option>其他</option></select></div>
+          <div class="fld"><label>需要用氧氣嗎</label><select class="sel" name="oxygen"><option value="">不確定</option><option>不需要</option><option>需要</option></select></div>
+          <div class="fld"><label>DNR 意願</label><select class="sel" name="dnr"><option value="">不確定</option><option>已簽署</option><option>討論中</option><option>未簽署</option></select></div>
+          <div class="fld"><label>溝通狀況</label><select class="sel" name="communication"><option value="">不確定</option><option>正常</option><option>聽力不佳</option><option>表達或理解困難</option></select></div>
+        </div>
+        <div class="fld"><label>需特別注意的安全狀況</label><div class="chips">
+          <label class="chip"><input type="checkbox" name="safety" value="曾跌倒"><span>曾跌倒</span></label>
+          <label class="chip"><input type="checkbox" name="safety" value="會拔管"><span>會自己拔管</span></label>
+          <label class="chip"><input type="checkbox" name="safety" value="躁動"><span>躁動不安</span></label>
+          <label class="chip"><input type="checkbox" name="safety" value="走失風險"><span>有走失風險</span></label></div></div>
+        <div class="fld"><label>目前服用的藥物</label><textarea class="ta" name="medication" style="min-height:70px" placeholder="選填"></textarea></div>
+        <div class="g2">
+          <div class="fld"><label>預計入住時間</label><input class="fi" name="expectedStay" placeholder="例如：下個月初"></div>
+          <div class="fld"><label>入住交通</label><select class="sel" name="transport" id="transport"><option value="">不確定</option><option>家屬自行送來</option><option>需要機構派車接送</option></select></div>
+        </div>
+        <div class="cond" id="pickBox">
+          <div class="fld"><label>接送地址</label><input class="fi" name="pickupAddr"></div>
+          <div class="fld"><label>接送方式</label><select class="sel" name="pickupMode"><option value="">不確定</option><option>可坐輪椅</option><option>需躺床（臥式）</option></select></div>
+        </div>
+        <div class="fld"><label>怎麼知道我們的？</label><select class="sel" name="infoSource"><option value="">不指定</option><option>醫院轉介</option><option>朋友介紹</option><option>網路搜尋</option><option>其他</option></select></div>
+      </div></details>
+      <div class="est" id="est"><div class="tot"><span>每月費用試算</span><b id="estNum">—</b></div><small id="estNote"></small></div>
+    </div>
+
+    <!-- 4 -->
+    <div class="pane" data-p="4">
+      <h3>確認並送出</h3>
+      <p class="hint">請確認以下資料，沒問題就可以送出囉。</p>
+      <div class="sum" id="sum"></div>
+      <div class="consent">
+        <b>個人資料蒐集告知</b>
+        <ul>
+          <li>蒐集目的：參訪預約聯繫與入住評估</li>
+          <li>蒐集項目：您與長輩所填寫之聯絡、基本及健康照護資料</li>
+          <li>保存與利用：僅供本機構相關人員使用，不會提供給無關第三方</li>
+          <li>您可隨時來電要求查詢、更正或刪除</li>
+        </ul>
+        <label><input type="checkbox" id="agree"> 我已閱讀並同意以上個人資料蒐集說明</label>
+        <span class="msg" id="agreeMsg" style="color:var(--red);display:none;margin-top:6px;font-weight:400">請先勾選同意</span>
+      </div>
+    </div>
+
+    <div class="pane" data-p="ok">
+      <div class="ok">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="41"/><path d="M30 52l14 14 27-30"/></svg>
+        <h3>預約已送出！</h3>
+        <p style="color:var(--sub)" id="okMsg"></p>
+        <div class="note-box" style="text-align:left;margin-top:22px">接下來：<br>① 行政人員會來電與您確認參訪時間<br>② 參訪時可事先準備長輩最近的就醫資料或藥袋<br>③ 若需更改，請直接來電告訴我們</div>
+        <button type="button" class="btn btn-g" style="margin-top:22px" onclick="closeBook(true)">回到介紹頁</button>
+      </div>
+    </div>
+
+    <div class="nav-row" id="navRow">
+      <button type="button" class="btn btn-ghost" id="prev" onclick="go(-1)">上一步</button>
+      <button type="button" class="btn btn-g" id="next" onclick="go(1)">下一步</button>
+    </div>
+  </form>
+  </div></div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ==================== 設定區（上線前只要改這裡） ==================== */
+// 家屬版 Apps Script 網址（部署後貼上；留空 = 預覽模式，資料只存在這個瀏覽器）
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyqPpYiDbEHE-aW9RZ3mfScKnGaTlVOatJtNyJxnwOjU2LaqaxW7n47YiwgepSnNqFxRw/exec";
+
+// 圖片：把照片放在同資料夾的 img/ 目錄後，把檔名填進來即可（留空會顯示示意色塊）
+const PHOTOS = {
+  hero:  ["img/wall.jpg","img/care.jpg","img/room.jpg"],
+  about: "img/care.jpg",
+  gallery: [   // 環境輪播
+    {src:"img/building.jpg", cap:"機構外觀"},
+    {src:"img/room.jpg",     cap:"住民房間"},
+    {src:"img/wall.jpg",     cap:"線東大眾護理之家"},
+    {src:"img/care.jpg",     cap:"溫暖的陪伴"}
+  ],
+  illus:"img/illus-life.png"   // 水彩插畫（每天的照顧區塊）
+};
+
+// 介紹文案（內容整理自機構現行官網 dazhongcare.com.tw，可直接在此修改）
+const CONTENT = {
+  tag:"住宿型長照機構　線東大眾護理之家",
+  title:"讓長輩快樂自在，<br>讓家人放心安心。",
+  sub:"我們想構築一座和樂的熟齡生活圈，把熱忱、關愛、專業和耐心，當作撐起每個家庭裡長輩生活的支點。",
+  stats:[ {n:24,u:"小時",t:"住宿式照護"}, {n:5,u:"種",t:"入住型態"}, {n:3,u:"次／週",t:"專人協助清洗身體"}, {n:1,u:"對1",t:"復健服務"} ],
+  aboutTitle:"一起慢慢變老的地方",
+  aboutText:"讓長輩快樂自在、家人放心安心，是我們陪伴住民，經年累月學習到的珍貴使命。在這裡生活，不必擔心遠離社會參與。多元的住宅設計、社會活動與藝文展覽，支持長者持續探索世界、保有學習的活力與互動的樂趣。",
+  vals:[
+    {i:"🌳",t:"老年安養，無須與世隔絕",d:"擁抱社會、參與彼此，在協作、互助、樂齡的環境一起慢慢變老"},
+    {i:"🤝",t:"自立支援照護",d:"由心態出發提高生活品質，協助住民適應老化歷程"},
+    {i:"🏘️",t:"延伸長青生活圈",d:"定期與周邊店家互動，隨時和社區保有熱情連結"}
+  ],
+  types:["長期入住","短期入住","安寧照護","短照服務（外籍看護請假時短期照顧）","喘息服務"],
+  who:[
+    "不限年齡，日常生活需他人協助者",
+    "生活可自理、需人陪伴之健康老人",
+    "慢性病需護理照顧者",
+    "急性醫療出院後，仍有照護需求者",
+    "日常生活無法自理者（如：中風、失智症、行動不便、癱瘓或長期臥床、植物人）",
+    "需定期醫療／護理服務者（如：復健、洗腎、化療、傷口照護）",
+    "癌症末期／安寧照護患者"
+  ],
+  services:[
+    {i:"🛁",t:"日常生活看顧",d:"專人清潔居住環境，並為每位住民每週三次清洗身體。"},
+    {i:"🏃",t:"復健服務",d:"一對一復健、被動關節運動，引導住民運用自身能力進行復健，並接送至附近門診或診所進行復健治療。"},
+    {i:"🩺",t:"護理服務",d:"每天量測生命徵象，由合格護理師評估並擬定照護計畫，推行主責護理師制度，每位住民都有專屬照護師把關日常健康。"},
+    {i:"💬",t:"社工服務",d:"定期評估住民生活狀況，節日舉辦支持性團體活動，並提供長照 3.0 服務諮詢與社福資源。"},
+    {i:"💊",t:"醫療服務",d:"由專業醫療院所醫師、藥劑師、營養師定期到機構巡視，提供診斷與治療。"},
+    {i:"🎨",t:"休閒服務",d:"提供書報雜誌、視聽娛樂等設施，定期舉辦文康活動，提升互動、延緩身心老化。"}
+  ],
+  env:[
+    {i:"🌬️",t:"會呼吸的室內環境",d:["全熱交換器，高效率提供新鮮空氣、濾除 PM2.5","獨立變頻冷暖空調","浴室配有暖風機，冬天淋浴也溫暖"]},
+    {i:"🛏️",t:"舒適的居住空間",d:["獨立私人衣櫃收納空間","全自動電動升降床","獨立式調光燈源，不打擾同房室友"]},
+    {i:"🧺",t:"細心的優質管家",d:["定時更換床單、枕套、床墊，並定期清潔除蟎","每人每室都有獨立空間","衣物用品登記管理，降低混用遺失風險"]},
+    {i:"🎉",t:"歡樂互動，延緩老化",d:["分級分層照顧，每區設計活動空間","定期安排多元社區活動","導入自立支援照護模式"]}
+  ],
+  care:[
+    {t:"每天",h:"量測生命徵象",d:"由合格護理師評估，依結果擬定合適的照護計畫。"},
+    {t:"每週 3 次",h:"專人協助清洗身體",d:"同時由專人清潔居住環境。"},
+    {t:"定期",h:"更換寢具與除蟎",d:"定時更換床單、枕套、床墊，並定期清潔與除蟎。"},
+    {t:"定期",h:"文康與社區活動",d:"多元活動讓每位住民都能適性發展社群生活。"},
+    {t:"定期",h:"醫師、藥師、營養師巡視",d:"專業醫療院所人員定期到機構診斷與治療。"}
+  ],
+  steps:[
+    {h:"線上預約",d:"填寫簡單的預約表單。"},
+    {h:"電話確認",d:"行政人員來電確認參訪時間。"},
+    {h:"現場參訪與會談",d:"參觀環境、了解長輩狀況與費用。"},
+    {h:"備妥資料入住",d:"準備體檢報告，安排簽約與入住。"}
+  ],
+  faqs:[
+    {q:"參訪需要先預約嗎？",a:"建議先預約，我們才能安排專人為您導覽，並事先了解長輩的狀況。"},
+    {q:"入住前需要準備什麼？",a:"需要提供體檢報告，參訪時我們會給您體檢表，上面有需要檢查的項目。"},
+    {q:"有提供短期入住嗎？",a:"有。我們提供短期入住、短照服務與喘息服務；新入住前 30 天當月未住滿 30 天者，以日計費，詳情請洽行政人員。"},
+    {q:"長輩有管路或需要特殊護理也能入住嗎？",a:"可以評估。請在預約表單勾選目前的身體狀況（如鼻胃管、導尿管、氣切等），我們會依實際狀況說明照護安排與費用。"}
+  ],
+  contact:[ {t:"📞 電話／傳真",v:"電話 (04)763-0685<br>傳真 (04)761-8491"}, {t:"✉️ Email",v:"dazhongcare@gmail.com"}, {t:"📍 地址",v:"彰化縣彰化市線東路一段一號"} ],
+  _end:0
+};
+
+// 費用預設值（系統連線後會以試算表「費用設定」分頁的內容為準）
+let PRICE = {
+  rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
+  addons:[{key:"尿布",price:3000},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"傷口",price:0},{key:"其他",price:0}],
+  daily:1850,
+  note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。",
+  disclaimer:"此為依您勾選項目的初步試算，並非正式報價，實際費用以機構評估後為準。"
+};
+/* ==================================================================== */
+
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const money=n=>"NT$ "+Number(n).toLocaleString();
+const bg=src=>src?`background-image:url('${src}')`:"";
+
+/* ---------- 版面渲染 ---------- */
+function render(){
+  $("#heroTag").textContent=CONTENT.tag; $("#heroTitle").innerHTML=CONTENT.title; $("#heroSub").textContent=CONTENT.sub;
+  const hs=$("#heroSlides"); const heroImgs=PHOTOS.hero.length?PHOTOS.hero:[null,null,null];
+  const grads=["linear-gradient(135deg,#3f7a31,#92c55f)","linear-gradient(135deg,#2d7a68,#7cc4ad)","linear-gradient(135deg,#5f8f2f,#b5d67a)"];
+  hs.innerHTML=heroImgs.map((s,i)=>`<div class="hero-slide${i?'':' on'}" style="${s?bg(s):'background:'+grads[i%3]}"></div>`).join("");
+  let hi=0; if(heroImgs.length>1) setInterval(()=>{const a=$$(".hero-slide");a[hi].classList.remove("on");hi=(hi+1)%a.length;a[hi].classList.add("on")},6000);
+
+  $("#stats").innerHTML=CONTENT.stats.map(s=>`<div class="stat"><b><span data-n="${s.n}">0</span>${s.u}</b><span>${s.t}</span></div>`).join("");
+  $("#aboutTitle").textContent=CONTENT.aboutTitle; $("#aboutText").textContent=CONTENT.aboutText;
+  if(PHOTOS.about){$("#aboutImg").style.cssText+=bg(PHOTOS.about);$("#aboutPh").remove()}
+  $("#vals").innerHTML=CONTENT.vals.map((v,i)=>`<div class="val reveal d${i+2}"><i>${v.i}</i><div><b>${v.t}</b><span>${v.d}</span></div></div>`).join("");
+  $("#svcs").innerHTML=CONTENT.services.map((s,i)=>`<div class="svc reveal d${(i%3)+1}"><i>${s.i}</i><h3>${s.t}</h3><p>${s.d}</p></div>`).join("");
+  $("#types").innerHTML=CONTENT.types.map(t=>`<span>${t}</span>`).join("");
+  $("#whoList").innerHTML=CONTENT.who.map((w,i)=>`<div class="who-item reveal d${(i%2)+1}">${w}</div>`).join("");
+  $("#envList").innerHTML=CONTENT.env.map((e,i)=>`<div class="env-card reveal d${i+1}"><i>${e.i}</i><h3>${e.t}</h3><ul>${e.d.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("");
+  const gg=["#92c55f,#3f7a31","#cfe08a,#6aa04a","#7cc4ad,#2d7a68","#b5d67a,#4a8a2e"];
+  $("#galTrack").innerHTML=PHOTOS.gallery.map((g,i)=>`<div class="gal-item" style="${g.src?bg(g.src):'background:linear-gradient(135deg,'+gg[i%4]+')'}"><span>${g.cap}</span></div>`).join("");
+  $("#galDots").innerHTML=PHOTOS.gallery.map((_,i)=>`<b onclick="galTo(${i})"></b>`).join(""); galTo(0);
+    $("#tl").insertAdjacentHTML("beforeend",CONTENT.care.map(d=>`<div class="tl-item reveal"><time>${d.t}</time><h3>${d.h}</h3><p>${d.d}</p></div>`).join(""));
+  renderPrice();
+  $("#steps").innerHTML=CONTENT.steps.map((s,i)=>`<div class="step reveal d${i+1}"><h3>${s.h}</h3><p>${s.d}</p></div>`).join("");
+  $("#faqs").innerHTML=CONTENT.faqs.map(f=>`<div class="qa reveal"><button type="button">${f.q}</button><div>${f.a}</div></div>`).join("");
+  $$(".qa button").forEach(b=>b.onclick=()=>{const q=b.parentElement,c=q.querySelector("div"),o=q.classList.toggle("open");c.style.maxHeight=o?c.scrollHeight+30+"px":0});
+  $("#contact").innerHTML=CONTENT.contact.map(c=>`<div class="reveal"><b>${c.t}</b>${c.v}</div>`).join("");
+  observe();
+}
+function renderPrice(){
+  $("#rooms").innerHTML=PRICE.rooms.map((r,i)=>`<div class="room reveal d${(i%5)+1}"><h3>${r.name}</h3><b>${Number(r.price).toLocaleString()}</b><span>元／月起</span></div>`).join("");
+  $("#priceNote").innerHTML=PRICE.note+"<br>"+PRICE.disclaimer;
+  $("#condChips").innerHTML=PRICE.addons.map(a=>`<label class="chip"><input type="checkbox" name="cond" value="${a.key}"><span>${a.key}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`).join("");
+  $("#roomSel").innerHTML=`<label class="chip"><input type="radio" name="roomType" value="" checked><span>尚未決定</span></label>`+PRICE.rooms.map(r=>`<label class="chip"><input type="radio" name="roomType" value="${r.name}"><span>${r.name}<b>${Number(r.price).toLocaleString()}</b></span></label>`).join("");
+  $$("#condChips input,#roomSel input").forEach(i=>i.addEventListener("change",calc)); calc();
+}
+
+/* ---------- 動畫 ---------- */
+let io;
+function observe(){
+  io&&io.disconnect();
+  io=new IntersectionObserver(es=>es.forEach(e=>{
+    if(!e.isIntersecting)return; e.target.classList.add("in"); io.unobserve(e.target);
+    e.target.querySelectorAll("[data-n]").forEach(count);
+  }),{threshold:.15,rootMargin:"0px 0px -6% 0px"});
+  $$(".reveal:not(.in),.tl-item:not(.in)").forEach(el=>io.observe(el));
+}
+function count(el){
+  const to=+el.dataset.n,t0=performance.now(),d=1400;
+  (function f(t){const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=Math.round(to*e);if(p<1)requestAnimationFrame(f)})(t0);
+}
+addEventListener("scroll",()=>{
+  const h=document.documentElement,sc=h.scrollTop,max=h.scrollHeight-innerHeight;
+  $("#bar").style.width=(max?sc/max*100:0)+"%";
+  $("#nav").classList.toggle("solid",sc>60);
+  $("#fab").classList.toggle("show",sc>innerHeight*.7&&!$("#ov").classList.contains("open"));
+  const tl=$("#tl"),r=tl.getBoundingClientRect(),p=Math.max(0,Math.min(1,(innerHeight*.6-r.top)/r.height));
+  $("#tlFill").style.height=(p*(r.height-12))+"px";
+},{passive:true});
+
+/* gallery */
+let gi=0,gt;
+function galTo(i){const n=PHOTOS.gallery.length;gi=(i+n)%n;$("#galTrack").style.transform=`translateX(-${gi*100}%)`;$$("#galDots b").forEach((b,k)=>b.classList.toggle("on",k===gi));clearInterval(gt);gt=setInterval(()=>galTo(gi+1),5000)}
+function gal(d){galTo(gi+d)}
+(()=>{let sx=null;const v=document.querySelector(".gal-view");v.addEventListener("touchstart",e=>sx=e.touches[0].clientX,{passive:true});v.addEventListener("touchend",e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;if(Math.abs(dx)>40)gal(dx<0?1:-1);sx=null})})();
+
+/* ---------- 預約表單 ---------- */
+let step=1;
+const LB=["聯絡方式","長輩資料","照護需求","確認送出"];
+const FORM=$("#f");
+const val=n=>{const e=FORM.elements[n];return e?(e.value||"").trim():""};
+const vals=n=>$$(`[name="${n}"]:checked`).map(e=>e.value);
+
+function openBook(){
+  $("#ov").classList.add("open");document.body.style.overflow="hidden";$("#fab").classList.remove("show");
+  const t=new Date();t.setDate(t.getDate()+1);$("#wantDate").min=t.toISOString().slice(0,10);
+  show(1);
+}
+function closeBook(reset){
+  $("#ov").classList.remove("open");document.body.style.overflow="";
+  if(reset){FORM.reset();calc();$("#pickBox").classList.remove("show");$("#condOtherBox").classList.remove("show")}
+  scrollTo({top:0,behavior:"smooth"});
+}
+function show(n){
+  step=n;
+  $$(".pane").forEach(p=>p.classList.toggle("on",p.dataset.p==(n==="ok"?"ok":n)));
+  $$("#stepper i").forEach((e,i)=>e.classList.toggle("on",n==="ok"||i<n));
+  const done=n==="ok";
+  $("#navRow").style.display=done?"none":"flex";$("#stLb").textContent=done?"完成":LB[n-1];$("#stNo").textContent=done?"":`${n} / 4`;
+  $("#prev").style.visibility=n===1?"hidden":"visible";
+  $("#next").textContent=n===4?"確認送出":"下一步";
+  $(".ov-body").scrollTo({top:0});
+}
+function setErr(name,bad){const f=FORM.elements[name];if(!f)return;const box=(f.length&&!f.tagName?f[0]:f).closest(".fld");box&&box.classList.toggle("err",bad);return bad}
+function validate(n){
+  let bad=false,first=null;
+  const chk=(name,cond)=>{const b=!cond;if(setErr(name,b)&&!first)first=name;bad=bad||b};
+  if(n===1){
+    chk("visitorName",val("visitorName"));chk("relation",val("relation"));
+    chk("mobile",/^(09\d{2}-?\d{3}-?\d{3}|0\d{1,2}-?\d{6,8})$/.test(val("mobile").replace(/\s/g,"")));
+    chk("email",!val("email")||/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val("email")));
+    chk("wantDate",val("wantDate")&&val("wantDate")>=$("#wantDate").min);chk("wantSlot",val("wantSlot"));
+  }
+  if(n===2){chk("elderName",val("elderName"));chk("gender",vals("gender").length);chk("age",val("age")!==""&&+val("age")>=0&&+val("age")<=120)}
+  if(bad&&first){const f=FORM.elements[first];(f.length&&!f.tagName?f[0]:f).scrollIntoView({block:"center",behavior:"smooth"})}
+  return !bad;
+}
+function go(d){
+  if(d>0){
+    if(step<4&&!validate(step))return;
+    if(step===3)buildSum();
+    if(step===4)return submit();
+  }
+  show(step+d);
+}
+FORM.addEventListener("input",e=>{const f=e.target.closest(".fld");f&&f.classList.remove("err")});
+$("#transport").addEventListener("change",e=>$("#pickBox").classList.toggle("show",e.target.value==="需要機構派車接送"));
+$("#condChips").addEventListener("change",()=>$("#condOtherBox").classList.toggle("show",vals("cond").includes("其他")));
+
+function calc(){
+  const room=PRICE.rooms.find(r=>r.name===(($('[name="roomType"]:checked')||{}).value));
+  const add=vals("cond").reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0);
+  const n=$("#estNum");
+  if(!room){n.textContent=add?"+ "+money(add):"請選擇房型";$("#estNote").textContent=PRICE.disclaimer;return null}
+  const t=room.price+add;n.textContent=money(t)+" / 月";
+  $("#estNote").textContent=`${room.name} ${money(room.price)}`+(add?` ＋ 照護加價 ${money(add)}`:"")+"　"+PRICE.disclaimer;return t;
+}
+function payload(){
+  const o={};
+  ["visitorName","relation","mobile","phone","email","wantDate","wantSlot","elderName","gender","age","hospital","reason","condNote","identity","mobility","feeding","oxygen","dnr","communication","medication","expectedStay","transport","pickupAddr","pickupMode","infoSource"].forEach(k=>o[k]=k==="gender"?vals("gender")[0]||"":val(k));
+  o.conditions=vals("cond").join("、");o.safety=vals("safety").join("、");
+  o.roomType=($('[name="roomType"]:checked')||{}).value||"";o.estimate=calc()||"";
+  o.channel="家屬線上";o.website=val("website");o.clientTime=Date.now();
+  return o;
+}
+function buildSum(){
+  const p=payload(),rows=[["您的姓名",p.visitorName+"（"+p.relation+"）"],["聯絡電話",p.mobile+(p.email?"\n"+p.email:"")],["希望參訪",p.wantDate+" "+p.wantSlot],["長輩",`${p.elderName}　${p.gender}　${p.age}歲`],["身體狀況",p.conditions||"未填"],["預想房型",p.roomType||"尚未決定"],["費用試算",p.estimate?money(p.estimate)+" / 月（僅供參考）":"—"]];
+  $("#sum").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><b>${String(r[1]).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\n/g,"<br>")}</b></div>`).join("");
+}
+function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",3200)}
+
+/* ---------- 送出 ---------- */
+let sending=false;
+async function submit(){
+  if(sending)return;
+  if(!$("#agree").checked){$("#agreeMsg").style.display="block";return}
+  $("#agreeMsg").style.display="none";
+  const p=payload();
+  if(p.website)return show("ok"); // 蜜罐：機器人，假裝成功
+  // 短時間內同一手機重複送出提醒
+  try{const last=JSON.parse(localStorage.getItem("tour_last")||"null");
+    if(last&&last.m===p.mobile&&Date.now()-last.t<10*60*1000&&!confirm("您剛剛已經送出過一筆預約了，確定要再送一次嗎？"))return}catch(e){}
+  sending=true;const btn=$("#next");btn.disabled=true;btn.innerHTML='<span class="spin"></span> 送出中…';
+  try{
+    const r=await callApi("submit",p);
+    if(!r.ok)throw new Error(r.error||"送出失敗");
+    try{localStorage.setItem("tour_last",JSON.stringify({m:p.mobile,t:Date.now()}))}catch(e){}
+    $("#okMsg").textContent=p.email?`確認信已寄到 ${p.email}，行政人員將盡快與您聯繫。`:"行政人員將盡快與您聯繫。";
+    show("ok");
+  }catch(e){
+    toast("送出失敗，請檢查網路後再試一次，或直接來電預約");btn.disabled=false;btn.textContent="確認送出";sending=false;return;
+  }
+  sending=false;btn.disabled=false;
+}
+
+/* ---------- API（預覽模式 / 正式連線） ---------- */
+const MOCK_KEY="tour_mock_v1";
+const mockLoad=()=>{try{return JSON.parse(localStorage.getItem(MOCK_KEY)||'{"rows":[],"notes":[],"hist":[]}')}catch(e){return{rows:[],notes:[],hist:[]}}};
+async function callApi(action,data){
+  if(!SCRIPT_URL){
+    await new Promise(r=>setTimeout(r,700));
+    if(action==="submit"){
+      const db=mockLoad(),d=new Date(),pad=n=>String(n).padStart(2,"0");
+      const id="T"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"-"+pad(db.rows.length+1);
+      db.rows.push(Object.assign({},data,{id,status:"待聯絡",createdAt:d.toISOString(),total:data.estimate||"",updatedAt:d.toISOString(),updatedBy:"家屬自填"}));
+      localStorage.setItem(MOCK_KEY,JSON.stringify(db));return{ok:true,id};
+    }
+    return{ok:true};
+  }
+  const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data})});
+  return res.json();
+}
+async function loadConfig(){
+  if(!SCRIPT_URL)return;
+  try{const r=await (await fetch(SCRIPT_URL+"?action=config")).json();if(r&&r.ok&&r.config&&r.config.rooms&&r.config.rooms.length){const c=r.config;PRICE={rooms:c.rooms,addons:c.addons.length?c.addons:PRICE.addons,daily:c.daily||PRICE.daily,note:c.note||PRICE.note,disclaimer:c.disclaimer||PRICE.disclaimer};renderPrice();observe()}}catch(e){}
+}
+
+render();loadConfig();
+if(!SCRIPT_URL)document.title+="（預覽模式）";
+addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#ov").classList.contains("open"))closeBook()});
+if(location.hash==="#book")openBook();
+</script>
+</body>
+</html>
