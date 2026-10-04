@@ -213,6 +213,14 @@
         <span class="go"><span data-i18n="open">開啟系統</span> <span class="arrow">→</span></span>
       </a>
 
+      <a class="card" data-key="tour" style="--a1:#6aae3c;--a2:#2f9a7e" href="tour/index.html">
+        <div class="ico">🏡</div>
+        <div class="cat">新 住 民 · 參 訪</div>
+        <h2>參訪預約管理</h2>
+        <p>家屬預約參訪的名單、訪談紀錄與狀態追蹤，電話詢問也可在此新增。</p>
+        <span class="go"><span data-i18n="open">開啟系統</span> <span class="arrow">→</span></span>
+      </a>
+
       <a class="card" data-key="items" style="--a1:#2e9e6b;--a2:#5fc38e" href="items/index.html">
         <div class="ico">📦</div>
         <div class="cat" data-i18n="itemsCat">住 民 物 品</div>
@@ -272,13 +280,13 @@
     var ORG_KEY = "handover_org", ORG_VALUE = "線東大眾護理之家";
     /* 各身份可看到的卡片（改這裡就好；卡片 data-key：visit/items/handover/car/pricing/repair） */
     var ROLE_CARDS = {
-      admin: ["visit","items","handover","car","pricing","repair"],   /* 行政：全部 */
-      nurse: ["visit","items","pricing","repair"],                 /* 護理：除行政交班、交通車外全部 */
+      admin: ["visit","tour","items","handover","car","pricing","repair"],   /* 行政：全部 */
+      nurse: ["visit","tour","items","pricing","repair"],                 /* 護理：除行政交班、交通車外全部 */
       care:  ["visit","items","repair"]                             /* 照服：不含計價、交通車、行政交班 */
     };
     var ROLE_LABEL = { admin:"行政", nurse:"護理", care:"照服" };
     /* 卡片預設連結；ROLE_HREF 可讓某身份的某張卡改連別的頁（例：照服的探視卡→簡化今日名單頁） */
-    var DEFAULT_HREF = { visit:"visit/index.html", items:"items/index.html", handover:"admin/index.html", car:"car/index.html", pricing:"pricing/index.html", repair:"repair/index.html" };
+    var DEFAULT_HREF = { visit:"visit/index.html", tour:"tour/index.html", items:"items/index.html", handover:"admin/index.html", car:"car/index.html", pricing:"pricing/index.html", repair:"repair/index.html" };
     var ROLE_HREF = {
       nurse: { items:"items-check/index.html", repair:"repair-report/index.html" },
       care:  { visit:"visit-today/index.html", items:"items-check/index.html", repair:"repair-report/index.html" }
