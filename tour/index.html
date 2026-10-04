@@ -426,6 +426,10 @@ async function save(){
   const bad=[];["visitorName","elderName"].forEach(k=>{const f=$(`.fl[data-k=${k}]`);const b=!String(CUR[k]||"").trim();f&&f.classList.toggle("bad",b);if(b)bad.push(k)});
   if(!String(CUR.mobile||"").trim()&&!String(CUR.phone||"").trim()){bad.push("mobile");$(`.fl[data-k=mobile]`).classList.add("bad")}
   if(bad.length){toast("請填寫姓名與聯絡電話（標紅欄位）");const f=$(`.fl[data-k=${bad[0]}]`);f&&f.scrollIntoView({block:"center",behavior:"smooth"});return}
+  if(OPEN_ST.includes(CUR.status)&&!CUR.wantDate&&!CUR.visitDate){
+    const f=$(`.fl[data-k=wantDate]`);f&&f.classList.add("bad");
+    if(!confirm("這筆還沒有填寫「希望參訪日」或「實際參訪日」。\n沒有日期的預約，不會被計入「今日參訪」「本週參訪」。\n\n確定要先儲存嗎？\n（按「取消」可回去補填日期）")){f&&f.scrollIntoView({block:"center",behavior:"smooth"});return}
+  }
   const b=$("#saveBtn");b.disabled=true;b.innerHTML='<span class="spin"></span> 儲存中';
   try{
     const fields={};KEYS().forEach(k=>fields[k]=CUR[k]==null?"":CUR[k]);fields.id=CUR.id||"";
