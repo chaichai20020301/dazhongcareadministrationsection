@@ -21,6 +21,8 @@ h1,h2,h3{font-family:'Noto Serif TC','Noto Sans TC',serif}
 .top h1 img{height:38px;width:auto}
 .top h1 span{display:block;line-height:1.25;border-left:2px solid var(--line);padding-left:12px}
 .top h1 small{display:block;font:400 10.5px 'Noto Sans TC';color:var(--sub);letter-spacing:.2em}
+.back{flex:none;display:inline-flex;align-items:center;gap:4px;padding:7px 14px;background:linear-gradient(120deg,#6aae3c,#2f8f78);color:#fff;border-radius:999px;font:700 13px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(74,138,46,.28);letter-spacing:.04em}
+.back:hover{filter:brightness(1.08)}
 .who{display:flex;align-items:center;gap:6px;background:var(--g3);padding:5px 12px;border-radius:99px;font-size:13px;color:var(--g)}
 .who input{background:transparent;border:none;border-bottom:1px dashed var(--g);color:var(--ink);width:84px;font-size:13px;padding:1px 2px}
 .who input::placeholder{color:#9aa793}
@@ -162,6 +164,7 @@ details.fold .in2{margin-top:10px}
 <body>
 <div class="top">
   <div class="in">
+    <a class="back" href="../index.html">&larr; 入口網站</a>
     <h1><img src="logo.png" alt="線東大眾護理之家"><span>參訪預約管理<small>VISIT RESERVATION ADMIN</small></span></h1>
     <div class="who">承辦人 <input id="who" placeholder="輸入姓名"></div>
     <button class="btn btn-w btn-sm" onclick="openRow(null)">＋ 新增紀錄</button>
