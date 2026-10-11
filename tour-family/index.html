@@ -523,7 +523,7 @@ const CONTENT = {
   tag:"住宿型長照機構　線東大眾護理之家",
   title:"讓長輩快樂自在，<br>讓家人放心安心。",
   sub:"我們想構築一座和樂的熟齡生活圈，把熱忱、關愛、專業和耐心，當作撐起每個家庭裡長輩生活的支點。",
-  stats:[ {n:24,u:"小時",t:"住宿式照護"}, {n:5,u:"種",t:"入住型態<small>長期・短期・安寧・短照・喘息</small>"}, {n:2,u:"天1次",t:"專人協助洗澡"}, {n:7,u:"類",t:"服務對象"} ],
+  stats:[ {n:24,u:"小時",t:"住宿式照護"}, {big:"每天",t:"量測生命徵象"}, {big:"專屬",t:"照護師<small>每位住民都有</small>"}, {n:3,u:"種",t:"專業人員定期巡視<small>醫師・藥師・營養師</small>"} ],
   aboutTitle:"一起慢慢變老的地方",
   aboutText:"讓長輩快樂自在、家人放心安心，是我們陪伴住民，經年累月學習到的珍貴使命。在這裡生活，不必擔心遠離社會參與。多元的住宅設計、社會活動與藝文展覽，支持長者持續探索世界、保有學習的活力與互動的樂趣。",
   vals:[
@@ -599,7 +599,7 @@ function render(){
   hs.innerHTML=heroImgs.map((s,i)=>`<div class="hero-slide${i?'':' on'}" style="${s?bg(s):'background:'+grads[i%3]}"></div>`).join("");
   let hi=0; if(heroImgs.length>1) setInterval(()=>{const a=$$(".hero-slide");a[hi].classList.remove("on");hi=(hi+1)%a.length;a[hi].classList.add("on")},6000);
 
-  $("#stats").innerHTML=CONTENT.stats.map(s=>`<div class="stat"><b><span data-n="${s.n}">0</span>${s.u}</b><span>${s.t}</span></div>`).join("");
+  $("#stats").innerHTML=CONTENT.stats.map(s=>`<div class="stat"><b>${s.big?s.big:`<span data-n="${s.n}">0</span>${s.u}`}</b><span>${s.t}</span></div>`).join("");
   $("#aboutTitle").textContent=CONTENT.aboutTitle; $("#aboutText").textContent=CONTENT.aboutText;
   if(PHOTOS.about){$("#aboutImg").style.cssText+=bg(PHOTOS.about);$("#aboutPh").remove()}
   $("#vals").innerHTML=CONTENT.vals.map((v,i)=>`<div class="val reveal d${i+2}"><i>${v.i}</i><div><b>${v.t}</b><span>${v.d}</span></div></div>`).join("");
