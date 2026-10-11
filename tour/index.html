@@ -242,7 +242,7 @@ function needWho(){if(me())return true;toast("請先在右上角輸入承辦人�
 const MK="tour_mock_v1";
 const mLoad=()=>{try{const d=JSON.parse(lsGet(MK)||"null");return d&&d.rows?d:{rows:[],notes:[],hist:[]}}catch(e){return{rows:[],notes:[],hist:[]}}};
 const mSave=d=>lsSet(MK,JSON.stringify(d));
-async function api(action,data){
+async function apiOnce(action,data){
   if(!SCRIPT_URL){
     await new Promise(r=>setTimeout(r,250));
     const db=mLoad(),now=new Date().toISOString();
@@ -265,9 +265,20 @@ async function api(action,data){
   const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),60000);   // Google 偶爾很慢，最多等 60 秒
   try{
     const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data}),signal:ctl.signal});
-    return await res.json();
-  }catch(e){ if(e&&e.name==="AbortError")throw new Error("連線逾時"); throw e }
+    const text=await res.text();
+    try{ return JSON.parse(text) }
+    catch(_){ const err=new Error("Google 暫時沒有正常回應");err.transient=true;throw err }   // 偶爾 Google 會回 HTML 錯誤頁而不是資料
+  }catch(e){ if(e&&e.name==="AbortError")throw new Error("連線逾時"); if(e&&e.name==="TypeError"&&!e.transient){e.transient=true;e.message="網路連線不穩，請稍後再試"} throw e }
   finally{ clearTimeout(to) }
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+// 讀取類（list/get）可安全重試；寫入類（save/note）不自動重試，避免第一次其實已成功卻重複寫入
+async function api(action,data){
+  const reads=(action==="list"||action==="get");
+  for(let i=0;;i++){
+    try{ return await apiOnce(action,data) }
+    catch(e){ if(!reads||!e||!e.transient||i>=2)throw e; await sleep(1500*(i+1)) }
+  }
 }
 
 /* ---------- 清單 ---------- */
@@ -457,7 +468,7 @@ async function save(){
       $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";
     }
     reload(true);   // 背景同步最新清單（不阻擋畫面）
-  }catch(e){toast(e&&e.message==="連線逾時"?"連線逾時，資料可能已儲存，請按「重新整理」確認":"連線失敗，請稍後再試")}
+  }catch(e){toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，資料不一定已儲存。請先按「重新整理」確認，再決定要不要重新儲存":"連線失敗，請稍後再試",7000)}
   finally{ clearTimeout(slow);b.innerHTML="儲存";mark(); }
 }
 async function addNote(){
@@ -475,7 +486,7 @@ async function addNote(){
     $("#nText").value="";$("#nFollow").value="";
     if(follow&&(!FOLLOW[CUR.id]||follow>FOLLOW[CUR.id]))FOLLOW[CUR.id]=follow;
     draw();mark();
-  }catch(e){toast(e&&e.message==="連線逾時"?"連線逾時，請按「重新整理」確認是否已新增":"新增失敗")}
+  }catch(e){toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，紀錄不一定已新增。請先按「重新整理」確認，再決定要不要重新新增":"新增失敗",7000)}
   clearTimeout(slow);b.disabled=false;
 }
 
