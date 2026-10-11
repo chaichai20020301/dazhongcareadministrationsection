@@ -62,11 +62,15 @@
   .acard-main{display:flex;align-items:center;gap:8px}
   .acard-main b{font-size:16px}
   .acard .s-price{color:var(--price);font-weight:700}
-  .acard-fields{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .acard-fields .lbl{color:var(--muted);font-size:13px}
-  .acard-fields input,.acard-fields select{padding:5px 7px;border:1px solid var(--line);border-radius:6px;font-size:14px}
-  .acard-fields .sd{width:140px}
-  .acard-fields .loc{width:110px}
+  .acard-fields{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap}
+  .acard-fields .lbl{color:var(--muted);font-size:12px}
+  .acard-fields input,.acard-fields select{padding:6px 8px;border:1px solid var(--line);border-radius:6px;font-size:14px}
+  .acard-fields .fld{display:flex;flex-direction:column;gap:3px}
+  .acard-fields .fldrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .acard-fields .sd{width:150px}
+  .acard-fields .loc{width:120px}
+  .acard-fields .payn{width:180px}
+  .acard-fields .rm-fld{align-self:flex-end;margin-left:auto}
   .big-m{color:var(--price);font-weight:800;white-space:nowrap}
   .small-m{color:var(--brand-d);font-weight:800;white-space:nowrap}
   .total .big{font-size:20px}
@@ -160,7 +164,14 @@
     header .sp{display:none}
     header{gap:6px 10px}
     .grid{grid-template-columns:1fr}
-    .acard{align-items:flex-start}
+    .acard{align-items:flex-start;flex-direction:column}
+    .acard-fields{width:100%;gap:12px}
+    .acard-fields .fld{flex:1 1 100%}
+    .acard-fields .fld .sd,.acard-fields .fld .loc,.acard-fields .payn{width:100%}
+    .acard-fields .fldrow{width:100%}
+    .acard-fields .fldrow select{flex:1}
+    .acard-fields .rm-fld{width:100%;margin-left:0}
+    .acard-fields .rm-fld .btn-rm{width:100%}
     .total .big{font-size:22px}
     .btn-set{flex:1;text-align:center}
   }
@@ -397,17 +408,18 @@ function openResident(rid){
 }
 
 // 每張卡片的欄位：部位(傷口)＋起始＋結束＋負擔方
+function fld(label, inner){ return '<label class="fld"><span class="lbl">'+label+'</span>'+inner+'</label>'; }
 function acardFields(c, pv){
-  var f='';
-  if(isWound(c.key)){
-    f+='<span class="lbl">部位</span><input type="text" class="loc" id="loc_'+c.key+'" value="'+esc(pv.location||'')+'" placeholder="部位（必填）" onchange="saveRow(\''+c.key+'\')">';
-    f+='<span class="lbl">換藥</span>'+freqControlHtml('wf_'+c.key,'wfn_'+c.key, pv.freq||'', "onWoundFreqChange('"+c.key+"')", "saveRow('"+c.key+"')");
+  var k=c.key, f='';
+  if(isWound(k)){
+    f+=fld('部位','<input type="text" class="loc" id="loc_'+k+'" value="'+esc(pv.location||'')+'" placeholder="部位（必填）" onchange="saveRow(\''+k+'\')">');
+    f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf_'+k,'wfn_'+k, pv.freq||'', "onWoundFreqChange('"+k+"')", "saveRow('"+k+"')")+'</span>');
   }
-  f+='<span class="lbl">起始</span><input type="date" class="sd" id="s_'+c.key+'" value="'+esc(pv.date||'')+'" onchange="saveRow(\''+c.key+'\')">';
-  f+='<span class="lbl">結束</span><input type="date" class="sd" id="e_'+c.key+'" value="'+esc(pv.end||'')+'" onchange="saveRow(\''+c.key+'\')">';
+  f+=fld('起始','<input type="date" class="sd" id="s_'+k+'" value="'+esc(pv.date||'')+'" onchange="saveRow(\''+k+'\')">');
+  f+=fld('結束','<input type="date" class="sd" id="e_'+k+'" value="'+esc(pv.end||'')+'" onchange="saveRow(\''+k+'\')">');
   var showName=(pv.payer==='照服員');
-  f+='<span class="lbl">負擔</span>'+payerSelectHtml('pay_'+c.key, pv.payer||'家屬', "onCardPayerChange('"+c.key+"')")
-    +'<input type="text" id="payn_'+c.key+'" value="'+esc(pv.payerName||'')+'" placeholder="照服員姓名（多位用、分隔）" style="width:190px;'+(showName?'':'display:none')+'" onchange="savePayer(\''+c.key+'\',gval(\'pay_'+c.key+'\'),this.value)">';
+  f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+k, pv.payer||'家屬', "onCardPayerChange('"+k+"')")
+    +'<input type="text" class="payn" id="payn_'+k+'" value="'+esc(pv.payerName||'')+'" placeholder="照服員姓名（多位用、分隔）" style="'+(showName?'':'display:none')+'" onchange="savePayer(\''+k+'\',gval(\'pay_'+k+'\'),this.value)"></span>');
   return f;
 }
 function acardHtml(c, pv){
@@ -416,7 +428,7 @@ function acardHtml(c, pv){
   var badges=(isOther?('<span class="pbadge">'+esc(pv.payer)+'負擔'+(pv.payerName?('・'+esc(pv.payerName)):'')+'</span>'):'')
     +(ended?('<span class="ebadge">已結束 '+esc(pv.end)+'</span>'):'');
   return '<div class="acard'+(ended?' ended':'')+'"><div class="acard-main"><b>'+esc(c.label)+'</b>'+badges+'</div>'
-    +'<div class="acard-fields">'+acardFields(c,pv)+'<button class="btn-rm" onclick="removeItem(\''+c.key+'\',\''+esc(c.label)+'\')">移除</button></div></div>';
+    +'<div class="acard-fields">'+acardFields(c,pv)+'<span class="rm-fld"><button class="btn-rm" onclick="removeItem(\''+c.key+'\',\''+esc(c.label)+'\')">移除</button></span></div></div>';
 }
 // ===== 傷口＝清單（可多處）：值存 JSON 陣列，每處 {loc,freq,s,e,payer,pname} =====
 function curRaw(key){ var row=STATE.data[STATE.current]; return row&&row.items?row.items[key]:''; }
@@ -439,13 +451,13 @@ function saveWoundEntry(key,i){
 function removeWoundEntry(key,i){ if(!confirm('確定移除這處傷口？（連歷史一起清除）')) return; var arr=parseWounds(curRaw(key)); arr.splice(i,1); save(key, arr.length?JSON.stringify(arr):''); }
 function woundFields(c,w,i){
   var key=c.key;
-  var f='<span class="lbl">部位</span><input type="text" id="loc_'+key+'_'+i+'" value="'+esc(w.loc||'')+'" placeholder="部位（必填）" onchange="saveWoundEntry(\''+key+'\','+i+')">';
-  f+='<span class="lbl">換藥</span>'+freqControlHtml('wf_'+key+'_'+i,'wfn_'+key+'_'+i, w.freq||'', "onWoundFreqChangeIdx('"+key+"',"+i+")", "saveWoundEntry('"+key+"',"+i+")");
-  f+='<span class="lbl">起始</span><input type="date" id="s_'+key+'_'+i+'" value="'+esc(w.s||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">';
-  f+='<span class="lbl">結束</span><input type="date" id="e_'+key+'_'+i+'" value="'+esc(w.e||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">';
+  var f=fld('部位','<input type="text" class="loc" id="loc_'+key+'_'+i+'" value="'+esc(w.loc||'')+'" placeholder="部位（必填）" onchange="saveWoundEntry(\''+key+'\','+i+')">');
+  f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf_'+key+'_'+i,'wfn_'+key+'_'+i, w.freq||'', "onWoundFreqChangeIdx('"+key+"',"+i+")", "saveWoundEntry('"+key+"',"+i+")")+'</span>');
+  f+=fld('起始','<input type="date" class="sd" id="s_'+key+'_'+i+'" value="'+esc(w.s||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
+  f+=fld('結束','<input type="date" class="sd" id="e_'+key+'_'+i+'" value="'+esc(w.e||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
   var showName=(w.payer==='照服員');
-  f+='<span class="lbl">負擔</span>'+payerSelectHtml('pay_'+key+'_'+i, w.payer||'家屬', "onWoundPayerChange('"+key+"',"+i+")")
-    +'<input type="text" id="payn_'+key+'_'+i+'" value="'+esc(w.pname||'')+'" placeholder="照服員姓名（多位用、分隔）" style="width:190px;'+(showName?'':'display:none')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">';
+  f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+key+'_'+i, w.payer||'家屬', "onWoundPayerChange('"+key+"',"+i+")")
+    +'<input type="text" class="payn" id="payn_'+key+'_'+i+'" value="'+esc(w.pname||'')+'" placeholder="照服員姓名（多位用、分隔）" style="'+(showName?'':'display:none')+'" onchange="saveWoundEntry(\''+key+'\','+i+')"></span>');
   return f;
 }
 function woundCardHtml(c,w,i){
@@ -453,7 +465,7 @@ function woundCardHtml(c,w,i){
   var title=esc(c.label)+(w.loc?(' ‧ '+esc(w.loc)):'');
   var badges=(isOther?('<span class="pbadge">'+esc(w.payer)+'負擔'+(w.pname?('・'+esc(w.pname)):'')+'</span>'):'')+(ended?('<span class="ebadge">已結束 '+esc(w.e)+'</span>'):'');
   return '<div class="acard'+(ended?' ended':'')+'"><div class="acard-main"><b>'+title+'</b>'+badges+'</div>'
-    +'<div class="acard-fields">'+woundFields(c,w,i)+'<button class="btn-rm" onclick="removeWoundEntry(\''+c.key+'\','+i+')">移除</button></div></div>';
+    +'<div class="acard-fields">'+woundFields(c,w,i)+'<span class="rm-fld"><button class="btn-rm" onclick="removeWoundEntry(\''+c.key+'\','+i+')">移除</button></span></div></div>';
 }
 // 進行中在上、已結束在下
 function renderActive(){
