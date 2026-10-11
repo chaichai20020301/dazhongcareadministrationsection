@@ -226,7 +226,7 @@ const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth
 const lsGet=k=>{try{return localStorage.getItem(k)||""}catch(e){return""}};
 const lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const fmtT=t=>{if(!t)return"";const d=new Date(t);return isNaN(d)?t:`${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`};
-function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2600)}
+function toast(m,ms){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),ms||2600)}
 function pill(s){return `<span class="pill" style="background:var(${SC[s]||"--s-can"})">${esc(s)}</span>`}
 
 /* ---------- 承辦人：自動帶入口網登入的名字 ---------- */
@@ -256,24 +256,28 @@ async function api(action,data){
       mSave(db);return{ok:true,row};
     }
     if(action==="note"){db.notes.push({time:now,pid:data.pid,by:data.by,type:data.type,content:data.content,followDate:data.followDate||""});
-      const r=db.rows.find(x=>x.id===data.pid);if(r){r.updatedAt=now;r.updatedBy=data.by}mSave(db);return{ok:true}}
+      const r=db.rows.find(x=>x.id===data.pid);if(r){r.updatedAt=now;r.updatedBy=data.by}mSave(db);return{ok:true,updatedAt:now}}
     return{ok:false,error:"unknown"};
   }
-  const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data})});
-  return res.json();
+  const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),60000);   // Google 偶爾很慢，最多等 60 秒
+  try{
+    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data}),signal:ctl.signal});
+    return await res.json();
+  }catch(e){ if(e&&e.name==="AbortError")throw new Error("連線逾時"); throw e }
+  finally{ clearTimeout(to) }
 }
 
 /* ---------- 清單 ---------- */
 let ROWS=[],FOLLOW={},fStatus="進行中",fQuick="",sortK="createdAt",sortD=-1;
-async function reload(){
-  $("#tbl").innerHTML='<div class="load"><span class="spin d"></span> 讀取中…</div>';$("#cards").innerHTML="";
+async function reload(silent){
+  if(!silent){$("#tbl").innerHTML='<div class="load"><span class="spin d"></span> 讀取中…</div>';$("#cards").innerHTML="";}
   try{
     const r=await api("list");if(!r.ok)throw new Error(r.error);
     ROWS=r.rows||[];FOLLOW=r.follow||{};if(r.config&&r.config.rooms&&r.config.rooms.length){const c=r.config;PRICE={rooms:c.rooms,addons:c.addons.length?c.addons:PRICE.addons,daily:c.daily||PRICE.daily,note:c.note||PRICE.note}}
     const chs=[...new Set(ROWS.map(x=>x.channel).filter(Boolean).concat(CHANNELS))];
     const cur=$("#fch").value;$("#fch").innerHTML='<option value="">所有來源</option>'+chs.map(c=>`<option>${esc(c)}</option>`).join("");$("#fch").value=cur;
     draw();if($("#v-stats").style.display!=="none")drawStats();
-  }catch(e){$("#tbl").innerHTML=`<div class="empty">讀取失敗：${esc(e.message||e)}<br><br><button class="btn btn-g btn-sm" onclick="reload()">重試</button></div>`}
+  }catch(e){ if(!silent)$("#tbl").innerHTML=`<div class="empty">讀取失敗：${esc(e.message||e)}<br><br><button class="btn btn-g btn-sm" onclick="reload()">重試</button></div>` }
 }
 function weekRange(){const d=new Date(),day=(d.getDay()+6)%7,s=new Date(d);s.setDate(d.getDate()-day);const e=new Date(s);e.setDate(s.getDate()+6);const f=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");return[f(s),f(e)]}
 const vDate=r=>r.visitDate||r.wantDate||"";
@@ -431,27 +435,45 @@ async function save(){
     if(!confirm("這筆還沒有填寫「希望參訪日」或「實際參訪日」。\n沒有日期的預約，不會被計入「今日參訪」「本週參訪」。\n\n確定要先儲存嗎？\n（按「取消」可回去補填日期）")){f&&f.scrollIntoView({block:"center",behavior:"smooth"});return}
   }
   const b=$("#saveBtn");b.disabled=true;b.innerHTML='<span class="spin"></span> 儲存中';
+  const slow=setTimeout(()=>toast("Google 回應較慢，請稍候，資料正在儲存…",6000),5000);
   try{
     const fields={};KEYS().forEach(k=>fields[k]=CUR[k]==null?"":CUR[k]);fields.id=CUR.id||"";
     const r=await api("save",{fields,by:me(),baseUpdatedAt:ORIG.updatedAt||""});
-    if(!r.ok){if(r.conflict){toast("⚠ "+r.error);}else toast("儲存失敗："+(r.error||""));b.innerHTML="儲存";b.disabled=false;return}
-    toast("已儲存 ✓");const id=r.row.id;CUR=null;ORIG=null;await reload();
-    $("#dr").classList.remove("on");$("#mask").classList.remove("on");document.body.style.overflow="";
-    if(!fields.id)setTimeout(()=>openRow(id),250);
-  }catch(e){toast("連線失敗，請稍後再試")}
-  b.innerHTML="儲存";mark();
+    if(!r.ok){if(r.conflict){toast("⚠ "+r.error);}else toast("儲存失敗："+(r.error||""));return}
+    toast("已儲存 ✓");
+    // 立刻用後端回傳的資料更新畫面，不用再等一輪讀取
+    const row=r.row,isNew=!fields.id,i=ROWS.findIndex(x=>x.id===row.id);
+    if(i>=0)ROWS[i]=row;else ROWS.push(row);
+    draw();
+    if(isNew){
+      // 新增完成：直接停在這筆的詳情，方便接著補訪談紀錄
+      CUR=Object.assign({},row);ORIG=Object.assign({},row);
+      paint([],[{time:row.createdAt,pid:row.id,by:me(),field:"（新增）",oldV:"",newV:"建立預約"}]);
+    }else{
+      CUR=null;ORIG=null;
+      $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";
+    }
+    reload(true);   // 背景同步最新清單（不阻擋畫面）
+  }catch(e){toast(e&&e.message==="連線逾時"?"連線逾時，資料可能已儲存，請按「重新整理」確認":"連線失敗，請稍後再試")}
+  finally{ clearTimeout(slow);b.innerHTML="儲存";mark(); }
 }
 async function addNote(){
   if(!needWho())return;const c=$("#nText").value.trim();if(!c)return toast("請輸入紀錄內容");
   const b=$("#noteBtn");b.disabled=true;
+  const type=$("#nType").value,follow=$("#nFollow").value;
+  const slow=setTimeout(()=>toast("Google 回應較慢，請稍候，資料正在儲存…",6000),5000);
   try{
-    const r=await api("note",{pid:CUR.id,by:me(),type:$("#nType").value,content:c,followDate:$("#nFollow").value});
+    const r=await api("note",{pid:CUR.id,by:me(),type,content:c,followDate:follow});
     if(!r.ok)throw 0;toast("已新增訪談紀錄");
-    const g=await api("get",{id:CUR.id});
-    if(g.ok){const keep=Object.assign({},CUR);ORIG=Object.assign({},g.row);CUR=keep;ORIG.updatedAt=g.row.updatedAt;CUR.updatedAt=g.row.updatedAt;
-      $("#notes").innerHTML=g.notes.map(noteHtml).join("");$("#nText").value="";$("#nFollow").value="";FOLLOW[CUR.id]=(g.notes.filter(n=>n.followDate).map(n=>n.followDate).sort().pop())||FOLLOW[CUR.id];draw();mark()}
-  }catch(e){toast("新增失敗")}
-  b.disabled=false;
+    // 後端會同步更新這筆的「最後更新」，記下新時間，之後儲存才不會誤判成被別人改過
+    if(r.updatedAt){CUR.updatedAt=r.updatedAt;ORIG.updatedAt=r.updatedAt;CUR.updatedBy=me();ORIG.updatedBy=me()}
+    const html=noteHtml({by:me(),time:r.updatedAt||new Date().toISOString(),type,content:c,followDate:follow}),box=$("#notes");
+    if(box.querySelector(".ni"))box.insertAdjacentHTML("afterbegin",html);else box.innerHTML=html;
+    $("#nText").value="";$("#nFollow").value="";
+    if(follow&&(!FOLLOW[CUR.id]||follow>FOLLOW[CUR.id]))FOLLOW[CUR.id]=follow;
+    draw();mark();
+  }catch(e){toast(e&&e.message==="連線逾時"?"連線逾時，請按「重新整理」確認是否已新增":"新增失敗")}
+  clearTimeout(slow);b.disabled=false;
 }
 
 /* ---------- 統計 ---------- */
