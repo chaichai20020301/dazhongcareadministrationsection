@@ -80,6 +80,14 @@
   .addpanel select,.addpanel input{padding:8px 10px;border:1px solid var(--line);border-radius:6px;font-size:15px;background:#fff}
   .addpanel .step{font-weight:700;color:var(--brand-d);min-width:76px}
   .addpanel .lbl{color:var(--muted);font-size:13px}
+  /* 新增計費項目：置中彈窗＋霧面背景 */
+  .modal-overlay{position:fixed;inset:0;background:rgba(35,48,33,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:48px 16px;overflow:auto}
+  .modal-overlay.show{display:flex}
+  .modal-card{width:100%;max-width:620px;max-height:88vh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 24px 70px rgba(0,0,0,.35);padding:22px}
+  .modal-card.addpanel{border:1px solid var(--line);background:var(--card);margin:0;padding:22px}  /* 蓋掉 addpanel 的虛線/底色 */
+  .modal-overlay.show .modal-card{animation:modalPop .18s ease-out}
+  @keyframes modalPop{from{transform:translateY(10px) scale(.97);opacity:.4}to{transform:none;opacity:1}}
+  .modal-title{font-size:18px;font-weight:800;color:var(--brand-d);margin:0 0 10px;border-bottom:2px solid var(--brand);padding-bottom:8px}
   .s-empty{color:var(--muted);padding:10px 2px}
   .btn-set{background:#fff;border:1px solid var(--brand);color:var(--brand-d);border-radius:8px;padding:7px 12px;cursor:pointer;font-size:14px;font-weight:700}
   .btn-set:hover{background:var(--accent)}
@@ -179,6 +187,10 @@
   <div class="detail" id="detail">
     <div class="empty">← 請先在左側選擇一位住民</div>
   </div>
+</div>
+
+<div class="modal-overlay" id="addOverlay" onclick="if(event.target===this)closeAddPanel()">
+  <div class="modal-card addpanel" id="addPanel"></div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -377,8 +389,7 @@ function openResident(rid){
     +'<span class="bed">'+esc(r.bed||'')+'</span></div>';
   html+='<h3 class="sec">目前進行中的計費項目</h3>';
   html+='<div id="activeList"></div>';
-  html+='<div class="addbar"><button class="btn-add" onclick="openAddPanel()">＋ 新增計費項目</button>'
-     +'<div class="addpanel" id="addPanel" style="display:none"></div></div>';
+  html+='<div class="addbar"><button class="btn-add" onclick="openAddPanel()">＋ 新增計費項目</button></div>';
   html+='<div class="total"><span class="hint">＊只記錄各計費項目的「起始～結束」；填了「結束」日期就會移到下方「已結束」（歷史仍保留）。</span>'
      +'<span class="saving" id="savingTag"></span></div>';
   document.getElementById('detail').innerHTML=html;
@@ -469,7 +480,8 @@ function removeItem(key,label){ if(confirm('確定移除「'+label+'」？（連
 function openAddPanel(){
   var gs=groupsOf();
   var groupOpts='<option value="">— 請選擇 —</option>'+gs.order.map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+'</option>';}).join('');
-  var html='<div class="row"><span class="step">① 大項目</span><select id="ap_group" onchange="apGroup()">'+groupOpts+'</select></div>'
+  var html='<h3 class="modal-title">＋ 新增計費項目</h3>'
+    +'<div class="row"><span class="step">① 大項目</span><select id="ap_group" onchange="apGroup()">'+groupOpts+'</select></div>'
     +'<div class="row" id="ap_row2" style="display:none"><span class="step" id="ap_row2lbl">② 小項目</span><select id="ap_item" onchange="apItem()"></select></div>'
     +'<div class="row" id="ap_extra" style="display:none"></div>'
     +'<div class="row" id="ap_payer" style="display:none"><span class="step">④ 負擔方</span>'
@@ -477,9 +489,10 @@ function openAddPanel(){
       +' <input type="text" id="ap_payer_name" placeholder="照服員姓名（多位用、分隔）" style="display:none;width:200px">'
       +' <span class="lbl">預設家屬；機構造成選「機構」即可，照服員造成請選「照服員」並指名（可多位，用、分隔）</span></div>'
     +'<div class="row"><button class="btn-add" onclick="addConfirm()">加入</button> <button class="btn-rm" onclick="closeAddPanel()">取消</button></div>';
-  var p=document.getElementById('addPanel'); p.innerHTML=html; p.style.display='';
+  var p=document.getElementById('addPanel'); p.innerHTML=html;
+  var o=document.getElementById('addOverlay'); if(o) o.classList.add('show');
 }
-function closeAddPanel(){ var p=document.getElementById('addPanel'); if(p){p.style.display='none';p.innerHTML='';} }
+function closeAddPanel(){ var o=document.getElementById('addOverlay'); if(o) o.classList.remove('show'); var p=document.getElementById('addPanel'); if(p) p.innerHTML=''; }
 function apGroup(){
   var g=gval('ap_group'); var row2=document.getElementById('ap_row2'); var sel=document.getElementById('ap_item');
   document.getElementById('ap_extra').style.display='none';
