@@ -42,7 +42,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px
 .btn-sm{padding:8px 18px;font-size:14px}
 
 /* hero */
-.hero{position:relative;min-height:calc(100svh + 56px);display:flex;align-items:center;color:#fff;overflow:hidden;background:#2a5a2c}
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;color:#fff;overflow:hidden;background:#2a5a2c}
 .hero-slides{position:absolute;inset:0}
 .hero-slide{position:absolute;inset:0;opacity:0;transition:opacity 1.6s ease;background-size:cover;background-position:center}
 .hero-slide.on{opacity:1;animation:kb 12s ease-out forwards}
@@ -54,7 +54,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px
 .hero p{max-width:540px;margin:18px 0 30px;font-size:clamp(16px,2.4vw,19px);opacity:.95}
 .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
 .hero .btn-ghost{border-color:rgba(255,255,255,.7);color:#fff}
-.scroll-hint{position:absolute;bottom:84px;left:50%;transform:translateX(-50%);z-index:2;width:26px;height:42px;border:2px solid rgba(255,255,255,.8);border-radius:14px}
+.scroll-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);z-index:2;width:26px;height:42px;border:2px solid rgba(255,255,255,.8);border-radius:14px}
 .scroll-hint::after{content:"";position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:#fff;animation:sc 1.6s infinite}
 @keyframes sc{0%{opacity:0;transform:translateY(0)}30%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
 .ph{display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.75);font:700 14px 'Noto Sans TC';letter-spacing:.2em}
@@ -68,15 +68,6 @@ section{padding:84px 0;position:relative}
 .reveal.in{opacity:1;transform:none}
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
 @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}.hero-slide.on{animation:none}}
-
-/* stats */
-.stats{margin-top:-56px;position:relative;z-index:5;padding:0}
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
-.stat{padding:26px 10px;text-align:center;border-right:1px solid var(--line)}
-.stat:last-child{border:none}
-.stat b{display:block;font:900 clamp(28px,5vw,42px) 'Noto Serif TC';color:var(--g1)}
-.stat span{color:var(--sub);font-size:14px}
-.stat span small{display:block;font-size:11.5px;opacity:.85;margin-top:3px;line-height:1.4;letter-spacing:.02em}
 
 /* about */
 .about-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:center}
@@ -270,7 +261,6 @@ details.opt .inner{margin-top:14px}
 }
 @media (max-width:560px){
   section{padding:60px 0}
-  .stat-grid{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:none}.stat:nth-child(-n+2){border-bottom:1px solid var(--line)}
   .svc-grid{grid-template-columns:1fr}
   .rooms{grid-template-columns:1fr 1fr}
   .g2{grid-template-columns:1fr}
@@ -300,8 +290,6 @@ details.opt .inner{margin-top:14px}
   </div>
   <div class="scroll-hint"></div>
 </header>
-
-<div class="stats wrap"><div class="stat-grid reveal" id="stats"></div></div>
 
 <section id="about"><div class="wrap about-grid">
   <div class="about-img reveal" id="aboutImg"><div class="ph" style="height:100%" id="aboutPh">機構照片</div></div>
@@ -523,7 +511,6 @@ const CONTENT = {
   tag:"住宿型長照機構　線東大眾護理之家",
   title:"讓長輩快樂自在，<br>讓家人放心安心。",
   sub:"我們想構築一座和樂的熟齡生活圈，把熱忱、關愛、專業和耐心，當作撐起每個家庭裡長輩生活的支點。",
-  stats:[ {n:24,u:"小時",t:"住宿式照護"}, {big:"每天",t:"量測生命徵象"}, {big:"專屬",t:"照護師<small>每位住民都有</small>"}, {n:3,u:"種",t:"專業人員定期巡視<small>醫師・藥師・營養師</small>"} ],
   aboutTitle:"一起慢慢變老的地方",
   aboutText:"讓長輩快樂自在、家人放心安心，是我們陪伴住民，經年累月學習到的珍貴使命。在這裡生活，不必擔心遠離社會參與。多元的住宅設計、社會活動與藝文展覽，支持長者持續探索世界、保有學習的活力與互動的樂趣。",
   vals:[
@@ -599,7 +586,6 @@ function render(){
   hs.innerHTML=heroImgs.map((s,i)=>`<div class="hero-slide${i?'':' on'}" style="${s?bg(s):'background:'+grads[i%3]}"></div>`).join("");
   let hi=0; if(heroImgs.length>1) setInterval(()=>{const a=$$(".hero-slide");a[hi].classList.remove("on");hi=(hi+1)%a.length;a[hi].classList.add("on")},6000);
 
-  $("#stats").innerHTML=CONTENT.stats.map(s=>`<div class="stat"><b>${s.big?s.big:`<span data-n="${s.n}">0</span>${s.u}`}</b><span>${s.t}</span></div>`).join("");
   $("#aboutTitle").textContent=CONTENT.aboutTitle; $("#aboutText").textContent=CONTENT.aboutText;
   if(PHOTOS.about){$("#aboutImg").style.cssText+=bg(PHOTOS.about);$("#aboutPh").remove()}
   $("#vals").innerHTML=CONTENT.vals.map((v,i)=>`<div class="val reveal d${i+2}"><i>${v.i}</i><div><b>${v.t}</b><span>${v.d}</span></div></div>`).join("");
