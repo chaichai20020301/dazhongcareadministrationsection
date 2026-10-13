@@ -21,6 +21,10 @@
   header .user{font-size:13px;color:var(--muted)}
   .wrap{display:flex;gap:14px;padding:14px;align-items:flex-start}
   .list{width:300px;flex:none;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .floorbar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 10px 0}
+  .fbtn{border:1px solid var(--line);background:#fff;color:var(--brand-d);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;cursor:pointer}
+  .fbtn:hover{background:var(--accent)}
+  .fbtn.on{background:var(--brand);color:#fff;border-color:var(--brand)}
   .list .search{padding:10px;border-bottom:1px solid var(--line)}
   .list .search input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:15px}
   .list .items{max-height:calc(100vh - 170px);overflow:auto}
@@ -192,6 +196,7 @@
 
 <div class="wrap">
   <div class="list">
+    <div class="floorbar" id="floorBar"></div>
     <div class="search"><input id="q" placeholder="搜尋 床號 或 姓名…" oninput="renderList()"></div>
     <div class="items" id="resList"><div class="loading">載入中…<br><span style="font-size:12px">（後端喚醒中，第一次可能需 10–30 秒）</span></div></div>
   </div>
@@ -251,7 +256,7 @@ function callApi(action, params){
   return attempt(retryable?4:0).then(function(res){ if(res && res.ok===false) throw new Error(res.error||'API 錯誤'); return res; });
 }
 
-var STATE={residents:[],catalog:[],rules:[],config:{},user:'',data:{},current:null,days:30};
+var STATE={residents:[],catalog:[],rules:[],config:{},user:'',data:{},current:null,days:30,floor:''};
 function currentMonthDays(){var d=new Date();return new Date(d.getFullYear(),d.getMonth()+1,0).getDate();}
 
 function toast(msg){var t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1400);}
@@ -295,10 +300,24 @@ function loadData(){
   });
 }
 
+// 從床號取樓層：2F-201-1 → 2F（取第一段）
+function floorOf(bed){ return (String(bed||'').split('-')[0]||'').trim(); }
+function renderFloors(){
+  var bar=document.getElementById('floorBar'); if(!bar) return;
+  var seen={}, order=[];
+  (STATE.residents||[]).forEach(function(r){ var f=floorOf(r.bed); if(f && !seen[f]){ seen[f]=1; order.push(f); } });
+  order.sort(function(a,b){ var na=parseInt(a,10), nb=parseInt(b,10); if(!isNaN(na)&&!isNaN(nb)&&na!==nb) return na-nb; return a>b?1:(a<b?-1:0); });
+  var html='<button class="fbtn'+(STATE.floor===''?' on':'')+'" onclick="setFloor(\'\')">全部</button>';
+  order.forEach(function(f){ html+='<button class="fbtn'+(STATE.floor===f?' on':'')+'" onclick="setFloor(\''+esc(f)+'\')">'+esc(f)+'</button>'; });
+  bar.innerHTML=html;
+}
+function setFloor(f){ STATE.floor=f; renderList(); }
 function renderList(){
   var q=(document.getElementById('q').value||'').toLowerCase();
+  renderFloors();
   var box=document.getElementById('resList'); box.innerHTML='';
   STATE.residents.filter(function(r){
+    if(STATE.floor && floorOf(r.bed)!==STATE.floor) return false;
     if(!q)return true; return (String(r.bed)+r.name).toLowerCase().indexOf(q)>=0;
   }).forEach(function(r){
     var d=document.createElement('div'); d.className='r'+(STATE.current===r.rid?' sel':'');
