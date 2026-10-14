@@ -235,6 +235,7 @@ const LEGACY_ST={"已確認":"控床聯絡","已參訪":"家屬討論中","取�
 const SC={"待聯絡":"--s-wait","控床聯絡":"--s-hold","家屬討論中":"--s-talk","已安排床位":"--s-bed","已入住":"--s-in","放棄":"--s-can"};
 const CHANNELS=["家屬線上","電話詢問","實地參訪","網路詢問"];
 const NOTE_TYPES=["電話","實地","LINE","其他"];
+const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
 const OPEN_ST=["待聯絡","控床聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
 const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日"};
@@ -421,7 +422,7 @@ function paint(notes,hist){
     ${inp("infoSourceNote","來源備註（哪間醫院／誰介紹）",{w:1})}
   </div></div>
   <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
-    ${sel("serviceType","預備服務類型",["長期入住","短期入住","安寧照護","短照服務","喘息服務"])}${inp("serviceCode","服務代碼／說明",{ph:"例：GA05機構住宿式喘息服務"})}
+    ${sel("serviceType","預備服務類型",SERVICE_TYPES,{w:1})}
     ${inp("stayStart","預入住開始日",{type:"date"})}${inp("stayEnd","預入住結束日（長期入住可不填）",{type:"date"})}
     <div class="fl w"><div id="stayDays" style="font-size:13.5px;color:var(--g);font-weight:700;min-height:20px"></div></div>
     ${inp("nurse","主責護理（護理師姓名）",{w:1})}
@@ -532,7 +533,7 @@ function buildNotice(c){
   const contact=[v("visitorName")+(v("relation")?`（${v("relation")}）`:""),v("mobile")||v("phone")].filter(Boolean).join(" ");
   const tubes=(v("conditions")?v("conditions").split("、"):[]).filter(x=>TUBES.includes(x)).join("、");
   const roc=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[1]-1911}/${m[2]}/${m[3]}`:""};
-  const svc=v("serviceType")+(v("serviceCode")?`(${v("serviceCode")})`:"");
+  const svc=v("serviceType");
   const n=stayDays(c);
   const period=v("stayStart")&&v("stayEnd")&&n>0?`${roc(v("stayStart"))}－${roc(v("stayEnd"))}(共${n}天)${svc?" "+svc:""}`
     :v("stayStart")?`${roc(v("stayStart"))} 起${svc?" "+svc:""}`
