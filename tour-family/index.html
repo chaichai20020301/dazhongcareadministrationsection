@@ -414,7 +414,8 @@ details.opt .inner{margin-top:14px}
         <div class="fld"><label>年齡<em>*</em></label><input class="fi" name="age" type="number" inputmode="numeric" min="0" max="120" placeholder="歲"><span class="msg">請填寫年齡</span></div>
       </div>
       <div class="fld"><label>目前看診醫院</label><input class="fi" name="hospital" placeholder="選填，例如：彰化基督教醫院"></div>
-      <div class="fld"><label>入住原因與目前狀況</label><textarea class="ta" name="reason" placeholder="選填。例如：出院後需要專業護理、家中無人照顧、有哪些慢性病…"></textarea></div>
+      <div class="fld"><label>入住原因與目前狀況</label><textarea class="ta" name="reason" placeholder="選填。例如：出院後需要專業護理、家中無人照顧…"></textarea></div>
+      <div class="fld"><label>疾病史</label><textarea class="ta" name="history" style="min-height:76px" placeholder="選填。例如：高血壓、糖尿病、中風、失智症…"></textarea></div>
     </div>
 
     <!-- 3 -->
@@ -422,6 +423,7 @@ details.opt .inner{margin-top:14px}
       <h3>照護需求 <small style="font-weight:400;color:var(--sub);font-size:14px">（選填）</small></h3>
       <p class="hint">不確定的可以直接跳過，之後由我們與您討論。</p>
       <div class="fld"><label>目前的身體狀況（可複選）</label><div class="chips" id="condChips"></div></div>
+      <div class="fld cond" id="woundBox"><label>傷口說明</label><input class="fi" name="woundNote" placeholder="位置、大小，例如：右臀 2×3 公分"></div>
       <div class="fld cond" id="condOtherBox"><label>其他狀況說明</label><input class="fi" name="condNote" placeholder="請簡述"></div>
       <div class="fld"><label>想了解的房型</label><div class="roomsel" id="roomSel"></div></div>
       <details class="opt"><summary>更多照護細節（可跳過）</summary><div class="inner">
@@ -432,6 +434,9 @@ details.opt .inner{margin-top:14px}
           <div class="fld"><label>需要用氧氣嗎</label><select class="sel" name="oxygen"><option value="">不確定</option><option>不需要</option><option>需要</option></select></div>
           <div class="fld"><label>DNR 意願</label><select class="sel" name="dnr"><option value="">不確定</option><option>已簽署</option><option>討論中</option><option>未簽署</option></select></div>
           <div class="fld"><label>溝通狀況</label><select class="sel" name="communication"><option value="">不確定</option><option>正常</option><option>聽力不佳</option><option>表達或理解困難</option></select></div>
+          <div class="fld"><label>餐食型態</label><select class="sel" name="diet"><option value="">不確定</option><option>一般</option><option>軟食</option><option>碎食</option><option>流質</option></select></div>
+          <div class="fld"><label>大小便狀況</label><select class="sel" name="excretion"><option value="">不確定</option><option>可自理</option><option>使用尿布</option><option>使用尿管</option><option>尿布＋尿管</option></select></div>
+          <div class="fld"><label>吃東西或喝水會嗆到嗎</label><select class="sel" name="choking"><option value="">不確定</option><option>不會</option><option>偶爾會</option><option>容易嗆咳</option></select></div>
         </div>
         <div class="fld"><label>需特別注意的安全狀況</label><div class="chips">
           <label class="chip"><input type="checkbox" name="safety" value="曾跌倒"><span>曾跌倒</span></label>
@@ -656,7 +661,7 @@ function openBook(){
 }
 function closeBook(reset){
   $("#ov").classList.remove("open");document.body.style.overflow="";
-  if(reset){FORM.reset();calc();$("#pickBox").classList.remove("show");$("#condOtherBox").classList.remove("show")}
+  if(reset){FORM.reset();calc();$("#pickBox").classList.remove("show");$("#condOtherBox").classList.remove("show");$("#woundBox").classList.remove("show")}
   scrollTo({top:0,behavior:"smooth"});
 }
 function show(n){
@@ -693,7 +698,7 @@ function go(d){
 }
 FORM.addEventListener("input",e=>{const f=e.target.closest(".fld");f&&f.classList.remove("err")});
 $("#transport").addEventListener("change",e=>$("#pickBox").classList.toggle("show",e.target.value==="需要機構派車接送"));
-$("#condChips").addEventListener("change",()=>$("#condOtherBox").classList.toggle("show",vals("cond").includes("其他")));
+$("#condChips").addEventListener("change",()=>{$("#condOtherBox").classList.toggle("show",vals("cond").includes("其他"));$("#woundBox").classList.toggle("show",vals("cond").includes("傷口"))});
 
 function calc(){
   const room=PRICE.rooms.find(r=>r.name===(($('[name="roomType"]:checked')||{}).value));
@@ -705,7 +710,7 @@ function calc(){
 }
 function payload(){
   const o={};
-  ["visitorName","relation","mobile","phone","email","wantDate","wantSlot","elderName","gender","age","hospital","reason","condNote","identity","mobility","feeding","oxygen","dnr","communication","medication","expectedStay","transport","pickupAddr","pickupMode","infoSource"].forEach(k=>o[k]=k==="gender"?vals("gender")[0]||"":val(k));
+  ["visitorName","relation","mobile","phone","email","wantDate","wantSlot","elderName","gender","age","hospital","reason","history","diet","excretion","choking","woundNote","condNote","identity","mobility","feeding","oxygen","dnr","communication","medication","expectedStay","transport","pickupAddr","pickupMode","infoSource"].forEach(k=>o[k]=k==="gender"?vals("gender")[0]||"":val(k));
   o.conditions=vals("cond").join("、");o.safety=vals("safety").join("、");
   o.roomType=($('[name="roomType"]:checked')||{}).value||"";o.estimate=calc()||"";
   o.channel="家屬線上";o.website=val("website");o.clientTime=Date.now();

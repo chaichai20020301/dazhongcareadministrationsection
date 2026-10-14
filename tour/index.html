@@ -146,6 +146,16 @@ details.fold .in2{margin-top:10px}
 .trend i{width:100%;max-width:44px;background:linear-gradient(var(--g2),var(--teal));border-radius:8px 8px 3px 3px;min-height:3px;transition:height .8s}
 .trend b{color:var(--ink);font-size:12.5px}
 
+.nm{position:fixed;inset:0;background:rgba(30,28,22,.55);z-index:120;display:none;align-items:center;justify-content:center;padding:16px}
+.nm.on{display:flex}
+.nm-box{background:var(--card);border-radius:16px;width:min(640px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.nm-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.nm-h h3{font-size:17px;color:var(--g)}
+.nm-miss{padding:10px 18px;background:#fff3df;color:#7a5522;font-size:13px;display:none;line-height:1.7}
+.nm-miss.on{display:block}
+#nmText{flex:1;min-height:340px;margin:12px 18px 0;padding:12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font:14px/1.7 'Noto Sans TC',ui-monospace,monospace;resize:none;white-space:pre-wrap}
+.nm-f{display:flex;gap:10px;align-items:center;padding:12px 18px calc(12px + env(safe-area-inset-bottom))}
+.nm-f span{flex:1;font-size:12.5px;color:var(--sub)}
 #toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%) translateY(30px);background:#2b2a26;color:#fff;padding:10px 22px;border-radius:99px;z-index:300;opacity:0;transition:.3s;font-size:14px;max-width:92vw;text-align:center;pointer-events:none}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .spin{width:15px;height:15px;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spn .8s linear infinite;display:inline-block}
@@ -197,12 +207,20 @@ details.fold .in2{margin-top:10px}
 <div id="mask" onclick="closeDr()"></div>
 <aside id="dr" aria-hidden="true">
   <div class="dh">
-    <div class="r1"><h2 id="dTitle"></h2><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
+    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知">📋 入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
     <div class="stbar" id="stbar"></div>
   </div>
   <div class="db" id="dBody"></div>
   <div class="df"><span class="st" id="dSt"></span><button class="btn btn-o" onclick="closeDr()">關閉</button><button class="btn btn-g" id="saveBtn" onclick="save()">儲存</button></div>
 </aside>
+<div id="nm" class="nm" onclick="if(event.target===this)closeNotice()">
+  <div class="nm-box">
+    <div class="nm-h"><h3>📋 新住民入住通知</h3><button class="x" onclick="closeNotice()" aria-label="關閉">✕</button></div>
+    <div id="nmMiss" class="nm-miss"></div>
+    <textarea id="nmText" spellcheck="false"></textarea>
+    <div class="nm-f"><span>可以直接在上面修改文字，再按「複製」。</span><button class="btn btn-o" onclick="closeNotice()">關閉</button><button class="btn btn-g" onclick="copyNotice()">複製通知內容</button></div>
+  </div>
+</div>
 <div id="toast"></div>
 
 <script>
@@ -219,7 +237,7 @@ const CHANNELS=["家屬線上","電話詢問","實地參訪","網路詢問"];
 const NOTE_TYPES=["電話","實地","LINE","其他"];
 const OPEN_ST=["待聯絡","控床聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
-const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人"};
+const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)"};
 let PRICE={rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
   addons:[{key:"尿布",price:3000},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"傷口",price:0},{key:"其他",price:0}],
   daily:1850,note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。"};
@@ -376,20 +394,23 @@ function paint(notes,hist){
   </div></div>
   <div class="sec"><h3>身體狀況與計價</h3>
     <div class="cks" id="condBox">${PRICE.addons.map(a=>`<label class="ck"><input type="checkbox" value="${esc(a.key)}"><span>${esc(a.key)}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`).join("")}</div>
-    <div class="grid" style="margin-top:10px">${inp("condNote","其他／備註",{w:1,ph:"例：傷口位置、其他管路…"})}
+    <div class="grid" style="margin-top:10px">${inp("condNote","其他／備註",{w:1,ph:"例：其他管路、其他狀況…"})}${inp("woundNote","傷口說明（位置、大小、處置）",{w:1})}
     ${sel("roomType","預入住房型",PRICE.rooms.map(r=>r.name))}${inp("bedNo","預入住床號")}</div>
     <div class="tot"><div>計價費用合計<br><small style="color:var(--sub)" id="estTxt"></small></div><div style="display:flex;gap:8px;align-items:center"><input class="f" id="totalIn" type="number" inputmode="numeric" placeholder="自動計算"><button type="button" class="btn btn-o btn-sm" onclick="recalc(true)">重新計算</button></div></div>
     <div style="font-size:12px;color:var(--sub);margin-top:6px">${esc(PRICE.note)}　可手動修改合計金額（例如有折扣或日計費）。</div>
   </div>
-  <div class="sec"><h3>入住原因、照護需求、病史、家屬期望</h3><div class="grid">
-    ${ta("reason","入住原因、照護需求、前次住院原因與治療過程、住民過去病史、家屬期望與其他注意事項")}
+  <div class="sec"><h3>入住原因與疾病史</h3><div class="grid">
+    ${ta("reason","入住原因（照護需求、前次住院原因與治療過程、家屬期望與其他注意事項）")}
+    ${ta("history","疾病史（慢性病、診斷、過去病史）")}
   </div></div>
   <div class="sec"><details class="fold" ${isNew?"":"open"}><summary>照護細項（訪談時詢問）</summary><div class="in2"><div class="grid">
     ${sel("identity","入住身份",["一般","中低收入戶","低收入戶"])}${sel("mobility","移動能力",["可自行行走","需輔具","輪椅","臥床"])}
+    ${sel("diet","餐食",["一般","軟食","碎食","流質","其他"])}${sel("excretion","排泄",["自理","尿布","尿管","尿布＋尿管","其他"])}
     ${sel("feeding","進食方式",["自行口食","鼻胃管灌食","其他"])}${sel("oxygen","氧氣",["不需要","需要"])}
     ${sel("dnr","DNR 意願",["已簽署","討論中","未簽署"])}${sel("communication","溝通狀況",["正常","聽力不佳","表達或理解困難"])}
+    ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}
     <div class="fl w"><label>安全看視</label><div class="cks" id="safeBox">${["曾跌倒","會拔管","躁動","走失風險"].map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div></div>
-    ${ta("medication","用藥")}
+    ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
     ${inp("expectedStay","預計入住時間／住多久")}${sel("transport","入住交通",["家屬自行送來","需要機構派車接送"])}
     ${inp("pickupAddr","接送地址")}${sel("pickupMode","接送方式",["可坐輪椅","需躺床（臥式）"])}
   </div></div></details></div>
@@ -398,6 +419,11 @@ function paint(notes,hist){
     ${inp("wantDate","希望參訪日",{type:"date"})}${sel("wantSlot","希望時段",["上午","下午","都可以"])}
     ${inp("visitDate","實際參訪日",{type:"date"})}${sel("infoSource","資料來源",["醫院轉介","朋友介紹","網路搜尋","其他"])}
     ${inp("infoSourceNote","來源備註（哪間醫院／誰介紹）",{w:1})}
+  </div></div>
+  <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
+    ${inp("nurse","主責護理（護理師姓名）",{w:1})}
+    ${sel("chkExam","體檢報告（控床）",["未繳","已繳","待補"])}${sel("chkContract","入住合約（行政）",["未簽","已簽"])}
+    ${sel("chkFee","入住費用說明（行政）",["未說明","已說明"])}
   </div></div>
   ${isNew?`<div class="sec" style="background:var(--g3);border-color:#cfe2c4;font-size:14px">💡 先儲存後，就可以在這裡新增「訪談紀錄」並設定下次追蹤日期。</div>`:`
   <div class="sec"><h3>訪談與追蹤紀錄</h3>
@@ -489,6 +515,73 @@ async function addNote(){
   }catch(e){toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，紀錄不一定已新增。請先按「重新整理」確認，再決定要不要重新新增":"新增失敗",7000)}
   clearTimeout(slow);b.disabled=false;
 }
+
+/* ---------- 入住通知（依護理師通知格式） ---------- */
+const TUBES=["鼻胃管","導尿管","氣切","人工造廔口"];
+function buildNotice(c){
+  const v=k=>String(c[k]==null?"":c[k]).trim();
+  const miss=[];
+  const need=(k,label)=>{ if(!v(k))miss.push(label||LABEL[k]) };
+  const sent=c.transport&&c.transport.includes("自行");
+  const contact=[v("visitorName")+(v("relation")?`（${v("relation")}）`:""),v("mobile")||v("phone")].filter(Boolean).join(" ");
+  const tubes=(v("conditions")?v("conditions").split("、"):[]).filter(x=>TUBES.includes(x)).join("、");
+  const wound=v("woundNote")||((c.conditions||"").includes("傷口")?"有":"");
+  const place=sent?"不需接送":[v("pickupAddr"),v("pickupMode")].filter(Boolean).join("，");
+  [["elderName"],["identity"],["reason"],["expectedStay"],["bedNo"],["nurse"],["transport"],["history"],["mobility"],["diet"],["excretion"],["feeding"],["oxygen"],["dnr"],["medication"],["communication"],["routine"],["choking"],["chkExam"],["chkContract"],["chkFee"]].forEach(([k])=>need(k));
+  if(!contact)miss.push("主要聯絡人");
+  if(!sent&&!place)miss.push("接送地點");
+  const text=[
+"【新住民入住通知】","",
+"【基本資料】",
+"姓名:"+v("elderName"),
+"入住身份:"+v("identity"),
+"入住原因:"+v("reason"),
+"主要聯絡人:"+contact,"",
+"【機構資訊】",
+"預入住期間:"+v("expectedStay"),
+"入住床號:"+v("bedNo"),
+"主責護理:"+v("nurse"),
+"入住交通:"+v("transport"),
+"接送地點:"+place,"",
+"【個案狀態】",
+"疾病史:"+v("history"),"",
+"移動能力:"+v("mobility"),"",
+"餐食:"+v("diet"),"",
+"排泄:"+v("excretion"),"",
+"進食方式:"+v("feeding"),
+"管路:"+tubes,
+"氧氣:"+v("oxygen"),
+"傷口:"+wound,
+"DNR:"+v("dnr"),"",
+"【照護注意事項】",
+"用藥:"+v("medication"),
+"溝通:"+v("communication"),
+"日常起居:"+v("routine"),
+"安全看視:"+v("safety"),
+"嗆咳風險:"+v("choking"),"",
+"【新入住檢核】",
+"體檢報告(控床):"+v("chkExam"),
+"入住合約(行政):"+v("chkContract"),
+"入住費用說明(行政):"+v("chkFee")
+  ].join("\n");
+  return {text,miss};
+}
+function openNotice(){
+  if(!CUR)return;
+  const {text,miss}=buildNotice(CUR);
+  $("#nmText").value=text;
+  const m=$("#nmMiss");
+  if(miss.length){m.innerHTML="⚠ 以下欄位還沒填，通知中會是空白："+miss.map(esc).join("、")+"<br><small>管路、傷口、安全看視若沒有可以留白。可回到表單補填，或直接在下面修改文字。</small>";m.classList.add("on")}
+  else m.classList.remove("on");
+  $("#nm").classList.add("on");
+}
+function closeNotice(){$("#nm").classList.remove("on")}
+async function copyNotice(){
+  const t=$("#nmText");
+  try{await navigator.clipboard.writeText(t.value)}catch(e){t.focus();t.select();try{document.execCommand("copy")}catch(_){return toast("複製失敗，請手動選取文字複製")}}
+  toast("已複製，可以貼到護理師群組了 ✓");
+}
+addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#nm").classList.contains("on")){closeNotice();e.stopImmediatePropagation()}},true);
 
 /* ---------- 統計 ---------- */
 function tab(t){
