@@ -147,6 +147,9 @@ var APPS = {
   items: { title:"物品登記", src:"items/index.html",          zoom:1,      open:false }   // 後端部署完成後改 true
 };
 
+// 預覽新版探視預約：在網址後加 ?visit=new（後端支援完成前，正式機台仍用現行探視頁）
+if(/[?&]visit=new/.test(location.search)){ APPS.visit.src = "visit/index.html"; APPS.visit.zoom = 1; }
+
 var $ = function(id){ return document.getElementById(id); };
 var cur = null, idleTimer = null, warnTimer = null, warnLeft = 0, warning = false;
 

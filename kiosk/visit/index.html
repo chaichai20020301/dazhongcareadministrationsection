@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>探視預約（機台）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root{--green:#2f9e6b;--green-d:#1c6b48;--leaf:#4f8c3a;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;--amber:#a8763c;
+    --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--serif:"Noto Serif TC",serif}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{font-size:clamp(13px,calc(.55vw + .7vh),22px)}
+  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);touch-action:manipulation;overflow:hidden}
+  button{font-family:inherit;cursor:pointer}
+  #app{height:100%;display:flex;flex-direction:column;padding:1.1rem 2.2rem 0}
+
+  .steps{flex:none;display:flex;gap:.8rem;margin-bottom:1rem}
+  .steps div{flex:1;text-align:center;padding:.7rem .4rem;border-radius:.9rem;background:#e8e2d3;color:var(--muted);font:700 1.25rem var(--sans)}
+  .steps div.on{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff}
+  .steps div.done{background:#cfe6d7;color:var(--green-d)}
+  .body{flex:1;min-height:0;overflow:auto;padding-bottom:.6rem}
+  .body::-webkit-scrollbar{width:0}
+  .nav{flex:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 0 1.1rem;border-top:1px solid var(--line);background:var(--paper)}
+  .nav .hint{flex:1;font:500 1.15rem var(--sans);color:var(--muted)}
+  .btn{border:0;border-radius:999px;padding:1rem 2.8rem;font:900 1.6rem var(--sans)}
+  .btn.main{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff;box-shadow:0 .35rem 1rem rgba(28,107,72,.3)}
+  .btn.sec{background:#fff;color:var(--green-d);border:2px solid var(--green)}
+  .btn:disabled{opacity:.4;box-shadow:none}
+  .btn:active:not(:disabled){transform:scale(.97)}
+  h1{margin:0 0 .2rem;font:900 1.9rem/1.2 var(--serif)}
+  .sub{margin:0 0 .7rem;font:500 1.1rem/1.4 var(--sans);color:var(--muted)}
+  .banner{background:#fff4d6;border:2px solid #e8c56b;border-radius:.9rem;padding:.6rem 1rem;margin-bottom:.8rem;font:700 1.1rem var(--sans);color:#7a5a00}
+
+  /* step 1 */
+  .two{display:grid;grid-template-columns:1.15fr .85fr;gap:2rem;align-items:start}
+  .panel{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.8rem 1.3rem}
+  .mbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+  .mbar .t{font:900 1.7rem var(--serif)}
+  .mbar button{width:3rem;height:3rem;border:0;border-radius:50%;background:#e8e2d3;font:900 1.7rem/1 var(--sans);color:var(--ink)}
+  .mbar button:disabled{opacity:.3}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem}
+  .cal .wd{text-align:center;font:700 1.05rem var(--sans);color:var(--muted);padding:.2rem 0}
+  .cal .d{height:3.6rem;border:2px solid var(--line);border-radius:.8rem;background:#fff;font:700 1.5rem var(--sans);color:var(--ink);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
+  .cal .d small{font:500 .85rem var(--sans);color:var(--muted);margin-top:.15rem}
+  .cal .d.off{background:#f1eee6;color:#b9b2a3;border-color:#ece6d8}
+  .cal .d.sel{background:var(--leaf);border-color:var(--leaf);color:#fff}
+  .cal .d.sel small{color:#e4f3d6}
+  .cal .d.has::after{content:"";position:absolute;right:.45rem;top:.45rem;width:.7rem;height:.7rem;border-radius:50%;background:var(--amber)}
+  .cal .d.sel.has::after{background:#fff}
+  .cal .blank{height:3.6rem}
+  .slots{display:flex;flex-direction:column;gap:.5rem}
+  .slot{display:flex;align-items:center;justify-content:space-between;gap:.8rem;border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.3rem 1.1rem;min-height:3rem;text-align:left;width:100%}
+  .slot .tm{font:900 1.7rem var(--serif);width:5.6rem}
+  .slot .st{font:700 1.15rem var(--sans);color:var(--muted);text-align:right;flex:1}
+  .slot.warn .st{color:var(--amber)}
+  .slot.off{background:#f1eee6;border-color:#ece6d8}
+  .slot.off .tm,.slot.off .st{color:#b9b2a3}
+  .slot.sel{background:var(--leaf);border-color:var(--leaf)}
+  .slot.sel .tm,.slot.sel .st{color:#fff}
+  .notice{padding:1.6rem 1rem;text-align:center;font:700 1.3rem/1.5 var(--sans);color:var(--muted)}
+  .basket{margin-top:.6rem;font:700 1.15rem var(--sans);color:var(--green-d)}
+  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem}
+  .tag{display:inline-flex;align-items:center;gap:.5rem;background:#e7f3dc;border:2px solid #cfe6bd;border-radius:999px;padding:.2rem .4rem .2rem .9rem;font:700 1rem var(--sans);color:var(--green-d)}
+  .tag button{width:1.9rem;height:1.9rem;border:0;border-radius:50%;background:#fff;font:900 1.1rem/1 var(--sans);color:var(--red)}
+
+  /* step 2 */
+  .field{margin-bottom:.9rem}
+  .field label{display:block;margin-bottom:.35rem;font:700 1.3rem var(--sans)}
+  .field label .req{color:var(--red)} .field label .opt{color:var(--muted);font-weight:500;font-size:1.05rem;margin-left:.4rem}
+  input[type=text],input[type=tel],textarea{width:100%;border:2px solid var(--line);border-radius:1rem;background:#fff;padding:.8rem 1rem;font:500 1.6rem var(--sans);color:var(--ink)}
+  input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 .3rem rgba(47,158,107,.18)}
+  textarea{min-height:5.2rem;resize:none}
+  .sugg{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.6rem}
+  .sg{border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.7rem 1rem;font:900 1.6rem var(--sans);text-align:left;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:.5rem;min-height:3.6rem}
+  .sg small{font:500 1rem var(--sans);color:var(--muted)}
+  .sg:active{background:#e7f3dc}
+  .smsg{margin-top:.6rem;font:700 1.15rem var(--sans);color:var(--muted);min-height:1.4em}
+  .picked{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#e7f3dc;border:2px solid #cfe6bd;border-radius:1rem;padding:.6rem 1rem}
+  .picked b{font:900 1.8rem var(--sans);color:var(--green-d)}
+  .picked button{border:0;border-radius:999px;background:#fff;color:var(--green-d);padding:.55rem 1.3rem;font:700 1.15rem var(--sans);border:2px solid var(--green)}
+  .famrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:.8rem}
+  .fam{border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.55rem 1rem;font:700 1.15rem/1.35 var(--sans);text-align:left;color:var(--ink)}
+  .fam small{display:block;font:500 1rem var(--sans);color:var(--muted)}
+  .fam.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
+  .fam.on small{color:#e4f3d6}
+  .rels{display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:.5rem 1.2rem;font:700 1.2rem var(--sans);color:var(--ink)}
+  .chip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .err{color:var(--red);font:700 1.1rem var(--sans);margin-top:.35rem;min-height:1.2em}
+  .alert{background:#fbeeec;border:2px solid #e6c9c4;border-radius:1rem;padding:.7rem 1rem;margin-top:.7rem;font:700 1.15rem/1.45 var(--sans);color:#7a2b22}
+  .phoneLock{display:flex;align-items:center;gap:.8rem}
+  .phoneLock .v{flex:1;border:2px dashed var(--line);border-radius:1rem;padding:.8rem 1rem;font:700 1.5rem var(--sans);color:var(--muted);background:#faf8f2}
+  .phoneLock button{border:2px solid var(--green);background:#fff;color:var(--green-d);border-radius:999px;padding:.55rem 1.2rem;font:700 1.1rem var(--sans)}
+
+  /* step 3 / done */
+  .sum{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.4rem 1.6rem;max-width:62rem}
+  .sum .r{display:flex;justify-content:space-between;gap:1.5rem;padding:.9rem 0;border-bottom:1px solid var(--line);font:500 1.5rem/1.4 var(--sans)}
+  .sum .r:last-child{border-bottom:0}
+  .sum .r span:first-child{color:var(--muted);flex:none}
+  .sum .r span:last-child{font-weight:700;text-align:right}
+  .done{text-align:center;padding:2.5rem 1rem}
+  .done .ok{width:9rem;height:9rem;margin:0 auto 1.4rem;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;font-size:5.5rem;line-height:9rem}
+  .done h1{font-size:3rem} .done p{font:500 1.6rem/1.6 var(--sans);color:var(--muted);margin:.6rem 0}
+  .done .sum{margin:1.2rem auto;text-align:left}
+  @media (max-aspect-ratio:1/1){ .two{grid-template-columns:1fr !important} .body{overflow:auto} }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ===== 設定 ===== */
+var API = "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
+var MOCK = /[?&]mock=1/.test(location.search);        // ?mock=1：用假資料預覽，不連後端、不送出
+var SLOTS = ["08:30","09:30","10:30","14:00","15:00","16:00"];
+var WEEKDAY_LIMIT = 6, WEEKEND_LIMIT = 8, MAX_SLOTS = 5, MIN_QUERY = 2;
+var RELS = ["配偶","長子","次子","長女","次女","媳婦","女婿","孫子","孫女","兄弟姊妹","外籍看護"];
+var WD = ["日","一","二","三","四","五","六"];
+var PERSIST_KEY = "nh_final_rel_v2";                  // 與現行探視頁共用，避免兩邊重複計算名額
+
+var D = { records:[], suspensions:[], blocked:[], loaded:false, loadErr:false };
+var S = { step:1, month:firstOfMonth(new Date()), selDate:"", basket:[], q:"", sugg:[], suggState:"idle", resident:null, manual:false,
+          fams:[], famState:"idle", fam:{id:"",name:"",rel:"",phone:"",masked:"",locked:false}, note:"", err:{}, sending:false, done:false, sendErr:"" };
+var $app = document.getElementById("app");
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function pad(n){ return String(n).padStart(2,"0"); }
+function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function firstOfMonth(d){ return new Date(d.getFullYear(), d.getMonth(), 1); }
+function normDate(s){ if(!s) return ""; var d=new Date(s); if(!isNaN(d.getTime())) return ymd(d); var p=String(s).replace(/\//g,"-").trim().split("-"); return p.length===3? p[0]+"-"+pad(p[1])+"-"+pad(p[2]) : String(s); }
+function normTime(s){ if(!s) return ""; s=String(s).trim().replace(/：/g,":"); if(s==="全天") return "全天"; if(s.indexOf(" ")>=0) s=s.split(" ")[1]; var p=s.split(":"); return p.length>=2? p[0].replace(/^0/,"")+":"+p[1] : s; }
+function normName(s){ return String(s||"").replace(/[（(][^）)]*[）)]/g,"").replace(/\s+/g,"").trim(); }
+function fmtDate(ds){ var d=new Date(ds+"T00:00:00"); return (d.getMonth()+1)+"月"+d.getDate()+"日（週"+WD[d.getDay()]+"）"; }
+function todayStr(){ return ymd(new Date()); }
+
+/* ===== 名額規則（與現行探視頁一致）===== */
+function persisted(){ try{ var l=JSON.parse(localStorage.getItem(PERSIST_KEY)||"[]"); var n=Date.now(); return l.filter(function(i){return n-i.timestamp<600000;}); }catch(e){ return []; } }
+function savePersisted(date,time){ try{ var l=persisted(); l.push({date:date,time:time,timestamp:Date.now()}); localStorage.setItem(PERSIST_KEY,JSON.stringify(l)); }catch(e){} }
+function dayInfo(ds){
+  var dow=new Date(ds+"T00:00:00").getDay();
+  if(dow===0) return {closed:true,label:"休",reason:"每週日不開放探視"};
+  var fd=D.suspensions.filter(function(s){return normDate(s.date)===ds && s.time==="全天";})[0];
+  if(fd){ var l=parseInt(fd.limit); if(!(l>0)) return {closed:true,label:"暫停",reason:fd.reason||"本日暫停開放"}; }
+  return {closed:false};
+}
+function slotInfo(ds,t){
+  var nT=normTime(t), dow=new Date(ds+"T00:00:00").getDay();
+  var fd=D.suspensions.filter(function(s){return normDate(s.date)===ds && s.time==="全天";})[0];
+  var fdl=null; if(fd){ var l0=parseInt(fd.limit); if(l0>0) fdl=l0; }
+  var sb=D.suspensions.filter(function(s){return normDate(s.date)===ds && normTime(s.time)===nT;})[0];
+  var custom=null; if(sb && parseInt(sb.limit)>0) custom=parseInt(sb.limit); else if(fdl!==null) custom=fdl;
+  var base=(dow===6||dow===0)?WEEKEND_LIMIT:WEEKDAY_LIMIT, limit=custom!==null?custom:base;
+  var used=D.records.filter(function(r){return normDate(r.date||r["預約日期"])===ds && normTime(r.time||r["預約時段"])===nT;}).length
+         + persisted().filter(function(p){return normDate(p.date)===ds && normTime(p.time)===nT;}).length;
+  if(sb && !(parseInt(sb.limit)>0)) return {off:true,label:sb.reason||"暫停開放",left:0};
+  var left=Math.max(0,limit-used);
+  if(used>=limit) return {off:true,label:"已額滿",left:0};
+  return {off:false,left:left,warn:left<=2,label:left<=2?"僅餘 "+left+" 組":"尚餘 "+left+" 組"};
+}
+function inBasket(ds,t){ return S.basket.some(function(b){return b.date===ds&&b.time===t;}); }
+
+/* ===== 資料來源 ===== */
+var MOCK_RES=[{id:"m1",name:"王小明",floor:""},{id:"m2",name:"王小美",floor:""},{id:"m3",name:"王大同",floor:"3F"},{id:"m4",name:"王大同",floor:"5F"},{id:"m5",name:"陳月西",floor:""},{id:"m6",name:"黃國進",floor:""}];
+var MOCK_FAM={m1:[{fid:"f1",name:"王大華",relation:"長子",phoneMasked:"0912-***-678"},{fid:"f2",name:"李美玲",relation:"媳婦",phoneMasked:"0933-***-210"}],m6:[{fid:"f3",name:"黃志強",relation:"次子",phoneMasked:"0955-***-402"}]};
+function getJSON(url){ return fetch(url,{cache:"no-store"}).then(function(r){return r.json();}); }
+function loadData(){
+  if(MOCK){
+    var recs=[], d=new Date(); for(var i=0;i<10;i++){ var x=new Date(d); x.setDate(d.getDate()+i); recs.push({date:ymd(x),time:"09:30"}); recs.push({date:ymd(x),time:"09:30"}); }
+    for(var k=0;k<6;k++) recs.push({date:ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()+2)),time:"14:00"});
+    D.records=recs; D.suspensions=[{date:ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()+4)),time:"全天",limit:0,reason:"機構活動"}];
+    D.blocked=[{name:"黃國進(Guo Jin)",start:ymd(d),end:ymd(new Date(d.getFullYear(),d.getMonth(),d.getDate()+6))}]; D.loaded=true; render(); return Promise.resolve();
+  }
+  return getJSON(API+"?t="+Date.now()).then(function(j){ D.records=j.records||[]; D.suspensions=j.suspensions||[]; D.blocked=j.blockedNames||[]; D.loaded=true; D.loadErr=false; })
+    .catch(function(){ D.loadErr=true; }).then(function(){ if(S.step===1 && !S.done) render(); });
+}
+var suggSeq=0, suggTimer=null;
+function doSuggest(){
+  var q=S.q, key=normName(q);
+  clearTimeout(suggTimer);
+  if(key.length<MIN_QUERY){ S.sugg=[]; S.suggState="idle"; paintSugg(); return; }
+  S.suggState="loading"; paintSugg();
+  var my=++suggSeq;
+  suggTimer=setTimeout(function(){
+    var p = MOCK ? Promise.resolve({ok:true,items:MOCK_RES.filter(function(r){return r.name.indexOf(key)>=0;}).slice(0,6)})
+                 : getJSON(API+"?action=suggest&q="+encodeURIComponent(q)+"&t="+Date.now());
+    p.then(function(j){ if(my!==suggSeq) return;
+      if(j && j.ok && j.items){ S.sugg=j.items; S.suggState=j.items.length?"ok":"empty"; }
+      else if(j && j.ok===false && j.error==="busy"){ S.sugg=[]; S.suggState="busy"; }
+      else { S.sugg=[]; S.suggState="error"; }
+      paintSugg();
+    }).catch(function(){ if(my!==suggSeq) return; S.sugg=[]; S.suggState="error"; paintSugg(); });
+  }, 250);
+}
+function loadFamilies(rid){
+  S.fams=[]; S.famState="loading"; paintFams();
+  var p = MOCK ? Promise.resolve({ok:true,families:(MOCK_FAM[rid]||[])}) : getJSON(API+"?action=families&rid="+encodeURIComponent(rid)+"&t="+Date.now());
+  p.then(function(j){ if(!S.resident||S.resident.id!==rid) return;
+    if(j&&j.ok&&j.families){ S.fams=j.families; S.famState="ok"; } else { S.famState="error"; } paintFams();
+  }).catch(function(){ S.famState="error"; paintFams(); });
+}
+
+/* ===== 隔離（只提示，不顯示原因）===== */
+function isoBlocks(){
+  if(!S.resident) return [];
+  var n=normName(S.resident.name), out=[];
+  D.blocked.forEach(function(b){ if(!n||normName(b.name)!==n) return;
+    S.basket.forEach(function(s){ var d=normDate(s.date); if(d>=normDate(b.start) && d<=normDate(b.end)) out.push(d); }); });
+  return out;
+}
+
+/* ===== 畫面 ===== */
+function stepsHtml(){
+  var t=["① 選日期與時段","② 填寫資料","③ 確認預約"];
+  return '<div class="steps">'+t.map(function(x,i){var n=i+1;return '<div class="'+(S.step===n?'on':(S.step>n?'done':''))+'">'+x+'</div>';}).join("")+'</div>';
+}
+function render(){
+  if(S.done){ renderDone(); return; }
+  var banner = MOCK ? '<div class="banner">預覽模式：使用假資料，不會連線也不會送出</div>' : '';
+  var main = S.step===1? step1() : (S.step===2? step2() : step3());
+  $app.innerHTML = stepsHtml()+'<div class="body">'+banner+main.body+'</div><div class="nav">'+main.nav+'</div>';
+  bind(); if(S.step===2){ paintSugg(); paintFams(); paintAlert(); }
+}
+
+/* --- step 1 --- */
+function step1(){
+  var m=S.month, y=m.getFullYear(), mo=m.getMonth(), first=new Date(y,mo,1).getDay(), days=new Date(y,mo+1,0).getDate(), today=todayStr();
+  var minM=firstOfMonth(new Date()), maxM=new Date(minM.getFullYear(),minM.getMonth()+6,1);
+  var cells=""; for(var i=0;i<first;i++) cells+='<div class="blank"></div>';
+  for(var d=1; d<=days; d++){
+    var ds=y+"-"+pad(mo+1)+"-"+pad(d), past=ds<today, info=past?{closed:true}:dayInfo(ds), off=past||info.closed;
+    var has=S.basket.some(function(b){return b.date===ds;});
+    cells+='<button class="d'+(off?' off':'')+(S.selDate===ds?' sel':'')+(has?' has':'')+'" data-day="'+ds+'"'+(off?' data-off="1"':'')+'>'+d+(info.label&&!past?'<small>'+info.label+'</small>':'')+'</button>';
+  }
+  var cal='<div class="panel"><div class="mbar"><button id="pm"'+(m<=minM?' disabled':'')+'>‹</button><span class="t">'+y+' 年 '+(mo+1)+' 月</span><button id="nm"'+(m>=maxM?' disabled':'')+'>›</button></div>'
+    +'<div class="cal">'+WD.map(function(w){return '<div class="wd">'+w+'</div>';}).join("")+cells+'</div></div>';
+  var right='<div class="panel"><div style="font:900 1.5rem var(--serif);margin-bottom:.7rem">'+(S.selDate?fmtDate(S.selDate):'請先選擇日期')+'</div>'+slotsHtml()+basketHtml()+'</div>';
+  var load = D.loaded? '' : '<div class="notice">名額載入中…</div>';
+  var errMsg = D.loadErr? '<div class="alert">目前無法取得最新名額，畫面上的名額可能不是最新的，請洽櫃檯人員。</div>' : '';
+  return { body:'<h1>請選擇探視日期與時段</h1><p class="sub">每週日不開放探視；可一次預約最多 '+MAX_SLOTS+' 個時段（點選時段即加入，再點一次取消）</p>'+errMsg+'<div class="two">'+cal+right+'</div>'+load,
+    nav:'<span class="hint">'+(S.basket.length?'已選 '+S.basket.length+' 個時段':'請至少選擇 1 個時段')+'</span><button class="btn main" id="to2"'+(S.basket.length?'':' disabled')+'>下一步 →</button>' };
+}
+function slotsHtml(){
+  if(!S.selDate) return '<div class="notice">點左邊的日期，這裡會顯示可預約的時段</div>';
+  var di=dayInfo(S.selDate); if(di.closed) return '<div class="notice">'+esc(di.reason)+'<br>請改選其他日期</div>';
+  return '<div class="slots">'+SLOTS.map(function(t){
+    var si=slotInfo(S.selDate,t), sel=inBasket(S.selDate,t);
+    return '<button class="slot'+(si.off?' off':'')+(sel?' sel':'')+(si.warn&&!sel?' warn':'')+'" data-slot="'+t+'"'+(si.off?' data-off="1"':'')+'><span class="tm">'+t+'</span><span class="st">'+(sel?'已選 ✓':esc(si.label))+'</span></button>';
+  }).join("")+'</div>';
+}
+function basketHtml(){
+  if(!S.basket.length) return '';
+  var list=S.basket.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;});
+  return '<div class="basket">已選擇的時段</div><div class="chips">'+list.map(function(b){return '<span class="tag">'+fmtDate(b.date)+' '+b.time+'<button data-rm="'+b.date+'|'+b.time+'">✕</button></span>';}).join("")+'</div>';
+}
+
+/* --- step 2 --- */
+function step2(){
+  var pickedHtml = S.resident
+    ? '<div class="picked"><b>'+esc(S.resident.name)+(S.resident.floor?'　<small style="font:500 1rem var(--sans);color:var(--muted)">'+esc(S.resident.floor)+'</small>':'')+'</b><button id="chg">更換長輩</button></div>'
+    : '<input type="text" id="q" value="'+esc(S.q)+'" placeholder="輸入長輩的姓名，例如：王小明" autocomplete="off"><div class="sugg" id="suggBox"></div><div class="smsg" id="suggMsg"></div>';
+  var left='<div class="field"><label>長輩的姓名 <span class="req">＊</span></label>'+pickedHtml+'<div class="err">'+esc(S.err.res||"")+'</div><div id="alertBox"></div></div><div id="famBox"></div><div class="field"><label>想跟我們說的話<span class="opt">（選填）</span></label><textarea id="note" maxlength="200">'+esc(S.note)+'</textarea></div>';
+  var f=S.fam;
+  var right=''
+    +'<div class="field"><label>您的姓名 <span class="req">＊</span></label><input type="text" id="fname" value="'+esc(f.name)+'" placeholder="例如：王大華" autocomplete="off"><div class="err">'+esc(S.err.name||"")+'</div></div>'
+    +'<div class="field"><label>與長輩的關係 <span class="req">＊</span></label><div class="rels">'+RELS.map(function(r){return '<button type="button" class="chip'+(f.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
+    +'<div class="field"><label>聯絡電話 <span class="req">＊</span></label>'
+    +(f.locked? '<div class="phoneLock"><div class="v">'+esc(f.masked)+'　（沿用上次登記的電話）</div><button type="button" id="chgPhone">更改電話</button></div>'
+               : '<input type="tel" id="fphone" value="'+esc(f.phone)+'" placeholder="例如：0912345678" autocomplete="off">')+'<div class="err">'+esc(S.err.phone||"")+'</div></div>';
+  return { body:'<h1>請填寫探視資料</h1><p class="sub">先輸入長輩姓名並點選，系統會帶出之前預約過的家屬資料</p><div class="two" style="grid-template-columns:1fr 1fr"><div class="panel">'+left+'</div><div class="panel">'+right+'</div></div>',
+    nav:'<button class="btn sec" id="back1">← 上一步</button><span class="hint"></span><button class="btn main" id="to3">下一步 →</button>' };
+}
+function paintSugg(){
+  var box=document.getElementById("suggBox"), msg=document.getElementById("suggMsg"); if(!box||!msg) return;
+  box.innerHTML = S.sugg.map(function(r,i){ return '<button class="sg" data-sg="'+i+'"><span>'+esc(r.name)+'</span>'+(r.floor?'<small>'+esc(r.floor)+'</small>':'')+'</button>'; }).join("");
+  var m="";
+  var key=normName(S.q);
+  if(S.suggState==="idle") m = key.length? '再多輸入一個字，系統就會幫您找' : '';
+  else if(S.suggState==="loading") m='尋找中…';
+  else if(S.suggState==="ok") m='請點選您要探視的長輩';
+  else if(S.suggState==="empty") m='找不到符合的長輩，請確認姓名是否正確，或洽櫃檯人員協助';
+  else if(S.suggState==="busy") m='目前查詢人數較多，請稍候幾秒再試';
+  else m='目前無法自動搜尋，請洽櫃檯人員協助';
+  msg.textContent=m;
+  box.querySelectorAll("[data-sg]").forEach(function(b){ b.onclick=function(){ pickResident(S.sugg[+b.dataset.sg]); }; });
+}
+function pickResident(r){
+  if(!r) return;
+  S.resident={id:r.id,name:r.name,floor:r.floor||""}; S.sugg=[]; S.suggState="idle"; S.err.res="";
+  S.fam={id:"",name:"",rel:"",phone:"",masked:"",locked:false}; render(); loadFamilies(r.id); paintAlert();
+}
+function paintFams(){
+  var box=document.getElementById("famBox"); if(!box) return;
+  if(!S.resident){ box.innerHTML=''; return; }
+  var h='';
+  if(S.famState==="loading") h='<div class="smsg">正在找這位長輩之前預約過的家屬…</div>';
+  else if(S.famState==="ok" && S.fams.length){
+    h='<div class="field"><label>之前預約過的家屬<span class="opt">（點一下自動帶入）</span></label><div class="famrow">'
+      +S.fams.map(function(f,i){return '<button type="button" class="fam'+(S.fam.id===f.fid?' on':'')+'" data-fam="'+i+'">'+esc(f.name)+'（'+esc(f.relation)+'）<small>'+esc(f.phoneMasked||"")+'</small></button>';}).join("")
+      +'<button type="button" class="fam" data-fam="new">＋ 我是其他家屬</button></div></div>';
+  }
+  box.innerHTML=h;
+  box.querySelectorAll("[data-fam]").forEach(function(b){ b.onclick=function(){
+    keepInputs();
+    if(b.dataset.fam==="new"){ S.fam={id:"",name:"",rel:"",phone:"",masked:"",locked:false}; }
+    else { var f=S.fams[+b.dataset.fam]; S.fam={id:f.fid,name:f.name,rel:f.relation,phone:"",masked:f.phoneMasked||"",locked:!!f.phoneMasked}; }
+    S.err={}; render(); }; });
+}
+function paintAlert(){
+  var box=document.getElementById("alertBox"); if(!box) return;
+  var b=isoBlocks();
+  box.innerHTML = b.length? '<div class="alert">這位長輩在 '+Array.from(new Set(b)).map(fmtDate).join("、")+' 暫停探視，請回上一步改選其他日期，或洽櫃檯人員。</div>' : '';
+}
+
+/* --- step 3 --- */
+function slotListText(){ return S.basket.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;}).map(function(b){return fmtDate(b.date)+" "+b.time;}); }
+function phoneShow(){ return S.fam.locked? S.fam.masked : S.fam.phone; }
+function step3(){
+  var rows='<div class="r"><span>探視長輩</span><span>'+esc(S.resident.name)+'</span></div>'
+    +'<div class="r"><span>探視日期時段</span><span>'+slotListText().map(esc).join("<br>")+'</span></div>'
+    +'<div class="r"><span>探視家屬</span><span>'+esc(S.fam.name)+'（'+esc(S.fam.rel)+'）</span></div>'
+    +'<div class="r"><span>聯絡電話</span><span>'+esc(phoneShow())+'</span></div>'
+    +(S.note.trim()?'<div class="r"><span>備註</span><span>'+esc(S.note.trim())+'</span></div>':'');
+  return { body:'<h1>請確認預約內容</h1><p class="sub">確認無誤後按「確認預約」</p><div class="sum">'+rows+'</div>'+(S.sendErr?'<div class="alert" style="max-width:62rem;font-size:1.3rem">'+esc(S.sendErr)+'</div>':''),
+    nav:'<button class="btn sec" id="back2"'+(S.sending?' disabled':'')+'>← 上一步</button><span class="hint"></span><button class="btn main" id="send"'+(S.sending?' disabled':'')+'>'+(S.sending?'送出中…':'確認預約')+'</button>' };
+}
+function renderDone(){
+  $app.innerHTML='<div class="body"><div class="done"><div class="ok">✓</div><h1>預約完成，謝謝您！</h1><p>我們已收到您的探視預約</p><div class="sum">'
+    +'<div class="r"><span>探視長輩</span><span>'+esc(S.resident.name)+'</span></div><div class="r"><span>日期時段</span><span>'+slotListText().map(esc).join("<br>")+'</span></div></div>'
+    +'<p><b id="dc">20</b> 秒後自動回到首頁</p><div><button class="btn main" id="goHome">回首頁</button> <button class="btn sec" id="again">再預約一位</button></div></div></div>';
+  var n=20,t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
+  document.getElementById("goHome").onclick=function(){ clearInterval(t); home(); };
+  document.getElementById("again").onclick=function(){ clearInterval(t); reset(); };
+}
+function home(){ try{ parent.postMessage({kiosk:"home"}, location.origin); }catch(e){} }
+function reset(){ S={ step:1, month:firstOfMonth(new Date()), selDate:"", basket:[], q:"", sugg:[], suggState:"idle", resident:null, manual:false, fams:[], famState:"idle", fam:{id:"",name:"",rel:"",phone:"",masked:"",locked:false}, note:"", err:{}, sending:false, done:false, sendErr:"" }; loadData(); render(); }
+
+/* ===== 互動 ===== */
+function keepInputs(){
+  var g=function(id){var e=document.getElementById(id);return e?e.value:null;};
+  if(g("fname")!==null) S.fam.name=g("fname").trim(); if(g("fphone")!==null) S.fam.phone=g("fphone").trim(); if(g("note")!==null) S.note=g("note");
+  if(g("q")!==null) S.q=g("q");
+}
+function bind(){
+  var on=function(id,fn){ var e=document.getElementById(id); if(e) e.onclick=fn; };
+  document.querySelectorAll("[data-day]").forEach(function(b){ b.onclick=function(){ if(b.dataset.off) return; S.selDate=b.dataset.day; render(); }; });
+  document.querySelectorAll("[data-slot]").forEach(function(b){ b.onclick=function(){ if(b.dataset.off) return; var t=b.dataset.slot, ds=S.selDate;
+    if(inBasket(ds,t)) S.basket=S.basket.filter(function(x){return !(x.date===ds&&x.time===t);});
+    else if(S.basket.length>=MAX_SLOTS){ alert1("最多可一次預約 "+MAX_SLOTS+" 個時段"); return; } else S.basket.push({date:ds,time:t});
+    render(); }; });
+  document.querySelectorAll("[data-rm]").forEach(function(b){ b.onclick=function(){ var p=b.dataset.rm.split("|"); S.basket=S.basket.filter(function(x){return !(x.date===p[0]&&x.time===p[1]);}); render(); }; });
+  on("pm",function(){ S.month=new Date(S.month.getFullYear(),S.month.getMonth()-1,1); render(); });
+  on("nm",function(){ S.month=new Date(S.month.getFullYear(),S.month.getMonth()+1,1); render(); });
+  on("to2",function(){ S.step=2; render(); loadData(); if(S.resident&&S.famState==="idle") loadFamilies(S.resident.id); });
+  on("back1",function(){ keepInputs(); S.step=1; render(); });
+  on("chg",function(){ keepInputs(); S.resident=null; S.fams=[]; S.famState="idle"; S.fam={id:"",name:"",rel:"",phone:"",masked:"",locked:false}; S.q=""; S.sugg=[]; S.suggState="idle"; render(); });
+  on("chgPhone",function(){ keepInputs(); S.fam.locked=false; S.fam.phone=""; S.fam.masked=""; render(); });
+  document.querySelectorAll("[data-rel]").forEach(function(b){ b.onclick=function(){ keepInputs(); S.fam.rel=b.dataset.rel; S.err.rel=""; render(); }; });
+  var q=document.getElementById("q"); if(q){ q.oninput=function(){ S.q=q.value; doSuggest(); }; if(!S.resident) setTimeout(function(){ try{q.focus();}catch(e){} },60); }
+  on("to3",function(){ keepInputs(); S.err={};
+    if(!S.resident) S.err.res="請輸入長輩姓名並點選下方的建議";
+    if(!S.fam.name) S.err.name="請填寫您的姓名"; if(!S.fam.rel) S.err.rel="請選擇與長輩的關係";
+    if(!S.fam.locked && S.fam.phone.replace(/\D/g,"").length<8) S.err.phone="請填寫正確的聯絡電話";
+    if(S.err.res||S.err.name||S.err.rel||S.err.phone){ render(); return; }
+    if(isoBlocks().length){ render(); return; }
+    S.step=3; S.sendErr=""; render(); });
+  on("back2",function(){ S.step=2; render(); if(S.resident&&S.famState==="idle") loadFamilies(S.resident.id); });
+  on("send",send);
+}
+function alert1(msg){ var b=document.createElement("div"); b.textContent=msg; b.style.cssText="position:fixed;left:50%;bottom:7rem;transform:translateX(-50%);background:#1c2b23;color:#fff;padding:.9rem 2rem;border-radius:999px;font:700 1.3rem var(--sans);z-index:9"; document.body.appendChild(b); setTimeout(function(){b.remove();},2200); }
+
+/* ===== 送出 ===== */
+async function send(){
+  if(S.sending) return; S.sending=true; S.sendErr=""; render();
+  var byTime={}; S.basket.forEach(function(s){ (byTime[s.time]=byTime[s.time]||[]).push(s.date); });
+  var phone=S.fam.locked? "" : S.fam.phone;
+  try{
+    if(MOCK){ await new Promise(function(r){setTimeout(r,700);}); }
+    else{
+      for(var t in byTime){
+        var data={ residentName:S.resident.name, residentId:S.resident.id, familyName:S.fam.name, familyId:S.fam.id||"", relationship:S.fam.rel, phone:phone, note:S.note.trim(), time:t, dates:byTime[t] };
+        var ctl=new AbortController(), to=setTimeout(function(){ctl.abort();},45000);
+        var res=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(data),signal:ctl.signal});
+        clearTimeout(to);
+        var j=null; try{ j=await res.json(); }catch(e){}
+        if(j && j.ok===false) throw new Error(j.error||"server");
+      }
+      S.basket.forEach(function(s){ savePersisted(s.date,s.time); });
+    }
+    S.done=true; S.sending=false; render();
+  }catch(e){
+    S.sending=false;
+    var m=String(e&&e.message||"");
+    S.sendErr = m==="full" ? "有時段剛好被預約額滿了，請回上一步重新選擇時段。"
+              : m==="isolation" ? "這位長輩目前暫停探視，請洽櫃檯人員協助。"
+              : "預約沒有成功，資料還在，請再按一次「確認預約」；若仍失敗請洽櫃檯人員協助。";
+    render();
+  }
+}
+
+loadData(); setInterval(function(){ if(!S.done && S.step===1) loadData(); }, 60000);
+render();
+</script>
+</body>
+</html>
