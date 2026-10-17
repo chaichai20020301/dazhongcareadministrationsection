@@ -38,8 +38,6 @@
     box-shadow:0 1.2vmin 3vmin rgba(28,43,35,.18);transition:transform .12s ease,box-shadow .12s ease}
   .card:active{transform:scale(.975);box-shadow:0 .5vmin 1.4vmin rgba(28,43,35,.2)}
   .card::after{content:"";position:absolute;right:-8vmin;top:-8vmin;width:30vmin;height:30vmin;border-radius:50%;background:rgba(255,255,255,.12)}
-  .card .ico{width:clamp(70px,13vmin,150px);height:clamp(70px,13vmin,150px);border-radius:50%;background:rgba(255,255,255,.22);
-    display:flex;align-items:center;justify-content:center;font-size:clamp(40px,7.5vmin,88px)}
   .card h2{margin:0;font:900 clamp(30px,5.2vmin,64px)/1.1 var(--sans);letter-spacing:.04em}
   .card p{margin:1.2vmin 0 0;font:500 clamp(17px,2.7vmin,32px)/1.45 var(--sans);opacity:.95}
   .card .go{display:inline-flex;align-items:center;gap:1vmin;background:#fff;color:var(--green-d);border-radius:999px;
@@ -97,18 +95,15 @@
   </div>
   <div class="grid">
     <button class="card" style="--a1:#2f9e6b;--a2:#1c6b48" onclick="openApp('visit')">
-      <div class="ico">👨‍👩‍👧</div>
       <div class="txt"><h2>探視預約</h2><p>預約探視家人的日期與時段</p></div>
       <span class="go">開始預約 →</span>
     </button>
     <button class="card" style="--a1:#6aae3c;--a2:#2f8f78" onclick="openApp('tour')">
-      <div class="ico">🏡</div>
       <div class="txt"><h2>參訪預約</h2><p>想了解入住？預約參觀機構環境</p></div>
       <span class="go">開始預約 →</span>
     </button>
     <button class="card" id="cardItems" style="--a1:#c8923a;--a2:#a8702a" onclick="openApp('items')">
       <span class="tag" id="itemsTag" style="display:none">即將開放</span>
-      <div class="ico">🧺</div>
       <div class="txt"><h2>物品登記</h2><p>登記今天帶來給長輩的衣物與用品</p></div>
       <span class="go">開始登記 →</span>
     </button>
