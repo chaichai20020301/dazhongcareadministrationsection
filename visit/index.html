@@ -28,10 +28,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
   #app-bg{padding:40px 24px 72px!important}
   #app-shell{max-width:640px!important}
 }
-/* 桌機 */
+/* 桌機：左右不留白，右側放「今日探視名單」側欄 */
 @media (min-width:1024px){
   #app-bg{padding:52px 24px 80px!important}
-  #app-shell{max-width:680px!important}
+  #app-shell{max-width:920px!important}
+  #app-row{display:flex;gap:24px;align-items:flex-start;justify-content:center}
+  #booking-col{flex:0 0 560px;width:560px;max-width:560px}
+  #today-panel{display:flex!important;flex:0 0 300px;position:sticky;top:52px}
 }
 /* 一般手機：外框留白縮小 */
 @media (max-width:480px){
@@ -49,9 +52,10 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
 </style>
 </head>
 <body>
-<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
 <div id="app-bg" style="min-height:100vh;padding:28px 16px 60px;background:#f1ede5">
 <div id="app-shell" style="max-width:560px;margin:0 auto">
+<div id="app-row">
+<div id="booking-col">
 
 <div style="background:#faf8f4;border:1px solid #e7e1d6;border-radius:6px;overflow:hidden;box-shadow:0 6px 26px rgba(79,140,58,.10)">
 
@@ -215,8 +219,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
 </div>
 </div>
 
+</div>
+<aside id="today-panel" style="display:none;flex-direction:column;gap:12px;background:#faf8f4;border:1px solid #e7e1d6;border-radius:6px;padding:18px 16px;box-shadow:0 6px 26px rgba(79,140,58,.06)">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:1px solid #eae5dc;padding-bottom:11px">
+<div style="font:700 16px 'Noto Serif TC';color:#4f8c3a">今日探視名單</div>
+<div id="today-panel-date" style="font:400 11px 'Noto Sans TC';color:#a79f94"></div>
+</div>
+<div id="today-panel-list" style="display:flex;flex-direction:column;gap:8px;max-height:66vh;overflow-y:auto;padding-right:2px"></div>
+<div id="today-panel-note" style="font:400 11px/1.6 'Noto Sans TC';color:#c3bcb1"></div>
+</aside>
+</div>
+
 <div style="margin-top:22px;text-align:center;display:flex;flex-direction:column;gap:6px">
-<div id="staff-override-trigger" style="font:400 12px 'Noto Sans TC';color:#b0a89b;letter-spacing:.14em;cursor:pointer">工作人員入口</div>
 <div id="sync-status" style="font:400 11px 'Noto Sans TC';color:#c6bfb2;letter-spacing:.1em">READY</div>
 </div>
 
@@ -254,7 +268,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
     componentDidMount() {
       const P = this.props;
       const SCRIPT_URL = P.scriptUrl || "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
-      const ADMIN_PASSWORD = P.adminPassword || "0804";
+      let staffPwd = ""; // 工作人員輸入後交後端驗證；密碼不寫在此頁原始碼
       const TIME_SLOTS = ["08:30", "09:30", "10:30", "14:00", "15:00", "16:00"];
       const WEEKDAY_LIMIT = P.weekdayLimit ?? 6;
       const WEEKEND_LIMIT = P.weekendLimit ?? 8;
@@ -267,6 +281,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
 
       let sheetRecords = [], suspensions = [], selectedDate = "", selectedTime = "", isFetching = false, isStaffOverride = false;
       let blockedNames = [];
+      let todayMasked = []; // 今日探視（遮罩版，家屬端側欄用）
       let isoMode = "room"; // room | resident：隔離設定的對象類型
       let adminRecords = { records: [], residents: [], history: [], isolations: [], rooms: [] };
       let extraDates = [];
@@ -341,11 +356,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         isFetching = true;
         show("slot-loading-indicator", "flex");
         try {
-          const url = isStaffOverride ? `${SCRIPT_URL}?pwd=${ADMIN_PASSWORD}&t=${Date.now()}` : `${SCRIPT_URL}?t=${Date.now()}`;
+          const url = isStaffOverride ? `${SCRIPT_URL}?pwd=${encodeURIComponent(staffPwd)}&t=${Date.now()}` : `${SCRIPT_URL}?t=${Date.now()}`;
           const data = await (await fetch(url)).json();
           sheetRecords = data.records || [];
           suspensions = data.suspensions || [];
           blockedNames = data.blockedNames || [];
+          todayMasked = data.todayMasked || [];
           if (isStaffOverride) {
             adminRecords.records = data.records || [];
             adminRecords.residents = data.residents || [];
@@ -361,7 +377,45 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
           isFetching = false;
           hide("slot-loading-indicator");
           if (selectedDate) renderTimeSlots();
+          renderTodayPanel();
         }
+      }
+
+      function renderTodayPanel() {
+        const listEl = $("today-panel-list"); if (!listEl) return;
+        const dateEl = $("today-panel-date"), noteEl = $("today-panel-note");
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+        if (dateEl) dateEl.innerText = `${now.getMonth() + 1}月${now.getDate()}日（${WD[now.getDay()]}）`;
+        let rows = [];
+        if (isStaffOverride) {
+          rows = (adminRecords.records || []).filter(r => normalizeDateStr(r.date) === todayStr)
+            .sort((a, b) => {
+              const t = normalizeTimeStr(a.time).localeCompare(normalizeTimeStr(b.time), undefined, { numeric: true });
+              if (t) return t;
+              const f = floorOfBed(bedOfRecord(a)).localeCompare(floorOfBed(bedOfRecord(b)), undefined, { numeric: true });
+              if (f) return f;
+              return bedOfRecord(a).localeCompare(bedOfRecord(b), undefined, { numeric: true });
+            })
+            .map(r => ({ time: r.time, name: r.residentName, sub: [r.familyName, r.phone].filter(Boolean).join(" · ") }));
+          if (noteEl) noteEl.innerText = "工作人員模式：顯示完整名單。";
+        } else {
+          rows = (todayMasked || []).slice()
+            .sort((a, b) => normalizeTimeStr(a.time).localeCompare(normalizeTimeStr(b.time), undefined, { numeric: true }))
+            .map(r => ({ time: r.time, name: r.nameMasked, sub: "" }));
+          if (noteEl) noteEl.innerText = "為保護隱私，僅顯示部分姓名。";
+        }
+        if (!rows.length) {
+          listEl.innerHTML = `<div style="padding:26px 10px;text-align:center;font:400 13px 'Noto Sans TC';color:#b6ae9f">今日尚無探視預約</div>`;
+          return;
+        }
+        listEl.innerHTML = rows.map(r => `<div style="display:flex;gap:10px;align-items:center;padding:9px 10px;background:#fff;border:1px solid #eee7db;border-radius:4px">
+          <div style="width:46px;font:700 13px 'Noto Serif TC';color:#4f8c3a;flex:none">${esc(r.time)}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font:700 14px 'Noto Sans TC';color:#2a2926;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.name)}</div>
+            ${r.sub ? `<div style="font:400 12px 'Noto Sans TC';color:#857e73;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(r.sub)}</div>` : ""}
+          </div>
+        </div>`).join("");
       }
 
       function populateAdminDropdowns() {
@@ -526,20 +580,29 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         const container = $("admin-list-container");
         const selected = normalizeDateStr($("admin-date-picker").value);
         const list = adminRecords.records.filter(r => normalizeDateStr(r.date) === selected)
-          .sort((a, b) => normalizeTimeStr(a.time).localeCompare(normalizeTimeStr(b.time)));
+          .sort((a, b) => {
+            const t = normalizeTimeStr(a.time).localeCompare(normalizeTimeStr(b.time), undefined, { numeric: true });
+            if (t) return t;
+            const f = floorOfBed(bedOfRecord(a)).localeCompare(floorOfBed(bedOfRecord(b)), undefined, { numeric: true });
+            if (f) return f;
+            return bedOfRecord(a).localeCompare(bedOfRecord(b), undefined, { numeric: true });
+          });
         if (!list.length) {
           container.innerHTML = `<div style="padding:34px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:4px;font:400 14px 'Noto Sans TC';color:#b6ae9f">此日期尚無預約資料</div>`;
           return;
         }
-        container.innerHTML = list.map(a => `<div style="display:flex;gap:13px;padding:15px;background:#fff;border:1px solid #e7e1d6;border-radius:4px">
-          <div style="width:58px;padding:9px 0;background:#eef5e6;border-radius:4px;text-align:center;font:700 15px 'Noto Serif TC';color:#4f8c3a">${esc(a.time)}</div>
+        container.innerHTML = list.map(a => { const bed = bedOfRecord(a); return `<div style="display:flex;gap:13px;padding:15px;background:#fff;border:1px solid #e7e1d6;border-radius:4px">
+          <div style="width:58px;flex:none;display:flex;flex-direction:column;gap:4px;align-items:stretch">
+            <div style="padding:7px 0;background:#eef5e6;border-radius:4px;text-align:center;font:700 15px 'Noto Serif TC';color:#4f8c3a">${esc(a.time)}</div>
+            ${bed ? `<div style="padding:5px 0;background:#f5f2ec;border:1px solid #e7e1d6;border-radius:4px;text-align:center;font:700 11px 'Noto Sans TC';color:#7d766c;word-break:break-all">${esc(bed)}</div>` : ""}
+          </div>
           <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
-            <div style="font:700 17px 'Noto Sans TC';color:#2a2926">${esc(a.residentName)}</div>
+            <div style="font:700 17px 'Noto Sans TC';color:#2a2926">${esc(nameNoBed(a.residentName))}</div>
             <div style="font:400 13px 'Noto Sans TC';color:#857e73">${esc(a.familyName)} · ${esc(a.phone)}</div>
             ${a.note ? `<div style="padding:8px 11px;background:#f7efe3;border:1px solid #eddfc4;border-radius:4px;font:400 13px/1.6 'Noto Sans TC';color:#8a6520;word-break:break-word">${esc(a.note)}</div>` : ""}
           </div>
           <div data-del="1" data-date="${esc(a.date)}" data-time="${esc(a.time)}" data-fam="${esc(a.familyName)}" style="align-self:flex-start;padding:7px 12px;background:#fbeeec;border-radius:4px;font:700 12.5px 'Noto Sans TC';color:#7a2b22;cursor:pointer">刪除</div>
-        </div>`).join("");
+        </div>`; }).join("");
         container.querySelectorAll("[data-del]").forEach(el => {
           el.onclick = () => deleteAppointment(el.getAttribute("data-date"), el.getAttribute("data-time"), el.getAttribute("data-fam"));
         });
@@ -549,7 +612,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         showConfirmPrompt("刪除確認", `確定要刪除「${famName}」\n在 ${date} ${time} 的預約嗎？`, async () => {
           showStatusMsg("正在刪除…", false);
           try {
-            const url = `${SCRIPT_URL}?action=delete&pwd=${ADMIN_PASSWORD}&date=${date}&time=${time}&famName=${encodeURIComponent(famName)}&t=${Date.now()}`;
+            const url = `${SCRIPT_URL}?action=delete&pwd=${encodeURIComponent(staffPwd)}&date=${date}&time=${time}&famName=${encodeURIComponent(famName)}&t=${Date.now()}`;
             const data = await (await fetch(url)).json();
             if (data.result === "success") { showStatusMsg("已刪除", false); await fetchData(); renderAdminList(); }
             else showStatusMsg("找不到該筆資料");
@@ -580,7 +643,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         const noteVal = (input ? input.value : "").trim();
         showStatusMsg("儲存中…", false);
         try {
-          const url = `${SCRIPT_URL}?action=save_note&pwd=${ADMIN_PASSWORD}&resName=${encodeURIComponent(resName)}&note=${encodeURIComponent(noteVal)}&t=${Date.now()}`;
+          const url = `${SCRIPT_URL}?action=save_note&pwd=${encodeURIComponent(staffPwd)}&resName=${encodeURIComponent(resName)}&note=${encodeURIComponent(noteVal)}&t=${Date.now()}`;
           const data = await (await fetch(url)).json();
           if (data.result === "success") {
             showStatusMsg(`「${resName}」註記已儲存`, false);
@@ -593,6 +656,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
       const splitNames = (raw) => String(raw || "").split(/[&＆與和,，、+＋]/).map(n => n.trim()).filter(Boolean);
       // 姓名正規化：去掉括號拼音（如「黃國進(Guo Jin)」→「黃國進」）與空白，讓家屬打的中文名也能對上資料庫名字
       const normName = (s) => String(s || "").replace(/[（(][^）)]*[）)]/g, "").replace(/\s+/g, "").trim();
+      // 從一筆預約記錄取得床號：優先取 residentName 的 [床號] 前綴，否則用姓名回住民資料庫查
+      const bedOfRecord = (r) => {
+        const m = String(r.residentName || "").match(/^\s*\[([^\]]+)\]/);
+        if (m) return m[1].trim();
+        const core = normName(r.residentName);
+        const found = (adminRecords.residents || []).find(x => normName(x.name) === core);
+        return found ? found.bed : "";
+      };
+      const floorOfBed = (bed) => { const m = String(bed || "").match(/^[^-_/－—–]+/); return m ? m[0].trim() : ""; };
+      const nameNoBed = (s) => String(s || "").replace(/^\s*\[[^\]]+\]\s*/, "");
       // 回傳被隔離而擋下的清單：[{name, room, reason, end, date}]，date 為觸發的探視日期
       function findIsolationBlocks(rawName, dates) {
         const names = splitNames(rawName);
@@ -669,7 +742,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
           showStatusMsg("設定中…", false);
           try {
             const type = isRes ? "住民" : "房間";
-            const url = `${SCRIPT_URL}?action=set_isolation&pwd=${ADMIN_PASSWORD}&type=${encodeURIComponent(type)}&target=${encodeURIComponent(target)}&start=${start}&end=${end}&reason=${encodeURIComponent(reason)}&t=${Date.now()}`;
+            const url = `${SCRIPT_URL}?action=set_isolation&pwd=${encodeURIComponent(staffPwd)}&type=${encodeURIComponent(type)}&target=${encodeURIComponent(target)}&start=${start}&end=${end}&reason=${encodeURIComponent(reason)}&t=${Date.now()}`;
             const data = await (await fetch(url)).json();
             if (data.result === "success") {
               showStatusMsg(`已設定「${label}」隔離`, false);
@@ -684,7 +757,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         showConfirmPrompt("解除隔離", `確定要解除「${target}」（${start} 起）的隔離嗎？\n\n解除後即可重新預約探視。`, async () => {
           showStatusMsg("解除中…", false);
           try {
-            const url = `${SCRIPT_URL}?action=lift_isolation&pwd=${ADMIN_PASSWORD}&target=${encodeURIComponent(target)}&start=${encodeURIComponent(start)}&t=${Date.now()}`;
+            const url = `${SCRIPT_URL}?action=lift_isolation&pwd=${encodeURIComponent(staffPwd)}&target=${encodeURIComponent(target)}&start=${encodeURIComponent(start)}&t=${Date.now()}`;
             const data = await (await fetch(url)).json();
             if (data.result === "success") { showStatusMsg(`已解除「${target}」隔離`, false); await fetchData(); renderIsolationList(); }
             else showStatusMsg("找不到該筆隔離設定");
@@ -768,20 +841,32 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         const noteInput = $("note").value;
         if (!resName || !famName || !relation || !phone) { showStatusMsg("請填寫所有必填欄位。"); return; }
 
-        const executeSubmit = () => {
+        const executeSubmit = async () => {
           const btn = $("btn-submit"); btn.disabled = true; btn.innerHTML = `<span class="ld"></span>　傳送中…`;
-        const allSlots = [{ date: normalizeDateStr(selectedDate), time: selectedTime }, ...extraDates];
-        const byTime = {};
-        allSlots.forEach(s => { (byTime[s.time] = byTime[s.time] || []).push(s.date); });
-        if (TEST_MODE) {
-          showStatusMsg("測試模式：未實際送出至試算表", false);
-        } else {
-          allSlots.forEach(s => savePersistedReservation(s.date, s.time));
-          Object.keys(byTime).forEach(t => {
-            const data = { residentName: resName, familyName: famName, relationship: relation, phone, note: noteInput, time: t, dates: byTime[t] };
-            try { fetch(SCRIPT_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(data), keepalive: true }); } catch (e) {}
-          });
-        }
+          const resetBtn = () => { btn.disabled = false; btn.innerHTML = "送出預約"; };
+          const errMsg = (code) => code === "isolation" ? "此住民目前隔離中，暫停探視，請洽機構。"
+            : code === "full" ? "很抱歉，該時段名額剛好額滿，請改選其他時段。"
+            : "送出失敗，請再試一次或洽機構。";
+          const allSlots = [{ date: normalizeDateStr(selectedDate), time: selectedTime }, ...extraDates];
+          const byTime = {};
+          allSlots.forEach(s => { (byTime[s.time] = byTime[s.time] || []).push(s.date); });
+
+          if (TEST_MODE) {
+            showStatusMsg("測試模式：未實際送出至試算表", false);
+          } else {
+            try {
+              const results = await Promise.all(Object.keys(byTime).map(t => {
+                const data = { residentName: resName, familyName: famName, relationship: relation, phone, note: noteInput, time: t, dates: byTime[t] };
+                if (isStaffOverride && staffPwd) data.pwd = staffPwd; // 工作人員特許：後端略過額滿/隔離驗證
+                return fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
+                  .then(r => r.json()).catch(() => ({ ok: false, error: "network" }));
+              }));
+              const bad = results.find(r => r && r.ok === false);
+              if (bad) { showStatusMsg(errMsg(bad.error)); resetBtn(); fetchData(); return; }
+            } catch (e) { showStatusMsg("網路錯誤，送出失敗，請再試一次。"); resetBtn(); return; }
+            allSlots.forEach(s => savePersistedReservation(s.date, s.time)); // 僅成功才記入本地暫存
+          }
+
           const dd = new Date(selectedDate);
           const rows = [
             ["探視對象", resName],
@@ -790,7 +875,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
           ];
           if (extraDates.length) rows.push(["另含日期", extraDates.map(x => `${x.date} ${x.time}`).join("、")]);
           $("success-summary").innerHTML = rows.map((r, i) => `${i ? '<div style="height:1px;background:#efeae0"></div>' : ""}<div style="display:flex;justify-content:space-between;gap:16px;font:400 14px 'Noto Sans TC';color:#857e73"><span>${r[0]}</span><span style="font-weight:700;color:#2a2926;text-align:right">${esc(r[1])}</span></div>`).join("");
-          setTimeout(() => { hide("view-step-2"); show("view-step-3", "flex"); setStep(3); window.scrollTo(0, 0); }, 150);
+          hide("view-step-2"); show("view-step-3", "flex"); setStep(3); window.scrollTo(0, 0);
         };
 
         const proceed = () => {
@@ -831,10 +916,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
       };
 
       $("btn-close-override").onclick = () => {
-        isStaffOverride = false; hide("staff-banner");
+        isStaffOverride = false; staffPwd = ""; hide("staff-banner");
         show("res-name", "block"); hide("admin-res-select"); hide("admin-fam-select");
         $("btn-back-to-booking").click(); showStatusMsg("已登出管理模式", false);
         if (selectedDate) renderTimeSlots();
+        renderTodayPanel();
       };
 
       $("btn-view-admin-list").onclick = () => {
@@ -874,16 +960,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
       $("btn-set-isolation").onclick = setIsolation;
       setIsoMode("room");
 
-      $("staff-override-trigger").onclick = () => {
-        showPasswordPrompt("工作人員授權", "請輸入管理密碼，以啟動「強制預約模式」與「查閱清單」。", async (pass) => {
-          if (pass === ADMIN_PASSWORD) {
-            isStaffOverride = true; show("staff-banner", "flex");
-            hide("res-name"); show("admin-res-select", "block"); show("admin-fam-select", "block");
-            showStatusMsg("已啟動現場強制預約模式", false);
-            await fetchData();
-          } else showStatusMsg("密碼錯誤，拒絕存取");
-        });
-      };
+      // 家屬版：不提供工作人員入口（已移除）。此頁只有預約功能，不讀任何 portal key、不含管理密碼。
 
       setStep(1); setNextEnabled(false); fetchData();
     }

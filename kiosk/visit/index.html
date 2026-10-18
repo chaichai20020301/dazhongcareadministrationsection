@@ -262,7 +262,7 @@ function step2(){
   var f=S.fam;
   var right=''
     +'<div class="field"><label>您的姓名 <span class="req">＊</span></label><input type="text" id="fname" value="'+esc(f.name)+'" placeholder="例如：王大華" autocomplete="off"><div class="err">'+esc(S.err.name||"")+'</div></div>'
-    +'<div class="field"><label>與長輩的關係 <span class="req">＊</span></label><div class="rels">'+RELS.map(function(r){return '<button type="button" class="chip'+(f.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
+    +'<div class="field"><label>與長輩的關係 <span class="req">＊</span></label><div class="rels">'+(f.rel&&RELS.indexOf(f.rel)<0?[f.rel]:[]).concat(RELS).map(function(r){return '<button type="button" class="chip'+(f.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
     +'<div class="field"><label>聯絡電話 <span class="req">＊</span></label>'
     +(f.locked? '<div class="phoneLock"><div class="v">'+esc(f.masked)+'　（沿用上次登記的電話）</div><button type="button" id="chgPhone">更改電話</button></div>'
                : '<input type="tel" id="fphone" value="'+esc(f.phone)+'" placeholder="例如：0912345678" autocomplete="off">')+'<div class="err">'+esc(S.err.phone||"")+'</div></div>';
