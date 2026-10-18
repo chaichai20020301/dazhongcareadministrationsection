@@ -7,191 +7,284 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  :root{--green:#2f9e6b;--green-d:#1c6b48;--gold:#c8923a;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;
+  :root{--green:#2f9e6b;--green-d:#1c6b48;--leaf:#4f8c3a;--gold:#c8923a;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;
     --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--serif:"Noto Serif TC",serif}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);touch-action:manipulation}
+  html{font-size:clamp(13px,calc(.55vw + .7vh),22px)}
+  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);touch-action:manipulation;overflow:hidden}
   button{font-family:inherit;cursor:pointer}
-  .wrap{max-width:1500px;margin:0 auto;padding:22px 40px 40px}
-  .g2{display:grid;grid-template-columns:1fr 1fr;gap:0 36px}
-  @media (max-width:1000px){.g2{grid-template-columns:1fr}}
-  .steps{display:flex;gap:10px;margin-bottom:20px}
-  .steps div{flex:1;text-align:center;padding:14px 6px;border-radius:14px;background:#e8e2d3;color:var(--muted);font:700 20px var(--sans)}
+  #app{height:100%;display:flex;flex-direction:column;padding:1.1rem 2.2rem 0}
+  .steps{flex:none;display:flex;gap:.8rem;margin-bottom:.9rem}
+  .steps div{flex:1;text-align:center;padding:.65rem .3rem;border-radius:.9rem;background:#e8e2d3;color:var(--muted);font:700 1.2rem var(--sans)}
   .steps div.on{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff}
   .steps div.done{background:#cfe6d7;color:var(--green-d)}
-  h1{margin:0 0 6px;font:900 38px/1.2 var(--serif)}
-  .sub{margin:0 0 22px;font:500 22px/1.5 var(--sans);color:var(--muted)}
-  .field{margin-bottom:22px}
-  .field label{display:block;margin-bottom:8px;font:700 24px var(--sans)}
-  .field label .req{color:var(--red)}
-  .field label .opt{color:var(--muted);font-weight:500;font-size:20px;margin-left:8px}
-  input[type=text],input[type=tel],textarea{width:100%;border:2px solid var(--line);border-radius:16px;background:#fff;padding:18px 20px;font:500 28px var(--sans);color:var(--ink)}
-  input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 5px rgba(47,158,107,.18)}
-  textarea{min-height:130px;resize:none}
-  .chips{display:flex;flex-wrap:wrap;gap:12px}
-  .chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:14px 30px;font:700 24px var(--sans);color:var(--ink)}
-  .chip.on{background:var(--green);border-color:var(--green);color:#fff}
-  .err{margin-top:8px;color:var(--red);font:700 22px var(--sans);min-height:1.2em}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
-  .tile{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#fff;border:2px solid var(--line);border-radius:18px;padding:12px 12px 12px 18px}
-  .tile.on{border-color:var(--green);background:#eef8f2}
-  .tile .nm{font:700 24px var(--sans)}
-  .stp{display:flex;align-items:center;gap:6px}
-  .stp button{width:58px;height:58px;border:0;border-radius:50%;background:#e8e2d3;color:var(--ink);font:900 32px/1 var(--sans)}
-  .stp button.add{background:var(--green);color:#fff}
-  .stp button:active{transform:scale(.92)}
-  .stp .q{min-width:34px;text-align:center;font:900 28px var(--sans)}
-  .other{display:flex;gap:12px;align-items:center;margin-top:6px}
-  .other input[type=text]{flex:1}
-  .other .qty{width:150px;display:flex;align-items:center;justify-content:center}
-  .btn{border:0;border-radius:999px;padding:20px 46px;font:900 28px var(--sans)}
-  .btn.main{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff;box-shadow:0 6px 16px rgba(28,107,72,.3)}
+  .body{flex:1;min-height:0;overflow:auto;padding-bottom:.6rem}.body::-webkit-scrollbar{width:0}
+  .nav{flex:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.8rem 0 1rem;border-top:1px solid var(--line);background:var(--paper)}
+  .nav .hint{flex:1;font:500 1.15rem var(--sans);color:var(--muted)}
+  .btn{border:0;border-radius:999px;padding:.95rem 2.6rem;font:900 1.55rem var(--sans)}
+  .btn.main{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff;box-shadow:0 .35rem 1rem rgba(28,107,72,.3)}
   .btn.sec{background:#fff;color:var(--green-d);border:2px solid var(--green)}
-  .btn:disabled{opacity:.5}
-  .btn:active{transform:scale(.97)}
-  .nav{display:flex;justify-content:space-between;gap:16px;margin-top:20px;position:sticky;bottom:0;padding:16px 0 14px;background:linear-gradient(to top,var(--paper) 78%,rgba(242,239,230,0));z-index:3}
-  .sum{background:#fff;border:2px solid var(--line);border-radius:18px;padding:8px 22px;margin-bottom:22px}
-  .sum .r{display:flex;justify-content:space-between;gap:20px;padding:14px 0;border-bottom:1px solid var(--line);font:500 24px/1.4 var(--sans)}
-  .sum .r:last-child{border-bottom:0}
-  .sum .r span:first-child{color:var(--muted);flex:none}
-  .sum .r span:last-child{font-weight:700;text-align:right}
-  .picked{margin:20px 0 0;font:700 22px var(--sans);color:var(--green-d)}
-  .done{text-align:center;padding:50px 20px}
-  .done .ok{width:150px;height:150px;margin:0 auto 24px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;font-size:92px;line-height:150px}
-  .done h1{font-size:48px}
-  .done p{font:500 28px/1.6 var(--sans);color:var(--muted);margin:14px 0}
-  .banner{background:#fff4d6;border:2px solid #e8c56b;border-radius:16px;padding:14px 18px;margin-bottom:20px;font:700 22px var(--sans);color:#7a5a00}
-  @media (max-width:700px){.wrap{padding:14px}h1{font-size:30px}.tile{padding:10px}.steps div{font-size:16px}}
+  .btn.small{padding:.6rem 1.5rem;font-size:1.2rem}
+  .btn:disabled{opacity:.4;box-shadow:none}.btn:active:not(:disabled){transform:scale(.97)}
+  h1{margin:0 0 .2rem;font:900 1.9rem/1.2 var(--serif)}
+  .sub{margin:0 0 .7rem;font:500 1.1rem/1.4 var(--sans);color:var(--muted)}
+  .banner{background:#fff4d6;border:2px solid #e8c56b;border-radius:.9rem;padding:.5rem 1rem;margin-bottom:.7rem;font:700 1.05rem var(--sans);color:#7a5a00}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem;align-items:start}
+  .panel{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.8rem 1.3rem}
+  .field{margin-bottom:.8rem}
+  .field label{display:block;margin-bottom:.3rem;font:700 1.3rem var(--sans)}
+  .field label .req{color:var(--red)}.field label .opt{color:var(--muted);font-weight:500;font-size:1.05rem;margin-left:.4rem}
+  input[type=text],input[type=tel],textarea{width:100%;border:2px solid var(--line);border-radius:1rem;background:#fff;padding:.75rem 1rem;font:500 1.6rem var(--sans);color:var(--ink)}
+  input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 .3rem rgba(47,158,107,.18)}
+  textarea{min-height:6rem;resize:none}
+  .err{color:var(--red);font:700 1.1rem var(--sans);margin-top:.3rem;min-height:1.2em}
+  .sugg{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.6rem}
+  .sg{border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.7rem 1rem;font:900 1.6rem var(--sans);text-align:left;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:.5rem;min-height:3.6rem}
+  .sg small{font:500 1rem var(--sans);color:var(--muted)}.sg:active{background:#e7f3dc}
+  .smsg{margin-top:.5rem;font:700 1.15rem var(--sans);color:var(--muted);min-height:1.4em}
+  .picked{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#e7f3dc;border:2px solid #cfe6bd;border-radius:1rem;padding:.6rem 1rem}
+  .picked b{font:900 1.8rem var(--sans);color:var(--green-d)}
+  .picked button{border:2px solid var(--green);border-radius:999px;background:#fff;color:var(--green-d);padding:.5rem 1.3rem;font:700 1.15rem var(--sans)}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem}
+  .chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:.5rem 1.2rem;font:700 1.2rem var(--sans);color:var(--ink)}.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+  /* step 2 */
+  .tabs{display:flex;gap:.6rem;margin-bottom:.7rem}
+  .tab{flex:1;border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.6rem;font:900 1.4rem var(--sans);color:var(--muted)}
+  .tab.on{background:var(--gold);border-color:var(--gold);color:#fff}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem}
+  .tile{display:flex;align-items:center;justify-content:space-between;gap:.4rem;background:#fff;border:2px solid var(--line);border-radius:1rem;padding:.4rem .5rem .4rem .9rem}
+  .tile.on{border-color:var(--green);background:#eef8f2}.tile .nm{font:700 1.3rem var(--sans)}
+  .stp{display:flex;align-items:center;gap:.3rem}
+  .stp button{width:2.9rem;height:2.9rem;border:0;border-radius:50%;background:#e8e2d3;color:var(--ink);font:900 1.5rem/1 var(--sans)}
+  .stp button.add{background:var(--green);color:#fff}.stp button:active{transform:scale(.92)}.stp .q{min-width:1.6rem;text-align:center;font:900 1.4rem var(--sans)}
+  .other{display:flex;gap:.7rem;align-items:center;margin-top:.7rem}.other input{flex:1}
+  .sel .row{display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.45rem 0;border-bottom:1px solid var(--line);font:700 1.25rem var(--sans)}
+  .sel .row:last-child{border-bottom:0}.sel .row .k{font:500 .95rem var(--sans);color:#fff;background:var(--gold);border-radius:.5rem;padding:.1rem .5rem;margin-right:.5rem}
+  .sel .row .k.i{background:var(--green)}
+  .sel .empty{padding:1.5rem .5rem;text-align:center;color:var(--muted);font:500 1.2rem var(--sans)}
+  .sel h3{margin:.1rem 0 .4rem;font:900 1.35rem var(--serif)}
+  /* step 3 camera */
+  .cam{position:relative;background:#101a14;border-radius:1.2rem;overflow:hidden;aspect-ratio:2.2/1;display:flex;align-items:center;justify-content:center}
+  .cam video{width:100%;height:100%;object-fit:cover;display:block}
+  .cam .msg{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.8rem;color:#e8efe9;font:700 1.4rem/1.5 var(--sans);text-align:center;padding:1.5rem}
+  .camBtns{display:flex;gap:.8rem;margin-top:.6rem;flex-wrap:wrap}
+  .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem}
+  .th{position:relative;border:2px solid var(--line);border-radius:.8rem;overflow:hidden;background:#fff;aspect-ratio:4/3}
+  .th img{width:100%;height:100%;object-fit:cover;display:block}
+  .th button{position:absolute;right:.3rem;top:.3rem;width:2.2rem;height:2.2rem;border:0;border-radius:50%;background:rgba(180,64,47,.92);color:#fff;font:900 1.1rem/1 var(--sans)}
+  .th.blank{border-style:dashed;display:flex;align-items:center;justify-content:center;color:#b9b2a3;font:700 1rem var(--sans)}
+  /* step 4 */
+  .sum{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.3rem 1.4rem}
+  .sum .r{display:flex;justify-content:space-between;gap:1.5rem;padding:.65rem 0;border-bottom:1px solid var(--line);font:500 1.3rem/1.4 var(--sans)}
+  .sum .r:last-child{border-bottom:0}.sum .r span:first-child{color:var(--muted);flex:none}.sum .r span:last-child{font-weight:700;text-align:right}
+  .alert{background:#fbeeec;border:2px solid #e6c9c4;border-radius:1rem;padding:.7rem 1rem;margin:.7rem 0;font:700 1.2rem/1.45 var(--sans);color:#7a2b22}
+  .done{text-align:center;padding:1.6rem 1rem}
+  .done .ok{width:7.5rem;height:7.5rem;margin:0 auto 1rem;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;font-size:4.6rem;line-height:7.5rem}
+  .done h1{font-size:2.6rem}.done p{font:500 1.5rem/1.6 var(--sans);color:var(--muted);margin:.5rem 0}
+  .done .code{display:inline-block;margin:.6rem 0;padding:.6rem 2rem;border:3px dashed var(--green);border-radius:1rem;font:900 2.8rem var(--sans);color:var(--green-d);letter-spacing:.08em;background:#fff}
+  @media (max-aspect-ratio:1/1){.two{grid-template-columns:1fr !important}.tiles{grid-template-columns:repeat(3,1fr)}}
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
-
+<div id="app"></div>
+<input type="file" id="fileIn" accept="image/*" capture="environment" style="display:none">
 <script>
 /* ===== 設定 ===== */
-var API_URL = "https://script.google.com/macros/s/AKfycbwN0nILIfWhTlZAgOUnuVt9TuvaLAJG3RRPMA7XDQWS5-c2Up8rghz7mU89_Ez6GsjT/exec";   // 物品系統後端；需已新增 familyDropoff 動作
-var DRY = /[?&]dry=1/.test(location.search);   // ?dry=1 只看畫面，不送出
-var COMMON = ["長袖上衣","短袖上衣","長褲","短褲","外套","內衣","內褲","襪子","帽子","毛巾","拖鞋","鞋子","杯子","牙刷","牙膏","臉盆","衛生紙","濕紙巾","尿布","看護墊"];
+var API_URL = "https://script.google.com/macros/s/AKfycbwN0nILIfWhTlZAgOUnuVt9TuvaLAJG3RRPMA7XDQWS5-c2Up8rghz7mU89_Ez6GsjT/exec";   // 物品系統後端：公開只用 suggest 與 familyDropoff
+var MOCK = /[?&]mock=1/.test(location.search);   // ?mock=1：假資料預覽，不連線、不送出
+var COMMON_ITEM = ["長袖上衣","短袖上衣","長褲","短褲","外套","內衣","內褲","襪子","帽子","毛巾","拖鞋","鞋子","杯子","牙刷","臉盆","圍巾"];
+var COMMON_CONS = ["衛生紙","濕紙巾","尿布","看護墊","口罩","手套","潔身液","乳液","牙膏","沐浴乳","洗髮精","營養品"];
 var RELS = ["子女","配偶","孫輩","兄弟姊妹","其他親屬","朋友"];
+var MAX_PHOTOS = 6, MAX_B64 = 850000, LONG_EDGE = 1280, MIN_Q = 2;
+var MOCK_RES=[{id:"m1",name:"王小明",floor:""},{id:"m2",name:"王小美",floor:""},{id:"m3",name:"王大同",floor:"3F"},{id:"m4",name:"王大同",floor:"5F"},{id:"m5",name:"陳月西",floor:""}];
 
-var S = { step:1, resident:"", family:"", rel:"", phone:"", items:{}, other:[], oName:"", oQty:1, note:"", err:{}, sending:false, done:false, sendErr:"" };
-var $app = document.getElementById("app");
-function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+var S;
+function fresh(){ return { step:1, q:"", sugg:[], suggState:"idle", resident:null, family:"", rel:"", phone:"", tab:"item", sel:[], oName:"", oQty:1, photos:[], note:"", err:{}, sending:false, done:false, code:"", sendErr:"" }; }
+S=fresh();
+var cam={stream:null,state:"idle"};
+var $app=document.getElementById("app");
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function normName(s){ return String(s||"").replace(/[（(][^）)]*[）)]/g,"").replace(/\s+/g,"").trim(); }
 
-function list(){
-  var out=[];
-  COMMON.forEach(function(n){ if(S.items[n]>0) out.push({name:n,qty:S.items[n]}); });
-  S.other.forEach(function(o){ out.push({name:o.name,qty:o.qty}); });
-  return out;
+/* ===== 已選物品 ===== */
+function qtyOf(kind,name){ var r=S.sel.filter(function(x){return x.kind===kind&&x.name===name;})[0]; return r?r.qty:0; }
+function setQty(kind,name,q){ var i=S.sel.findIndex(function(x){return x.kind===kind&&x.name===name;});
+  if(q<=0){ if(i>=0) S.sel.splice(i,1); } else if(i>=0) S.sel[i].qty=Math.min(99,q); else S.sel.push({kind:kind,name:name,qty:Math.min(99,q)}); }
+function totalQty(){ return S.sel.reduce(function(a,x){return a+x.qty;},0); }
+
+/* ===== 建議住民 ===== */
+var suggSeq=0, suggTimer=null;
+function getJSON(u){ return fetch(u,{cache:"no-store"}).then(function(r){return r.json();}); }
+function doSuggest(){
+  var key=normName(S.q); clearTimeout(suggTimer);
+  if(key.length<MIN_Q){ S.sugg=[]; S.suggState="idle"; paintSugg(); return; }
+  S.suggState="loading"; paintSugg(); var my=++suggSeq;
+  suggTimer=setTimeout(function(){
+    var p=MOCK?Promise.resolve({ok:true,items:MOCK_RES.filter(function(r){return r.name.indexOf(key)>=0;}).slice(0,6)}):getJSON(API_URL+"?action=suggest&q="+encodeURIComponent(S.q)+"&t="+Date.now());
+    p.then(function(j){ if(my!==suggSeq) return;
+      if(j&&j.ok&&j.items){ S.sugg=j.items; S.suggState=j.items.length?"ok":"empty"; }
+      else if(j&&j.ok===false&&j.error==="busy"){ S.sugg=[]; S.suggState="busy"; } else { S.sugg=[]; S.suggState="error"; }
+      paintSugg(); }).catch(function(){ if(my!==suggSeq) return; S.sugg=[]; S.suggState="error"; paintSugg(); });
+  },250);
 }
-function stepsHtml(){
-  var t=["① 基本資料","② 帶來的物品","③ 確認送出"];
-  return '<div class="steps">'+t.map(function(x,i){ var n=i+1; return '<div class="'+(S.step===n?'on':(S.step>n?'done':''))+'">'+x+'</div>'; }).join("")+'</div>';
+function paintSugg(){
+  var box=document.getElementById("suggBox"), msg=document.getElementById("suggMsg"); if(!box||!msg) return;
+  box.innerHTML=S.sugg.map(function(r,i){return '<button class="sg" data-sg="'+i+'"><span>'+esc(r.name)+'</span>'+(r.floor?'<small>'+esc(r.floor)+'</small>':'')+'</button>';}).join("");
+  var key=normName(S.q), m="";
+  if(S.suggState==="idle") m=key.length?"再多輸入一個字，系統就會幫您找":"";
+  else if(S.suggState==="loading") m="尋找中…"; else if(S.suggState==="ok") m="請點選您要登記的長輩";
+  else if(S.suggState==="empty") m="找不到符合的長輩，請確認姓名是否正確，或洽櫃檯人員協助";
+  else if(S.suggState==="busy") m="目前查詢人數較多，請稍候幾秒再試"; else m="目前無法自動搜尋，請洽櫃檯人員協助";
+  msg.textContent=m;
+  box.querySelectorAll("[data-sg]").forEach(function(b){ b.onclick=function(){ var r=S.sugg[+b.dataset.sg]; S.resident={id:r.id,name:r.name,floor:r.floor||""}; S.sugg=[]; S.suggState="idle"; S.err.res=""; keep(); render(); }; });
 }
 
+/* ===== 鏡頭與照片 ===== */
+function stopCam(){ if(cam.stream){ try{cam.stream.getTracks().forEach(function(t){t.stop();});}catch(e){} cam.stream=null; } cam.state="idle"; }
+function startCam(){
+  if(cam.state==="on"||cam.state==="starting") return;
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ cam.state="error"; paintCam(); return; }
+  cam.state="starting"; paintCam();
+  navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:false}).then(function(st){
+    if(S.step!==3||S.done){ st.getTracks().forEach(function(t){t.stop();}); cam.state="idle"; return; }
+    cam.stream=st; var v=document.getElementById("vid"); if(!v){ stopCam(); return; } v.srcObject=st;
+    return v.play().then(function(){ cam.state="on"; paintCam(); });
+  }).catch(function(){ cam.state="error"; paintCam(); });
+}
+function paintCam(){
+  var m=document.getElementById("camMsg"), btn=document.getElementById("snap"); if(!m) return;
+  if(cam.state==="on"){ m.style.display="none"; if(btn) btn.disabled=S.photos.length>=MAX_PHOTOS; }
+  else{ m.style.display="flex"; if(btn) btn.disabled=true;
+    m.innerHTML = cam.state==="starting"?'<div>鏡頭啟動中…<br><small>若畫面詢問是否允許使用鏡頭，請按「允許」</small></div>'
+      : '<div>無法使用機台鏡頭<br><small>可改用下方「從檔案選擇照片」，或不拍照直接下一步</small></div><button class="btn sec small" id="retryCam">重新啟動鏡頭</button>';
+    var r=document.getElementById("retryCam"); if(r) r.onclick=function(){ cam.state="idle"; startCam(); }; }
+}
+function canvasToB64(cv){
+  var q=0.75, d=cv.toDataURL("image/jpeg",q);
+  while(d.length>MAX_B64 && q>0.3){ q-=0.1; d=cv.toDataURL("image/jpeg",q); }
+  if(d.length>MAX_B64) return null;
+  return d;
+}
+function addPhotoFromSource(src,w,h){
+  if(S.photos.length>=MAX_PHOTOS) return false;
+  var sc=Math.min(1,LONG_EDGE/Math.max(w,h)), cw=Math.round(w*sc), ch=Math.round(h*sc);
+  var cv=document.createElement("canvas"); cv.width=cw; cv.height=ch; cv.getContext("2d").drawImage(src,0,0,cw,ch);
+  var d=canvasToB64(cv); if(!d) return false;
+  S.photos.push({url:d,b64:d.replace(/^data:image\/jpeg;base64,/,"")}); return true;
+}
+function snap(){
+  var v=document.getElementById("vid"); if(!v||cam.state!=="on"||!v.videoWidth) return;
+  if(addPhotoFromSource(v,v.videoWidth,v.videoHeight)){ paintThumbs(); paintCam(); }
+}
+function fromFile(f){
+  if(!f) return; var u=URL.createObjectURL(f), im=new Image();
+  im.onload=function(){ addPhotoFromSource(im,im.naturalWidth,im.naturalHeight); URL.revokeObjectURL(u); paintThumbs(); paintCam(); };
+  im.onerror=function(){ URL.revokeObjectURL(u); };
+  im.src=u;
+}
+document.getElementById("fileIn").onchange=function(e){ var fs=e.target.files; for(var i=0;i<fs.length&&S.photos.length<MAX_PHOTOS;i++) fromFile(fs[i]); e.target.value=""; };
+function paintThumbs(){
+  var box=document.getElementById("thumbs"); if(!box) return;
+  var h=S.photos.map(function(p,i){return '<div class="th"><img src="'+p.url+'" alt=""><button data-del="'+i+'">✕</button></div>';}).join("");
+  for(var i=S.photos.length;i<MAX_PHOTOS;i++) h+='<div class="th blank">'+(i+1)+'</div>';
+  box.innerHTML=h; var c=document.getElementById("pcount"); if(c) c.textContent=S.photos.length;
+  box.querySelectorAll("[data-del]").forEach(function(b){ b.onclick=function(){ S.photos.splice(+b.dataset.del,1); paintThumbs(); paintCam(); }; });
+}
+
+/* ===== 畫面 ===== */
+function stepsHtml(){ var t=["① 長輩與登記人","② 帶來的物品","③ 拍照","④ 確認送出"]; return '<div class="steps">'+t.map(function(x,i){var n=i+1;return '<div class="'+(S.step===n?'on':(S.step>n?'done':''))+'">'+x+'</div>';}).join("")+'</div>'; }
 function render(){
-  if(S.done) return renderDone();
-  var h = stepsHtml();
-  if(DRY) h += '<div class="banner">預覽模式：不會真的送出資料</div>';
-  if(S.step===1) h += step1(); else if(S.step===2) h += step2(); else h += step3();
-  $app.innerHTML = h;
-  bind();
+  if(S.done){ renderDone(); return; }
+  if(S.step!==3) stopCam();
+  var banner=MOCK?'<div class="banner">預覽模式：假資料，不會連線也不會送出</div>':'';
+  var m=S.step===1?step1():S.step===2?step2():S.step===3?step3():step4();
+  $app.innerHTML=stepsHtml()+'<div class="body">'+banner+m.body+'</div><div class="nav">'+m.nav+'</div>';
+  bind(); if(S.step===1){ paintSugg(); } if(S.step===3){ paintThumbs(); paintCam(); startCam(); }
 }
-
 function step1(){
-  return '<h1>請先填寫基本資料</h1><p class="sub">讓櫃檯人員知道這些物品是給哪一位長輩</p><div class="g2">'
-  + '<div class="field"><label>長輩的姓名 <span class="req">＊</span></label><input type="text" id="resident" value="'+esc(S.resident)+'" placeholder="例如：王小明" autocomplete="off"><div class="err">'+esc(S.err.resident||"")+'</div></div>'
-  + '<div class="field"><label>您的姓名 <span class="req">＊</span></label><input type="text" id="family" value="'+esc(S.family)+'" placeholder="例如：王大華" autocomplete="off"><div class="err">'+esc(S.err.family||"")+'</div></div>'
-  + '<div class="field"><label>您與長輩的關係 <span class="req">＊</span></label><div class="chips">'
-  + RELS.map(function(r){ return '<button type="button" class="chip'+(S.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>'; }).join("")
-  + '</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
-  + '<div class="field"><label>聯絡電話<span class="opt">（選填）</span></label><input type="tel" id="phone" value="'+esc(S.phone)+'" placeholder="例如：0912345678" autocomplete="off"></div></div>'
-  + '<div class="nav"><span></span><button class="btn main" id="next1">下一步 →</button></div>';
+  var left=S.resident?'<div class="picked"><b>'+esc(S.resident.name)+(S.resident.floor?'　<small style="font:500 1rem var(--sans);color:var(--muted)">'+esc(S.resident.floor)+'</small>':'')+'</b><button id="chg">更換長輩</button></div>'
+    :'<input type="text" id="q" value="'+esc(S.q)+'" placeholder="輸入長輩的姓名，例如：王小明" autocomplete="off"><div class="sugg" id="suggBox"></div><div class="smsg" id="suggMsg"></div>';
+  return { body:'<h1>請先填寫基本資料</h1><p class="sub">輸入長輩姓名並點選，讓櫃檯人員知道這些物品是給哪一位長輩</p><div class="two"><div class="panel"><div class="field"><label>長輩的姓名 <span class="req">＊</span></label>'+left+'<div class="err">'+esc(S.err.res||"")+'</div></div></div>'
+    +'<div class="panel"><div class="field"><label>您的姓名 <span class="req">＊</span></label><input type="text" id="family" value="'+esc(S.family)+'" placeholder="例如：王大華" autocomplete="off"><div class="err">'+esc(S.err.family||"")+'</div></div>'
+    +'<div class="field"><label>與長輩的關係 <span class="req">＊</span></label><div class="chips">'+RELS.map(function(r){return '<button type="button" class="chip'+(S.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
+    +'<div class="field"><label>聯絡電話<span class="opt">（選填）</span></label><input type="tel" id="phone" value="'+esc(S.phone)+'" placeholder="例如：0912345678" autocomplete="off"></div></div></div>',
+    nav:'<span class="hint"></span><button class="btn main" id="to2">下一步 →</button>' };
 }
-
 function step2(){
-  var tiles = COMMON.map(function(n){
-    var q=S.items[n]||0;
-    return '<div class="tile'+(q>0?' on':'')+'"><span class="nm">'+n+'</span><span class="stp">'
-      + (q>0?'<button type="button" data-dec="'+n+'">−</button><span class="q">'+q+'</span>':'')
-      + '<button type="button" class="add" data-inc="'+n+'">＋</button></span></div>';
-  }).join("");
-  var others = S.other.map(function(o,i){
-    return '<div class="tile on"><span class="nm">'+esc(o.name)+'</span><span class="stp"><span class="q">× '+o.qty+'</span><button type="button" data-rm="'+i+'">✕</button></span></div>';
-  }).join("");
-  var n=list().reduce(function(a,x){return a+x.qty;},0);
-  return '<h1>這次帶來哪些物品？</h1><p class="sub">點「＋」增加數量；沒有在清單裡的請填在下方「其他物品」</p>'
-  + '<div class="tiles">'+tiles+others+'</div>'
-  + '<div class="field" style="margin-top:26px"><label>其他物品<span class="opt">（清單裡沒有的）</span></label>'
-  + '<div class="other"><input type="text" id="oName" value="'+esc(S.oName)+'" placeholder="例如：輪椅坐墊" autocomplete="off">'
-  + '<span class="stp qty"><button type="button" id="oDec">−</button><span class="q">'+S.oQty+'</span><button type="button" class="add" id="oInc">＋</button></span>'
-  + '<button type="button" class="btn sec" id="oAdd" style="padding:16px 30px">加入</button></div><div class="err">'+esc(S.err.other||"")+'</div></div>'
-  + '<div class="picked">目前共選了 '+n+' 件</div><div class="err">'+esc(S.err.items||"")+'</div>'
-  + '<div class="nav"><button class="btn sec" id="prev">← 上一步</button><button class="btn main" id="next2">下一步 →</button></div>';
+  var list=S.tab==="item"?COMMON_ITEM:COMMON_CONS;
+  var tiles=list.map(function(n){ var q=qtyOf(S.tab,n); return '<div class="tile'+(q>0?' on':'')+'"><span class="nm">'+n+'</span><span class="stp">'+(q>0?'<button type="button" data-dec="'+n+'">−</button><span class="q">'+q+'</span>':'')+'<button type="button" class="add" data-inc="'+n+'">＋</button></span></div>'; }).join("");
+  var selHtml=S.sel.length?S.sel.map(function(x,i){return '<div class="row"><span><span class="k '+(x.kind==="item"?"i":"")+'">'+(x.kind==="item"?"用品":"消耗品")+'</span>'+esc(x.name)+'</span><span class="stp"><button type="button" data-sdec="'+i+'">−</button><span class="q">'+x.qty+'</span><button type="button" class="add" data-sinc="'+i+'">＋</button></span></div>';}).join(""):'<div class="empty">還沒有選擇物品<br>點左邊的「＋」加入</div>';
+  return { body:'<h1>這次帶來哪些物品？</h1><p class="sub">分成「用品」（衣物、日用品）和「消耗品」（衛生紙、尿布等）；沒有在清單裡的請填在「其他」</p><div class="two" style="grid-template-columns:2.1fr 1fr"><div class="panel"><div class="tabs"><button class="tab'+(S.tab==="item"?' on':'')+'" data-tab="item">用品</button><button class="tab'+(S.tab==="cons"?' on':'')+'" data-tab="cons">消耗品</button></div><div class="tiles">'+tiles+'</div>'
+    +'<div class="other"><input type="text" id="oName" value="'+esc(S.oName)+'" placeholder="其他'+(S.tab==="item"?'用品':'消耗品')+'，例如：'+(S.tab==="item"?'輪椅坐墊':'成人營養奶粉')+'" maxlength="20" autocomplete="off"><span class="stp"><button type="button" id="oDec">−</button><span class="q">'+S.oQty+'</span><button type="button" class="add" id="oInc">＋</button></span><button type="button" class="btn sec small" id="oAdd">加入</button></div><div class="err">'+esc(S.err.other||"")+'</div></div>'
+    +'<div class="panel sel"><h3>已選擇（共 '+totalQty()+' 件）</h3>'+selHtml+'<div class="err">'+esc(S.err.items||"")+'</div></div></div>',
+    nav:'<button class="btn sec" id="back">← 上一步</button><span class="hint"></span><button class="btn main" id="to3">下一步 →</button>' };
 }
-
 function step3(){
-  var items=list();
-  return '<h1>請確認後送出</h1><p class="sub">送出後請把物品交給櫃檯人員點收</p>'
-  + '<div class="sum"><div class="r"><span>長輩</span><span>'+esc(S.resident)+'</span></div>'
-  + '<div class="r"><span>登記人</span><span>'+esc(S.family)+'（'+esc(S.rel)+'）'+(S.phone?'　'+esc(S.phone):'')+'</span></div>'
-  + '<div class="r"><span>物品</span><span>'+items.map(function(x){return esc(x.name)+' × '+x.qty;}).join("、")+'</span></div></div>'
-  + '<div class="field"><label>備註<span class="opt">（選填，例如：需要標示姓名、易碎品）</span></label><textarea id="note" maxlength="200">'+esc(S.note)+'</textarea></div>'
-  + (S.sendErr?'<div class="err" style="font-size:24px;margin-bottom:12px">'+esc(S.sendErr)+'</div>':'')
-  + '<div class="nav"><button class="btn sec" id="prev"'+(S.sending?' disabled':'')+'>← 上一步</button><button class="btn main" id="send"'+(S.sending?' disabled':'')+'>'+(S.sending?'送出中…':'確認送出')+'</button></div>';
+  return { body:'<h1>請拍下帶來的物品</h1><p class="sub">把物品放在鏡頭前拍照（最多 '+MAX_PHOTOS+' 張，可以不拍直接下一步）。照片只供櫃檯人員核對物品。</p><div class="two" style="grid-template-columns:1.6fr 1fr"><div class="panel"><div class="cam"><video id="vid" playsinline muted></video><div class="msg" id="camMsg"></div></div>'
+    +'<div class="camBtns"><button class="btn main" id="snap" disabled>📷 拍照</button><button class="btn sec" id="pick">從檔案選擇照片</button></div></div>'
+    +'<div class="panel"><div style="font:900 1.35rem var(--serif);margin-bottom:.5rem">已拍 <span id="pcount">0</span> / '+MAX_PHOTOS+' 張</div><div class="thumbs" id="thumbs"></div></div></div>',
+    nav:'<button class="btn sec" id="back">← 上一步</button><span class="hint"></span><button class="btn main" id="to4">下一步 →</button>' };
 }
-
+function step4(){
+  var items=S.sel.map(function(x){return esc(x.name)+' × '+x.qty+(x.kind==="cons"?'（消耗品）':'');}).join("<br>");
+  return { body:'<h1>請確認後送出</h1><p class="sub">送出後會產生登記編號，請記下來，櫃檯人員會依編號點收</p><div class="two" style="grid-template-columns:1.3fr 1fr"><div><div class="sum"><div class="r"><span>長輩</span><span>'+esc(S.resident.name)+'</span></div><div class="r"><span>登記人</span><span>'+esc(S.family)+'（'+esc(S.rel)+'）'+(S.phone?'　'+esc(S.phone):'')+'</span></div><div class="r"><span>物品</span><span>'+items+'</span></div><div class="r"><span>照片</span><span>'+S.photos.length+' 張</span></div></div>'
+    +(S.sendErr?'<div class="alert">'+esc(S.sendErr)+'</div>':'')+'</div><div class="panel"><div class="field"><label>備註<span class="opt">（選填，例如：需要標示姓名）</span></label><textarea id="note" maxlength="200">'+esc(S.note)+'</textarea></div></div></div>',
+    nav:'<button class="btn sec" id="back"'+(S.sending?' disabled':'')+'>← 上一步</button><span class="hint"></span><button class="btn main" id="send"'+(S.sending?' disabled':'')+'>'+(S.sending?'送出中…':'確認送出')+'</button>' };
+}
 function renderDone(){
-  $app.innerHTML = '<div class="done"><div class="ok">✓</div><h1>登記完成，謝謝您！</h1>'
-  + '<p>請把物品交給櫃檯人員點收</p><p><b id="dc">15</b> 秒後自動回到首頁</p>'
-  + '<div style="margin-top:20px"><button class="btn main" id="goHome">回首頁</button> <button class="btn sec" id="again">再登記一位長輩</button></div></div>';
-  var n=15, t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
+  stopCam();
+  $app.innerHTML='<div class="body"><div class="done"><div class="ok">✓</div><h1>登記完成，謝謝您！</h1><p>您的登記編號</p><div class="code" id="codeBox">'+esc(S.code)+'</div><p>請記下編號（或用手機拍下這個畫面），櫃檯人員會依編號點收物品</p><p><b id="dc">20</b> 秒後自動回到首頁</p><div style="margin-top:.8rem"><button class="btn main" id="goHome">回首頁</button> <button class="btn sec" id="again">再登記一位長輩</button></div></div></div>';
+  var n=20,t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
   document.getElementById("goHome").onclick=function(){ clearInterval(t); home(); };
   document.getElementById("again").onclick=function(){ clearInterval(t); reset(); };
 }
-function home(){ try{ parent.postMessage({kiosk:"home"}, location.origin); }catch(e){} }
-function reset(){ S={ step:1, resident:"", family:"", rel:"", phone:"", items:{}, other:[], oName:"", oQty:1, note:"", err:{}, sending:false, done:false, sendErr:"" }; render(); window.scrollTo(0,0); }
+function home(){ stopCam(); try{ parent.postMessage({kiosk:"home"},location.origin); }catch(e){} }
+function reset(){ stopCam(); S=fresh(); render(); }
 
+/* ===== 互動 ===== */
 function keep(){ var g=function(id){var e=document.getElementById(id);return e?e.value:null;};
-  if(g("resident")!==null) S.resident=g("resident").trim(); if(g("family")!==null) S.family=g("family").trim();
-  if(g("phone")!==null) S.phone=g("phone").trim(); if(g("oName")!==null) S.oName=g("oName"); if(g("note")!==null) S.note=g("note"); }
-
+  if(g("family")!==null) S.family=g("family").trim(); if(g("phone")!==null) S.phone=g("phone").trim(); if(g("oName")!==null) S.oName=g("oName"); if(g("note")!==null) S.note=g("note"); if(g("q")!==null) S.q=g("q"); }
 function bind(){
-  var q=function(sel,fn){ [].forEach.call(document.querySelectorAll(sel),fn); };
+  var q=function(sel,fn){ document.querySelectorAll(sel).forEach(fn); }, on=function(id,fn){ var e=document.getElementById(id); if(e) e.onclick=fn; };
   q("[data-rel]",function(b){ b.onclick=function(){ keep(); S.rel=b.dataset.rel; S.err.rel=""; render(); }; });
-  q("[data-inc]",function(b){ b.onclick=function(){ keep(); var n=b.dataset.inc; S.items[n]=Math.min(99,(S.items[n]||0)+1); S.err.items=""; render(); }; });
-  q("[data-dec]",function(b){ b.onclick=function(){ keep(); var n=b.dataset.dec; S.items[n]=Math.max(0,(S.items[n]||0)-1); render(); }; });
-  q("[data-rm]",function(b){ b.onclick=function(){ keep(); S.other.splice(+b.dataset.rm,1); render(); }; });
-  var on=function(id,fn){ var e=document.getElementById(id); if(e) e.onclick=fn; };
-  on("next1",function(){ keep(); S.err={};
-    if(!S.resident) S.err.resident="請填寫長輩的姓名"; if(!S.family) S.err.family="請填寫您的姓名"; if(!S.rel) S.err.rel="請選擇您與長輩的關係";
-    if(S.err.resident||S.err.family||S.err.rel){ render(); return; } S.step=2; render(); window.scrollTo(0,0); });
-  on("prev",function(){ keep(); S.sendErr=""; S.step--; render(); window.scrollTo(0,0); });
-  on("oDec",function(){ keep(); S.oQty=Math.max(1,S.oQty-1); render(); });
-  on("oInc",function(){ keep(); S.oQty=Math.min(99,S.oQty+1); render(); });
-  on("oAdd",function(){ keep(); var n=(S.oName||"").trim(); if(!n){ S.err.other="請先填寫物品名稱"; render(); return; }
-    S.other.push({name:n.slice(0,40),qty:S.oQty}); S.oName=""; S.oQty=1; S.err.other=""; S.err.items=""; render(); });
-  on("next2",function(){ keep(); if(!list().length){ S.err.items="請至少選擇一項物品"; render(); return; } S.err.items=""; S.step=3; render(); window.scrollTo(0,0); });
+  q("[data-tab]",function(b){ b.onclick=function(){ keep(); S.tab=b.dataset.tab; S.oName=""; S.oQty=1; render(); }; });
+  q("[data-inc]",function(b){ b.onclick=function(){ keep(); setQty(S.tab,b.dataset.inc,qtyOf(S.tab,b.dataset.inc)+1); S.err.items=""; render(); }; });
+  q("[data-dec]",function(b){ b.onclick=function(){ keep(); setQty(S.tab,b.dataset.dec,qtyOf(S.tab,b.dataset.dec)-1); render(); }; });
+  q("[data-sinc]",function(b){ b.onclick=function(){ keep(); var x=S.sel[+b.dataset.sinc]; setQty(x.kind,x.name,x.qty+1); render(); }; });
+  q("[data-sdec]",function(b){ b.onclick=function(){ keep(); var x=S.sel[+b.dataset.sdec]; setQty(x.kind,x.name,x.qty-1); render(); }; });
+  var qi=document.getElementById("q"); if(qi){ qi.oninput=function(){ S.q=qi.value; doSuggest(); }; setTimeout(function(){ try{qi.focus();}catch(e){} },60); }
+  on("chg",function(){ keep(); S.resident=null; S.q=""; S.sugg=[]; S.suggState="idle"; render(); });
+  on("to2",function(){ keep(); S.err={}; if(!S.resident) S.err.res="請輸入長輩姓名並點選下方的建議"; if(!S.family) S.err.family="請填寫您的姓名"; if(!S.rel) S.err.rel="請選擇與長輩的關係";
+    if(S.err.res||S.err.family||S.err.rel){ render(); return; } S.step=2; render(); });
+  on("back",function(){ keep(); S.sendErr=""; S.step--; render(); });
+  on("oDec",function(){ keep(); S.oQty=Math.max(1,S.oQty-1); render(); }); on("oInc",function(){ keep(); S.oQty=Math.min(99,S.oQty+1); render(); });
+  on("oAdd",function(){ keep(); var n=(S.oName||"").trim().slice(0,20); if(!n){ S.err.other="請先填寫物品名稱"; render(); return; } setQty(S.tab,n,qtyOf(S.tab,n)+S.oQty); S.oName=""; S.oQty=1; S.err.other=""; S.err.items=""; render(); });
+  on("to3",function(){ keep(); if(!S.sel.length){ S.err.items="請至少選擇一項物品"; render(); return; } S.step=3; render(); });
+  on("snap",snap); on("pick",function(){ document.getElementById("fileIn").click(); });
+  on("to4",function(){ stopCam(); S.step=4; render(); });
   on("send",send);
 }
 
+/* ===== 送出（不自動重試，避免重複登記）===== */
 async function send(){
-  keep(); if(S.sending) return;
-  S.sending=true; S.sendErr=""; render();
-  var data={ residentName:S.resident, familyName:S.family, relation:S.rel, phone:S.phone, items:list(), note:S.note.trim() };
+  keep(); if(S.sending) return; S.sending=true; S.sendErr=""; render();
+  var data={ residentId:S.resident.id, residentName:S.resident.name, familyName:S.family, relation:S.rel, phone:S.phone,
+    items:S.sel.map(function(x){return {kind:x.kind==="cons"?"consumable":"item",name:x.name,qty:x.qty};}), note:S.note.trim(),
+    photos:S.photos.map(function(p){return {data:p.b64,label:""};}) };
   try{
-    if(DRY){ await new Promise(function(r){setTimeout(r,600);}); }
+    if(MOCK){ await new Promise(function(r){setTimeout(r,700);}); S.code="D20261019-001"; }
     else{
-      var ctl=new AbortController(), to=setTimeout(function(){ctl.abort();},45000);
+      var ctl=new AbortController(), to=setTimeout(function(){ctl.abort();},60000);
       var res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action:"familyDropoff",data:data}),signal:ctl.signal});
-      clearTimeout(to);
-      var j=await res.json();
-      if(!j||!j.ok) throw new Error((j&&j.error)||"server");
+      clearTimeout(to); var j=await res.json();
+      if(!j||!j.ok){ var er=new Error((j&&j.error)||"server"); er.server=true; throw er; }
+      S.code=j.id||"";
     }
     S.done=true; S.sending=false; render();
   }catch(e){
     S.sending=false;
-    S.sendErr="登記沒有成功，資料還在，請再按一次「確認送出」；若仍失敗請洽櫃檯人員協助。";
+    if(e&&e.server){ S.sendErr = e.message==="invalid" ? "資料不完整，請檢查長輩姓名與物品後再送出。" : e.message==="busy" ? "目前使用人數較多或今日登記已達上限，請稍後再試，或洽櫃檯人員協助。" : "登記沒有成功，資料還在，請再按一次「確認送出」；若仍失敗請洽櫃檯人員協助。"; }
+    else S.sendErr="網路沒有回應，登記「可能已經送出」。請先洽櫃檯人員確認，避免重複登記。";
     render();
   }
 }
