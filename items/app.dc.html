@@ -365,6 +365,13 @@ input,select,button,textarea{font-family:inherit}
                   <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
                 </div>
               </sc-if>
+              <button type="button" onClick="{{ goDropoff }}" style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(92,154,69,.4);background:#F4FAEE;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#E3F0D5">
+                <span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:2px">
+                  <span style="font-size:14px;font-weight:600;color:#3E7530">家屬寄放待點收 {{ dropoffBadge }}</span>
+                  <span style="font-size:11.5px;color:#6A6E62">機台家屬登記的物品，點收後轉入住民清單</span>
+                </span>
+                <span style="flex:none;font-size:12px;color:#4E8C3C">前往 ›</span>
+              </button>
               <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="搜尋床號或姓名" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
               <div style="display:flex;align-items:baseline;justify-content:space-between">
                 <div style="display:flex;align-items:center;gap:8px">
@@ -796,6 +803,59 @@ input,select,button,textarea{font-family:inherit}
             </div>
           </sc-if>
 
+          <sc-if value="{{ isDropoff }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div style="font-size:12.5px;line-height:1.6;color:#45483F">家屬在機台登記、自己拍照帶來的物品。核對實物與照片後，用「帶入新增清單」轉成該住民的正式清單（照片一起轉入），或「標記已點收／退件」。</div>
+              <sc-if value="{{ dropoffLoading }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:#8A8E80">讀取中…</div>
+              </sc-if>
+              <sc-if value="{{ hasDropoffErr }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:11px;border:1px solid #B4553C;background:#FBEEE9;font-size:12.5px;line-height:1.6;color:#8F3F2C;border-radius:10px">{{ dropoffErrMsg }}</div>
+              </sc-if>
+              <sc-if value="{{ noDropoff }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">目前沒有待點收的家屬寄放</div>
+              </sc-if>
+              <sc-for list="{{ dropoffItems }}" as="it" hint-placeholder-count="0">
+                <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                  <div style="display:flex;align-items:baseline;gap:8px">
+                    <span style="flex:1;min-width:0;font-size:15px;font-weight:600">{{ it.residentLabel }}</span>
+                    <span style="flex:none;font-size:11px;color:{{ it.bedFg }}">{{ it.bedLabel }}</span>
+                  </div>
+                  <span style="font-size:13px;color:#3F443C">{{ it.family }}</span>
+                  <span style="font-size:13.5px;line-height:1.55;color:#1F2320">{{ it.itemText }}</span>
+                  <sc-if value="{{ it.hasNote }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size:12.5px;color:#6A6E62">備註：{{ it.note }}</span>
+                  </sc-if>
+                  <span style="font-size:11px;color:#8A8E80">{{ it.meta }}</span>
+                  <sc-if value="{{ it.hasThumbs }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+                      <sc-for list="{{ it.thumbs }}" as="ph" hint-placeholder-count="0">
+                        <button type="button" onClick="{{ ph.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ ph.img }}</button>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <sc-if value="{{ it.hasItems }}" hint-placeholder-val="{{ false }}">
+                      <button type="button" onClick="{{ it.take }}" style="padding:8px 13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">帶入新增清單</button>
+                    </sc-if>
+                    <button type="button" onClick="{{ it.askConfirm }}" style="padding:8px 13px;border:1px solid rgba(92,154,69,.5);background:#F4FAEE;color:#3E7530;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5">標記已點收</button>
+                    <button type="button" onClick="{{ it.askReject }}" style="padding:8px 13px;border:1px solid rgba(196,85,47,.5);background:transparent;color:#A8431F;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC">退件</button>
+                  </div>
+                  <sc-if value="{{ it.acting }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(31,35,32,.2);background:#F1F0E8;border-radius:10px">
+                      <span style="font-size:12.5px;line-height:1.55;color:#45483F">{{ it.actMsg }}</span>
+                      <input value="{{ dropoffReceiver }}" onChange="{{ onDropoffReceiver }}" placeholder="點收人，例：黃俐穎" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                      <div style="display:flex;gap:6px">
+                        <button type="button" onClick="{{ it.doAct }}" style="padding:7px 13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">{{ it.actBtn }}</button>
+                        <button type="button" onClick="{{ it.cancelAct }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px">取消</button>
+                      </div>
+                    </div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+
         </div>
 
         <div style="flex:none;border-top:1px solid rgba(31,35,32,.16);padding:12px 16px;display:{{ ctaDisplay }};gap:8px;background:#F1F0E8">
@@ -880,7 +940,10 @@ class Component extends DCLogic {
     fileNameEdited: null,
     draft: null,
     residents: [],
-    photos: []
+    photos: [],
+    // 機台家屬寄放・員工點收
+    dropoffs: [], dropoffState: '', dropoffError: '', dropoffReceiver: '',
+    dropoffActId: '', dropoffActMode: '', fromDropoff: null
   };
 
   today() {
@@ -1403,6 +1466,66 @@ class Component extends DCLogic {
     }
   }
 
+  // ── 機台家屬寄放・員工點收 ──
+  async loadDropoffs(force) {
+    if (this.state.dropoffState === 'loading') return;
+    if (!force && this.state.dropoffState === 'ok' && (this.state.dropoffs || []).length) { /* 仍重抓以保最新 */ }
+    this.setState({dropoffState: 'loading'});
+    try {
+      const drive = await this.lib('DriveLib');
+      const rows = await drive.loadDropoffs({endpoint: this.endpoint(), rootFolderId: this.root()});
+      this.setState({dropoffs: rows, dropoffState: 'ok'});
+    } catch (e) {
+      this.setState({dropoffState: 'error', dropoffError: String(e.message || e)});
+    }
+  }
+
+  // 「帶入新增清單」：把家屬寄放的用品與照片預填進一般新增流程；存檔成功會自動標記已點收
+  async takeDropoff(row) {
+    const drive = await this.lib('DriveLib');
+    let photos = [];
+    try {
+      photos = await drive.loadDropoffPhotos({endpoint: this.endpoint(), rootFolderId: this.root(), id: row.id});
+    } catch (e) { this.flash('讀取家屬照片失敗，仍可繼續（照片之後補拍）：' + (e.message || e)); }
+    const its = (row.items || []).filter(it => it.kind !== 'consumable')
+      .map(it => ({name: it.name, qty: Math.max(1, Number(it.qty) || 1), unit: UNIT[it.name] || '個'}));
+    const m = /[（(]\s*([^）)]+?)\s*[）)]/.exec(String(row.residentName || ''));
+    const draft = this.newDraft(null);
+    draft.name = String(row.residentName || '').replace(/[（(][^）)]*[）)]/g, '').trim() || String(row.residentName || '');
+    draft.en = m ? m[1].trim() : '';
+    draft.bed = (row.matchedBed && row.matchedBed !== '未比對') ? this.normBed(row.matchedBed) : '';
+    draft.items = its;
+    const hasConsum = (row.items || []).some(it => it.kind === 'consumable');
+    this.setState({
+      draft: draft, photos: (photos || []).map(p => ({url: p.url, tag: '__all'})),
+      fileNameEdited: null, screen: 'basic', rosterSel: '', dupIdx: -1, dupBed: '', dupOldBed: '',
+      fromDropoff: {rowId: row.rowId, id: row.id, hasConsum: hasConsum}
+    });
+    this.ensureRoster();
+    if (hasConsum) this.flash('此筆另含消耗品，請完成用品後，再用「消耗品及食品」登記並補效期');
+  }
+
+  async confirmDropoffRow(row) {
+    const who = String(this.state.dropoffReceiver || '').trim();
+    if (!who) { this.flash('請先填點收人'); return; }
+    try {
+      const drive = await this.lib('DriveLib');
+      await drive.confirmDropoff({endpoint: this.endpoint(), rootFolderId: this.root(), rowId: row.rowId, id: row.id, receiver: who});
+      this.setState(st => ({dropoffActId: '', dropoffActMode: '', dropoffs: (st.dropoffs || []).filter(x => x.id !== row.id)}));
+      this.flash('已標記點收：' + row.residentName);
+    } catch (e) { this.flash('點收失敗：' + (e.message || e)); }
+  }
+
+  async rejectDropoffRow(row) {
+    const who = String(this.state.dropoffReceiver || '').trim();
+    try {
+      const drive = await this.lib('DriveLib');
+      await drive.rejectDropoff({endpoint: this.endpoint(), rootFolderId: this.root(), rowId: row.rowId, id: row.id, receiver: who, reason: ''});
+      this.setState(st => ({dropoffActId: '', dropoffActMode: '', dropoffs: (st.dropoffs || []).filter(x => x.id !== row.id)}));
+      this.flash('已退件：' + row.residentName);
+    } catch (e) { this.flash('退件失敗：' + (e.message || e)); }
+  }
+
   async delConsum(rowId) {
     try {
       const drive = await this.lib('DriveLib');
@@ -1596,6 +1719,8 @@ class Component extends DCLogic {
       this.setState({dbState: 'error', dbError: String(e.message || e)});
       this.flash('雲端連線失敗：' + (e.message || e));
     }
+    // 背景抓家屬寄放待點收數，讓首頁按鈕顯示數量（失敗不打擾）
+    this.loadDropoffs();
   }
 
   // 把一位住民寫回雲端資料庫（示範資料不寫）
@@ -1700,6 +1825,17 @@ class Component extends DCLogic {
       else { const s2 = this.state; await this.syncResident(rec || s2.residents[s2.cur]); }
       this.dropPending(d.bed, d.name);
       this.flash('已存進雲端硬碟：' + d.bed + ' ' + d.name);
+      // 若此次是從「家屬寄放」帶入的，存檔成功就自動標記已點收、清掉暫存照片
+      const fd = this.state.fromDropoff;
+      if (fd) {
+        this.setState({fromDropoff: null});
+        try {
+          await drive.confirmDropoff({endpoint: this.endpoint(), rootFolderId: this.root(),
+            rowId: fd.rowId, id: fd.id, receiver: d.receiverName || ''});
+          this.setState(st => ({dropoffs: (st.dropoffs || []).filter(x => x.id !== fd.id)}));
+          this.flash('家屬寄放已點收並轉入清單' + (fd.hasConsum ? '（此筆另含消耗品，請再用消耗品登記補效期）' : ''));
+        } catch (e) { this.flash('已存檔，但家屬寄放點收標記失敗，請到待點收手動標記'); }
+      }
     } catch (e) {
       // 上傳失敗：進待補上傳清單（首頁會一直顯示，不會被吃掉）
       this.addPending({bed: d.bed, name: d.name, fileName: name, draft: d,
@@ -1804,7 +1940,8 @@ class Component extends DCLogic {
       preview: ['文件預覽', '與 Word 版面一致'],
       done: ['完成', '已存入雲端硬碟'],
       resident: [cur ? cur.name + ' 的物品' : '住民物品', '資料庫即時增減'],
-      ret: ['退住歸還核對', '逐項核對 · 記錄點收人']
+      ret: ['退住歸還核對', '逐項核對 · 記錄點收人'],
+      dropoff: ['家屬寄放待點收', '機台家屬登記 · 待行政點收']
     };
     const steps = {basic: 'STEP 1/4', items: 'STEP 2/4', photos: 'STEP 3/4', preview: 'STEP 4/4'};
     const t = titles[scr] || titles.home;
@@ -1834,7 +1971,8 @@ class Component extends DCLogic {
       resident: (cur && cur.left && (cur.items || []).length > 0)
         ? ['繼續清點歸還', () => { this.setState({screen: 'ret', returned: {}}); this.ensurePhotos(this.state.cur, true); }]
         : ['以此住民新增清單', () => { this.setState({draft: this.newDraft(cur), photos: [], fileNameEdited: null, screen: 'basic'}); }],
-      ret: ['完成退住並封存', () => this.finishLeave()]
+      ret: ['完成退住並封存', () => this.finishLeave()],
+      dropoff: ['↻ 重新整理', () => this.loadDropoffs(true)]
     }[scr] || ['繼續', () => {}];
 
     const secondary = {
@@ -1854,7 +1992,8 @@ class Component extends DCLogic {
       preview: ['上一步', () => this.go('photos')],
       done: ['看物品紀錄', () => { this.go('resident'); this.ensurePhotos(this.state.cur); }],
       resident: ['退住核對', () => { this.setState({screen: 'ret', returned: {}}); this.ensurePhotos(this.state.cur, true); }],
-      ret: ['返回', () => this.go('resident')]
+      ret: ['返回', () => this.go('resident')],
+      dropoff: ['返回住民清單', () => this.go('home')]
     }[scr] || ['返回', () => this.go('home')];
 
     const q = s.query.trim();
@@ -1887,8 +2026,8 @@ class Component extends DCLogic {
       title: t[0], subtitle: t[1], stepLabel: steps[scr] || '',
       isHome: scr === 'home', isBasic: scr === 'basic', isItems: scr === 'items',
       isPhotos: scr === 'photos', isPreview: scr === 'preview', isDone: scr === 'done',
-      isResident: scr === 'resident', isReturn: scr === 'ret',
-      back: () => this.go({hub: 'hub', home: 'hub', cHome: 'hub', cNew: 'cHome', cPhotos: 'cNew', cDone: 'cPhotos', ret: 'resident'}[scr] || 'home'),
+      isResident: scr === 'resident', isReturn: scr === 'ret', isDropoff: scr === 'dropoff',
+      back: () => this.go({hub: 'hub', home: 'hub', cHome: 'hub', cNew: 'cHome', cPhotos: 'cNew', cDone: 'cPhotos', ret: 'resident', dropoff: 'home'}[scr] || 'home'),
       goHub: () => this.go('hub'),
       isHub: scr === 'hub', isCHome: scr === 'cHome', isCNew: scr === 'cNew',
       isCPhotos: scr === 'cPhotos', isCDone: scr === 'cDone',
@@ -2285,7 +2424,45 @@ class Component extends DCLogic {
       }),
       returnedCount: returnedCount, returnTotal: cur ? cur.items.length : 0,
       returnTo: s.returnTo, onReturnTo: (e) => this.setState({returnTo: e.target.value}),
-      returnBy: s.returnBy, onReturnBy: (e) => this.setState({returnBy: e.target.value})
+      returnBy: s.returnBy, onReturnBy: (e) => this.setState({returnBy: e.target.value}),
+
+      // ── 機台家屬寄放・員工點收 ──
+      goDropoff: () => { this.go('dropoff'); this.loadDropoffs(); },
+      dropoffBadge: s.dropoffs.length ? '（' + s.dropoffs.length + '）' : '',
+      dropoffLoading: s.dropoffState === 'loading',
+      hasDropoffErr: s.dropoffState === 'error',
+      dropoffErrMsg: '家屬寄放讀取失敗：' + s.dropoffError,
+      noDropoff: s.dropoffState === 'ok' && s.dropoffs.length === 0,
+      dropoffReceiver: s.dropoffReceiver,
+      onDropoffReceiver: (e) => this.setState({dropoffReceiver: e.target.value}),
+      dropoffItems: (s.dropoffs || []).map(r => {
+        const matched = r.matchedBed && r.matchedBed !== '未比對';
+        return {
+          residentLabel: r.residentName,
+          bedLabel: matched ? r.matchedBed : '未比對',
+          bedFg: matched ? '#3E7530' : '#A8431F',
+          family: r.familyName + (r.relation ? '（' + r.relation + '）' : '') + (r.phone ? ' · ' + r.phone : ''),
+          itemText: r.itemText || '—',
+          hasNote: !!String(r.note || '').trim(), note: r.note,
+          meta: r.time + ' · ' + r.id,
+          hasThumbs: (r.thumbs || []).length > 0,
+          thumbs: (r.thumbs || []).map(url => ({
+            img: React.createElement('img', {src: url, alt: '', style: {width: '100%', height: 72, objectFit: 'cover', display: 'block'}}),
+            view: () => this.setState({viewer: url})
+          })),
+          hasItems: (r.items || []).some(it => it.kind !== 'consumable'),
+          take: () => this.takeDropoff(r),
+          askConfirm: () => this.setState({dropoffActId: r.id, dropoffActMode: 'confirm'}),
+          askReject: () => this.setState({dropoffActId: r.id, dropoffActMode: 'reject'}),
+          acting: s.dropoffActId === r.id,
+          actMsg: s.dropoffActMode === 'reject'
+            ? '退件後這批家屬寄放會標為「退件」，暫存照片一併清除。'
+            : '標記已點收後會從待點收移除、暫存照片清除（若尚未轉入正式清單，請先用「帶入新增清單」）。',
+          actBtn: s.dropoffActMode === 'reject' ? '確定退件' : '確定已點收',
+          doAct: () => (s.dropoffActMode === 'reject' ? this.rejectDropoffRow(r) : this.confirmDropoffRow(r)),
+          cancelAct: () => this.setState({dropoffActId: '', dropoffActMode: ''})
+        };
+      })
     };
   }
 }

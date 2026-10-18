@@ -201,7 +201,9 @@
 
   // ── 網路：POST text/plain（避開 CORS preflight），逾時重試一次 ──
   function api(payload){
-    payload = Object.assign({ rootFolderId: ROOT }, payload);
+    // 員工通行碼：後端 ITEMS_PW 有設時，每個 action 都要帶 pwd（入口網登入的 handover_code）
+    var pwd=''; try{ pwd = localStorage.getItem('handover_code')||''; }catch(e){}
+    payload = Object.assign({ rootFolderId: ROOT, pwd: pwd }, payload);
     var attempt = function(n){
       var ctrl = ('AbortController' in window) ? new AbortController() : null;
       var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 45000) : null;
@@ -214,7 +216,11 @@
         return r.text();
       }).then(function(txt){
         var o; try{ o=JSON.parse(txt); }catch(e){ throw new Error('雲端回應異常'); }
-        if(o && o.error) throw new Error(o.error);
+        if(o && o.error){
+          if(o.error==='unauthorized') throw new Error('未授權：請回入口網站重新登入');
+          if(o.error==='busy') throw new Error('系統忙碌中，請稍後再試');
+          throw new Error(o.error);
+        }
         return o;
       }).catch(function(e){
         if(timer) clearTimeout(timer);

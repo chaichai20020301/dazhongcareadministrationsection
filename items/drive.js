@@ -19,13 +19,23 @@ const once = async (endpoint, payload, ms) => {
     let out;
     try { out = JSON.parse(text); }
     catch (e) { throw new Error('雲端回應異常（可能要重新授權 Apps Script）'); }
-    if (out.error) throw new Error(out.error);
+    if (out.error) {
+      // 把後端的機器碼錯誤轉成白話，避免員工看到英文或白畫面
+      if (out.error === 'unauthorized') throw new Error('未授權：請回入口網站重新登入（需要員工通行碼）');
+      if (out.error === 'busy') throw new Error('系統忙碌中，請稍後再試');
+      throw new Error(out.error);
+    }
     return out;
   } finally { if (timer) clearTimeout(timer); }
 };
 
 const post = async (endpoint, payload) => {
   if (!endpoint) throw new Error('尚未設定 Apps Script 網址');
+  // 員工通行碼：後端 ITEMS_PW 有設時，所有員工 action 都要帶 pwd（取入口網登入的 handover_code）
+  try {
+    const code = (typeof localStorage !== 'undefined' && localStorage.getItem('handover_code')) || '';
+    payload = Object.assign({ pwd: code }, payload);
+  } catch (e) {}
   const ms = payload && payload.data ? 120000 : 45000;
   let last;
   for (let i = 0; i < 3; i++) {
@@ -124,8 +134,29 @@ async function renameFolder({ endpoint, rootFolderId, bed, name }) {
   return post(endpoint, { action: 'rename', rootFolderId, bed, resident: name });
 }
 
+// ── 機台家屬寄放・員工點收 ──
+async function loadDropoffs({ endpoint, rootFolderId }) {
+  const out = await post(endpoint, { action: 'dropoffLoad', rootFolderId });
+  return (out.rows || []).map(r => Object.assign({}, r, {
+    thumbs: (r.thumbs || []).map(t => 'data:' + (t.mime || 'image/jpeg') + ';base64,' + t.data)
+  }));
+}
+async function loadDropoffPhotos({ endpoint, rootFolderId, id }) {
+  const out = await post(endpoint, { action: 'dropoffPhotos', rootFolderId, id });
+  return (out.photos || []).map(p => ({
+    url: 'data:' + (p.mime || 'image/jpeg') + ';base64,' + p.data, tag: '__all'
+  }));
+}
+async function confirmDropoff({ endpoint, rootFolderId, rowId, id, receiver }) {
+  return post(endpoint, { action: 'dropoffConfirm', rootFolderId, rowId, id, receiver });
+}
+async function rejectDropoff({ endpoint, rootFolderId, rowId, id, receiver, reason }) {
+  return post(endpoint, { action: 'dropoffReject', rootFolderId, rowId, id, receiver, reason });
+}
+
 window.DriveLib = { saveToDrive, loadPhotos, loadRoster,
   saveConsumable, loadConsumables, markConsumDone, deleteConsumable, loadConsumPhotos,
-  renumberPhotos, loadResidents, saveResident, archiveResident, renameFolder };
+  renumberPhotos, loadResidents, saveResident, archiveResident, renameFolder,
+  loadDropoffs, loadDropoffPhotos, confirmDropoff, rejectDropoff };
 
 })();
