@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>員工教育訓練系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:99999;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><img src="../kiosk/logo.png" alt="線東大眾護理之家" style="height:28px;width:auto;display:block;flex:none"><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 15px/1 'Noto Serif TC',serif;color:#1c6b48;letter-spacing:1px">線東大眾護理之家</span></div>
+
+<div class="wrap">
+  <div id="demoBanner" class="demo hide">示範模式：尚未連接後端，資料只存在這台瀏覽器。部署後端後，把 <code>common.js</code> 最上面的 <code>TRAIN_API</code> 填上網址即可。</div>
+  <div class="head"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><h1>員工教育訓練系統</h1><span class="sp"></span><span class="who" id="who"></span></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"><p class="muted">載入中…</p></div>
+</div>
+<script src="common.js"></script>
+<script src="tree.js"></script>
+<script>
+function render() {
+  $("view").innerHTML = heroHtml(ME, true) +
+    '<div class="legend"><span><i class="dot open"></i>可挑戰</span><span><i class="dot done"></i>已完成</span><span><i class="dot awaiting"></i>待主管簽核</span><span><i class="dot locked"></i>未解鎖（先完成前置技能）</span></div>' + treeHtml(ME, false);
+  afterTree();
+  if (!window.__first) { window.__first = true; checkLevelUps(); }
+}
+boot(render, { active: "learn" });
+</script>
+</body>
+</html>

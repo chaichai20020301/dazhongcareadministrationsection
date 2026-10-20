@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>教育訓練 · 編輯</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:99999;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><img src="../../kiosk/logo.png" alt="線東大眾護理之家" style="height:28px;width:auto;display:block;flex:none"><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 15px/1 'Noto Serif TC',serif;color:#1c6b48;letter-spacing:1px">線東大眾護理之家</span></div>
+
+<div class="wrap">
+  <div id="demoBanner" class="demo hide">示範模式：尚未連接後端，資料只存在這台瀏覽器。</div>
+  <div class="head"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><h1>教育訓練 · 編輯</h1><span class="sp"></span><span class="who" id="who"></span></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"><p class="muted">載入中…</p></div>
+</div>
+<script src="../common.js"></script>
+
+<script>
+var ICON_LABELS = { home: "房屋", shield: "盾牌", clipboard: "清單", folder: "資料夾", banknote: "費用", phone: "電話", flame: "火", droplet: "水滴", book: "書本", star: "星星", flag: "旗幟", award: "獎章", heart: "愛心", leaf: "葉子", sun: "太陽", bolt: "閃電", target: "目標", link: "連結", crown: "皇冠", cap: "學士帽", users: "人員", wrench: "工具", bed: "床", pill: "藥丸", user: "人像" };
+function iconSelect(id, cur) {
+  var h = '<select id="' + id + '">';
+  if (cur && !ICONS[cur]) h += '<option value="' + esc(cur) + '" selected>' + esc(cur) + "（原圖示）</option>";
+  Object.keys(ICON_LABELS).forEach(function (k) { h += '<option value="' + k + '"' + (k === cur ? " selected" : "") + ">" + ICON_LABELS[k] + "</option>"; });
+  return h + "</select>";
+}
+function render() {
+  var h = '<div class="row" style="margin-bottom:12px"><button class="btn pri" onclick="editTrack(\'\')">＋ 新增職能</button></div>';
+  h += DB.tracks.slice().sort(function (a, b) { return a.sort - b.sort; }).map(function (t) {
+    return '<div class="card"><div class="trackhead"><span class="ico">' + iconOr(t.icon, 28, "star") + "</span><h2>" + esc(t.name) + '</h2><span style="flex:1"></span><button class="btn sm" onclick="editTrack(\'' + t.id + '\')">編輯職能</button></div>' +
+      '<h3 class="sec" style="margin-top:14px">等級與門檻 <button class="btn sm" onclick="editLevel(\'\',\'' + t.id + '\')">＋ 等級</button></h3>' +
+      (trackLevels(t.id).map(function (l) { return '<div class="row" style="margin:4px 0"><span class="badge">' + esc(l.name) + '</span><span class="muted">累積 ' + l.threshold + " 點</span><button class=\"btn sm\" onclick=\"editLevel('" + l.id + "','" + t.id + "')\">編輯</button></div>"; }).join("") || '<span class="muted">尚無等級</span>') +
+      '<h3 class="sec" style="margin-top:14px">技能 <button class="btn sm" onclick="editSkill(\'\',\'' + t.id + '\')">＋ 技能</button></h3>' +
+      '<div class="scroll"><table>' + DB.skills.filter(function (s) { return s.trackId === t.id; }).sort(function (a, b) { return a.sort - b.sort; }).map(function (s) {
+        var l = DB.levels.find(function (x) { return x.id === s.levelId; }), pre = DB.skills.find(function (x) { return x.id === s.prereq; });
+        return "<tr><td>" + iconOr(s.icon, 20, "book") + " <b>" + esc(s.name) + "</b></td><td>" + (l ? esc(l.name) : "—") + "</td><td>" + s.points + " 點</td><td>" + (s.questions || []).length + " 題</td><td>" + (pre ? "需先完成：" + esc(pre.name) : "") + "</td><td>" + (s.required ? "必修 " : "") + (s.practical ? "需簽核" : "") + "</td><td><button class=\"btn sm\" onclick=\"editSkill('" + s.id + "','" + t.id + "')\">編輯</button></td></tr>";
+      }).join("") + "</table></div></div>";
+  }).join("");
+  $("view").innerHTML = h;
+}
+function editTrack(id) {
+  var t = id ? DB.tracks.find(function (x) { return x.id === id; }) : { id: "", name: "", icon: "star", sort: DB.tracks.length + 1 };
+  modal("<h2>" + (id ? "編輯職能" : "新增職能") + '</h2><label class="f">名稱（例：新入住作業）</label><input type="text" id="f_name" value="' + esc(t.name) + '"><label class="f">圖示</label>' + iconSelect("f_icon", t.icon) + '<label class="f">排序</label><input type="number" id="f_sort" value="' + t.sort + '">' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveTrack(\'' + id + '\')">儲存</button>' + (id ? '<button class="btn bad" onclick="delItem(\'職能\',\'' + id + '\',\'此職能底下的等級與技能也會一併刪除\')">刪除</button>' : "") + '<button class="btn" onclick="closeModal()">取消</button></div>');
+}
+async function saveTrack(id) {
+  var n = $("f_name").value.trim(); if (!n) { toast("請填名稱"); return; }
+  await saveRow("職能", { id: id || uid("T"), name: n, icon: $("f_icon").value || "star", sort: Number($("f_sort").value) || 0 });
+}
+function editLevel(id, trackId) {
+  var l = id ? DB.levels.find(function (x) { return x.id === id; }) : { id: "", trackId: trackId, name: "", threshold: 10 };
+  modal("<h2>" + (id ? "編輯等級" : "新增等級") + '</h2><label class="f">等級名稱（例：新入住 1級）</label><input type="text" id="f_name" value="' + esc(l.name) + '"><label class="f">累積技能點門檻（此職能內）</label><input type="number" id="f_th" value="' + l.threshold + '">' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveLevel(\'' + id + '\',\'' + l.trackId + '\')">儲存</button>' + (id ? '<button class="btn bad" onclick="delItem(\'等級\',\'' + id + '\',\'\')">刪除</button>' : "") + '<button class="btn" onclick="closeModal()">取消</button></div>');
+}
+async function saveLevel(id, trackId) {
+  var n = $("f_name").value.trim(); if (!n) { toast("請填名稱"); return; }
+  await saveRow("等級", { id: id || uid("L"), trackId: trackId, name: n, threshold: Number($("f_th").value) || 0 });
+}
+function fmtQ(arr) { return (arr || []).map(function (q) { return q.q + "\n" + q.o.map(function (o, j) { return String.fromCharCode(65 + j) + ". " + o; }).join("\n") + "\n答案：" + String.fromCharCode(65 + Number(q.a)); }).join("\n\n"); }
+function parseQ(t) {
+  return t.split(/\n\s*\n/).map(function (b) {
+    var q = [], o = [], a = null;
+    b.split("\n").map(function (x) { return x.trim(); }).filter(Boolean).forEach(function (l) {
+      var m;
+      if ((m = l.match(/^(?:答案|ans(?:wer)?)\s*[:：]\s*([A-Ha-h])/i))) a = m[1].toUpperCase().charCodeAt(0) - 65;
+      else if ((m = l.match(/^([A-Ha-h])[\.\、\)）]\s*(.+)/))) o.push(m[2]);
+      else q.push(l);
+    });
+    return o.length >= 2 && a !== null && a < o.length && q.length ? { q: q.join(" "), o: o, a: a } : null;
+  }).filter(Boolean);
+}
+function editSkill(id, trackId) {
+  var s = id ? DB.skills.find(function (x) { return x.id === id; }) : { id: "", trackId: trackId, levelId: "", name: "", icon: "book", points: 5, required: false, dueDays: 0, practical: false, passScore: 80, prereq: "", desc: "", materials: [], questions: [], sort: DB.skills.length + 1 };
+  var lvOpts = '<option value="">（不屬於特定等級）</option>' + trackLevels(s.trackId).map(function (l) { return '<option value="' + l.id + '"' + (l.id === s.levelId ? " selected" : "") + ">" + esc(l.name) + "</option>"; }).join("");
+  var preOpts = '<option value="">（無）</option>' + DB.skills.filter(function (x) { return x.trackId === s.trackId && x.id !== s.id; }).map(function (x) { return '<option value="' + x.id + '"' + (x.id === s.prereq ? " selected" : "") + ">" + esc(x.name) + "</option>"; }).join("");
+  modal("<h2>" + (id ? "編輯技能" : "新增技能") + '</h2><div class="row"><div style="width:150px"><label class="f">圖示</label>' + iconSelect("f_icon", s.icon || "book") + '</div><div style="flex:1;min-width:160px"><label class="f">技能名稱</label><input type="text" id="f_name" value="' + esc(s.name) + '"></div></div>' +
+    '<div class="row"><div style="flex:1;min-width:140px"><label class="f">所屬等級層</label><select id="f_lv">' + lvOpts + '</select></div><div style="flex:1;min-width:140px"><label class="f">前置技能（先完成才解鎖）</label><select id="f_pre">' + preOpts + "</select></div></div>" +
+    '<div class="row"><div style="flex:1;min-width:100px"><label class="f">技能點</label><input type="number" id="f_pts" value="' + s.points + '"></div><div style="flex:1;min-width:100px"><label class="f">及格分數</label><input type="number" id="f_pass" value="' + (s.passScore || 80) + '"></div><div style="flex:1;min-width:100px"><label class="f">排序</label><input type="number" id="f_sort" value="' + s.sort + '"></div></div>' +
+    '<div class="row" style="margin-top:10px"><label><input type="checkbox" id="f_req"' + (s.required ? " checked" : "") + '> 必修</label><label>入職後 <input type="number" id="f_due" value="' + (s.dueDays || 0) + '" style="width:70px;display:inline"> 天內要完成（0＝無期限）</label></div>' +
+    '<div class="row" style="margin-top:6px"><label><input type="checkbox" id="f_prac"' + (s.practical ? " checked" : "") + '> 通過測驗後需主管實作簽核才給技能點</label></div>' +
+    '<label class="f">說明</label><textarea id="f_desc">' + esc(s.desc) + '</textarea>' +
+    '<label class="f">教材（每行一個：標題 | 網址，可貼影片、講義、雲端檔案連結）</label><textarea id="f_mat" placeholder="入住流程影片 | https://youtu.be/...">' + esc((s.materials || []).map(function (m) { return m.title + " | " + m.url; }).join("\n")) + "</textarea>" +
+    '<label class="f">題目（選擇題；題與題之間空一行）</label><textarea id="f_q" style="min-height:200px" placeholder="入住當天第一步？\nA. 核對文件\nB. 直接帶進房間\n答案：A">' + esc(fmtQ(s.questions)) + '</textarea><div class="muted" id="qcount"></div>' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveSkill(\'' + id + '\',\'' + s.trackId + '\')">儲存</button>' + (id ? '<button class="btn bad" onclick="delItem(\'技能\',\'' + id + '\',\'\')">刪除</button>' : "") + '<button class="btn" onclick="closeModal()">取消</button></div>');
+  var cnt = function () { $("qcount").textContent = "辨識到 " + parseQ($("f_q").value).length + " 題有效題目（需有 ≥2 個選項與「答案：X」）"; };
+  $("f_q").addEventListener("input", cnt); cnt();
+}
+async function saveSkill(id, trackId) {
+  var n = $("f_name").value.trim(); if (!n) { toast("請填技能名稱"); return; }
+  var mats = $("f_mat").value.split("\n").map(function (l) { var i = l.indexOf("|"); return i < 0 ? { title: "", url: l.trim() } : { title: l.slice(0, i).trim(), url: l.slice(i + 1).trim() }; }).filter(function (m) { return m.url; });
+  await saveRow("技能", { id: id || uid("S"), trackId: trackId, levelId: $("f_lv").value, name: n, icon: $("f_icon").value || "book", points: Number($("f_pts").value) || 0, required: $("f_req").checked, dueDays: Number($("f_due").value) || 0,
+    practical: $("f_prac").checked, passScore: Number($("f_pass").value) || 80, prereq: $("f_pre").value, desc: $("f_desc").value.trim(), materials: mats, questions: parseQ($("f_q").value), sort: Number($("f_sort").value) || 0 });
+}
+async function saveRow(table, row) { try { await api("save", { table: table, row: row }); closeModal(); await reload(); toast("已儲存"); } catch (e) { toast("儲存失敗：" + e.message); } }
+async function delItem(table, id, note) {
+  if (!confirm("確定刪除？" + (note ? "\n" + note : ""))) return;
+  try { await api("remove", { table: table, id: id }); closeModal(); await reload(); toast("已刪除"); } catch (e) { toast(e.message); }
+}
+boot(render, { active: "edit", needEditor: true });
+</script>
+</body>
+</html>

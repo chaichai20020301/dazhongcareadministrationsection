@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>教育訓練 · 管理</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:99999;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><img src="../../kiosk/logo.png" alt="線東大眾護理之家" style="height:28px;width:auto;display:block;flex:none"><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:700 15px/1 'Noto Serif TC',serif;color:#1c6b48;letter-spacing:1px">線東大眾護理之家</span></div>
+
+<div class="wrap">
+  <div id="demoBanner" class="demo hide">示範模式：尚未連接後端，資料只存在這台瀏覽器。</div>
+  <div class="head"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg><h1>教育訓練 · 管理</h1><span class="sp"></span><span class="who" id="who"></span></div>
+  <div class="tabs" id="tabs"></div>
+  <div id="view"><p class="muted">載入中…</p></div>
+</div>
+<script src="../common.js"></script>
+<script src="../tree.js"></script>
+<script>
+function render() {
+  var wait = DB.progress.filter(function (r) { return r.status === "awaiting"; });
+  var h = '<div class="card"><h3 class="sec">待實作簽核（' + wait.length + "）</h3>";
+  h += wait.length ? '<div class="scroll"><table><tr><th>員工</th><th>技能</th><th>測驗</th><th></th></tr>' + wait.map(function (r) {
+    var s = DB.skills.find(function (x) { return x.id === r.skillId; }) || {};
+    return "<tr><td>" + esc(r.name) + "</td><td>" + esc(s.name) + "</td><td>" + r.score + " 分</td><td><button class=\"btn sm pri\" onclick=\"signoff('" + esc(r.name) + "','" + r.skillId + "',true)\">簽核通過</button> <button class=\"btn sm bad\" onclick=\"signoff('" + esc(r.name) + "','" + r.skillId + "',false)\">退回</button></td></tr>";
+  }).join("") + "</table></div>" : '<span class="muted">目前沒有待簽核項目</span>';
+  h += "</div>";
+  h += '<div class="card"><h3 class="sec">員工總覽</h3><div class="scroll"><table><tr><th>員工</th><th>部門</th><th>到職日</th><th>Email</th><th>各職能等級</th><th>逾期必修</th><th></th></tr>' +
+    DB.staff.map(function (st) {
+      var lv = DB.tracks.map(function (t) { var L = levelOf(st.name, t.id); return esc(t.name) + "：" + (L.got ? esc(L.got.name) : "—") + "（" + L.pts + "點）"; }).join("<br>");
+      var late = DB.skills.filter(function (s) { var d = dueOf(st.name, s); return d && d < today() && !isDone(st.name, s.id); }).map(function (s) { return esc(s.name); }).join("、");
+      return "<tr><td><b>" + esc(st.name) + "</b></td><td>" + esc(st.dept) + "</td><td>" + esc(st.joinDate || "未填") + "</td><td>" + esc(st.email || "未填") + "</td><td>" + (lv || "—") + '</td><td style="color:var(--bad)">' + (late || "—") + "</td><td><button class=\"btn sm\" onclick=\"editStaff('" + esc(st.name) + "')\">編輯</button> <button class=\"btn sm\" onclick=\"viewStaff('" + esc(st.name) + "')\">技能樹</button></td></tr>";
+    }).join("") + "</table></div>" +
+    '<div class="row" style="margin-top:10px"><button class="btn" onclick="editStaff(\'\')">＋ 新增員工</button></div></div>';
+  var s = DB.settings || {};
+  h += '<div class="card"><h3 class="sec">提醒與權限設定</h3><label class="f">管理者名單（可進編輯頁、簽核；逗號分隔姓名。留空＝所有人都是管理者）</label><input type="text" id="s_mgr" value="' + esc(s.managers || "") + '">' +
+    '<label class="f">提醒收件人 Email（逗號分隔；收缺訓彙總與待簽核通知）</label><input type="text" id="s_mail" value="' + esc(s.reminderEmails || "") + '">' +
+    '<label class="f">必修期限前幾天開始提醒</label><input type="number" id="s_days" value="' + esc(s.reminderDays || 7) + '">' +
+    '<div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveSet()">儲存設定</button><button class="btn" onclick="testRemind()">立即寄出一次提醒</button></div>' +
+    '<p class="muted">每日自動提醒需在後端執行一次 <code>installTrigger</code>（見部署說明）。目前以 Email 通知；LINE 之後可串接。</p></div>';
+  $("view").innerHTML = h;
+}
+async function signoff(name, skillId, ok) {
+  if (!ok && !confirm("確定退回？員工需重新測驗。")) return;
+  try { await api("signoff", { name: name, skillId: skillId, approve: ok }); await reload(); toast(ok ? "已簽核" : "已退回"); } catch (e) { toast(e.message); }
+}
+function viewStaff(name) {
+  modal("<h2>" + esc(name) + " 的技能樹</h2>" + heroHtml(name, false) + treeHtml(name, true) + '<div class="row"><button class="btn" onclick="closeModal()">關閉</button></div>', true);
+  afterTree();
+}
+function editStaff(name) {
+  var st = name ? staffOf(name) : { name: "", dept: "行政", email: "", joinDate: "" };
+  modal("<h2>" + (name ? "編輯員工" : "新增員工") + '</h2><label class="f">姓名（需與入口網站登入名字一致）</label><input type="text" id="f_name" value="' + esc(st.name) + '"' + (name ? " readonly" : "") + '>' +
+    '<label class="f">部門</label><input type="text" id="f_dept" value="' + esc(st.dept) + '"><label class="f">Email（缺訓提醒用）</label><input type="email" id="f_email" value="' + esc(st.email) + '">' +
+    '<label class="f">到職日（必修期限由此起算）</label><input type="date" id="f_join" value="' + esc(st.joinDate) + '"><div class="row" style="margin-top:14px"><button class="btn pri" onclick="saveStaff()">儲存</button><button class="btn" onclick="closeModal()">取消</button></div>');
+}
+async function saveStaff() {
+  var n = $("f_name").value.trim(); if (!n) { toast("請填姓名"); return; }
+  try { await api("save", { table: "員工", row: { name: n, dept: $("f_dept").value.trim(), email: $("f_email").value.trim(), joinDate: $("f_join").value } }); closeModal(); await reload(); toast("已儲存"); } catch (e) { toast(e.message); }
+}
+async function saveSet() {
+  var row = { managers: $("s_mgr").value.trim(), reminderEmails: $("s_mail").value.trim(), reminderDays: $("s_days").value || "7" };
+  try {
+    if (DEMO) await api("save", { table: "設定", row: row });
+    else for (var k in row) await api("save", { table: "設定", row: { key: k, value: row[k] } });
+    await reload(); toast("已儲存");
+  } catch (e) { toast(e.message); }
+}
+async function testRemind() {
+  try { var r = await api("remind"); toast(DEMO ? "示範模式不會寄信" : "已寄出 " + r.sent + " 封"); } catch (e) { toast(e.message); }
+}
+boot(render, { active: "manage", needEditor: true });
+</script>
+</body>
+</html>
