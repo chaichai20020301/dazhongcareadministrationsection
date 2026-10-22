@@ -19,63 +19,66 @@
     -webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
   button{font-family:inherit;cursor:pointer}
 
-  /* ===== 首頁（自動適應螢幕比例；素材取自設計圖）===== */
-  #home{--u:1vmin;position:fixed;inset:0;display:flex;flex-direction:column;padding:calc(var(--u)*2.6) calc(var(--u)*3.6) 0;gap:calc(var(--u)*2.2);background:#fcf9ef;overflow:hidden}
+  /* ===== 首頁（自動適應螢幕比例；素材為分離的透明圖）===== */
+  #home{--u:1vmin;position:fixed;inset:0;display:flex;flex-direction:column;padding:calc(var(--u)*2.6) calc(var(--u)*3.6) 0;gap:calc(var(--u)*2.2);background:#faf8ef;overflow:hidden}
   #home.hide{display:none}
   #home>*{position:relative;z-index:1}
-  .corner{position:absolute !important;z-index:0 !important;pointer-events:none;background-repeat:no-repeat;background-size:100% 100%}
-  .corner.bl{left:0;bottom:0;width:calc(var(--u)*11);aspect-ratio:240/193;background-image:url(img/lf-bl.png)}
-  .corner.br{right:0;bottom:0;width:calc(var(--u)*11);aspect-ratio:240/193;background-image:url(img/lf-br.png)}
+  .im{position:absolute;pointer-events:none;background-repeat:no-repeat;background-size:100% 100%;display:block}
+  .corner{position:absolute !important;z-index:0 !important}
+  .corner.bl{left:0;bottom:0;width:calc(var(--u)*12);aspect-ratio:640/639;background-image:url(img/n-c-bl.webp)}
+  .corner.br{right:0;bottom:0;width:calc(var(--u)*12);aspect-ratio:622/640;background-image:url(img/n-c-br.webp)}
   .top{display:flex;align-items:center;justify-content:space-between;gap:calc(var(--u)*2);flex:none}
   .top img{height:clamp(46px,calc(var(--u)*8.4),100px);width:auto;display:block}
   .clock{text-align:right;line-height:1.2}
-  .clock .t{font:900 clamp(30px,calc(var(--u)*6.4),76px)/1 var(--sans);color:#0f3d2a;letter-spacing:.02em}
-  .clock .d{font:500 clamp(14px,calc(var(--u)*2.5),30px) var(--sans);color:#22352b;margin-top:calc(var(--u)*.7)}
-  .welcome{flex:none;overflow:hidden;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2.6) calc(var(--u)*4);min-height:calc(var(--u)*19);display:flex;flex-direction:column;justify-content:center;
-    background:#f6f5e6 url(img/bld.jpg) right center/auto 100% no-repeat;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*2) rgba(60,80,50,.12);position:relative}
-  .welcome::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#f6f5e6 0,#f6f5e6 36%,rgba(246,245,230,0) 64%)}
-  .welcome>*{position:relative}
-  .welcome h1{margin:0;font:900 clamp(30px,calc(var(--u)*5.4),72px)/1.18 var(--serif);letter-spacing:.04em;color:#17261d}
+  .clock .t{font:900 clamp(30px,calc(var(--u)*6.4),76px)/1 var(--sans);color:#092f25;letter-spacing:.02em}
+  .clock .d{font:500 clamp(14px,calc(var(--u)*2.5),30px) var(--sans);color:#4d695a;margin-top:calc(var(--u)*.7)}
+  .welcome{flex:none;overflow:hidden;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2.6) calc(var(--u)*5);min-height:calc(var(--u)*19);display:flex;flex-direction:column;justify-content:center;
+    background:#f5f6e6;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*2) rgba(60,80,50,.12);position:relative}
+  .welcome .wl{left:calc(var(--u)*-1);top:calc(var(--u)*-1);height:90%;aspect-ratio:640/601;background-image:url(img/n-c-tl.webp);opacity:.9}
+  .welcome .wr{right:calc(var(--u)*-1);top:calc(var(--u)*-1);height:90%;aspect-ratio:518/640;background-image:url(img/n-c-tr.webp);opacity:.9}
+  .welcome .wb{right:calc(var(--u)*4);bottom:0;height:110%;aspect-ratio:1100/533;background-image:url(img/n-bld.webp)}
+  .welcome>*{position:relative}.welcome>.im{position:absolute}
+  .welcome h1{margin:0;font:900 clamp(30px,calc(var(--u)*5.4),72px)/1.25 var(--serif);letter-spacing:.04em;color:#092f25}
   .welcome h1 br{display:none}
-  .welcome p{margin:calc(var(--u)*1) 0 0;font:500 clamp(18px,calc(var(--u)*3),38px) var(--sans);color:#33443a}
+  .welcome p{margin:calc(var(--u)*1) 0 0;font:500 clamp(18px,calc(var(--u)*3),38px) var(--sans);color:#4d695a}
   .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*2.6)}
   .card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*1.4);text-align:center;
-    border:calc(var(--u)*.25) solid #c8dcb8;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2.4) calc(var(--u)*2);color:#17261d;overflow:hidden;
-    background:linear-gradient(160deg,#eef7e2,#e2f0d6);box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2.2) rgba(60,90,60,.14);transition:transform .12s ease}
+    border:2px solid #b5cda2;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2.4) calc(var(--u)*2);color:#092f25;overflow:hidden;
+    background:#eaf3dc;box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2.2) rgba(60,90,60,.14);transition:transform .12s ease}
   .card:active{transform:scale(.975)}
-  .card .lv{position:absolute;pointer-events:none;background-repeat:no-repeat;background-size:100% 100%}
-  .card .lv.l{left:0;top:0;height:68%;aspect-ratio:92/318;background-image:url(img/cl-g-l.png)}
-  .card .lv.r{right:0;top:0;height:40%;aspect-ratio:108/138;background-image:url(img/cl-g-r.png)}
-  .card.items{background:linear-gradient(160deg,#fff3e0,#fbe6c8);border-color:#efc994}
-  .card.items .lv.l{background-image:url(img/cl-o-l.png);aspect-ratio:92/328}
-  .card.items .lv.r{background-image:url(img/cl-o-r.png)}
+  .card .lv.l{left:0;top:8%;height:70%;aspect-ratio:232/640;background-image:url(img/n-g-l.webp);opacity:.95}
+  .card .lv.r{right:0;top:0;height:30%;aspect-ratio:640/525;background-image:url(img/n-g-r.webp);opacity:.9}
+  .card.items{background:#fff0d7;border-color:#edc58d}
+  .card.items .lv.l{background-image:url(img/n-o-l.webp);aspect-ratio:249/640}
+  .card.items .lv.r{background-image:url(img/n-o-r.webp);aspect-ratio:640/629}
   .card .ico{position:relative;height:clamp(56px,calc(var(--u)*14),200px);width:auto;flex:none}
   .card .txt{position:relative}
-  .card h2{margin:0;font:900 clamp(30px,calc(var(--u)*5.8),72px)/1.1 var(--sans);letter-spacing:.04em}
-  .card p{margin:calc(var(--u)*1) 0 0;font:500 clamp(16px,calc(var(--u)*2.6),34px)/1.4 var(--sans);color:#33443a}
-  .card .go{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;color:#fff;background:#14583a;
-    padding:calc(var(--u)*1.7) calc(var(--u)*3);width:90%;font:900 clamp(20px,calc(var(--u)*3.3),42px) var(--sans);box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(15,77,51,.3)}
-  .card.items .go{background:#b25a1e;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(178,90,30,.3)}
+  .card h2{margin:0;font:900 clamp(30px,calc(var(--u)*5.8),72px)/1.25 var(--sans);letter-spacing:.04em}
+  .card p{margin:calc(var(--u)*1) 0 0;font:500 clamp(16px,calc(var(--u)*2.6),34px)/1.5 var(--sans);color:#4d695a}
+  .card .go{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;color:#fff;background:#14563f;
+    padding:calc(var(--u)*1.7) calc(var(--u)*3);width:90%;font:800 clamp(20px,calc(var(--u)*3.3),42px)/1.3 var(--sans);box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(20,86,63,.3)}
+  .card.items .go{background:#b65b16;box-shadow:0 calc(var(--u)*.5) calc(var(--u)*1.2) rgba(182,91,22,.3)}
   .card.soon{filter:saturate(.55)}
-  .foot{flex:none;display:flex;align-items:center;gap:calc(var(--u)*2.4);padding:calc(var(--u)*1.6) 0 calc(var(--u)*2.2);border-top:calc(var(--u)*.2) solid #cfd3c4;
-    font:500 clamp(14px,calc(var(--u)*2.3),28px) var(--sans);color:#33443a}
-  .foot .hs{height:clamp(44px,calc(var(--u)*8.6),96px);width:auto;flex:none}
-  .foot .help{font:700 clamp(20px,calc(var(--u)*3.8),48px) var(--sans);color:#17261d;letter-spacing:.03em}
+  .foot{flex:none;display:flex;align-items:center;gap:calc(var(--u)*2.4);padding:calc(var(--u)*1.6) 0 calc(var(--u)*2.2);border-top:2px solid #d3d8c8;
+    font:500 clamp(14px,calc(var(--u)*2.3),28px) var(--sans);color:#4d695a}
+  .foot .hs{height:clamp(44px,calc(var(--u)*8),90px);width:auto;flex:none}
+  .foot .help{font:700 clamp(20px,calc(var(--u)*3.8),48px) var(--sans);color:#092f25;letter-spacing:.03em}
   .foot .info{margin-left:auto;display:flex;align-items:center;gap:calc(var(--u)*2);text-align:right}
-  .foot .sep{width:calc(var(--u)*.2);height:calc(var(--u)*3.4);background:#aab1a0;flex:none}
-  .foot b{color:#0f4d33;font-weight:700}
+  .foot .sep{width:2px;height:calc(var(--u)*3.4);background:#aab1a0;flex:none}
+  .foot b{color:#14563f;font-weight:700}
   @media (max-aspect-ratio:1/1){
     #home{--u:min(1vmin,.563vh)}
     .welcome h1{font-size:calc(var(--u)*7)}.welcome h1 br{display:inline}
     .welcome p{font-size:calc(var(--u)*3.4)}
-    .welcome{min-height:calc(var(--u)*24);padding:calc(var(--u)*3) calc(var(--u)*4);background-image:url(img/bld-p.jpg);background-size:auto 100%}
+    .welcome{min-height:calc(var(--u)*27)}
+    .welcome .wb{height:80%;right:calc(var(--u)*2)}
     .grid{grid-template-columns:1fr;grid-auto-rows:1fr}
     .card{display:grid;grid-template-columns:34% 1fr;grid-template-rows:auto auto;column-gap:calc(var(--u)*2);row-gap:calc(var(--u)*1.2);align-content:center;text-align:left;padding:calc(var(--u)*2.4) calc(var(--u)*3)}
     .card .ico{grid-row:1/3;justify-self:center;height:auto;width:clamp(80px,calc(var(--u)*24),240px)}
     .card .txt{grid-column:2;grid-row:1;align-self:end}
     .card .go{grid-column:2;grid-row:2;align-self:start;width:100%;font-size:calc(var(--u)*4);padding:calc(var(--u)*2) calc(var(--u)*3)}
     .card h2{font-size:calc(var(--u)*7.2)}.card p{font-size:calc(var(--u)*3)}
-    .foot{flex-wrap:wrap}.foot .info{margin-left:0;flex-basis:100%;margin-top:-calc(var(--u)*1);justify-content:flex-start;font-size:calc(var(--u)*2.6);gap:calc(var(--u)*3);text-align:left}
+    .foot{flex-wrap:wrap}.foot .info{margin-left:0;flex-basis:100%;margin-top:calc(var(--u)*-1);justify-content:flex-start;font-size:calc(var(--u)*2.6);gap:calc(var(--u)*3);text-align:left}
     .foot .info .sep{display:none}.foot .help{flex:1;font-size:calc(var(--u)*4.4)}
   }
 
@@ -113,34 +116,35 @@
 
 <!-- 首頁 -->
 <main id="home">
-  <i class="corner bl"></i><i class="corner br"></i>
+  <i class="im corner bl"></i><i class="im corner br"></i>
   <div class="top">
     <img src="logo.png" alt="線東大眾護理之家">
     <div class="clock"><div class="t" data-clk="t">--:--</div><div class="d" data-clk="d"></div></div>
   </div>
   <div class="welcome">
+    <i class="im wl"></i><i class="im wr"></i><i class="im wb"></i>
     <h1>歡迎來到<br>大眾護理之家</h1>
     <p>請點選您需要的服務</p>
   </div>
   <div class="grid">
     <button class="card" onclick="openApp('visit')">
-      <i class="lv l"></i><i class="lv r"></i><img class="ico" src="img/ic-cal.png" alt="">
+      <i class="im lv l"></i><i class="im lv r"></i><img class="ico" src="img/n-cal.webp" alt="">
       <div class="txt"><h2>探視預約</h2><p>預約探視家人的日期與時段</p></div>
       <span class="go">開始預約 →</span>
     </button>
     <button class="card" onclick="openApp('tour')">
-      <i class="lv l"></i><i class="lv r"></i><img class="ico" src="img/ic-house.png" alt="">
+      <i class="im lv l"></i><i class="im lv r"></i><img class="ico" src="img/n-house.webp" alt="">
       <div class="txt"><h2>參訪預約</h2><p>想了解入住？預約參觀機構環境</p></div>
       <span class="go">開始預約 →</span>
     </button>
     <button class="card items" id="cardItems" onclick="openApp('items')">
-      <i class="lv l"></i><i class="lv r"></i><img class="ico" src="img/ic-box.png" alt="">
+      <i class="im lv l"></i><i class="im lv r"></i><img class="ico" src="img/n-box.webp" alt="">
       <div class="txt"><h2>物品登記</h2><p>登記今天帶來給長輩的衣物與用品</p></div>
       <span class="go">開始登記 →</span>
     </button>
   </div>
   <div class="foot">
-    <img class="hs" src="img/ic-hs.png" alt=""><span class="help">需要協助，請洽櫃檯人員</span>
+    <img class="hs" src="img/n-hs.webp" alt=""><span class="help">需要協助，請洽櫃檯人員</span>
     <span class="info"><span>服務電話 <b>(04)763-0685</b></span><span class="sep"></span><span>彰化縣彰化市線東路一段一號</span></span>
   </div>
 </main>

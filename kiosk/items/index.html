@@ -14,10 +14,10 @@
   html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);touch-action:manipulation;overflow:hidden}
   button{font-family:inherit;cursor:pointer}
   .lf{position:fixed;z-index:0;pointer-events:none;background-repeat:no-repeat;background-size:100% 100%}
-  .lf.tl{left:0;top:10.6%;width:6.6%;aspect-ratio:110/150;background-image:url(../img/lf-tl.png)}
-  .lf.tr{right:0;top:10.6%;width:9.4%;aspect-ratio:157/150;background-image:url(../img/lf-tr.png)}
-  .lf.bl{left:0;bottom:0;width:14.4%;aspect-ratio:240/251;background-image:url(../img/lf-bl.png)}
-  .lf.br{right:0;bottom:0;width:14.5%;aspect-ratio:242/251;background-image:url(../img/lf-br.png)}
+  .lf.tl{left:0;top:9%;width:9%;aspect-ratio:640/601;background-image:url(../img/n-c-tl.webp);opacity:.9}
+  .lf.tr{right:0;top:9%;width:7.5%;aspect-ratio:518/640;background-image:url(../img/n-c-tr.webp);opacity:.9}
+  .lf.bl{left:0;bottom:0;width:12%;aspect-ratio:640/639;background-image:url(../img/n-c-bl.webp)}
+  .lf.br{right:0;bottom:0;width:12%;aspect-ratio:622/640;background-image:url(../img/n-c-br.webp)}
   #app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:.9rem 2.6rem .8rem}
 
   /* 頂部：回首頁 / 標誌 / 步驟 / 櫃檯協助 */
@@ -132,7 +132,7 @@
   .sum .r .v small{font:500 1.2rem var(--sans);color:var(--muted)}
   .center{text-align:center}
   .done{display:flex;flex-direction:column;align-items:center;padding-top:.2rem}
-  .done .wr{width:min(38rem,62vw);height:auto;display:block}
+  .done .wr{width:min(44rem,70vw);height:auto;display:block}
   .done h1{font-size:4rem;margin-top:-.4rem}
   .done .sub{font-size:1.6rem}
   .done .sum{width:min(78rem,90%);margin:1.2rem auto .4rem;padding:.3rem 1.2rem}
@@ -340,7 +340,7 @@ function step4(){
 }
 function renderDone(){
   stopCam();
-  $app.innerHTML=headerHtml()+'<div class="body"><div class="done"><img class="wr" src="../img/wreath.png" alt=""><h1>登記完成，謝謝您！</h1><p class="sub">您的登記編號</p><div class="code" id="codeBox">'+esc(S.code)+'</div><p class="t">請記下編號（或用手機拍下這個畫面），櫃檯人員會依編號點收物品。</p><div class="cd"><span id="dc">20</span> 秒後自動回到首頁。</div><div class="btns"><button class="btn main" id="goHome">回首頁</button><button class="btn sec" id="again">再登記一位長輩</button></div></div></div>';
+  $app.innerHTML=headerHtml()+'<div class="body"><div class="done"><img class="wr" src="../img/n-wreath.webp" alt=""><h1>登記完成，謝謝您！</h1><p class="sub">您的登記編號</p><div class="code" id="codeBox">'+esc(S.code)+'</div><p class="t">請記下編號（或用手機拍下這個畫面），櫃檯人員會依編號點收物品。</p><div class="cd"><span id="dc">20</span> 秒後自動回到首頁。</div><div class="btns"><button class="btn main" id="goHome">回首頁</button><button class="btn sec" id="again">再登記一位長輩</button></div></div></div>';
   var hb=document.getElementById("hb"); if(hb) hb.onclick=home;
   var n=20,t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
   document.getElementById("goHome").onclick=function(){ clearInterval(t); home(); };
