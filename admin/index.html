@@ -691,12 +691,17 @@
         fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: name, args: args })
+          // 入口認證：token 放 POST body（不走網址參數）。未登入為空字串，
+          // 後端視為沒帶 token，過渡期維持舊的共用通行碼。
+          body: JSON.stringify({ action: name, args: args, token: portalToken_() })
         })
         .then(function (r) { return r.json(); })
         .then(function (res) {
-          if (res.ok) onOk(res.data);
-          else onErr({ message: res.error || '不明錯誤' });
+          if (res.ok) { onOk(res.data); return; }
+          if (res.error === 'unauthorized') { portalKick_(); return; }  // 憑證失效→回入口登入頁
+          var msg = res.error === 'forbidden'
+            ? '權限不足，此功能僅限特定身份使用' : (res.error || '不明錯誤');
+          onErr({ message: msg });
         })
         .catch(function (e) {
           onErr({ message: '連線失敗，請檢查網路後重試（' + e.message + '）' });
@@ -788,13 +793,41 @@ function api() {
 }
 
 /* ---- 進入前的門 ---- */
-var MY_NAME = '', MY_CODE = '';
+var MY_NAME = '', MY_CODE = '', MY_TOKEN = '';
 var NAME_KEY = 'handover_name', CODE_KEY = 'handover_code';
+
+/** 入口網站登入後的憑證；過期(portal_exp)視為未登入。每次呼叫即時讀，不快取。 */
+function portalToken_() {
+  try {
+    var t = localStorage.getItem('portal_token') || '';
+    if (!t) return '';
+    var exp = parseInt(localStorage.getItem('portal_exp') || '0', 10);
+    if (exp && (Date.now() / 1000) > exp) return '';
+    return t;
+  } catch (e) { return ''; }
+}
+
+/** 憑證失效或未登入時，回入口網站登入頁 */
+function portalKick_() {
+  MY_TOKEN = '';
+  try { location.href = '../index.html'; } catch (e) { /* 內嵌環境可能擋跳轉 */ }
+}
 
 function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* 無痕模式 */ } }
 
 function resolveIdentity() {
+  // ① 入口網站已登入：直接用憑證，姓名取自憑證，不再顯示通行碼門禁
+  MY_TOKEN = portalToken_();
+  if (MY_TOKEN) {
+    MY_NAME = lsGet(NAME_KEY) || ME.email || '';
+    MY_CODE = '';
+    showWhoTag();
+    return true;
+  }
+  // ② 切換日（後端 AUTH_ENFORCE=1）之後，沒有有效憑證一律回入口登入頁
+  if (ME.authEnforce) { portalKick_(); return false; }
+  // ③ 過渡期：維持原本的共用通行碼＋姓名門禁，行為跟現在完全一樣
   MY_CODE = lsGet(CODE_KEY);
   MY_NAME = ME.email || lsGet(NAME_KEY);
 
@@ -827,9 +860,9 @@ function showWhoTag() {
   document.getElementById('whoText').textContent = MY_NAME || '—';
   document.getElementById('whoTextM').textContent = MY_NAME || '';
   var tag = document.getElementById('whoTag');
-  // 公司帳號登入時名字不能自己改，隱藏「更改」
-  tag.classList.toggle('hidden', !!ME.email);
-  tag.onclick = openGate;
+  // 公司帳號或入口登入時名字不能自己改，隱藏「更改」
+  tag.classList.toggle('hidden', !!ME.email || !!MY_TOKEN);
+  tag.onclick = MY_TOKEN ? null : openGate;
 }
 
 function saveWho() {
