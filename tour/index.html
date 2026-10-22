@@ -146,6 +146,7 @@ details.fold .in2{margin-top:10px}
 .trend i{width:100%;max-width:44px;background:linear-gradient(var(--g2),var(--teal));border-radius:8px 8px 3px 3px;min-height:3px;transition:height .8s}
 .trend b{color:var(--ink);font-size:12.5px}
 
+.subh{font-weight:900;color:var(--g);letter-spacing:.12em;border-bottom:2px solid var(--g3);padding-bottom:4px;font-size:14px}
 .nm{position:fixed;inset:0;background:rgba(30,28,22,.55);z-index:120;display:none;align-items:center;justify-content:center;padding:16px}
 .nm.on{display:flex}
 .nm-box{background:var(--card);border-radius:16px;width:min(640px,100%);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.35)}
@@ -238,7 +239,7 @@ const NOTE_TYPES=["電話","實地","LINE","其他"];
 const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
 const OPEN_ST=["待聯絡","控床聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
-const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日"};
+const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日",inTime:"入住時間",inNote:"入住說明",outTransport:"退住交通",outAddr:"退住接送地址",outMode:"退住接送方式",outTime:"退住時間",outNote:"退住說明"};
 let PRICE={rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
   addons:[{key:"尿布",price:3000},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"傷口",price:0},{key:"其他",price:0}],
   daily:1850,note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。"};
@@ -412,14 +413,23 @@ function paint(notes,hist){
     ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}
     <div class="fl w"><label>安全看視</label><div class="cks" id="safeBox">${["曾跌倒","會拔管","躁動","走失風險"].map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div></div>
     ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
-    ${inp("expectedStay","預計入住時間（家屬說明或備註）")}${sel("transport","入住交通",["家屬自行送來","需要機構派車接送"])}
-    ${inp("pickupAddr","接送地址")}${sel("pickupMode","接送方式",["可坐輪椅","需躺床（臥式）"])}
+    ${inp("expectedStay","預計入住時間（家屬說明或備註）",{w:1})}
   </div></div></details></div>
   <div class="sec"><h3>預約與來源</h3><div class="grid">
     ${sel("channel","詢問方式",CHANNELS)}${inp("handler","承辦人（電詢服務人／帶參訪人）")}
     ${inp("wantDate","希望參訪日",{type:"date"})}${sel("wantSlot","希望時段",["上午","下午","都可以"])}
     ${inp("visitDate","實際參訪日",{type:"date"})}${sel("infoSource","資料來源",["醫院轉介","朋友介紹","網路搜尋","其他"])}
     ${inp("infoSourceNote","來源備註（哪間醫院／誰介紹）",{w:1})}
+  </div></div>
+  <div class="sec"><h3>入住與退住安排</h3><div class="grid">
+    <div class="fl w"><div class="subh">入住</div></div>
+    ${inp("inTime","入住時間",{type:"time"})}${sel("transport","入住交通",["家屬自行送來","需要機構派車接送"])}
+    ${inp("pickupAddr","入住接送地址（派車才需要）")}${sel("pickupMode","入住接送方式",["可坐輪椅","需躺床（臥式）"])}
+    ${inp("inNote","入住說明",{w:1,ph:"例：日照下課後入住"})}
+    <div class="fl w"><div class="subh">退住</div></div>
+    ${inp("outTime","退住時間",{type:"time"})}${sel("outTransport","退住交通",["家屬自行接回","需要機構派車送回"])}
+    ${inp("outAddr","退住接送地址（派車才需要）")}${sel("outMode","退住接送方式",["可坐輪椅","需躺床（臥式）"])}
+    ${inp("outNote","退住說明",{w:1,ph:"例：由機構派車送回家"})}
   </div></div>
   <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
     ${sel("serviceType","預備服務類型",SERVICE_TYPES,{w:1})}
@@ -529,7 +539,11 @@ function buildNotice(c){
   const v=k=>String(c[k]==null?"":c[k]).trim();
   const miss=[];
   const need=(k,label)=>{ if(!v(k))miss.push(label||LABEL[k]) };
-  const sent=c.transport&&c.transport.includes("自行");
+  const inCar=(c.transport||"").includes("派車"), outCar=(c.outTransport||"").includes("派車");
+  const short=m=>String(m||"").replace(/（.*?）/g,"");     // 「需躺床（臥式）」→「需躺床」
+  const inPart=[v("inTime")&&`${v("inTime")} 入住`,v("inNote"),v("transport")+(inCar&&v("pickupMode")?`(${short(v("pickupMode"))})`:"")].filter(Boolean).join("，");
+  const outPart=[v("outTime"),v("outNote"),v("outTransport")+(outCar&&v("outMode")?`(${short(v("outMode"))})`:"")].filter(Boolean).join("，");
+  const transportLine=[inPart,outPart?"退住"+outPart:""].filter(Boolean).join(";");   // 例：日照下課後入住;退住由機構派車送回家(可坐輪椅)
   const contact=[v("visitorName")+(v("relation")?`（${v("relation")}）`:""),v("mobile")||v("phone")].filter(Boolean).join(" ");
   const tubes=(v("conditions")?v("conditions").split("、"):[]).filter(x=>TUBES.includes(x)).join("、");
   const roc=d=>{const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||"");return m?`${+m[1]-1911}/${m[2]}/${m[3]}`:""};
@@ -539,11 +553,14 @@ function buildNotice(c){
     :v("stayStart")?`${roc(v("stayStart"))} 起${svc?" "+svc:""}`
     :[v("expectedStay"),svc].filter(Boolean).join(" ");
   const wound=v("woundNote")||((c.conditions||"").includes("傷口")?"有":"");
-  const place=sent?"不需接送":[v("pickupAddr"),v("pickupMode")].filter(Boolean).join("，");
+  const inPlace=inCar?[v("pickupAddr"),v("pickupMode")].filter(Boolean).join("，"):"", outPlace=outCar?[v("outAddr"),v("outMode")].filter(Boolean).join("，"):"";
+  const place=[inPlace&&`入住 ${inPlace}`,outPlace&&`退住 ${outPlace}`].filter(Boolean).join("；")||((c.transport||c.outTransport)&&!inCar&&!outCar?"不需接送":"");
   [["elderName"],["identity"],["reason"],["serviceType"],["bedNo"],["nurse"],["transport"],["history"],["mobility"],["diet"],["excretion"],["feeding"],["oxygen"],["dnr"],["medication"],["communication"],["routine"],["choking"],["chkExam"],["chkContract"],["chkFee"]].forEach(([k])=>need(k));
   if(!contact)miss.push("主要聯絡人");
   if(!period)miss.push("預入住期間（日期區間）");
-  if(!sent&&!place)miss.push("接送地點");
+  if(inCar&&!v("pickupAddr"))miss.push("入住接送地點");
+  if(outCar&&!v("outAddr"))miss.push("退住接送地點");
+  if(v("stayEnd")&&!v("outTransport"))miss.push("退住交通");
   const text=[
 "【新住民入住通知】","",
 "【基本資料】",
@@ -555,7 +572,7 @@ function buildNotice(c){
 "預入住期間:"+period,
 "入住床號:"+v("bedNo"),
 "主責護理:"+v("nurse"),
-"入住交通:"+v("transport"),
+"入住交通:"+transportLine,
 "接送地點:"+place,"",
 "【個案狀態】",
 "疾病史:"+v("history"),"",
