@@ -221,7 +221,17 @@
 var API_URL   = (window.DZ_API_URL || 'https://script.google.com/macros/s/AKfycbzPIdwcgvfNaVaVNHhe4CSoF5weV8-l6ZBZ1fKTzEEOgn3BlBLGOxUMXTqbytafvd0u/exec');
 var PORTAL_USER = (window.DZ_USER || (function(){try{return (localStorage.getItem('handover_name')||'').trim();}catch(e){return '';}})() || '');
 var API_TOKEN = (window.DZ_TOKEN || '');
-
+// 入口認證：每次呼叫帶 portal_token（存在 localStorage，portal_exp 過期視為未登入）。
+function portalToken(){ try{ var exp=Number(localStorage.getItem('portal_exp')||0); if(exp && (Date.now()/1000)>exp) return ''; return (localStorage.getItem('portal_token')||'').trim(); }catch(e){ return ''; } }
+// 統一處理 API 回應：unauthorized→回入口登入頁；forbidden→權限不足。
+function handleApiRes(res){
+  if(res && res.ok===false){
+    if(res.error==='unauthorized'){ try{ location.href='../index.html'; }catch(e){} throw new Error('請重新登入'); }
+    if(res.error==='forbidden'){ throw new Error('權限不足'); }
+    throw new Error(res.error||'API 錯誤');
+  }
+  return res;
+}
 function _hasGsr(){ return (typeof google!=='undefined' && google.script && google.script.run); }
 function callApi(action, params){
   params = params || {};
@@ -236,10 +246,10 @@ function callApi(action, params){
       else if(action==='saveRules')   run.api_saveRules(params.rules, PORTAL_USER);
       else if(action==='manage')      run.api_manage(params.op, params, PORTAL_USER);
       else reject(new Error('unknown action: '+action));
-    }).then(function(res){ if(res && res.ok===false) throw new Error(res.error||'API 錯誤'); return res; });
+    }).then(handleApiRes);
   }
   // 放在入口網站（跨網域）→ 走 fetch；讀取類自動重試，避免手機偶發「Load failed」/冷啟動
-  params.action = action; params.actor = PORTAL_USER; params.token = API_TOKEN;
+  params.action = action; params.actor = PORTAL_USER; params.token = portalToken();
   var retryable = (action==='bootstrap' || action==='getData');
   function attempt(n){
     return fetch(API_URL, {
@@ -253,7 +263,7 @@ function callApi(action, params){
         throw (e && e.message==='__net__') ? new Error('連線逾時，請再按一次刷新') : e;
       });
   }
-  return attempt(retryable?4:0).then(function(res){ if(res && res.ok===false) throw new Error(res.error||'API 錯誤'); return res; });
+  return attempt(retryable?4:0).then(handleApiRes);
 }
 
 var STATE={residents:[],catalog:[],rules:[],config:{},user:'',data:{},current:null,days:30,floor:''};

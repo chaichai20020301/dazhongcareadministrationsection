@@ -499,16 +499,25 @@
   <script>
     /*==================================================================
       【通道設定】
-      - 由 Apps Script 直接服務本頁時：自動用內建 RUN()，下面免設定。
-      - 把本頁放到外部平台（Netlify/入口網）時：請把 API_URL 換成
+      - 由 Apps Script 直接服務本頁時：自動用內建的 google.script.run，下面免設定（僅過渡期可用）。
+      - 把本頁放到外部平台（入口網）時：請把 API_URL 換成
         交通車後端的 Apps Script 網址（結尾 /exec）。
-      - API_TOKEN 選填：要加密碼保護就填一組字串，並在 Code.gs 設成相同值。
+      - 身分驗證：每次呼叫都用 POST（text/plain JSON），並在 body 帶入口登入後存的 portal_token。
+        token 絕不放網址。portal_exp（秒）已過期視為未登入，不帶 token。
+        後端回 unauthorized → 導回入口登入頁；回 forbidden → 顯示「權限不足」。
     ==================================================================*/
     var API_URL   = 'https://script.google.com/macros/s/AKfycby7wvyS_57PO30yuRERLX1vsES-Z9--oAp0_wq5UBQ-mQ-QMywgKBj6ZRdD3VLCEu42/exec';   // ← 放到外部平台時填這裡
-    var API_TOKEN = '';
 
-    // 讀取類走 GET、寫入類走 POST(text/plain 避開 CORS preflight)
-    var _READS={getConfig:1,listReservations:1,searchClients:1,listClinic:1};
+    // 取得入口認證 token；沒有或已過期回傳空字串（過渡期後端仍放行沒帶 token 的呼叫）
+    function _portalToken(){
+      try{
+        var t=localStorage.getItem('portal_token')||'';
+        if(!t) return '';
+        var exp=Number(localStorage.getItem('portal_exp')||0);
+        if(exp && exp*1000<=Date.now()) return '';
+        return t;
+      }catch(e){ return ''; }
+    }
     function _argToPayload(name,args){
       switch(name){
         case 'listReservations': return args[0]||{};
@@ -521,17 +530,22 @@
         default: return args[0]||{};
       }
     }
-    function _unwrap(res){ if(res&&res.ok) return res.data; throw new Error((res&&res.error)||'伺服器錯誤'); }
-    function _callApi(name,args){
-      var payload=_argToPayload(name,args);
-      if(_READS[name]){
-        var url=API_URL+'?action='+encodeURIComponent(name)+'&payload='+encodeURIComponent(JSON.stringify(payload))+(API_TOKEN?'&token='+encodeURIComponent(API_TOKEN):'');
-        return fetch(url).then(function(r){return r.json()}).then(_unwrap);
-      }
-      return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body:JSON.stringify({action:name,payload:payload,token:API_TOKEN})}).then(function(r){return r.json()}).then(_unwrap);
+    function _unwrap(res){
+      if(res&&res.ok) return res.data;
+      var code=(res&&res.error)||'';
+      var e=new Error(code==='forbidden'?'權限不足（此功能僅限行政與主管）'
+                    :code==='unauthorized'?'登入已過期，請重新登入'
+                    :(code||'伺服器錯誤'));
+      e.code=code; throw e;
     }
-    // 模擬 RUN() 的鏈式介面，改用 fetch
+    // 一律 POST（text/plain 避開 CORS preflight）；token 只放 body，不放網址
+    function _callApi(name,args){
+      var body={action:name,payload:_argToPayload(name,args)};
+      var tk=_portalToken(); if(tk) body.token=tk;
+      return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify(body)}).then(function(r){return r.json()}).then(_unwrap);
+    }
+    // 模擬 google.script.run 的鏈式介面，改用 fetch
     function _makeRunner(){
       var self={_s:null,_f:null,
         withSuccessHandler:function(f){this._s=f;return this},
@@ -539,7 +553,11 @@
       ['getConfig','listReservations','searchClients','addReservation','updateReservation','deleteReservation','generateDailyReport','generatePaiche','listClinic','addClinic','updateClinic','deleteClinic','generateClinicPaiche'].forEach(function(name){
         self[name]=function(){var args=[].slice.call(arguments);
           _callApi(name,args).then(function(d){if(self._s)self._s(d)})
-            .catch(function(e){if(self._f)self._f({message:String((e&&e.message)||e)})});
+            .catch(function(e){
+              var code=e&&e.code;
+              if(code==='unauthorized'){ location.href='../index.html'; return; }   // 未登入／憑證失效 → 入口登入頁
+              if(self._f)self._f({message:String((e&&e.message)||e),code:code});     // forbidden 等：交給原本的失敗提示
+            });
         };
       });
       return self;

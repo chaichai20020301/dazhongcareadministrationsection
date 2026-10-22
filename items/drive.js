@@ -21,7 +21,12 @@ const once = async (endpoint, payload, ms) => {
     catch (e) { throw new Error('雲端回應異常（可能要重新授權 Apps Script）'); }
     if (out.error) {
       // 把後端的機器碼錯誤轉成白話，避免員工看到英文或白畫面
-      if (out.error === 'unauthorized') throw new Error('未授權：請回入口網站重新登入（需要員工通行碼）');
+      if (out.error === 'unauthorized') {
+        // 未登入／憑證失效：導回入口登入頁
+        try { if (typeof location !== 'undefined') location.replace('../index.html'); } catch (e) {}
+        throw new Error('未授權：請回入口網站重新登入');
+      }
+      if (out.error === 'forbidden') throw new Error('權限不足，您的身份無法執行此動作');
       if (out.error === 'busy') throw new Error('系統忙碌中，請稍後再試');
       throw new Error(out.error);
     }
@@ -31,10 +36,11 @@ const once = async (endpoint, payload, ms) => {
 
 const post = async (endpoint, payload) => {
   if (!endpoint) throw new Error('尚未設定 Apps Script 網址');
-  // 員工通行碼：後端 ITEMS_PW 有設時，所有員工 action 都要帶 pwd（取入口網登入的 handover_code）
+  // 授權：帶入口認證 token（新制）＋舊員工通行碼 pwd（過渡期雙軌，後端擇一通過即可）
   try {
+    const token = (typeof localStorage !== 'undefined' && localStorage.getItem('portal_token')) || '';
     const code = (typeof localStorage !== 'undefined' && localStorage.getItem('handover_code')) || '';
-    payload = Object.assign({ pwd: code }, payload);
+    payload = Object.assign({ token: token, pwd: code }, payload);
   } catch (e) {}
   const ms = payload && payload.data ? 120000 : 45000;
   let last;

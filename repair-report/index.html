@@ -112,7 +112,8 @@ var I18N = {
        submit:'送出報修', sending:'送出中…',
        okTitle:'報修已送出', okMsg:'謝謝！總務會盡快處理。', again:'再報一張',
        eReporter:'請填報修人', eDept:'請選部門', eLoc:'請選地點', eCat:'請選設備／類別', eDesc:'請填問題描述',
-       eSend:'送出失敗，請確認網路後再試一次' },
+       eSend:'送出失敗，請確認網路後再試一次',
+       eForbidden:'權限不足，無法送出報修' },
   id:{ title:'Lapor Perbaikan', subtitle:'Panti Jompo Dazhong Xiandong',
        reporter:'Pelapor', reporterPh:'Nama Anda',
        dept:'Departemen', priority:'Tingkat Urgensi', location:'Lokasi', category:'Peralatan / Kategori',
@@ -123,7 +124,8 @@ var I18N = {
        submit:'Kirim Laporan', sending:'Mengirim…',
        okTitle:'Laporan Terkirim', okMsg:'Terima kasih! Bagian umum akan segera menangani.', again:'Lapor Lagi',
        eReporter:'Isi nama pelapor', eDept:'Pilih departemen', eLoc:'Pilih lokasi', eCat:'Pilih peralatan/kategori', eDesc:'Isi deskripsi masalah',
-       eSend:'Gagal mengirim, periksa koneksi lalu coba lagi' },
+       eSend:'Gagal mengirim, periksa koneksi lalu coba lagi',
+       eForbidden:'Tidak ada izin untuk mengirim laporan' },
   vi:{ title:'Báo hỏng sửa chữa', subtitle:'Viện dưỡng lão Dazhong Xiandong',
        reporter:'Người báo', reporterPh:'Tên của bạn',
        dept:'Bộ phận', priority:'Mức độ khẩn', location:'Địa điểm', category:'Thiết bị / Loại',
@@ -134,7 +136,8 @@ var I18N = {
        submit:'Gửi báo hỏng', sending:'Đang gửi…',
        okTitle:'Đã gửi báo hỏng', okMsg:'Cảm ơn! Bộ phận tổng vụ sẽ xử lý sớm.', again:'Báo tiếp',
        eReporter:'Nhập tên người báo', eDept:'Chọn bộ phận', eLoc:'Chọn địa điểm', eCat:'Chọn thiết bị/loại', eDesc:'Nhập mô tả sự cố',
-       eSend:'Gửi thất bại, kiểm tra mạng rồi thử lại' }
+       eSend:'Gửi thất bại, kiểm tra mạng rồi thử lại',
+       eForbidden:'Không đủ quyền để gửi báo hỏng' }
 };
 
 /* ── 選項（顯示三語、送出值存中文 v）── */
@@ -202,9 +205,31 @@ function rocDate(d){ return (d.getFullYear()-1911)+'/'+pad2(d.getMonth()+1)+'/'+
 function rocDateTime(d){ return rocDate(d)+' '+pad2(d.getHours())+':'+pad2(d.getMinutes()); }
 function ticketPrefix(){ var d=new Date(); return 'R'+(d.getFullYear()-1911)+pad2(d.getMonth()+1)+'-'; }
 
+/* ── 入口認證（統一登入）──
+   token 來自入口網站登入後存的 portal_token；portal_exp（秒）已過期就視為未登入。
+   過渡期（後端 AUTH_ENFORCE 未設）沒帶 token 後端照舊放行；切換日起後端只認 token。 */
+function portalToken(){
+  try{
+    var tk=localStorage.getItem('portal_token')||'';
+    if(!tk) return '';
+    var exp=Number(localStorage.getItem('portal_exp')||0);
+    if(exp && Date.now()/1000>exp) return '';
+    return tk;
+  }catch(e){ return ''; }
+}
+var _goingLogin=false;
+function goLogin(){                       // unauthorized：憑證失效，導回入口登入頁
+  if(_goingLogin) return; _goingLogin=true;
+  try{ localStorage.removeItem('portal_token'); localStorage.removeItem('portal_exp'); }catch(e){}
+  location.href='../index.html';
+}
+// 後端明確回覆的錯誤：不用重試（重試只會得到同樣答案）
+var DEFINITE_ERR = {unauthorized:1, forbidden:1, conflict:1, bad_request:1};
+
 /* ── 網路：POST text/plain（避開 CORS preflight），逾時＋重試一次 ── */
 function api(payload){
   payload = Object.assign({ rootFolderId: ROOT }, payload);
+  var tk = portalToken(); if(tk) payload.token = tk;       // token 放 POST body，不放網址
   var attempt = function(n){
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 60000) : null;
@@ -217,10 +242,11 @@ function api(payload){
       return r.text();
     }).then(function(txt){
       var o; try{ o=JSON.parse(txt); }catch(e){ throw new Error('bad json'); }
-      if(o && o.error) throw new Error(o.error);
+      if(o && o.error){ if(o.error==='unauthorized') goLogin(); throw new Error(o.error); }
       return o;
     }).catch(function(e){
       if(timer) clearTimeout(timer);
+      if(e && DEFINITE_ERR[e.message]) throw e;
       if(n<1) return new Promise(function(res){ setTimeout(res,1200); }).then(function(){ return attempt(n+1); });
       throw e;
     });
@@ -296,7 +322,7 @@ function renderForm(){
   });
   document.getElementById('f_submit').onclick=submit;
   renderPhotos();
-  if(state.err){ var e=document.getElementById('err'); e.textContent=state.err; e.classList.add('err'); }
+  if(state.err){ var e=document.getElementById('err'); e.textContent=t(state.err); e.classList.add('err'); }
 }
 
 function renderPhotos(){
@@ -339,7 +365,7 @@ function renderAll(){
   if(state.done) renderDone(); else renderForm();
 }
 
-function showErr(msg){ state.err=msg; var e=document.getElementById('err'); if(e){ e.textContent=msg; e.classList.add('err'); window.scrollTo(0,0);} }
+function showErr(key){ state.err=key; var e=document.getElementById('err'); if(e){ e.textContent=t(key); e.classList.add('err'); window.scrollTo(0,0);} }   // key＝I18N 的訊息代碼，切換語言時會跟著換
 
 function submit(){
   if(state.submitting || !document.getElementById('f_reporter')) return;
@@ -347,16 +373,17 @@ function submit(){
   f.reporter=(document.getElementById('f_reporter').value||'').trim();
   f.desc=(document.getElementById('f_desc').value||'').trim();
   state.err='';
-  if(!f.reporter) return showErr(t('eReporter'));
-  if(!f.location) return showErr(t('eLoc'));
-  if(!f.category) return showErr(t('eCat'));
-  if(!f.desc) return showErr(t('eDesc'));
+  if(!f.reporter) return showErr('eReporter');
+  if(!f.location) return showErr('eLoc');
+  if(!f.category) return showErr('eCat');
+  if(!f.desc) return showErr('eDesc');
 
   state.submitting=true;
   var btn=document.getElementById('f_submit'); btn.disabled=true; btn.textContent=t('sending');
   var now=new Date();
-  // 先取單號，再送出（與完整版一致）
-  api({action:'nextSeq'}).then(function(res){
+  // 先取單號，再送出（與完整版一致）。兩人同時取到同一個單號時，後端對後送的回 conflict：
+  // 這裡自動重新取一次單號再送（最多一次），使用者不會看到錯誤。
+  function send(retried){ return api({action:'nextSeq'}).then(function(res){
     var seq=(res&&res.nextSeq)||1;
     var no=ticketPrefix()+pad3(seq);
     var pIcon=f.priority==='緊急'?'🔴 緊急':(f.priority==='低'?'🟢 低':'🟡 一般');
@@ -383,10 +410,16 @@ function submit(){
     return api({action:'upload', ticketNo:no, ticket:ticket, photos:photos, photoMode:'append',
                 notifyText:notify, notifyPhoto:hasPhoto, notifyStage:'before'})
       .then(function(){ state.submitting=false; state.done=no; renderDone(); window.scrollTo(0,0); });
-  }).catch(function(){
+  }).catch(function(e){
+    if(e && e.message==='conflict' && !retried) return send(true);
+    throw e;
+  }); }
+  send(false).catch(function(e){
     state.submitting=false;
     btn.disabled=false; btn.textContent=t('submit');
-    showErr(t('eSend'));
+    var code=e&&e.message;
+    if(code==='unauthorized') return;                 // api() 已導回入口登入頁
+    showErr(code==='forbidden' ? 'eForbidden' : 'eSend');
   });
 }
 

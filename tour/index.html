@@ -255,7 +255,22 @@ function toast(m,ms){const t=$("#toast");t.textContent=m;t.classList.add("on");c
 function pill(s){return `<span class="pill" style="background:var(${SC[s]||"--s-can"})">${esc(s)}</span>`}
 
 /* ---------- 承辦人：自動帶入口網登入的名字 ---------- */
-$("#who").value=lsGet("tour_who")||lsGet("handover_name")||"";
+/* ---------- 入口認證（token） ----------
+ * portal_token／portal_exp 由入口網站登入後寫入 localStorage；portal_role 只用來決定畫面顯示，不是權限依據。
+ * 過渡期：還沒有 token 時照舊運作；有 token 就每次 POST 帶上，由後端驗證身份與權限。 */
+function portalToken(){const t=lsGet("portal_token"),exp=+lsGet("portal_exp")||0;if(!t)return"";if(exp&&exp<Date.now()/1000)return"";return t}   // 過期視為未登入
+function authFail(){try{location.replace("../index.html")}catch(e){}const err=new Error("請重新登入");err.auth=true;throw err}   // unauthorized → 回入口登入頁
+function showDenied(){
+  if(document.getElementById("denied"))return;
+  const d=document.createElement("div");d.id="denied";
+  d.style.cssText="position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center";
+  d.innerHTML='<div style="max-width:420px"><div style="font-size:46px">🔒</div><h2 style="color:var(--g);margin:8px 0">權限不足</h2><p style="color:var(--sub);margin-bottom:18px">這個帳號的身份無法使用「參訪預約管理」。<br>如需使用，請洽管理者。</p><a class="btn btn-g" href="../index.html" style="text-decoration:none">← 回入口網站</a></div>';
+  document.body.appendChild(d);
+}
+function deniedFail(){showDenied();const err=new Error("權限不足");err.denied=true;throw err}   // forbidden → 顯示權限不足
+const HAS_TOKEN=!!portalToken();
+$("#who").value=HAS_TOKEN?(lsGet("handover_name")||""):(lsGet("tour_who")||lsGet("handover_name")||"");
+if(HAS_TOKEN){const w=$("#who");w.readOnly=true;w.title="已用入口登入的身份，無法修改";w.style.cursor="default"}   // 操作人姓名由登入身份決定
 $("#who").addEventListener("change",e=>lsSet("tour_who",e.target.value.trim()));
 const me=()=>$("#who").value.trim();
 function needWho(){if(me())return true;toast("請先在右上角輸入承辦人姓名");$("#who").focus();return false}
@@ -286,10 +301,13 @@ async function apiOnce(action,data){
   }
   const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),60000);   // Google 偶爾很慢，最多等 60 秒
   try{
-    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data}),signal:ctl.signal});
+    const res=await fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({action,data,token:portalToken()||undefined}),signal:ctl.signal});
     const text=await res.text();
-    try{ return JSON.parse(text) }
+    let j;
+    try{ j=JSON.parse(text) }
     catch(_){ const err=new Error("Google 暫時沒有正常回應");err.transient=true;throw err }   // 偶爾 Google 會回 HTML 錯誤頁而不是資料
+    if(j&&j.ok===false){ if(j.error==="unauthorized")authFail(); if(j.error==="forbidden")deniedFail() }
+    return j;
   }catch(e){ if(e&&e.name==="AbortError")throw new Error("連線逾時"); if(e&&e.name==="TypeError"&&!e.transient){e.transient=true;e.message="網路連線不穩，請稍後再試"} throw e }
   finally{ clearTimeout(to) }
 }
@@ -313,7 +331,7 @@ async function reload(silent){
     const chs=[...new Set(ROWS.map(x=>x.channel).filter(Boolean).concat(CHANNELS))];
     const cur=$("#fch").value;$("#fch").innerHTML='<option value="">所有來源</option>'+chs.map(c=>`<option>${esc(c)}</option>`).join("");$("#fch").value=cur;
     draw();if($("#v-stats").style.display!=="none")drawStats();
-  }catch(e){ if(!silent)$("#tbl").innerHTML=`<div class="empty">讀取失敗：${esc(e.message||e)}<br><br><button class="btn btn-g btn-sm" onclick="reload()">重試</button></div>` }
+  }catch(e){ if(e&&(e.denied||e.auth))return; if(!silent)$("#tbl").innerHTML=`<div class="empty">讀取失敗：${esc(e.message||e)}<br><br><button class="btn btn-g btn-sm" onclick="reload()">重試</button></div>` }
 }
 function weekRange(){const d=new Date(),day=(d.getDay()+6)%7,s=new Date(d);s.setDate(d.getDate()-day);const e=new Date(s);e.setDate(s.getDate()+6);const f=x=>x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");return[f(s),f(e)]}
 const vDate=r=>r.visitDate||r.wantDate||"";
@@ -511,7 +529,7 @@ async function save(){
       $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";
     }
     reload(true);   // 背景同步最新清單（不阻擋畫面）
-  }catch(e){toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，資料不一定已儲存。請先按「重新整理」確認，再決定要不要重新儲存":"連線失敗，請稍後再試",7000)}
+  }catch(e){ if(e&&(e.denied||e.auth))return; toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，資料不一定已儲存。請先按「重新整理」確認，再決定要不要重新儲存":"連線失敗，請稍後再試",7000)}
   finally{ clearTimeout(slow);b.innerHTML="儲存";mark(); }
 }
 async function addNote(){
@@ -529,7 +547,7 @@ async function addNote(){
     $("#nText").value="";$("#nFollow").value="";
     if(follow&&(!FOLLOW[CUR.id]||follow>FOLLOW[CUR.id]))FOLLOW[CUR.id]=follow;
     draw();mark();
-  }catch(e){toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，紀錄不一定已新增。請先按「重新整理」確認，再決定要不要重新新增":"新增失敗",7000)}
+  }catch(e){ if(!(e&&(e.denied||e.auth)))toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，紀錄不一定已新增。請先按「重新整理」確認，再決定要不要重新新增":"新增失敗",7000)}
   clearTimeout(slow);b.disabled=false;
 }
 
@@ -669,7 +687,7 @@ function clearDemo(){if(confirm("確定清空預覽模式的所有資料？（�
 if(!SCRIPT_URL)$("#demoBanner").style.display="flex";
 addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#dr").classList.contains("on"))closeDr()});
 addEventListener("beforeunload",e=>{if(CUR&&dirty()){e.preventDefault();e.returnValue=""}});
-reload();
+if(lsGet("portal_role")==="care")showDenied();else reload();   // 護理／行政／主管才載入；照服不在此系統的身份矩陣內
 </script>
 </body>
 </html>

@@ -179,35 +179,6 @@
 </head>
 <body>
 <!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
-<!--PREFILL_USER-->
-<script>
-(function(){
-  var NAME=""; try{ NAME=(localStorage.getItem("handover_name")||"").trim(); }catch(e){}
-  if(!NAME) return;
-  var SEL=['#f_reporter','input[placeholder*="點收並製表"]'];
-  var done=[];
-  function seen(el){ return done.indexOf(el)>=0; }
-  function tick(){
-    for(var i=0;i<SEL.length;i++){
-      var list; try{ list=document.querySelectorAll(SEL[i]); }catch(e){ continue; }
-      for(var j=0;j<list.length;j++){
-        var el=list[j];
-        if(seen(el)) continue;
-        if((el.value||"").trim()!==""){ continue; }
-        try{ var p=(el.tagName==="TEXTAREA")?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
-          Object.getOwnPropertyDescriptor(p,"value").set.call(el, NAME);
-        }catch(e){ el.value=NAME; }
-        el.dispatchEvent(new Event("input",{bubbles:true}));
-        el.dispatchEvent(new Event("change",{bubbles:true}));
-        if((el.value||"").trim()===NAME) done.push(el);
-      }
-    }
-  }
-  setInterval(tick, 400);
-  if(document.readyState!=="loading") tick();
-  document.addEventListener("DOMContentLoaded",tick);
-})();
-</script>
 <div class="wrap">
   <header>
     <div class="brand-logo" id="brandLogo">
@@ -299,16 +270,50 @@ function setCloud(status,txt){
   el.className='cloud'+(status?' '+status:'');
   el.textContent=txt;
 }
+/* ---------- 入口認證（統一登入）---------- */
+// token 來自入口網站登入後存的 portal_token；portal_exp（秒）已過期就視為未登入。
+// 過渡期（後端 AUTH_ENFORCE 未設）沒帶 token 後端照舊放行；切換日起後端只認 token。
+function portalToken(){
+  try{
+    var tk=localStorage.getItem('portal_token')||'';
+    if(!tk) return '';
+    var exp=Number(localStorage.getItem('portal_exp')||0);
+    if(exp && Date.now()/1000>exp) return '';
+    return tk;
+  }catch(e){ return ''; }
+}
+var _goingLogin=false;
+function goLogin(){                       // 收到 unauthorized：憑證失效，導回入口登入頁
+  if(_goingLogin) return; _goingLogin=true;
+  try{ localStorage.removeItem('portal_token'); localStorage.removeItem('portal_exp'); }catch(e){}
+  location.href='../index.html';
+}
+function errText(res){
+  var e=res&&res.error;
+  return e==='forbidden'?'權限不足':(e==='unauthorized'?'請重新登入':(e||''));
+}
+// portal_role 只決定畫面顯示（真正的權限由後端判定）：護理／照服不是這個系統的使用對象
+var BLOCKED=(function(){ try{ var r=localStorage.getItem('portal_role')||''; return r==='nurse'||r==='care'; }catch(e){ return false; } })();
+function prefillName(){ try{ return (localStorage.getItem('handover_name')||'').trim(); }catch(e){ return ''; } }
+
 function api(payload){
+  var body=Object.assign({rootFolderId:state.cfg.folderId},payload);
+  var tk=portalToken(); if(tk) body.token=tk;          // token 一律放 POST body，不放網址
   return fetch(state.cfg.url,{
     method:'POST', redirect:'follow',
     headers:{'Content-Type':'text/plain;charset=utf-8'}, // 避開 CORS preflight
-    body:JSON.stringify(Object.assign({rootFolderId:state.cfg.folderId},payload))
-  }).then(function(r){ return r.json(); });
+    body:JSON.stringify(body)
+  }).then(function(r){ return r.json(); }).then(function(o){
+    if(o && o.error==='unauthorized') goLogin();
+    else if(o && o.error==='forbidden') toast('權限不足');
+    return o;
+  });
 }
 
+// 回傳 'ok'＝同步成功、'auth'＝權限／登入問題（api() 已提示）、'fail'＝其他失敗
 function syncLoad(){
-  if(!cloudReady()){ setCloud('bad','未設定'); return Promise.resolve(); }
+  if(BLOCKED){ setCloud('bad','權限不足'); return Promise.resolve('auth'); }
+  if(!cloudReady()){ setCloud('bad','未設定'); return Promise.resolve('fail'); }
   setCloud('', '同步中…');
   return api({action:'load'}).then(function(res){
     if(res && res.tickets){
@@ -318,9 +323,14 @@ function syncLoad(){
       save(LS.seq, state.seq);
       setCloud('ok','雲端已同步');
       if(state.view==='list') render();
-    } else { setCloud('bad','讀取失敗'); }
-  }).catch(function(){ setCloud('bad','連線失敗'); });
+      return 'ok';
+    }
+    var auth=res&&(res.error==='forbidden'||res.error==='unauthorized');
+    setCloud('bad', res&&res.error==='forbidden'?'權限不足':'讀取失敗');
+    return auth?'auth':'fail';
+  }).catch(function(){ setCloud('bad','連線失敗'); return 'fail'; });
 }
+function syncToast(r,okMsg){ if(r==='ok') toast(okMsg); else if(r==='fail') toast('更新失敗，請稍後再試'); }   // 'auth' 已由 api() 提示
 
 /* 送出/更新一張單（含照片）到雲端 */
 function pushTicket(ticket, photos, photoMode, notifyText, notifyPhoto, video, notifyStage){
@@ -335,7 +345,9 @@ function pushTicket(ticket, photos, photoMode, notifyText, notifyPhoto, video, n
         setCloud('ok','雲端已同步');
         return res;
       }
-      setCloud('bad','儲存失敗'); toast('雲端儲存失敗：'+(res&&res.error||'')); return res;
+      setCloud('bad','儲存失敗');
+      if(!res || (res.error!=='forbidden' && res.error!=='unauthorized')) toast('雲端儲存失敗：'+errText(res));   // 權限類錯誤 api() 已提示
+      return res;
     })
     .catch(function(){ setCloud('bad','連線失敗'); toast('雲端連線失敗，已存本機'); return {local:true}; });
 }
@@ -371,6 +383,13 @@ function fileToJpeg(file, maxW){
 function render(){
   var m=document.getElementById('main');
   document.body.setAttribute('data-view', state.view); // 供響應式 CSS 依頁面調整版面
+  if(BLOCKED){                                         // 護理／照服：完整維修系統僅限行政、主管
+    document.getElementById('fab').classList.add('hidden');
+    m.innerHTML='<div class="card" style="text-align:center;padding:36px 20px"><div style="font-size:18px;font-weight:700;margin-bottom:8px">權限不足</div>'+
+      '<div class="hint" style="margin:0 0 18px">此頁僅限行政與主管使用。要報修請使用「維修報修」頁。</div>'+
+      '<a class="btn" href="../repair-report/" style="text-decoration:none;width:auto;display:inline-block;padding:12px 22px">前往維修報修</a></div>';
+    return;
+  }
   document.getElementById('fab').classList.toggle('hidden', state.view!=='list');
   if(state.view==='list') return renderList(m);
   if(state.view==='form') return renderForm(m);
@@ -453,7 +472,7 @@ function ticketCard(t){
 var formDraft=null;
 function renderForm(m){
   document.getElementById('hTitle').textContent='新報修單';
-  formDraft=formDraft||{reporter:'',org:'',dept:'',location:'',category:'',priority:'一般',desc:'',photos:[],video:null};
+  formDraft=formDraft||{reporter:prefillName(),org:'',dept:'',location:'',category:'',priority:'一般',desc:'',photos:[],video:null};   // 報修人預填登入姓名（仍可改，後端另存憑證上的確認姓名）
   var d=formDraft;
   m.innerHTML=
    '<div class="card">'+
@@ -561,6 +580,7 @@ function renderDetail(m){
      '<div style="font-size:17px;font-weight:700;margin-bottom:12px">'+esc(t.desc)+'</div>'+
      (t.org?kv('機構',esc(t.org)):'')+
      kv('報修人',(esc(t.reporter)+(t.dept?' ('+esc(t.dept)+')':'')))+
+     (t.verifiedReporter&&t.verifiedReporter!==t.reporter?kv('登入帳號',esc(t.verifiedReporter)):'')+
      kv('報修日',esc(t.date))+
      kv('地點',esc(t.location))+
      kv('類別',esc(t.category))+
@@ -742,7 +762,7 @@ function renderSettings(m){
    '<div style="height:16px"></div>';
 
   document.getElementById('s_back').onclick=function(){ state.view='list'; render(); };
-  document.getElementById('s_reload').onclick=function(){ toast('重新讀取中…'); syncLoad().then(function(){ toast('已重新讀取'); }); };
+  document.getElementById('s_reload').onclick=function(){ toast('重新讀取中…'); syncLoad().then(function(r){ syncToast(r,'已重新讀取'); }); };
   bindEditors();
 }
 /* role='org'（機構清單）或 'dept'（某機構的部門，orgidx 指向機構索引） */
@@ -848,7 +868,7 @@ document.getElementById('btnRefresh').onclick=function(){
   if(!cloudReady()){ toast('雲端未設定'); return; }
   var b=document.getElementById('btnRefresh'); b.classList.add('spin');
   toast('重新整理中…');
-  syncLoad().then(function(){ b.classList.remove('spin'); toast('已更新'); });
+  syncLoad().then(function(r){ b.classList.remove('spin'); syncToast(r,'已更新'); });
 };
 
 /* ---------- 啟動 ---------- */
@@ -863,6 +883,35 @@ document.getElementById('btnRefresh').onclick=function(){
 })();
 render();
 if(cloudReady()) syncLoad(); else setCloud('bad','未設定');
+</script>
+<!--PREFILL_USER-->
+<script>
+(function(){
+  var NAME=""; try{ NAME=(localStorage.getItem("handover_name")||"").trim(); }catch(e){}
+  if(!NAME) return;
+  var SEL=['#f_reporter','input[placeholder*="點收並製表"]'];
+  var done=[];
+  function seen(el){ return done.indexOf(el)>=0; }
+  function tick(){
+    for(var i=0;i<SEL.length;i++){
+      var list; try{ list=document.querySelectorAll(SEL[i]); }catch(e){ continue; }
+      for(var j=0;j<list.length;j++){
+        var el=list[j];
+        if(seen(el)) continue;
+        if((el.value||"").trim()!==""){ continue; }
+        try{ var p=(el.tagName==="TEXTAREA")?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
+          Object.getOwnPropertyDescriptor(p,"value").set.call(el, NAME);
+        }catch(e){ el.value=NAME; }
+        el.dispatchEvent(new Event("input",{bubbles:true}));
+        el.dispatchEvent(new Event("change",{bubbles:true}));
+        if((el.value||"").trim()===NAME) done.push(el);
+      }
+    }
+  }
+  setInterval(tick, 400);
+  if(document.readyState!=="loading") tick();
+  document.addEventListener("DOMContentLoaded",tick);
+})();
 </script>
 </body>
 </html>

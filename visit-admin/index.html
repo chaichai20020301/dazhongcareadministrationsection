@@ -270,7 +270,22 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
     componentDidMount() {
       const P = this.props;
       const SCRIPT_URL = P.scriptUrl || "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
-      let staffPwd = ""; // 工作人員輸入後交後端驗證；密碼不寫在此頁原始碼
+      let staffPwd = "";   // 過渡期：舊通行碼（handover_code）
+      let authToken = "";  // 入口認證 token（token 模式）
+      // 統一員工 API：token 模式走 POST(body 帶 token)，過渡期走 GET(?pwd=)；unauthorized→回入口，forbidden→權限不足
+      async function staffApi(params) {
+        let res;
+        if (authToken) {
+          res = await fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(Object.assign({}, params, { token: authToken })) });
+        } else {
+          const qs = Object.keys(params).map(k => k + "=" + encodeURIComponent(params[k])).join("&");
+          res = await fetch(SCRIPT_URL + "?pwd=" + encodeURIComponent(staffPwd) + (qs ? "&" + qs : "") + "&t=" + Date.now());
+        }
+        const j = await res.json();
+        if (j && j.error === "unauthorized") { location.href = "../index.html"; throw new Error("unauthorized"); }
+        if (j && j.error === "forbidden") { showStatusMsg("權限不足"); throw new Error("forbidden"); }
+        return j;
+      }
       const TIME_SLOTS = ["08:30", "09:30", "10:30", "14:00", "15:00", "16:00"];
       const WEEKDAY_LIMIT = P.weekdayLimit ?? 6;
       const WEEKEND_LIMIT = P.weekendLimit ?? 8;
@@ -358,8 +373,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         isFetching = true;
         show("slot-loading-indicator", "flex");
         try {
-          const url = isStaffOverride ? `${SCRIPT_URL}?pwd=${encodeURIComponent(staffPwd)}&t=${Date.now()}` : `${SCRIPT_URL}?t=${Date.now()}`;
-          const data = await (await fetch(url)).json();
+          const data = isStaffOverride ? await staffApi({ action: "staff_data" }) : await (await fetch(`${SCRIPT_URL}?t=${Date.now()}`)).json();
           sheetRecords = data.records || [];
           suspensions = data.suspensions || [];
           blockedNames = data.blockedNames || [];
@@ -614,8 +628,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         showConfirmPrompt("刪除確認", `確定要刪除「${famName}」\n在 ${date} ${time} 的預約嗎？`, async () => {
           showStatusMsg("正在刪除…", false);
           try {
-            const url = `${SCRIPT_URL}?action=delete&pwd=${encodeURIComponent(staffPwd)}&date=${date}&time=${time}&famName=${encodeURIComponent(famName)}&t=${Date.now()}`;
-            const data = await (await fetch(url)).json();
+            const data = await staffApi({ action: "delete", date, time, famName });
             if (data.result === "success") { showStatusMsg("已刪除", false); await fetchData(); renderAdminList(); }
             else showStatusMsg("找不到該筆資料");
           } catch (e) { showStatusMsg("網路錯誤，刪除失敗"); }
@@ -645,8 +658,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         const noteVal = (input ? input.value : "").trim();
         showStatusMsg("儲存中…", false);
         try {
-          const url = `${SCRIPT_URL}?action=save_note&pwd=${encodeURIComponent(staffPwd)}&resName=${encodeURIComponent(resName)}&note=${encodeURIComponent(noteVal)}&t=${Date.now()}`;
-          const data = await (await fetch(url)).json();
+          const data = await staffApi({ action: "save_note", resName, note: noteVal });
           if (data.result === "success") {
             showStatusMsg(`「${resName}」註記已儲存`, false);
             const r = adminRecords.residents.find(x => x.name === resName); if (r) r.note = noteVal;
@@ -744,8 +756,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
           showStatusMsg("設定中…", false);
           try {
             const type = isRes ? "住民" : "房間";
-            const url = `${SCRIPT_URL}?action=set_isolation&pwd=${encodeURIComponent(staffPwd)}&type=${encodeURIComponent(type)}&target=${encodeURIComponent(target)}&start=${start}&end=${end}&reason=${encodeURIComponent(reason)}&t=${Date.now()}`;
-            const data = await (await fetch(url)).json();
+            const data = await staffApi({ action: "set_isolation", type, target, start, end, reason });
             if (data.result === "success") {
               showStatusMsg(`已設定「${label}」隔離`, false);
               $("iso-room-select").value = ""; $("iso-res-select").value = ""; $("iso-start").value = ""; $("iso-end").value = ""; $("iso-reason").value = ""; $("iso-room-residents").innerHTML = "";
@@ -759,8 +770,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         showConfirmPrompt("解除隔離", `確定要解除「${target}」（${start} 起）的隔離嗎？\n\n解除後即可重新預約探視。`, async () => {
           showStatusMsg("解除中…", false);
           try {
-            const url = `${SCRIPT_URL}?action=lift_isolation&pwd=${encodeURIComponent(staffPwd)}&target=${encodeURIComponent(target)}&start=${encodeURIComponent(start)}&t=${Date.now()}`;
-            const data = await (await fetch(url)).json();
+            const data = await staffApi({ action: "lift_isolation", target, start });
             if (data.result === "success") { showStatusMsg(`已解除「${target}」隔離`, false); await fetchData(); renderIsolationList(); }
             else showStatusMsg("找不到該筆隔離設定");
           } catch (e) { showStatusMsg("網路錯誤，解除失敗"); }
@@ -859,7 +869,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
             try {
               const results = await Promise.all(Object.keys(byTime).map(t => {
                 const data = { residentName: resName, familyName: famName, relationship: relation, phone, note: noteInput, time: t, dates: byTime[t] };
-                if (isStaffOverride && staffPwd) data.pwd = staffPwd; // 工作人員特許：後端略過額滿/隔離驗證
+                if (isStaffOverride) { if (authToken) data.token = authToken; else if (staffPwd) data.pwd = staffPwd; } // 工作人員特許：後端略過額滿/隔離驗證
                 return fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
                   .then(r => r.json()).catch(() => ({ ok: false, error: "network" }));
               }));
@@ -984,12 +994,13 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
         });
       };
 
-      // 行政版：一進入就是完整工作人員模式（密碼已由外層 gate 驗證）
-      if (P.forceAdmin && P.adminPwd) {
+      // 行政版：一進入就是完整工作人員模式（身份已由外層 gate 驗證：token 或過渡期 pwd）
+      if (P.forceAdmin && (P.authToken || P.adminPwd)) {
         hide("staff-override-trigger");
         $("btn-close-override").onclick = () => { location.href = "../index.html"; }; // 「登出」改為返回入口網站（整合可調整路徑）
         $("btn-close-override").innerText = "返回入口";
-        staffPwd = P.adminPwd;
+        authToken = P.authToken || "";
+        staffPwd = P.adminPwd || "";
         isStaffOverride = true; show("staff-banner", "flex");
         hide("res-name"); show("admin-res-select", "block"); show("admin-fam-select", "block");
         const rs = $("admin-res-select"); rs.innerHTML = '<option value="">住民資料載入中…</option>'; rs.disabled = true;
@@ -1008,7 +1019,11 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
   }
   function gate(){
     var role=""; try{ role=localStorage.getItem("portal_role")||""; }catch(e){}
-    if(role!=="admin"){ gateNotice("此頁僅限行政人員使用。"); return; }
+    if(role!=="admin" && role!=="manager"){ gateNotice("此頁僅限行政人員使用。"); return; } // 主管＝行政全權
+    // 入口認證 token 模式：有有效 portal_token 就直接進（後端驗證身份）
+    var token=""; try{ var pt=localStorage.getItem("portal_token"); var pe=parseInt(localStorage.getItem("portal_exp")||"0",10); if(pt&&pe*1000>Date.now()) token=pt; }catch(e){}
+    if(token){ app.props = { testMode:false, forceAdmin:true, authToken:token }; try{ app.componentDidMount(); }catch(e){ console.error(e); } return; }
+    // 過渡期：舊通行碼
     var pwd=""; try{ pwd=localStorage.getItem("handover_code")||""; }catch(e){}
     if(!pwd){ gateNotice("通行碼與探視系統不符，請洽管理員。"); return; }
     fetch(SCRIPT_URL_GATE+"?action=verify&pwd="+encodeURIComponent(pwd)+"&t="+Date.now())

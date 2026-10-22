@@ -178,9 +178,8 @@
       <h3>線東大眾護理之家</h3>
       <div class="gsub" data-i18n="orgSub">系 統 整 合 入 口</div>
       <div class="field"><select id="gLang" onchange="applyLang(this.value)" style="width:100%;padding:14px 16px;text-align:center;font-size:15px;font-family:inherit;border:1.5px solid var(--line);border-radius:13px;background:#fbf9f3;color:var(--ink);cursor:pointer;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7d74%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;text-align-last:center"><option value="zh">中文</option><option value="id">Bahasa Indonesia</option><option value="vi">Tiếng Việt</option></select></div>
-      <div class="field"><select id="gRole" style="width:100%;padding:14px 16px;text-align:center;font-size:15px;font-family:inherit;border:1.5px solid var(--line);border-radius:13px;background:#fbf9f3;color:var(--ink);cursor:pointer;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2214%22 height=%2214%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%236b7d74%22 stroke-width=%222%22><path d=%22M6 9l6 6 6-6%22/></svg>');background-repeat:no-repeat;background-position:right 14px center;text-align-last:center"><option value="admin" data-i18n="roleAdmin">行政</option><option value="nurse" data-i18n="roleNurse">護理</option><option value="care" data-i18n="roleCare">照服</option></select></div>
-      <div class="field"><input id="gCode" type="password" placeholder="通行碼" data-i18n-ph="phCode" autocomplete="off"></div>
-      <div class="field"><input id="gName" type="text" placeholder="你的名字，例如：王小明" data-i18n-ph="phName" autocomplete="off"></div>
+      <div class="field"><input id="gName" type="text" placeholder="你的名字，例如：王小明" data-i18n-ph="phName" autocomplete="username" maxlength="40"></div>
+      <div class="field"><input id="gCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="6 位數通行碼" data-i18n-ph="phCode" autocomplete="current-password"></div>
       <button id="gBtn" onclick="doLogin()" data-i18n="btnLogin">登　入</button>
       <div id="gateMsg"></div>
       <div class="gate-hint" data-i18n="hint">這台裝置登入一次就會記住，之後免再輸入。</div>
@@ -269,6 +268,14 @@
         <span class="go"><span data-i18n="open">開啟系統</span> <span class="arrow">→</span></span>
       </a>
 
+      <a class="card" data-key="people" style="--a1:#c8923a;--a2:#a8702a" href="people/index.html">
+        <div class="ico">👥</div>
+        <div class="cat" data-i18n="peopleCat">主 管 · 人 員 管 理</div>
+        <h2 data-i18n="peopleTitle">人員名單管理</h2>
+        <p data-i18n="peopleDesc">新增或停用同仁的登入帳號、設定身份與通行碼。</p>
+        <span class="go"><span data-i18n="open">開啟系統</span> <span class="arrow">→</span></span>
+      </a>
+
     </div>
   </main>
 
@@ -279,23 +286,27 @@
   </footer>
 
   <script>
-    /* 行政交班後端（用來驗證通行碼）。交通車等內部系統共用同一組登入。 */
-    var VERIFY_API = "https://script.google.com/macros/s/AKfycby_XulC71Nz1aPSSzlPxuSNfd0DOmAaJF2FJbphmRGyfFTkuhcUFvhyVgfG215SYIaZ/exec";
-    /* 與各系統共用的瀏覽器記憶鍵（勿更動，行政交班系統靠這兩個鍵免登入） */
+    /* 入口認證後端：個人帳號（姓名＋6 位數通行碼）登入，回傳 12 小時憑證與身份 */
+    var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1LEZoMrWlUGQ8TSETNExaMLHZglE_zhEyTIs_rrDf8g8/exec";
+    /* 與各系統共用的瀏覽器記憶鍵。portal_token／portal_exp 是各系統送去後端驗證的憑證；
+       portal_role 只用來決定顯示哪些畫面（真正的權限由各系統後端用憑證判斷）。
+       handover_code（舊的共用通行碼）登入後不再寫入，並會清除。 */
     var CODE_KEY = "handover_code", NAME_KEY = "handover_name";
-    var ROLE_KEY = "portal_role";
+    var ROLE_KEY = "portal_role", TOKEN_KEY = "portal_token", EXP_KEY = "portal_exp";
     /* 本機構固定值：維修系統等後端有跨機構資料，靠這個鍵讀本站對應的機構名稱 */
     var ORG_KEY = "handover_org", ORG_VALUE = "線東大眾護理之家";
     /* 各身份可看到的卡片（改這裡就好；卡片 data-key：visit/items/handover/car/pricing/repair/training） */
     var ROLE_CARDS = {
+      manager: ["visit","tour","items","handover","car","pricing","repair","training","people"],   /* 主管：行政全部＋人員名單管理 */
       admin: ["visit","tour","items","handover","car","pricing","repair","training"],   /* 行政：全部 */
       nurse: ["visit","tour","items","pricing","repair"],                 /* 護理：除行政交班、交通車外全部 */
       care:  ["visit","items","repair"]                             /* 照服：不含計價、交通車、行政交班 */
     };
-    var ROLE_LABEL = { admin:"行政", nurse:"護理", care:"照服" };
+    var ROLE_LABEL = { manager:"主管", admin:"行政", nurse:"護理", care:"照服" };
     /* 卡片預設連結；ROLE_HREF 可讓某身份的某張卡改連別的頁（例：照服的探視卡→簡化今日名單頁） */
-    var DEFAULT_HREF = { visit:"visit/index.html", tour:"tour/index.html", items:"items/index.html", handover:"admin/index.html", car:"car/index.html", pricing:"pricing/index.html", repair:"repair/index.html", training:"training/index.html" };
+    var DEFAULT_HREF = { visit:"visit/index.html", tour:"tour/index.html", items:"items/index.html", handover:"admin/index.html", car:"car/index.html", pricing:"pricing/index.html", repair:"repair/index.html", training:"training/index.html", people:"people/index.html" };
     var ROLE_HREF = {
+      manager: { visit:"visit-admin/index.html" },
       admin: { visit:"visit-admin/index.html" },
       nurse: { visit:"visit-today/index.html", items:"items-check/index.html", repair:"repair-report/index.html" },
       care:  { visit:"visit-today/index.html", items:"items-check/index.html", repair:"repair-report/index.html" }
@@ -303,10 +314,10 @@
     /* ===== 多語系（入口頁）===== */
     var LANG_KEY = "portal_lang";
     var CUR_NAME = "", CUR_ROLE = "";
-    var I18N = {"zh": {"orgSub": "系 統 整 合 入 口", "roleAdmin": "行政", "roleNurse": "護理", "roleCare": "照服", "phCode": "通行碼", "phName": "你的名字，例如：王小明", "btnLogin": "登　入", "hint": "這台裝置登入一次就會記住，之後免再輸入。", "tbTitle": "系統整合入口", "logout": "登出", "open": "開啟系統", "verifying": "驗證中…", "errName": "請填寫你的名字", "errCode": "請輸入通行碼", "errWrong": "通行碼錯誤，請再試一次", "errNet": "連線失敗，請檢查網路後再試", "footer1": "線東大眾護理之家 · 內部系統整合入口", "footer2": "如需新增或調整系統連結，請通知資訊窗口鈞傑", "visitCat": "家 屬 · 訪 客", "visitTitle": "預約探視系統", "visitDesc": "家屬 / 訪客線上預約探視時段，管理探視名單與時段。", "itemsCat": "住 民 物 品", "itemsTitle": "物品登記系統", "itemsDesc": "住民個人物品 / 寄放物品登記與查詢，進出留存紀錄。", "handoverCat": "行 政 · 交 班", "handoverTitle": "行政交班暨任務管理系統", "handoverDesc": "行政交班事項、待辦任務指派與進度追蹤，班次交接不漏接。", "carCat": "長 照 交 通", "carTitle": "交通車預約系統", "carDesc": "長照 3.0 交通接送預約、派車單與日報表產生。", "pricingCat": "費 用 · 計 價", "pricingTitle": "住民計價管理系統", "pricingDesc": "住民各項費用計價、月費與收費項目管理。", "repairCat": "設 備 · 維 修", "repairTitle": "維修申請系統", "repairDesc": "設備 / 環境維修線上申請、派工與處理進度追蹤。", "trainingCat": "人 員 · 教 育 訓 練", "trainingTitle": "員工教育訓練系統", "trainingDesc": "員工在職教育訓練課程、時數登錄與年度完訓進度追蹤。"}, "id": {"orgSub": "Portal Sistem", "roleAdmin": "Administrasi", "roleNurse": "Perawat", "roleCare": "Pengasuh", "phCode": "Kode akses", "phName": "Nama Anda, contoh: Budi", "btnLogin": "Masuk", "hint": "Perangkat ini akan mengingat setelah login sekali, tidak perlu isi lagi.", "tbTitle": "Portal Sistem", "logout": "Keluar", "open": "Buka sistem", "verifying": "Memverifikasi…", "errName": "Silakan isi nama Anda", "errCode": "Silakan masukkan kode akses", "errWrong": "Kode akses salah, coba lagi", "errNet": "Koneksi gagal, periksa jaringan lalu coba lagi", "footer1": "線東大眾護理之家 · Portal Sistem Internal", "footer2": "Untuk menambah/mengubah tautan sistem, hubungi admin IT Jun-Jie.", "visitCat": "Keluarga · Tamu", "visitTitle": "Sistem Reservasi Kunjungan", "visitDesc": "Reservasi jadwal kunjungan online untuk keluarga/tamu, kelola daftar & jadwal kunjungan.", "itemsCat": "Barang Penghuni", "itemsTitle": "Sistem Pendaftaran Barang", "itemsDesc": "Pendaftaran & pencarian barang pribadi/titipan penghuni, catatan masuk-keluar.", "handoverCat": "Administrasi · Serah Terima", "handoverTitle": "Sistem Serah Terima & Tugas", "handoverDesc": "Serah terima administrasi, penugasan & pelacakan tugas, pergantian shift tidak terlewat.", "carCat": "Transportasi", "carTitle": "Sistem Reservasi Antar-Jemput", "carDesc": "Reservasi antar-jemput Perawatan Jangka Panjang 3.0, surat tugas & laporan harian.", "pricingCat": "Biaya", "pricingTitle": "Sistem Manajemen Biaya Penghuni", "pricingDesc": "Perhitungan biaya penghuni, biaya bulanan & manajemen item tagihan.", "repairCat": "Peralatan · Perbaikan", "repairTitle": "Sistem Permintaan Perbaikan", "repairDesc": "Permintaan perbaikan peralatan/lingkungan online, penugasan & pelacakan progres.", "trainingCat": "Staf · Pelatihan", "trainingTitle": "Sistem Pelatihan Karyawan", "trainingDesc": "Kursus pelatihan karyawan, pencatatan jam & pelacakan progres tahunan."}, "vi": {"orgSub": "Cổng Hệ thống", "roleAdmin": "Hành chính", "roleNurse": "Điều dưỡng", "roleCare": "Hộ lý", "phCode": "Mã truy cập", "phName": "Tên của bạn, ví dụ: Nguyễn Văn A", "btnLogin": "Đăng nhập", "hint": "Thiết bị này sẽ ghi nhớ sau khi đăng nhập một lần, lần sau không cần nhập lại.", "tbTitle": "Cổng Hệ thống", "logout": "Đăng xuất", "open": "Mở hệ thống", "verifying": "Đang xác minh…", "errName": "Vui lòng nhập tên của bạn", "errCode": "Vui lòng nhập mã truy cập", "errWrong": "Mã truy cập sai, vui lòng thử lại", "errNet": "Kết nối thất bại, kiểm tra mạng rồi thử lại", "footer1": "線東大眾護理之家 · Cổng Hệ thống Nội bộ", "footer2": "Cần thêm/chỉnh sửa liên kết hệ thống, vui lòng báo cho phụ trách CNTT Jun-Jie.", "visitCat": "Người nhà · Khách", "visitTitle": "Hệ thống Đặt lịch Thăm", "visitDesc": "Người nhà/khách đặt lịch thăm trực tuyến, quản lý danh sách & khung giờ thăm.", "itemsCat": "Vật dụng Cư dân", "itemsTitle": "Hệ thống Đăng ký Vật dụng", "itemsDesc": "Đăng ký & tra cứu vật dụng cá nhân/gửi giữ của cư dân, lưu hồ sơ ra-vào.", "handoverCat": "Hành chính · Bàn giao", "handoverTitle": "Hệ thống Bàn giao & Công việc", "handoverDesc": "Bàn giao hành chính, phân công & theo dõi công việc, chuyển ca không bỏ sót.", "carCat": "Vận chuyển", "carTitle": "Hệ thống Đặt xe Đưa đón", "carDesc": "Đặt xe đưa đón Chăm sóc Dài hạn 3.0, phiếu điều xe & báo cáo hằng ngày.", "pricingCat": "Chi phí", "pricingTitle": "Hệ thống Quản lý Chi phí Cư dân", "pricingDesc": "Tính chi phí các khoản của cư dân, phí hằng tháng & quản lý hạng mục thu phí.", "repairCat": "Thiết bị · Sửa chữa", "repairTitle": "Hệ thống Yêu cầu Sửa chữa", "repairDesc": "Yêu cầu sửa chữa thiết bị/môi trường trực tuyến, phân công & theo dõi tiến độ.", "trainingCat": "Nhân sự · Đào tạo", "trainingTitle": "Hệ thống Đào tạo Nhân viên", "trainingDesc": "Khóa đào tạo nhân viên, ghi giờ học & theo dõi tiến độ hằng năm."}};
+    var I18N = {"zh": {"orgSub": "系 統 整 合 入 口", "roleAdmin": "行政", "roleNurse": "護理", "roleCare": "照服", "phCode": "6 位數通行碼", "phName": "你的名字，例如：王小明", "btnLogin": "登　入", "hint": "登入後 12 小時內免再輸入；換班或共用電腦請按「登出」。", "tbTitle": "系統整合入口", "logout": "登出", "open": "開啟系統", "verifying": "驗證中…", "errName": "請填寫你的名字", "errCode": "請輸入通行碼", "errWrong": "姓名或通行碼錯誤，請再試一次", "errNet": "連線失敗，請檢查網路後再試", "footer1": "線東大眾護理之家 · 內部系統整合入口", "footer2": "如需新增或調整系統連結，請通知資訊窗口鈞傑", "visitCat": "家 屬 · 訪 客", "visitTitle": "預約探視系統", "visitDesc": "家屬 / 訪客線上預約探視時段，管理探視名單與時段。", "itemsCat": "住 民 物 品", "itemsTitle": "物品登記系統", "itemsDesc": "住民個人物品 / 寄放物品登記與查詢，進出留存紀錄。", "handoverCat": "行 政 · 交 班", "handoverTitle": "行政交班暨任務管理系統", "handoverDesc": "行政交班事項、待辦任務指派與進度追蹤，班次交接不漏接。", "carCat": "長 照 交 通", "carTitle": "交通車預約系統", "carDesc": "長照 3.0 交通接送預約、派車單與日報表產生。", "pricingCat": "費 用 · 計 價", "pricingTitle": "住民計價管理系統", "pricingDesc": "住民各項費用計價、月費與收費項目管理。", "repairCat": "設 備 · 維 修", "repairTitle": "維修申請系統", "repairDesc": "設備 / 環境維修線上申請、派工與處理進度追蹤。", "trainingCat": "人 員 · 教 育 訓 練", "trainingTitle": "員工教育訓練系統", "trainingDesc": "員工在職教育訓練課程、時數登錄與年度完訓進度追蹤。", "roleManager": "主管", "errCodeFmt": "通行碼是 6 位數字", "errLocked": "輸入錯誤次數過多，請 10 分鐘後再試", "errBusy": "系統忙碌中，請稍後再試", "peopleCat": "主 管 · 人 員 管 理", "peopleTitle": "人員名單管理", "peopleDesc": "新增或停用同仁的登入帳號、設定身份與通行碼。"}, "id": {"orgSub": "Portal Sistem", "roleAdmin": "Administrasi", "roleNurse": "Perawat", "roleCare": "Pengasuh", "phCode": "Kode akses 6 digit", "phName": "Nama Anda, contoh: Budi", "btnLogin": "Masuk", "hint": "Setelah login, tidak perlu masuk lagi selama 12 jam; pada perangkat bersama, tekan \"Keluar\".", "tbTitle": "Portal Sistem", "logout": "Keluar", "open": "Buka sistem", "verifying": "Memverifikasi…", "errName": "Silakan isi nama Anda", "errCode": "Silakan masukkan kode akses", "errWrong": "Nama atau kode akses salah, coba lagi", "errNet": "Koneksi gagal, periksa jaringan lalu coba lagi", "footer1": "線東大眾護理之家 · Portal Sistem Internal", "footer2": "Untuk menambah/mengubah tautan sistem, hubungi admin IT Jun-Jie.", "visitCat": "Keluarga · Tamu", "visitTitle": "Sistem Reservasi Kunjungan", "visitDesc": "Reservasi jadwal kunjungan online untuk keluarga/tamu, kelola daftar & jadwal kunjungan.", "itemsCat": "Barang Penghuni", "itemsTitle": "Sistem Pendaftaran Barang", "itemsDesc": "Pendaftaran & pencarian barang pribadi/titipan penghuni, catatan masuk-keluar.", "handoverCat": "Administrasi · Serah Terima", "handoverTitle": "Sistem Serah Terima & Tugas", "handoverDesc": "Serah terima administrasi, penugasan & pelacakan tugas, pergantian shift tidak terlewat.", "carCat": "Transportasi", "carTitle": "Sistem Reservasi Antar-Jemput", "carDesc": "Reservasi antar-jemput Perawatan Jangka Panjang 3.0, surat tugas & laporan harian.", "pricingCat": "Biaya", "pricingTitle": "Sistem Manajemen Biaya Penghuni", "pricingDesc": "Perhitungan biaya penghuni, biaya bulanan & manajemen item tagihan.", "repairCat": "Peralatan · Perbaikan", "repairTitle": "Sistem Permintaan Perbaikan", "repairDesc": "Permintaan perbaikan peralatan/lingkungan online, penugasan & pelacakan progres.", "trainingCat": "Staf · Pelatihan", "trainingTitle": "Sistem Pelatihan Karyawan", "trainingDesc": "Kursus pelatihan karyawan, pencatatan jam & pelacakan progres tahunan.", "roleManager": "Manajer", "errCodeFmt": "Kode akses terdiri dari 6 angka", "errLocked": "Terlalu banyak percobaan salah, coba lagi dalam 10 menit", "errBusy": "Sistem sibuk, coba lagi sebentar", "peopleCat": "Manajer · Kelola Staf", "peopleTitle": "Kelola Daftar Staf", "peopleDesc": "Tambah atau nonaktifkan akun login staf, atur peran dan kode akses."}, "vi": {"orgSub": "Cổng Hệ thống", "roleAdmin": "Hành chính", "roleNurse": "Điều dưỡng", "roleCare": "Hộ lý", "phCode": "Mã truy cập 6 chữ số", "phName": "Tên của bạn, ví dụ: Nguyễn Văn A", "btnLogin": "Đăng nhập", "hint": "Đăng nhập xong không cần nhập lại trong 12 giờ; máy dùng chung vui lòng bấm \"Đăng xuất\".", "tbTitle": "Cổng Hệ thống", "logout": "Đăng xuất", "open": "Mở hệ thống", "verifying": "Đang xác minh…", "errName": "Vui lòng nhập tên của bạn", "errCode": "Vui lòng nhập mã truy cập", "errWrong": "Tên hoặc mã truy cập sai, vui lòng thử lại", "errNet": "Kết nối thất bại, kiểm tra mạng rồi thử lại", "footer1": "線東大眾護理之家 · Cổng Hệ thống Nội bộ", "footer2": "Cần thêm/chỉnh sửa liên kết hệ thống, vui lòng báo cho phụ trách CNTT Jun-Jie.", "visitCat": "Người nhà · Khách", "visitTitle": "Hệ thống Đặt lịch Thăm", "visitDesc": "Người nhà/khách đặt lịch thăm trực tuyến, quản lý danh sách & khung giờ thăm.", "itemsCat": "Vật dụng Cư dân", "itemsTitle": "Hệ thống Đăng ký Vật dụng", "itemsDesc": "Đăng ký & tra cứu vật dụng cá nhân/gửi giữ của cư dân, lưu hồ sơ ra-vào.", "handoverCat": "Hành chính · Bàn giao", "handoverTitle": "Hệ thống Bàn giao & Công việc", "handoverDesc": "Bàn giao hành chính, phân công & theo dõi công việc, chuyển ca không bỏ sót.", "carCat": "Vận chuyển", "carTitle": "Hệ thống Đặt xe Đưa đón", "carDesc": "Đặt xe đưa đón Chăm sóc Dài hạn 3.0, phiếu điều xe & báo cáo hằng ngày.", "pricingCat": "Chi phí", "pricingTitle": "Hệ thống Quản lý Chi phí Cư dân", "pricingDesc": "Tính chi phí các khoản của cư dân, phí hằng tháng & quản lý hạng mục thu phí.", "repairCat": "Thiết bị · Sửa chữa", "repairTitle": "Hệ thống Yêu cầu Sửa chữa", "repairDesc": "Yêu cầu sửa chữa thiết bị/môi trường trực tuyến, phân công & theo dõi tiến độ.", "trainingCat": "Nhân sự · Đào tạo", "trainingTitle": "Hệ thống Đào tạo Nhân viên", "trainingDesc": "Khóa đào tạo nhân viên, ghi giờ học & theo dõi tiến độ hằng năm.", "roleManager": "Quản lý", "errCodeFmt": "Mã truy cập gồm 6 chữ số", "errLocked": "Nhập sai quá nhiều lần, vui lòng thử lại sau 10 phút", "errBusy": "Hệ thống đang bận, vui lòng thử lại sau", "peopleCat": "Quản lý · Nhân sự", "peopleTitle": "Quản lý Danh sách Nhân viên", "peopleDesc": "Thêm hoặc vô hiệu hóa tài khoản đăng nhập, đặt vai trò và mã truy cập."}};
     function curLang(){ var l=lsGet(LANG_KEY); return I18N[l]?l:"zh"; }
     function T(k){ var d=I18N[curLang()]; return (d&&d[k]!=null)?d[k]:(I18N.zh[k]||""); }
-    function roleLabel(role){ var m={admin:"roleAdmin",nurse:"roleNurse",care:"roleCare"}; return T(m[role]||"")||""; }
+    function roleLabel(role){ var m={manager:"roleManager",admin:"roleAdmin",nurse:"roleNurse",care:"roleCare"}; return T(m[role]||"")||""; }
     function applyLang(lang){
       lang = I18N[lang] ? lang : "zh";
       lsSet(LANG_KEY, lang);
@@ -319,7 +330,7 @@
       if(CUR_ROLE){ var wn=document.getElementById("whoName"); if(wn) wn.textContent=CUR_NAME+(roleLabel(CUR_ROLE)?" · "+roleLabel(CUR_ROLE):""); }
     }
     function applyRole(role){
-      var allow = ROLE_CARDS[role] || ROLE_CARDS.admin;
+      var allow = ROLE_CARDS[role] || ROLE_CARDS.care;
       var cards = document.querySelectorAll("#app .card[data-key]");
       for(var i=0;i<cards.length;i++){
         var k = cards[i].getAttribute("data-key");
@@ -350,7 +361,7 @@
     function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 
     function showApp(name, role){
-      role = role || lsGet(ROLE_KEY) || "admin";
+      role = role || lsGet(ROLE_KEY) || "care";
       applyRole(role);
       document.getElementById("gate").classList.add("hidden");
       document.body.style.overflow = "";
@@ -367,40 +378,47 @@
       document.getElementById("whobar").classList.add("hidden");
       document.getElementById("gate").classList.remove("hidden");
       document.body.style.overflow = "hidden";
-      var r=lsGet(ROLE_KEY); if(r){ var s=document.getElementById("gRole"); if(s) s.value=r; }
-      setTimeout(function(){ var e=document.getElementById("gCode"); if(e) e.focus(); },0);
+      setTimeout(function(){ var e=document.getElementById("gName"); if(e) e.focus(); },0);
     }
 
-    /* 呼叫後端驗證通行碼；回傳 Promise，resolve true/false，網路錯誤時 reject */
-    function verifyCode(code){
-      return fetch(VERIFY_API, {
+    /* 向入口認證後端送出請求（text/plain 避免跨網域預檢）；網路錯誤時 reject */
+    function authCall(payload){
+      return fetch(AUTH_API, {
         method:"POST",
         headers:{ "Content-Type":"text/plain;charset=utf-8" },
-        body: JSON.stringify({ action:"verifyPass", args:[code] })
-      }).then(function(r){ return r.json(); }).then(function(res){ return !!res.ok; });
+        body: JSON.stringify(payload)
+      }).then(function(r){ return r.json(); });
+    }
+    function tokenValid(){
+      var t = lsGet(TOKEN_KEY), exp = parseInt(lsGet(EXP_KEY)||"0",10);
+      return !!t && exp > Math.floor(Date.now()/1000);
     }
 
     function doLogin(){
       var msg  = document.getElementById("gateMsg");
       var code = document.getElementById("gCode").value.trim();
       var name = document.getElementById("gName").value.trim();
-      var role = document.getElementById("gRole").value || "admin";
       msg.style.color = "#c0392b"; msg.textContent = "";
       if(!name){ msg.textContent = T("errName"); document.getElementById("gName").focus(); return; }
       if(!code){ msg.textContent = T("errCode"); document.getElementById("gCode").focus(); return; }
+      if(!/^\d{6}$/.test(code)){ msg.textContent = T("errCodeFmt"); document.getElementById("gCode").select(); return; }
 
       var btn = document.getElementById("gBtn");
       btn.disabled = true; msg.style.color = "var(--muted)"; msg.textContent = T("verifying");
-      verifyCode(code).then(function(ok){
+      authCall({ action:"login", name:name, code:code }).then(function(res){
         btn.disabled = false;
-        if(ok){
-          lsSet(CODE_KEY, code); lsSet(NAME_KEY, name); lsSet(ROLE_KEY, role); lsSet(ORG_KEY, ORG_VALUE);
+        if(res && res.ok && res.token){
+          lsSet(TOKEN_KEY, res.token); lsSet(EXP_KEY, String(res.exp||0));
+          lsSet(NAME_KEY, res.name||name); lsSet(ROLE_KEY, res.role); lsSet(ORG_KEY, ORG_VALUE);
+          lsDel(CODE_KEY);                                   /* 舊的共用通行碼不再使用 */
+          document.getElementById("gCode").value = "";
           msg.textContent = "";
-          showApp(name, role);
+          showApp(res.name||name, res.role);
         }else{
           msg.style.color = "#c0392b";
-          msg.textContent = T("errWrong");
-          var c=document.getElementById("gCode"); c.select(); c.focus();
+          var er = res && res.error;
+          msg.textContent = er==="locked" ? T("errLocked") : er==="busy" ? T("errBusy") : T("errWrong");
+          var c=document.getElementById("gCode"); c.value=""; c.focus();
         }
       }).catch(function(){
         btn.disabled = false;
@@ -410,22 +428,26 @@
     }
 
     function doLogout(){
-      lsDel(CODE_KEY); lsDel(NAME_KEY); lsDel(ROLE_KEY);
+      lsDel(TOKEN_KEY); lsDel(EXP_KEY); lsDel(CODE_KEY); lsDel(NAME_KEY); lsDel(ROLE_KEY);
       document.getElementById("gCode").value = "";
       showGate();
     }
 
-    /* 開啟即檢查是否已登入過（同網域，各系統共用這份記憶） */
+    /* 開啟即檢查憑證（同網域，各系統共用這份記憶）；舊版共用通行碼登入的裝置需重新登入 */
     (function boot(){
       applyLang(curLang());
-      var code = lsGet(CODE_KEY), name = lsGet(NAME_KEY);
-      if(code && name){
-        lsSet(ORG_KEY, ORG_VALUE);  // 補寫入：確保舊登入的裝置也有機構值
-        showApp(name, lsGet(ROLE_KEY) || "admin");  // 先放行，體驗順暢
-        verifyCode(code).then(function(ok){
-          if(!ok) doLogout();    // 通行碼已變更才擋回登入
-        }).catch(function(){});  // 網路問題不擋，交由各系統再驗
+      var name = lsGet(NAME_KEY);
+      if(tokenValid() && name){
+        lsSet(ORG_KEY, ORG_VALUE);
+        showApp(name, lsGet(ROLE_KEY) || "care");   /* 先放行，體驗順暢 */
+        authCall({ action:"verify", token:lsGet(TOKEN_KEY) }).then(function(res){
+          if(res && res.ok){
+            lsSet(ROLE_KEY, res.role); lsSet(NAME_KEY, res.name||name);
+            if(res.role !== CUR_ROLE || (res.name||name) !== CUR_NAME) showApp(res.name||name, res.role);   /* 身份有變就更新卡片 */
+          }else if(res && res.error==="unauthorized"){ doLogout(); }   /* 帳號停用或憑證失效 */
+        }).catch(function(){});                                         /* 網路問題不擋，由各系統後端再驗 */
       }else{
+        if(lsGet(CODE_KEY) || lsGet(TOKEN_KEY)){ lsDel(TOKEN_KEY); lsDel(EXP_KEY); lsDel(CODE_KEY); lsDel(NAME_KEY); lsDel(ROLE_KEY); }
         showGate();
       }
     })();
@@ -436,11 +458,11 @@
       return false;
     }
 
-    /* Enter 鍵：名字欄按 Enter 直接登入，通行碼欄按 Enter 跳到名字 */
-    document.getElementById("gCode").addEventListener("keydown",function(e){
-      if(e.key==="Enter"){ e.preventDefault(); document.getElementById("gName").focus(); }
-    });
+    /* Enter 鍵：名字欄按 Enter 跳到通行碼，通行碼欄按 Enter 直接登入 */
     document.getElementById("gName").addEventListener("keydown",function(e){
+      if(e.key==="Enter"){ e.preventDefault(); document.getElementById("gCode").focus(); }
+    });
+    document.getElementById("gCode").addEventListener("keydown",function(e){
       if(e.key==="Enter"){ e.preventDefault(); doLogin(); }
     });
   </script>

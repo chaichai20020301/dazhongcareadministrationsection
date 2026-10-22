@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>人員名單管理 · 線東大眾護理之家</title>
+<link rel="icon" href="data:,">
+<style>
+:root{--green:#2f9e6b;--green-d:#1c6b48;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;--gold:#a8702a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
+button,input,select{font-family:inherit}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{margin:6px 0 4px;font-size:24px}
+.sub{margin:0 0 16px;color:var(--muted);font-size:14px;line-height:1.6}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.btn{border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:15px;cursor:pointer}
+.btn.main{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff}
+.btn.sec{background:#fff;color:var(--green-d);border:2px solid var(--green)}
+.btn.warn{background:#fff;color:var(--red);border:2px solid #e6c9c4}
+.btn:disabled{opacity:.5}
+.tbl{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{display:grid;grid-template-columns:1.2fr .8fr .7fr 1.2fr auto;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);font-size:15px}
+.row:last-child{border-bottom:0}
+.row.h{background:#efeadd;font-weight:700;font-size:13px;color:var(--muted)}
+.row.off{opacity:.55}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:700;background:#e7f3dc;color:var(--green-d)}
+.tag.m{background:#f6e7c8;color:var(--gold)}.tag.x{background:#eee;color:#777}
+.act{display:flex;gap:6px;justify-content:flex-end}
+.act button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+.msg{min-height:22px;margin:8px 2px;font-size:14px;font-weight:700}
+.msg.err{color:var(--red)}.msg.ok{color:var(--green-d)}
+.modal{position:fixed;inset:0;background:rgba(28,43,35,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal.show{display:flex}
+.box{background:var(--card);border-radius:16px;padding:22px;width:100%;max-width:420px}
+.box h2{margin:0 0 14px;font-size:19px}
+.f{margin-bottom:12px}.f label{display:block;margin-bottom:4px;font-weight:700;font-size:14px}
+.f input,.f select{width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:16px;background:#fff}
+.f .hint{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.f.chk label{display:flex;gap:8px;align-items:center;font-weight:500}
+.f.chk input{width:auto}
+.btns{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+@media (max-width:640px){.row{grid-template-columns:1fr auto;grid-template-areas:"n a" "r a" "l l"}.row.h{display:none}.row .c-role{grid-area:r}.row .c-last{grid-area:l;font-size:12.5px;color:var(--muted)}.row .c-st{display:none}.act{grid-area:a}}
+</style>
+</head>
+<body>
+<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<main>
+  <h1>人員名單管理</h1>
+  <p class="sub">這裡管理誰可以登入入口網站、是什麼身份。<b>系統不會顯示任何人的通行碼</b>；要換通行碼請按「編輯」直接設定新的 6 位數字。停用或改身份後，最多 5 分鐘內各系統生效。</p>
+  <div class="bar"><button class="btn main" id="add">＋ 新增人員</button><button class="btn sec" id="reload">重新整理</button></div>
+  <div class="msg" id="msg"></div>
+  <div class="tbl" id="tbl"><div class="empty">載入中…</div></div>
+</main>
+
+<div class="modal" id="modal"><div class="box">
+  <h2 id="mt">新增人員</h2>
+  <div class="f"><label for="fName">姓名</label><input id="fName" type="text" maxlength="20" autocomplete="off"><div class="hint" id="nameHint">登入時要打的姓名（不分大小寫、空白）。</div></div>
+  <div class="f"><label for="fRole">身份</label><select id="fRole"><option value="manager">主管</option><option value="admin">行政</option><option value="nurse">護理</option><option value="care">照服</option></select></div>
+  <div class="f"><label for="fCode">通行碼</label><input id="fCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password" placeholder="6 位數字"><div class="hint" id="codeHint">每人自己的 6 位數字，不要重複、不要用 123456 或生日。</div></div>
+  <div class="f chk"><label><input id="fActive" type="checkbox" checked> 啟用（取消勾選＝停用，無法登入）</label></div>
+  <div class="msg err" id="fMsg"></div>
+  <div class="btns"><button class="btn sec" id="cancel">取消</button><button class="btn main" id="save">儲存</button></div>
+</div></div>
+
+<script>
+var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1LEZoMrWlUGQ8TSETNExaMLHZglE_zhEyTIs_rrDf8g8/exec";
+var $ = function(id){ return document.getElementById(id); };
+var ROLES = { manager:"主管", admin:"行政", nurse:"護理", care:"照服" };
+var people = [], editing = null, saving = false;
+function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function kick(){ try{ localStorage.removeItem("portal_token"); localStorage.removeItem("portal_exp"); }catch(e){} location.replace("../index.html"); }
+function call(payload){
+  var t = token(); if(!t){ kick(); return Promise.reject(new Error("unauthorized")); }
+  payload.token = t;
+  return fetch(AUTH_API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)}).then(function(r){ return r.json(); })
+    .then(function(j){ if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; });
+}
+function say(el,text,ok){ el.textContent=text||""; el.className="msg "+(ok?"ok":"err"); }
+function load(){
+  say($("msg"),"");
+  call({action:"people.list"}).then(function(j){
+    if(!j || !j.ok){ $("tbl").innerHTML='<div class="empty">'+(j&&j.error==="forbidden"?"只有主管可以使用這個頁面。":"載入失敗，請稍後再試。")+'</div>'; return; }
+    people=j.people||[]; draw();
+  }).catch(function(e){ if(e.message!=="unauthorized") $("tbl").innerHTML='<div class="empty">連線失敗，請檢查網路後重新整理。</div>'; });
+}
+function draw(){
+  if(!people.length){ $("tbl").innerHTML='<div class="empty">還沒有任何人員</div>'; return; }
+  var rows=people.map(function(p,i){
+    return '<div class="row'+(p.active?'':' off')+'"><div><b>'+esc(p.name)+'</b></div><div class="c-role"><span class="tag'+(p.role==="manager"?' m':'')+'">'+esc(ROLES[p.role]||p.role)+'</span></div><div class="c-st"><span class="tag'+(p.active?'':' x')+'">'+(p.active?'啟用':'停用')+'</span></div><div class="c-last">'+(p.last?esc(p.last):'尚未登入')+'</div><div class="act"><button data-e="'+i+'">編輯</button></div></div>';
+  }).join("");
+  $("tbl").innerHTML='<div class="row h"><div>姓名</div><div>身份</div><div>狀態</div><div>最近登入</div><div></div></div>'+rows;
+  $("tbl").querySelectorAll("[data-e]").forEach(function(b){ b.onclick=function(){ openForm(people[+b.dataset.e]); }; });
+}
+function openForm(p){
+  editing=p||null; $("mt").textContent=p?"編輯人員":"新增人員";
+  $("fName").value=p?p.name:""; $("fName").disabled=!!p; $("fRole").value=p?p.role:"nurse"; $("fCode").value="";
+  $("fActive").checked=p?!!p.active:true;
+  $("nameHint").textContent=p?"姓名不能修改；要改名請新增一位並停用舊的。":"登入時要打的姓名（不分大小寫、空白）。";
+  $("codeHint").textContent=p?"要換通行碼才填（6 位數字）；不換請留空。":"每人自己的 6 位數字，不要重複、不要用 123456 或生日。";
+  say($("fMsg"),""); $("modal").classList.add("show"); setTimeout(function(){ try{ (p?$("fCode"):$("fName")).focus(); }catch(e){} },30);
+}
+function closeForm(){ $("modal").classList.remove("show"); }
+var ERR={forbidden:"只有主管可以做這個操作。",invalid:"資料不正確：姓名 1～20 字、通行碼要是 6 位數字（新增人員必填）。",last_manager:"不能讓系統沒有任何「啟用中的主管」。請先設定另一位主管。",busy:"系統忙碌中，請稍後再試。"};
+function save(){
+  if(saving) return;
+  var name=$("fName").value.trim(), role=$("fRole").value, code=$("fCode").value.trim(), active=$("fActive").checked;
+  if(!name){ say($("fMsg"),"請填寫姓名。"); return; }
+  if(code && !/^\d{6}$/.test(code)){ say($("fMsg"),"通行碼必須是 6 位數字。"); return; }
+  if(!editing && !code){ say($("fMsg"),"新增人員必須設定 6 位數通行碼。"); return; }
+  if(/^(\d)\1{5}$/.test(code) || code==="123456" || code==="654321"){ say($("fMsg"),"通行碼太容易猜，請換一組。"); return; }
+  var payload={action:"people.save",name:name,role:role,active:active}; if(code) payload.code=code;
+  saving=true; $("save").disabled=true; say($("fMsg"),"");
+  call(payload).then(function(j){
+    saving=false; $("save").disabled=false;
+    if(j && j.ok){ closeForm(); say($("msg"),(j.created?"已新增 ":"已更新 ")+name+"。",true); load(); }
+    else say($("fMsg"),ERR[j&&j.error]||"儲存失敗，請稍後再試。");
+  }).catch(function(e){ saving=false; $("save").disabled=false; if(e.message!=="unauthorized") say($("fMsg"),"連線失敗，請檢查網路後再試。"); });
+}
+$("add").onclick=function(){ openForm(null); }; $("reload").onclick=load; $("cancel").onclick=closeForm; $("save").onclick=save;
+$("modal").addEventListener("click",function(e){ if(e.target===$("modal")) closeForm(); });
+if(!token()){ kick(); } else if(ls("portal_role") && ls("portal_role")!=="manager"){ $("tbl").innerHTML='<div class="empty">只有主管可以使用這個頁面。</div>'; $("add").disabled=true; } else load();
+</script>
+</body>
+</html>

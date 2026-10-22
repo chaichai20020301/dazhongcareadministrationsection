@@ -69,6 +69,9 @@ input:focus{outline:none;border-color:#4f8c3a}
 (function(){
   var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
   var CODE = "";
+  // 入口認證 token（有效的 portal_token 就走 token 模式；否則過渡期用 handover_code）
+  var TOKEN = "";
+  try { var pt = localStorage.getItem("portal_token"); var pe = parseInt(localStorage.getItem("portal_exp") || "0", 10); if (pt && pe * 1000 > Date.now()) TOKEN = pt; } catch (e) {}
 
   var I18N = {
     zh: { title:"探視名單查詢", sub:"預設顯示今日，可依日期或住民姓名查詢", date:"日期", name:"住民姓名", namePh:"輸入姓名查詢（跨日期）",
@@ -182,17 +185,24 @@ input:focus{outline:none;border-color:#4f8c3a}
 
   var fetching = false;
   function load(){
-    if(fetching || !CODE) return;
+    if(fetching) return;
     fetching = true;
     var T = I18N[lang];
     if(cache === null) render();
-    fetch(SCRIPT_URL + "?pwd=" + encodeURIComponent(CODE) + "&t=" + Date.now())
-      .then(function(res){ return res.json(); })
-      .then(function(data){
-        cache = data.records || [];
+    var p;
+    if(TOKEN){
+      p = fetch(SCRIPT_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({ action:"visit_list", token:TOKEN }) });
+    } else {
+      p = fetch(SCRIPT_URL + "?action=visit_list&pwd=" + encodeURIComponent(CODE) + "&t=" + Date.now());
+    }
+    p.then(function(res){ return res.json(); })
+      .then(function(j){
+        if(j && j.error === "unauthorized"){ if(TOKEN){ location.href = "../index.html"; } else { showNotice(I18N[lang].mismatch, true); } return; }
+        if(j && j.error === "forbidden"){ showNotice(I18N[lang].roleBlocked, true); return; }
+        if(j && j.error === "busy"){ setSync(I18N[lang].busy, true); return; }
+        cache = (j && j.records) || [];
         render();
-        var now = new Date();
-        setSync(T.synced + now.toLocaleTimeString(T.locale, {hour:"2-digit",minute:"2-digit"}), false);
+        setSync(T.synced + new Date().toLocaleTimeString(T.locale, {hour:"2-digit",minute:"2-digit"}), false);
       })
       .catch(function(){
         setSync(T.offline, true);
@@ -213,21 +223,13 @@ input:focus{outline:none;border-color:#4f8c3a}
     $("t-count").innerText = "";
   }
 
-  function verify(pwd, cb){
-    if(!pwd){ cb(false, false); return; }
-    fetch(SCRIPT_URL + "?action=verify&pwd=" + encodeURIComponent(pwd) + "&t=" + Date.now())
-      .then(function(r){ return r.json(); })
-      .then(function(j){ cb(!!(j && j.ok), !!(j && j.error === "busy")); })
-      .catch(function(){ cb(false, false); });
-  }
   function boot(){
     var role = ""; try { role = localStorage.getItem("portal_role") || ""; } catch(e){}
     if(!ROLES_ALLOWED[role]){ showNotice(I18N[lang].roleBlocked, true); return; }
-    var pwd = ""; try { pwd = localStorage.getItem("handover_code") || ""; } catch(e){}
-    verify(pwd, function(ok, busy){
-      if(ok){ CODE = pwd; load(); }
-      else { showNotice(busy ? I18N[lang].busy : I18N[lang].mismatch, !busy); }
-    });
+    if(TOKEN){ load(); return; } // 入口認證 token 模式：由後端驗證
+    var pwd = ""; try { pwd = localStorage.getItem("handover_code") || ""; } catch(e){} // 過渡期：舊通行碼
+    if(!pwd){ showNotice(I18N[lang].mismatch, true); return; }
+    CODE = pwd; load();
   }
 
   // 查詢控制
