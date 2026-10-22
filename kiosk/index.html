@@ -19,37 +19,72 @@
     -webkit-user-select:none;user-select:none;touch-action:manipulation;overscroll-behavior:none}
   button{font-family:inherit;cursor:pointer}
 
-  /* ===== 首頁 ===== */
-  #home{position:fixed;inset:0;display:flex;flex-direction:column;padding:3.2vmin 4vmin 2.6vmin;
-    background:radial-gradient(120% 90% at 85% -10%,#e3efd5 0,rgba(227,239,213,0) 55%),var(--paper)}
+  /* ===== 首頁（水彩風）===== */
+  #home{position:fixed;inset:0;display:flex;flex-direction:column;padding:2.6vmin 3.6vmin 2vmin;gap:2.4vmin;
+    background:#fcf9ef}
   #home.hide{display:none}
-  .top{display:flex;align-items:center;justify-content:space-between;gap:2vmin}
-  .top img{height:clamp(46px,8vmin,96px);width:auto;display:block}
-  .clock{text-align:right;line-height:1.25}
-  .clock .t{font:700 clamp(26px,4.4vmin,52px)/1 var(--sans);color:var(--green-d);letter-spacing:.02em}
-  .clock .d{font:500 clamp(15px,2.3vmin,26px) var(--sans);color:var(--muted);margin-top:.5vmin}
-  .welcome{margin:3vmin 0 3.2vmin}
-  .welcome h1{margin:0;font:900 clamp(34px,6vmin,76px)/1.15 var(--serif);letter-spacing:.04em}
-  .welcome p{margin:1.2vmin 0 0;font:500 clamp(18px,2.9vmin,34px) var(--sans);color:var(--muted)}
-  .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:3vmin}
-  .card{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;text-align:left;
-    border:0;border-radius:3vmin;padding:3.4vmin;color:#fff;overflow:hidden;
-    background:linear-gradient(145deg,var(--a1),var(--a2));
-    box-shadow:0 1.2vmin 3vmin rgba(28,43,35,.18);transition:transform .12s ease,box-shadow .12s ease}
-  .card:active{transform:scale(.975);box-shadow:0 .5vmin 1.4vmin rgba(28,43,35,.2)}
-  .card::after{content:"";position:absolute;right:-8vmin;top:-8vmin;width:30vmin;height:30vmin;border-radius:50%;background:rgba(255,255,255,.12)}
-  .card h2{margin:0;font:900 clamp(30px,5.2vmin,64px)/1.1 var(--sans);letter-spacing:.04em}
-  .card p{margin:1.2vmin 0 0;font:500 clamp(17px,2.7vmin,32px)/1.45 var(--sans);opacity:.95}
-  .card .go{display:inline-flex;align-items:center;gap:1vmin;background:#fff;color:var(--green-d);border-radius:999px;
-    padding:1.6vmin 3.2vmin;font:900 clamp(18px,2.9vmin,34px) var(--sans)}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:2vmin;flex:none}
+  .top img{height:clamp(46px,8.4vmin,100px);width:auto;display:block}
+  .clock{text-align:right;line-height:1.2}
+  .clock .t{font:900 clamp(30px,6vmin,72px)/1 var(--sans);color:#0f4d33;letter-spacing:.02em}
+  .clock .d{font:500 clamp(14px,2.2vmin,26px) var(--sans);color:#33443a;margin-top:.6vmin}
+  .welcome{position:relative;flex:none;overflow:hidden;border-radius:3vmin;padding:2.6vmin 4vmin;min-height:19vmin;display:flex;flex-direction:column;justify-content:center;
+    background:#f3f4e2 url(img/bld.jpg) right center/auto 100% no-repeat;box-shadow:0 .6vmin 2vmin rgba(60,80,50,.12)}
+  .welcome::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#f6f5e6 0,#f6f5e6 38%,rgba(246,245,230,0) 66%)}
+  .welcome>*{position:relative}
+  .welcome h1{margin:0;font:900 clamp(30px,5.4vmin,72px)/1.18 var(--serif);letter-spacing:.04em;color:#17261d}
+  .welcome h1 br{display:none}
+  .welcome p{margin:1vmin 0 0;font:500 clamp(18px,3vmin,38px) var(--sans);color:#33443a}
+  .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:2.6vmin}
+  .card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.4vmin;text-align:center;
+    border:.25vmin solid #c8dcb8;border-radius:3vmin;padding:2.6vmin 2vmin;color:#17261d;overflow:hidden;
+    background:linear-gradient(160deg,#e8f3dc,#d9ead0);
+    box-shadow:0 .8vmin 2.2vmin rgba(60,90,60,.14);transition:transform .12s ease,box-shadow .12s ease}
+  .card:active{transform:scale(.975);box-shadow:0 .3vmin 1vmin rgba(60,90,60,.2)}
+  .card .leaf{position:absolute;width:11vmin;height:auto;opacity:.55;pointer-events:none}
+  .card .leaf.l{left:-1.5vmin;top:1vmin}
+  .card .leaf.r{right:-1.5vmin;bottom:5vmin;transform:scaleX(-1) rotate(8deg)}
+  .card .ico{width:clamp(70px,16vmin,190px);height:auto;color:#0f4d33;flex:none;position:relative}
+  .card .txt{position:relative}
+  .card h2{margin:0;font:900 clamp(30px,5.6vmin,70px)/1.1 var(--sans);letter-spacing:.04em}
+  .card p{margin:1vmin 0 0;font:500 clamp(16px,2.5vmin,32px)/1.4 var(--sans);color:#33443a}
+  .card .go{position:relative;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;color:#fff;background:#14583a;
+    padding:1.7vmin 3vmin;width:90%;font:900 clamp(20px,3.2vmin,40px) var(--sans);box-shadow:0 .5vmin 1.2vmin rgba(15,77,51,.3)}
+  .card.items{background:linear-gradient(160deg,#fdf1de,#f8e4c6);border-color:#efc994;color:#17261d}
+  .card.items .ico{color:#a9531b}
+  .card.items .go{background:#b25a1e;box-shadow:0 .5vmin 1.2vmin rgba(178,90,30,.3)}
   .card.soon{filter:saturate(.55)}
   .card .tag{position:absolute;right:2.4vmin;top:2.4vmin;z-index:1;background:#fff;color:#8a5a00;border-radius:999px;
     padding:.8vmin 2vmin;font:900 clamp(15px,2.3vmin,26px) var(--sans)}
-  .foot{margin-top:2.4vmin;display:flex;justify-content:space-between;align-items:center;gap:2vmin;
-    font:500 clamp(15px,2.3vmin,26px) var(--sans);color:var(--muted)}
-  .foot b{color:var(--green-d);font-weight:700}
-  @media (max-aspect-ratio:1/1){ .grid{grid-template-columns:1fr;grid-auto-rows:1fr} .card{flex-direction:row;align-items:center;gap:3vmin}
-    .card .txt{flex:1} .card .go{align-self:center} }
+  .foot{flex:none;display:flex;align-items:center;gap:2.4vmin;padding-top:1.8vmin;border-top:.2vmin solid #cfd3c4;
+    font:500 clamp(14px,2.2vmin,26px) var(--sans);color:#33443a}
+  .foot .hs{width:clamp(44px,8vmin,90px);height:auto;color:#0f4d33;flex:none}
+  .foot .help{font:700 clamp(20px,3.6vmin,46px) var(--sans);color:#17261d;letter-spacing:.03em}
+  .foot .info{margin-left:auto;display:flex;align-items:center;gap:2vmin}
+  .foot .sep{width:.2vmin;height:3.4vmin;background:#aab1a0}
+  .foot b{color:#0f4d33;font-weight:700}
+  @media (max-aspect-ratio:1/1){
+    .welcome h1 br{display:inline}
+    .welcome{min-height:24vmin;padding:3vmin 4vmin}
+    .grid{grid-template-columns:1fr;grid-auto-rows:1fr}
+    .card{display:grid;grid-template-columns:34% 1fr;grid-template-rows:auto auto;column-gap:2vmin;row-gap:1.2vmin;align-content:center;text-align:left;padding:2.4vmin 3vmin}
+    .card .ico{grid-row:1/3;justify-self:center;width:clamp(80px,22vmin,230px)}
+    .card .txt{grid-column:2;grid-row:1;align-self:end}
+    .card .go{grid-column:2;grid-row:2;align-self:start;width:100%}
+    .card .leaf.r{display:none}
+    .card h2{font-size:7.2vmin}
+    .card p{font-size:3vmin}
+    .card .go{font-size:4vmin;padding:2vmin 3vmin}
+    .welcome h1{font-size:7vmin}
+    .welcome p{font-size:3.4vmin}
+    .foot .info{font-size:2.6vmin}
+    .foot .help{font-size:4.4vmin}
+    .foot{flex-wrap:wrap}
+    .foot .info{margin-left:0;flex-basis:100%;margin-top:-1vmin}
+    .foot .info .sep{display:none}
+    .foot .info{gap:3vmin;justify-content:flex-start}
+    .foot .help{flex:1}
+  }
 
   /* ===== 內嵌系統畫面 ===== */
   #frameView{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper)}
@@ -90,27 +125,29 @@
     <div class="clock"><div class="t" id="clkT">--:--</div><div class="d" id="clkD"></div></div>
   </div>
   <div class="welcome">
-    <h1>歡迎來到線東大眾護理之家</h1>
-    <p>請點選您需要的服務，需要協助時請洽櫃檯人員</p>
+    <h1>歡迎來到<br>大眾護理之家</h1>
+    <p>請點選您需要的服務</p>
   </div>
   <div class="grid">
-    <button class="card" style="--a1:#2f9e6b;--a2:#1c6b48" onclick="openApp('visit')">
+    <button class="card" onclick="openApp('visit')">
+      <svg class="leaf l" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><svg class="leaf r" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><svg class="ico" viewBox="0 0 120 110" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="16" width="82" height="76" rx="12"/><path d="M26 6v18M72 6v18M8 38h82"/><g fill="currentColor" stroke="none" opacity=".75"><rect x="20" y="48" width="12" height="10" rx="2"/><rect x="40" y="48" width="12" height="10" rx="2"/><rect x="60" y="48" width="12" height="10" rx="2"/><rect x="20" y="68" width="12" height="10" rx="2"/><rect x="40" y="68" width="12" height="10" rx="2"/></g><circle cx="88" cy="82" r="22" fill="#fff" fill-opacity=".0"/><path d="M88 68v15l10 6"/></svg>
       <div class="txt"><h2>探視預約</h2><p>預約探視家人的日期與時段</p></div>
       <span class="go">開始預約 →</span>
     </button>
-    <button class="card" style="--a1:#6aae3c;--a2:#2f8f78" onclick="openApp('tour')">
+    <button class="card" onclick="openApp('tour')">
+      <svg class="leaf l" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><svg class="leaf r" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><svg class="ico" viewBox="0 0 120 110" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 54L60 10l52 44"/><path d="M20 48v52h80V48"/><path d="M48 100V72a12 12 0 0124 0v28"/><g fill="currentColor" stroke="none"><rect x="28" y="62" width="10" height="10" rx="2"/><rect x="82" y="62" width="10" height="10" rx="2"/></g></svg>
       <div class="txt"><h2>參訪預約</h2><p>想了解入住？預約參觀機構環境</p></div>
       <span class="go">開始預約 →</span>
     </button>
-    <button class="card" id="cardItems" style="--a1:#c8923a;--a2:#a8702a" onclick="openApp('items')">
-      <span class="tag" id="itemsTag" style="display:none">即將開放</span>
+    <button class="card items" id="cardItems" onclick="openApp('items')">
+      <svg class="leaf l" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><svg class="leaf r" viewBox="0 0 100 120" aria-hidden="true"><g fill="#7fae5f"><path d="M50 118 C48 80 46 50 52 6" stroke="#6a9a4e" stroke-width="2.5" fill="none"/><path d="M50 90 C30 86 16 70 14 54 C34 56 48 70 50 90Z"/><path d="M50 70 C70 66 84 50 86 34 C66 36 52 50 50 70Z"/><path d="M50 46 C34 42 24 30 22 16 C38 18 48 30 50 46Z"/></g></svg><span class="tag" id="itemsTag" style="display:none">即將開放</span><svg class="ico" viewBox="0 0 120 110" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M60 34L16 54v40l44 16 44-16V54z" transform="translate(0 -10)"/><path d="M16 44l44 16 44-16M60 60v50" transform="translate(0 -10)"/><path d="M92 12l8-8M104 30l10-3M80 6l2-8" stroke-width="5"/></svg>
       <div class="txt"><h2>物品登記</h2><p>登記今天帶來給長輩的衣物與用品</p></div>
       <span class="go">開始登記 →</span>
     </button>
   </div>
   <div class="foot">
-    <span>服務電話 <b>(04)763-0685</b></span>
-    <span>彰化縣彰化市線東路一段一號</span>
+    <svg class="hs" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 52V44a30 30 0 0160 0v8"/><rect x="12" y="46" width="12" height="22" rx="5"/><rect x="76" y="46" width="12" height="22" rx="5"/><path d="M82 68c0 10-8 14-22 14"/><circle cx="50" cy="48" r="13"/><path d="M24 96c2-18 12-26 26-26s24 8 26 26"/></svg><span class="help">需要協助，請洽櫃檯人員</span>
+    <span class="info"><span>服務電話 <b>(04)763-0685</b></span><span class="sep"></span><span>彰化縣彰化市線東路一段一號</span></span>
   </div>
 </main>
 
