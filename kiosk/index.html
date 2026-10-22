@@ -51,13 +51,13 @@
   #frameView{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper)}
   #frameView.show{display:flex}
   .bar{flex:none;height:clamp(64px,10vmin,110px);display:flex;align-items:center;gap:2.4vmin;padding:0 3vmin;
-    background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 .4vmin 1.6vmin rgba(28,43,35,.08);z-index:2}
-  .back{display:inline-flex;align-items:center;gap:1vmin;border:0;border-radius:999px;color:#fff;
-    background:linear-gradient(120deg,var(--green),var(--green-d));padding:0 3.4vmin;height:72%;
-    font:900 clamp(20px,3.2vmin,38px) var(--sans);box-shadow:0 .6vmin 1.6vmin rgba(28,107,72,.3)}
-  .back:active{transform:scale(.97)}
-  .bar .ttl{font:900 clamp(22px,3.6vmin,44px) var(--serif);letter-spacing:.04em}
-  .bar .help{margin-left:auto;font:500 clamp(14px,2.2vmin,26px) var(--sans);color:var(--muted)}
+    background:#fcf9ef;border-bottom:.2vmin solid #d3dcc7;z-index:2}
+  .back{display:inline-flex;align-items:center;gap:1vmin;border:.3vmin solid #14583a;border-radius:999px;color:#17261d;
+    background:rgba(255,255,255,.8);padding:0 3.4vmin;height:72%;font:900 clamp(20px,3.2vmin,38px) var(--sans)}
+  .back:active{background:#e8f3dc}
+  .bar .ttl{font:900 clamp(22px,3.6vmin,44px) var(--sans);letter-spacing:.04em;color:#17261d}
+  .bar .help{margin-left:auto;font:700 clamp(14px,2.2vmin,26px) var(--sans);color:#17261d}
+  #frameView.nobar .bar{display:none}
   #frame{flex:1;width:100%;border:0;background:var(--paper)}
 
   /* ===== 閒置提醒 / 提示 ===== */
@@ -123,9 +123,9 @@
 var IDLE_MS = 90 * 1000;        // 沒有操作多久後跳出提醒
 var WARN_SEC = 15;              // 提醒後幾秒自動回首頁
 var APPS = {
-  visit: { title:"探視預約", src:"visit/index.html",          zoom:1,      open:true  },
+  visit: { title:"探視預約", src:"visit/index.html",          zoom:1,      open:true, bar:false },
   tour:  { title:"參訪預約", src:"../tour-family/index.html", zoom:1.5,    open:true, fitHero:true },
-  items: { title:"物品登記", src:"items/index.html",          zoom:1,      open:true  }   // 後端部署完成後改 true
+  items: { title:"物品登記", src:"items/index.html",          zoom:1,      open:true, bar:false }   // 後端部署完成後改 true
 };
 
 var $ = function(id){ return document.getElementById(id); };
@@ -159,6 +159,7 @@ function openApp(key){
   $("ttl").textContent = a.title;
   $("home").classList.add("hide");
   $("frameView").classList.add("show");
+  $("frameView").classList.toggle("nobar", a.bar === false);   // 頁面自帶頂列時隱藏外層返回列
   $("frame").src = a.src;
   armIdle();
 }

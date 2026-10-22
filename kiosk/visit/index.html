@@ -7,106 +7,151 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
 <style>
-  :root{--green:#2f9e6b;--green-d:#1c6b48;--leaf:#4f8c3a;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;--amber:#a8763c;
+  :root{--g1:#14583a;--g2:#0f4d33;--leaf:#4f8c3a;--ink:#17261d;--muted:#4b5c52;--paper:#fcf9ef;--card:#fff;--line:#d3dcc7;--soft:#e8f3dc;--soft2:#d9ebcb;--red:#b4402f;--amber:#a8763c;
     --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;--serif:"Noto Serif TC",serif}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html{font-size:clamp(13px,calc(.55vw + .7vh),22px)}
+  html{font-size:clamp(13px,calc(.58vw + .74vh),24px)}
   html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:var(--sans);touch-action:manipulation;overflow:hidden}
   button{font-family:inherit;cursor:pointer}
-  #app{height:100%;display:flex;flex-direction:column;padding:1.1rem 2.2rem 0}
+  .lf{position:fixed;z-index:0;pointer-events:none;background-repeat:no-repeat;background-size:100% 100%}
+  .lf.tl{left:0;top:10.6%;width:6.6%;aspect-ratio:110/150;background-image:url(../img/lf-tl.png)}
+  .lf.tr{right:0;top:10.6%;width:9.4%;aspect-ratio:157/150;background-image:url(../img/lf-tr.png)}
+  .lf.bl{left:0;bottom:0;width:14.4%;aspect-ratio:240/193;background-image:url(../img/lf-bl.png)}
+  .lf.br{right:0;bottom:0;width:14.4%;aspect-ratio:240/193;background-image:url(../img/lf-br.png)}
+  #app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;padding:.9rem 2.6rem .8rem}
 
-  .steps{flex:none;display:flex;gap:.8rem;margin-bottom:1rem}
-  .steps div{flex:1;text-align:center;padding:.7rem .4rem;border-radius:.9rem;background:#e8e2d3;color:var(--muted);font:700 1.25rem var(--sans)}
-  .steps div.on{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff}
-  .steps div.done{background:#cfe6d7;color:var(--green-d)}
-  .body{flex:1;min-height:0;overflow:auto;padding-bottom:.6rem}
+  /* 頂部：回首頁 / 標誌 / 步驟 / 櫃檯協助 */
+  .hd{flex:none;display:flex;align-items:center;gap:1.6rem;min-height:4.8rem}
+  .hback{display:inline-flex;align-items:center;gap:.5rem;border:.14rem solid var(--g1);background:rgba(255,255,255,.7);color:var(--ink);border-radius:999px;padding:.55rem 1.5rem;font:900 1.35rem var(--sans)}
+  .hback:active{background:var(--soft)}
+  .hlogo{height:3.7rem;width:auto;display:block}
+  .stp{flex:1;display:flex;justify-content:center;align-items:flex-start;gap:0}
+  .si{display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:7.6rem;font:700 1.05rem var(--sans);color:#6b786f}
+  .si .c{width:2.9rem;height:2.9rem;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#b7bcb5;color:#fff;font:900 1.5rem var(--sans)}
+  .si.on .c,.si.done .c{background:var(--g1)}
+  .si.on,.si.done{color:var(--ink)}
+  .si .c svg{width:1.5rem;height:1.5rem}
+  .ln{display:block;width:5.4rem;height:.14rem;background:#9aa39b;margin-top:1.4rem}
+  .hhelp{display:flex;align-items:center;gap:.8rem;padding-left:1.4rem;border-left:.12rem solid #b9c0b3;font:700 1.12rem/1.3 var(--sans);color:var(--ink)}
+  .hhelp svg{width:3.4rem;height:3.4rem;color:var(--g2);flex:none}
+  .ttl{flex:none;margin:.5rem 0 .4rem .6rem}
+  h1{margin:0;font:900 3.2rem/1.15 var(--sans);letter-spacing:.03em;color:var(--ink)}
+  .sub{margin:.2rem 0 0;font:500 1.3rem/1.4 var(--sans);color:var(--muted)}
+  .body{flex:1;min-height:0;overflow:auto;padding:.4rem .2rem .6rem}
   .body::-webkit-scrollbar{width:0}
-  .nav{flex:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.9rem 0 1.1rem;border-top:1px solid var(--line);background:var(--paper)}
-  .nav .hint{flex:1;font:500 1.15rem var(--sans);color:var(--muted)}
-  .btn{border:0;border-radius:999px;padding:1rem 2.8rem;font:900 1.6rem var(--sans)}
-  .btn.main{background:linear-gradient(120deg,var(--green),var(--green-d));color:#fff;box-shadow:0 .35rem 1rem rgba(28,107,72,.3)}
-  .btn.sec{background:#fff;color:var(--green-d);border:2px solid var(--green)}
+  .body>.two{min-height:100%}
+  .nav{flex:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.4rem .6rem 0}
+  .nav .cnt{font:700 1.5rem var(--sans);color:var(--ink)}
+  .nav .cnt b{font:900 3rem/1 var(--sans);color:var(--g1);margin:0 .25rem}
+  .nav .hint{flex:1;text-align:center;font:500 1.2rem var(--sans);color:var(--muted)}
+  .btn{border:0;border-radius:999px;padding:.75rem 3.2rem;font:900 1.7rem var(--sans)}
+  .btn.main{background:var(--g1);color:#fff;box-shadow:0 .35rem .9rem rgba(15,77,51,.28)}
+  .btn.sec{background:rgba(255,255,255,.85);color:var(--ink);border:.15rem solid var(--g1)}
   .btn:disabled{opacity:.4;box-shadow:none}
   .btn:active:not(:disabled){transform:scale(.97)}
-  h1{margin:0 0 .2rem;font:900 1.9rem/1.2 var(--serif)}
-  .sub{margin:0 0 .7rem;font:500 1.1rem/1.4 var(--sans);color:var(--muted)}
-  .banner{background:#fff4d6;border:2px solid #e8c56b;border-radius:.9rem;padding:.6rem 1rem;margin-bottom:.8rem;font:700 1.1rem var(--sans);color:#7a5a00}
+  .banner{background:#fff4d6;border:2px solid #e8c56b;border-radius:.9rem;padding:.5rem 1rem;margin-bottom:.6rem;font:700 1.05rem var(--sans);color:#7a5a00}
+
+  .panel{background:rgba(255,255,255,.94);border:.12rem solid var(--line);border-radius:1.3rem;padding:.8rem 1.4rem;box-shadow:0 .3rem 1rem rgba(60,90,60,.1)}
+  .two{display:grid;grid-template-columns:1.15fr 1fr;gap:1.4rem;align-items:stretch}
+  .ph{display:flex;align-items:center;gap:.9rem;margin-bottom:.45rem;font:900 1.8rem var(--sans)}
+  .pi{width:2.8rem;height:2.8rem;border-radius:50%;background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--g2)}
+  .pi svg{width:1.7rem;height:1.7rem}
 
   /* step 1 */
-  .two{display:grid;grid-template-columns:1.15fr .85fr;gap:2rem;align-items:start}
-  .panel{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.8rem 1.3rem}
-  .mbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
-  .mbar .t{font:900 1.7rem var(--serif)}
-  .mbar button{width:3rem;height:3rem;border:0;border-radius:50%;background:#e8e2d3;font:900 1.7rem/1 var(--sans);color:var(--ink)}
+  .mbar{display:flex;align-items:center;justify-content:center;gap:2.4rem;margin-bottom:.6rem}
+  .mbar .t{font:900 2.4rem var(--sans);min-width:15rem;text-align:center}
+  .mbar button{width:3.6rem;height:3.6rem;border:.12rem solid #c4cbbd;border-radius:50%;background:#fff;font:900 1.8rem/1 var(--sans);color:var(--ink)}
   .mbar button:disabled{opacity:.3}
-  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:.4rem}
-  .cal .wd{text-align:center;font:700 1.05rem var(--sans);color:var(--muted);padding:.2rem 0}
-  .cal .d{height:3.6rem;border:2px solid var(--line);border-radius:.8rem;background:#fff;font:700 1.5rem var(--sans);color:var(--ink);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1}
-  .cal .d small{font:500 .85rem var(--sans);color:var(--muted);margin-top:.15rem}
-  .cal .d.off{background:#f1eee6;color:#b9b2a3;border-color:#ece6d8}
-  .cal .d.sel{background:var(--leaf);border-color:var(--leaf);color:#fff}
-  .cal .d.sel small{color:#e4f3d6}
-  .cal .d.has::after{content:"";position:absolute;right:.45rem;top:.45rem;width:.7rem;height:.7rem;border-radius:50%;background:var(--amber)}
-  .cal .d.sel.has::after{background:#fff}
-  .cal .blank{height:3.6rem}
-  .slots{display:flex;flex-direction:column;gap:.5rem}
-  .slot{display:flex;align-items:center;justify-content:space-between;gap:.8rem;border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.3rem 1.1rem;min-height:3rem;text-align:left;width:100%}
-  .slot .tm{font:900 1.7rem var(--serif);width:5.6rem}
-  .slot .st{font:700 1.15rem var(--sans);color:var(--muted);text-align:right;flex:1}
-  .slot.warn .st{color:var(--amber)}
-  .slot.off{background:#f1eee6;border-color:#ece6d8}
-  .slot.off .tm,.slot.off .st{color:#b9b2a3}
-  .slot.sel{background:var(--leaf);border-color:var(--leaf)}
-  .slot.sel .tm,.slot.sel .st{color:#fff}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:#dfe3d4;border:1px solid #dfe3d4;border-radius:.8rem;overflow:hidden}
+  .cal .wd{text-align:center;font:700 1.25rem var(--sans);color:var(--ink);padding:.7rem 0;background:#e9ece0}
+  .cal .d{height:3.65rem;border:0;background:#fff;font:700 1.75rem var(--sans);color:var(--ink);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;border-radius:0}
+  .cal .d small{font:700 1rem var(--sans);color:var(--muted);margin-top:.1rem}
+  .cal .d.off{background:#fff;color:#a9aea6}
+  .cal .d.off.closed{background:#e3e5df;color:var(--ink)}
+  .cal .d.sel{background:var(--g1);color:#fff;border-radius:.5rem}
+  .cal .d.sel small{color:#dff2e4}
+  .cal .d.has::after{content:"";position:absolute;right:.5rem;top:.45rem;width:.7rem;height:.7rem;border-radius:50%;background:var(--leaf)}
+  .cal .d.sel.has::after{content:"✓";width:auto;height:auto;background:none;position:static;font:900 1.2rem/1 var(--sans);color:#fff}
+  .cal .blank{height:3.65rem;background:#fff}
+  .slots{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+  .slot{display:flex;align-items:center;justify-content:space-between;gap:.6rem;border:.12rem solid var(--line);background:#fff;border-radius:1rem;padding:.4rem 1.1rem;min-height:4.4rem;text-align:left;width:100%;box-shadow:0 .15rem .5rem rgba(60,90,60,.08)}
+  .slot .tm{font:900 2.2rem var(--sans);color:var(--ink)}
+  .slot .st{font:500 1.1rem var(--sans);color:var(--muted);text-align:right}
+  .slot.warn .st{color:var(--amber);font-weight:700}
+  .slot.off{background:#f0f1ec;box-shadow:none}
+  .slot.off .tm,.slot.off .st{color:#a9aea6}
+  .slot.sel{background:var(--soft);border-color:#8fc27a}
+  .slot .ck{width:2.7rem;height:2.7rem;border-radius:50%;background:var(--g1);color:#fff;display:flex;align-items:center;justify-content:center}
+  .slot .ck svg{width:1.5rem;height:1.5rem}
   .notice{padding:1.6rem 1rem;text-align:center;font:700 1.3rem/1.5 var(--sans);color:var(--muted)}
-  .basket{margin-top:.6rem;font:700 1.15rem var(--sans);color:var(--green-d)}
-  .chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.35rem}
-  .tag{display:inline-flex;align-items:center;gap:.5rem;background:#e7f3dc;border:2px solid #cfe6bd;border-radius:999px;padding:.2rem .4rem .2rem .9rem;font:700 1rem var(--sans);color:var(--green-d)}
-  .tag button{width:1.9rem;height:1.9rem;border:0;border-radius:50%;background:#fff;font:900 1.1rem/1 var(--sans);color:var(--red)}
+  .basket{margin-top:.9rem;padding-top:.7rem;border-top:.12rem solid #e0e4d6;font:700 1.15rem var(--sans);color:var(--ink)}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+  .tag{display:inline-flex;align-items:center;gap:.6rem;background:var(--soft);border-radius:999px;padding:.35rem .6rem .35rem 1.1rem;font:500 1.2rem var(--sans);color:var(--ink)}
+  .tag button{border:0;background:none;font:900 1.3rem/1 var(--sans);color:var(--ink);padding:0 .3rem}
 
   /* step 2 */
-  .field{margin-bottom:.9rem}
-  .field label{display:block;margin-bottom:.35rem;font:700 1.3rem var(--sans)}
-  .field label .req{color:var(--red)} .field label .opt{color:var(--muted);font-weight:500;font-size:1.05rem;margin-left:.4rem}
-  input[type=text],input[type=tel],textarea{width:100%;border:2px solid var(--line);border-radius:1rem;background:#fff;padding:.8rem 1rem;font:500 1.6rem var(--sans);color:var(--ink)}
-  input:focus,textarea:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 .3rem rgba(47,158,107,.18)}
-  textarea{min-height:5.2rem;resize:none}
+  .field{margin-bottom:.55rem}
+  .field label{display:block;margin-bottom:.35rem;font:900 1.3rem var(--sans)}
+  .field label .req{color:var(--red);margin-left:.3rem} .field label .opt{color:var(--muted);font-weight:500;font-size:1.05rem;margin-left:.4rem}
+  input[type=text],input[type=tel],textarea{width:100%;border:.12rem solid #c6cfbc;border-radius:.8rem;background:#fff;padding:.55rem 1rem;font:500 1.45rem var(--sans);color:var(--ink)}
+  input::placeholder,textarea::placeholder{color:#9aa39b}
+  input:focus,textarea:focus{outline:none;border:.18rem solid var(--g1);box-shadow:none}
+  textarea{min-height:3.8rem;resize:none}
   .sugg{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.6rem}
-  .sg{border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.7rem 1rem;font:900 1.6rem var(--sans);text-align:left;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:.5rem;min-height:3.6rem}
+  .sg{border:.12rem solid var(--line);background:#fff;border-radius:.9rem;padding:.6rem 1rem;font:900 1.5rem var(--sans);text-align:left;color:var(--ink);display:flex;justify-content:space-between;align-items:center;gap:.5rem;min-height:3.5rem}
   .sg small{font:500 1rem var(--sans);color:var(--muted)}
-  .sg:active{background:#e7f3dc}
-  .smsg{margin-top:.6rem;font:700 1.15rem var(--sans);color:var(--muted);min-height:1.4em}
-  .picked{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#e7f3dc;border:2px solid #cfe6bd;border-radius:1rem;padding:.6rem 1rem}
-  .picked b{font:900 1.8rem var(--sans);color:var(--green-d)}
-  .picked button{border:0;border-radius:999px;background:#fff;color:var(--green-d);padding:.55rem 1.3rem;font:700 1.15rem var(--sans);border:2px solid var(--green)}
-  .famrow{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:.8rem}
-  .fam{border:2px solid var(--line);background:#fff;border-radius:1rem;padding:.55rem 1rem;font:700 1.15rem/1.35 var(--sans);text-align:left;color:var(--ink)}
-  .fam small{display:block;font:500 1rem var(--sans);color:var(--muted)}
-  .fam.on{background:var(--leaf);border-color:var(--leaf);color:#fff}
-  .fam.on small{color:#e4f3d6}
-  .rels{display:flex;flex-wrap:wrap;gap:.5rem}
-  .chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:.5rem 1.2rem;font:700 1.2rem var(--sans);color:var(--ink)}
-  .chip.on{background:var(--green);border-color:var(--green);color:#fff}
-  .err{color:var(--red);font:700 1.1rem var(--sans);margin-top:.35rem;min-height:1.2em}
-  .alert{background:#fbeeec;border:2px solid #e6c9c4;border-radius:1rem;padding:.7rem 1rem;margin-top:.7rem;font:700 1.15rem/1.45 var(--sans);color:#7a2b22}
-  .phoneLock{display:flex;align-items:center;gap:.8rem}
-  .phoneLock .v{flex:1;border:2px dashed var(--line);border-radius:1rem;padding:.8rem 1rem;font:700 1.5rem var(--sans);color:var(--muted);background:#faf8f2}
-  .phoneLock button{border:2px solid var(--green);background:#fff;color:var(--green-d);border-radius:999px;padding:.55rem 1.2rem;font:700 1.1rem var(--sans)}
+  .sg:active{background:var(--soft)}
+  .smsg{margin-top:.5rem;font:700 1.1rem var(--sans);color:var(--muted);min-height:1.4em}
+  .picked{display:flex;align-items:stretch;gap:.8rem}
+  .picked .v{flex:1;display:flex;align-items:center;background:var(--soft);border:.12rem solid #c6d9b8;border-radius:.8rem;padding:.6rem 1rem;font:900 1.7rem var(--sans);color:var(--ink)}
+  .picked .v small{font:500 1rem var(--sans);color:var(--muted);margin-left:.7rem}
+  .picked button,.phoneLock button{border:.14rem solid var(--g1);background:#fff;color:var(--ink);border-radius:.8rem;padding:.5rem 1.3rem;font:700 1.15rem var(--sans)}
+  .famrow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:.4rem}
+  .fam{border:.12rem solid var(--g1);background:#fff;border-radius:.9rem;padding:.4rem 1rem;font:900 1.35rem/1.25 var(--sans);text-align:left;color:var(--ink);position:relative;min-height:3.6rem}
+  .fam small{display:block;font:500 1.05rem var(--sans);color:var(--muted)}
+  .fam.on{background:var(--g1);color:#fff}
+  .fam.on small{color:#dbece1}
+  .fam.on::after{content:"✓";position:absolute;right:.8rem;top:.8rem;width:2.2rem;height:2.2rem;border-radius:50%;background:#fff;color:var(--g1);font:900 1.3rem/2.2rem var(--sans);text-align:center}
+  .fam.new{display:flex;align-items:center;gap:.6rem;font-size:1.3rem}
+  .rels{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem}
+  .chip{border:.12rem solid var(--g1);background:#fff;border-radius:.6rem;padding:.4rem .3rem;font:700 1.25rem var(--sans);color:var(--ink)}
+  .chip.on{background:var(--g1);color:#fff}
+  .err{color:var(--red);font:700 1.05rem var(--sans);margin-top:.2rem;min-height:0}
+  .alert{background:#fbeeec;border:2px solid #e6c9c4;border-radius:1rem;padding:.7rem 1rem;margin-top:.6rem;font:700 1.15rem/1.45 var(--sans);color:#7a2b22}
+  .phoneLock{display:flex;align-items:stretch;gap:.8rem}
+  .phoneLock .v{flex:1;border:.12rem solid #c6d9b8;border-radius:.8rem;padding:.7rem 1rem;font:700 1.5rem var(--sans);color:var(--ink);background:var(--soft)}
+  .note{font:500 .95rem var(--sans);color:var(--muted);margin-top:.25rem}
 
   /* step 3 / done */
-  .sum{background:var(--card);border:2px solid var(--line);border-radius:1.2rem;padding:.4rem 1.6rem;max-width:62rem}
-  .sum .r{display:flex;justify-content:space-between;gap:1.5rem;padding:.9rem 0;border-bottom:1px solid var(--line);font:500 1.5rem/1.4 var(--sans)}
-  .sum .r:last-child{border-bottom:0}
-  .sum .r span:first-child{color:var(--muted);flex:none}
-  .sum .r span:last-child{font-weight:700;text-align:right}
-  .done{text-align:center;padding:2.5rem 1rem}
-  .done .ok{width:9rem;height:9rem;margin:0 auto 1.4rem;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-d));color:#fff;font-size:5.5rem;line-height:9rem}
-  .done h1{font-size:3rem} .done p{font:500 1.6rem/1.6 var(--sans);color:var(--muted);margin:.6rem 0}
-  .done .sum{margin:1.2rem auto;text-align:left}
-  @media (max-aspect-ratio:1/1){ .two{grid-template-columns:1fr !important} .body{overflow:auto} }
+  .sum{background:rgba(255,255,255,.95);border:.12rem solid var(--line);border-radius:1.3rem;padding:.6rem 1.4rem 1rem;box-shadow:0 .3rem 1rem rgba(60,90,60,.1)}
+  .sum .sh{display:flex;align-items:center;gap:.9rem;padding:.4rem 0 .6rem;font:900 2.2rem var(--sans)}
+  .sum .sh svg{width:2.6rem;height:2.6rem;color:var(--g2)}
+  .sum .r{display:flex;align-items:center;gap:1.4rem;padding:.5rem 0;border-top:.1rem solid #dfe3d4}
+  .sum .r .k{flex:none;width:18rem;background:#eef0e8;border-radius:.7rem;padding:.8rem 1.1rem;font:900 1.5rem var(--sans);color:var(--ink)}
+  .sum .r .v{flex:1;font:900 2.2rem var(--sans);display:flex;align-items:center;flex-wrap:wrap;gap:.9rem}
+  .sum .r .v .pill{background:var(--soft);border-radius:.8rem;padding:.4rem 1.2rem;font:700 1.55rem var(--sans)}
+  .sum .r .v small{font:500 1.2rem var(--sans);color:var(--muted)}
+  .center{text-align:center}
+  .done{display:flex;flex-direction:column;align-items:center;padding-top:.2rem}
+  .done .wr{width:min(38rem,62vw);height:auto;display:block}
+  .done h1{font-size:4rem;margin-top:-.4rem}
+  .done .sub{font-size:1.6rem}
+  .done .sum{width:min(78rem,90%);margin:1.2rem auto .4rem;padding:.3rem 1.2rem}
+  .done .sum .r:first-child{border-top:0}
+  .done .sum .r .k{width:12rem;background:none;padding-left:.4rem}
+  .done .sum .r .v{font-size:1.9rem}
+  .done .cd{margin:.5rem 0 .6rem;font:500 1.2rem var(--sans);color:var(--muted)}
+  .done .btns{display:flex;gap:1.4rem}
+  @media (max-aspect-ratio:1/1){
+    .two{grid-template-columns:1fr !important}
+    .hd{flex-wrap:wrap;gap:.8rem}.hhelp{display:none}.stp{order:3;flex-basis:100%}.ln{width:3rem}.si{min-width:5.4rem}
+    h1{font-size:2.6rem}.sum .r{flex-direction:column;align-items:stretch;gap:.5rem}.sum .r .k{width:auto}
+    .rels{grid-template-columns:repeat(3,1fr)}
+  }
 </style>
 </head>
 <body>
+<div class="lf tl"></div><div class="lf tr"></div><div class="lf bl"></div><div class="lf br"></div>
 <div id="app"></div>
 
 <script>
@@ -209,15 +254,23 @@ function isoBlocks(){
 }
 
 /* ===== 畫面 ===== */
-function stepsHtml(){
-  var t=["① 選日期與時段","② 填寫資料","③ 確認預約"];
-  return '<div class="steps">'+t.map(function(x,i){var n=i+1;return '<div class="'+(S.step===n?'on':(S.step>n?'done':''))+'">'+x+'</div>';}).join("")+'</div>';
+var CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+var ICO_HS='<svg viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 52V44a30 30 0 0160 0v8"/><rect x="12" y="46" width="12" height="22" rx="5"/><rect x="76" y="46" width="12" height="22" rx="5"/><path d="M82 68c0 10-8 14-22 14"/><circle cx="50" cy="48" r="13"/><path d="M24 96c2-18 12-26 26-26s24 8 26 26"/></svg>';
+var ICO_ONE='<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4.2"/><path d="M3.5 21c.6-4.6 4-7 8.5-7s7.9 2.4 8.5 7z"/></svg>';
+var ICO_TWO='<svg viewBox="0 0 28 24" fill="currentColor" aria-hidden="true"><circle cx="10" cy="8" r="4"/><path d="M2 21c.5-4.4 3.6-6.6 8-6.6s7.500 2.200 8 6.600z"/><circle cx="20" cy="9" r="3.2"/><path d="M19.500 14.600c4 0 6.300 1.800 6.800 5.400h-6c-.2-2.300-.5-3.900-1.800-5.200.3-.1.600-.2 1-.2z"/></svg>';
+var ICO_CLIP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.500" y="4.500" width="15" height="17" rx="2.500"/><path d="M9 4.500V3.500h6v1M8 11h8M8 15h8"/></svg>';
+function headerHtml(){
+  var cur=S.done?4:S.step, labels=["選日期與時段","填寫資料","確認預約"];
+  var st=labels.map(function(t,i){ var n=i+1; return '<div class="si '+(cur>n?'done':(cur===n?'on':''))+'"><span class="c">'+(cur>n?CHECK:n)+'</span><span class="l">'+t+'</span></div>'; }).join('<i class="ln"></i>');
+  return '<header class="hd"><button class="hback" id="hb">← 回首頁</button><img class="hlogo" src="../logo.png" alt="線東大眾護理之家"><div class="stp">'+st+'</div>'
+    +'<div class="hhelp">'+ICO_HS+'<span>需要協助，<br>請洽櫃檯人員</span></div></header>';
 }
 function render(){
   if(S.done){ renderDone(); return; }
   var banner = MOCK ? '<div class="banner">預覽模式：使用假資料，不會連線也不會送出</div>' : '';
   var main = S.step===1? step1() : (S.step===2? step2() : step3());
-  $app.innerHTML = stepsHtml()+'<div class="body">'+banner+main.body+'</div><div class="nav">'+main.nav+'</div>';
+  $app.innerHTML = headerHtml()+'<div class="ttl"><h1>'+main.title+'</h1><p class="sub">'+main.sub+'</p></div><div class="body">'+banner+main.body+'</div><div class="nav">'+main.nav+'</div>';
+  var hb=document.getElementById("hb"); if(hb) hb.onclick=home;
   bind(); if(S.step===2){ paintSugg(); paintFams(); paintAlert(); }
 }
 
@@ -229,45 +282,47 @@ function step1(){
   for(var d=1; d<=days; d++){
     var ds=y+"-"+pad(mo+1)+"-"+pad(d), past=ds<today, info=past?{closed:true}:dayInfo(ds), off=past||info.closed;
     var has=S.basket.some(function(b){return b.date===ds;});
-    cells+='<button class="d'+(off?' off':'')+(S.selDate===ds?' sel':'')+(has?' has':'')+'" data-day="'+ds+'"'+(off?' data-off="1"':'')+'>'+d+(info.label&&!past?'<small>'+info.label+'</small>':'')+'</button>';
+    cells+='<button class="d'+(off?' off':'')+(info.closed&&!past?' closed':'')+(S.selDate===ds?' sel':'')+(has?' has':'')+'" data-day="'+ds+'"'+(off?' data-off="1"':'')+'>'+d+(info.label&&!past?'<small>'+info.label+'</small>':'')+'</button>';
   }
   var cal='<div class="panel"><div class="mbar"><button id="pm"'+(m<=minM?' disabled':'')+'>‹</button><span class="t">'+y+' 年 '+(mo+1)+' 月</span><button id="nm"'+(m>=maxM?' disabled':'')+'>›</button></div>'
     +'<div class="cal">'+WD.map(function(w){return '<div class="wd">'+w+'</div>';}).join("")+cells+'</div></div>';
-  var right='<div class="panel"><div style="font:900 1.5rem var(--serif);margin-bottom:.7rem">'+(S.selDate?fmtDate(S.selDate):'請先選擇日期')+'</div>'+slotsHtml()+basketHtml()+'</div>';
+  var right='<div class="panel"><div style="font:900 2.2rem var(--sans);margin:.2rem 0 .8rem">'+(S.selDate?fmtDate(S.selDate):'請先選擇日期')+'</div>'+slotsHtml()+basketHtml()+'</div>';
   var load = D.loaded? '' : '<div class="notice">名額載入中…</div>';
   var errMsg = D.loadErr? '<div class="alert">目前無法取得最新名額，畫面上的名額可能不是最新的，請洽櫃檯人員。</div>' : '';
-  return { body:'<h1>請選擇探視日期與時段</h1><p class="sub">每週日不開放探視；可一次預約最多 '+MAX_SLOTS+' 個時段（點選時段即加入，再點一次取消）</p>'+errMsg+'<div class="two">'+cal+right+'</div>'+load,
-    nav:'<span class="hint">'+(S.basket.length?'已選 '+S.basket.length+' 個時段':'請至少選擇 1 個時段')+'</span><button class="btn main" id="to2"'+(S.basket.length?'':' disabled')+'>下一步 →</button>' };
+  return { title:'請選擇探視日期與時段', sub:'每週日不開放探視；一次最多可選 '+MAX_SLOTS+' 個時段。',
+    body:errMsg+'<div class="two">'+cal+right+'</div>'+load,
+    nav:'<span class="cnt">已選<b>'+S.basket.length+'</b>/ '+MAX_SLOTS+' 個時段</span><button class="btn main" id="to2"'+(S.basket.length?'':' disabled')+'>下一步 →</button>' };
 }
 function slotsHtml(){
   if(!S.selDate) return '<div class="notice">點左邊的日期，這裡會顯示可預約的時段</div>';
   var di=dayInfo(S.selDate); if(di.closed) return '<div class="notice">'+esc(di.reason)+'<br>請改選其他日期</div>';
   return '<div class="slots">'+SLOTS.map(function(t){
     var si=slotInfo(S.selDate,t), sel=inBasket(S.selDate,t);
-    return '<button class="slot'+(si.off?' off':'')+(sel?' sel':'')+(si.warn&&!sel?' warn':'')+'" data-slot="'+t+'"'+(si.off?' data-off="1"':'')+'><span class="tm">'+t+'</span><span class="st">'+(sel?'已選 ✓':esc(si.label))+'</span></button>';
+    return '<button class="slot'+(si.off?' off':'')+(sel?' sel':'')+(si.warn&&!sel?' warn':'')+'" data-slot="'+t+'"'+(si.off?' data-off="1"':'')+'><span class="tm">'+t+'</span>'+(sel?'<span class="ck">'+CHECK+'</span>':'<span class="st">'+esc(si.label.replace("尚餘 ","尚餘").replace("僅餘 ","僅餘").replace(" 組","組"))+'</span>')+'</button>';
   }).join("")+'</div>';
 }
 function basketHtml(){
   if(!S.basket.length) return '';
   var list=S.basket.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;});
-  return '<div class="basket">已選擇的時段</div><div class="chips">'+list.map(function(b){return '<span class="tag">'+fmtDate(b.date)+' '+b.time+'<button data-rm="'+b.date+'|'+b.time+'">✕</button></span>';}).join("")+'</div>';
+  return '<div class="basket">已選擇的時段</div><div class="chips">'+list.map(function(b){var d=normDate(b.date).slice(5).replace("-","/");return '<span class="tag">'+d+' '+b.time+'<button data-rm="'+b.date+'|'+b.time+'" aria-label="取消">✕</button></span>';}).join("")+'</div>';
 }
 
 /* --- step 2 --- */
 function step2(){
   var pickedHtml = S.resident
-    ? '<div class="picked"><b>'+esc(S.resident.name)+(S.resident.floor?'　<small style="font:500 1rem var(--sans);color:var(--muted)">'+esc(S.resident.floor)+'</small>':'')+'</b><button id="chg">更換長輩</button></div>'
-    : '<input type="text" id="q" value="'+esc(S.q)+'" placeholder="輸入長輩的姓名，例如：王小明" autocomplete="off"><div class="sugg" id="suggBox"></div><div class="smsg" id="suggMsg"></div>';
-  var left='<div class="field"><label>長輩的姓名 <span class="req">＊</span></label>'+pickedHtml+'<div class="err">'+esc(S.err.res||"")+'</div><div id="alertBox"></div></div><div id="famBox"></div><div class="field"><label>想跟我們說的話<span class="opt">（選填）</span></label><textarea id="note" maxlength="200">'+esc(S.note)+'</textarea></div>';
+    ? '<div class="picked"><div class="v">'+esc(S.resident.name)+(S.resident.floor?'<small>'+esc(S.resident.floor)+'</small>':'')+'</div><button id="chg">更換長輩</button></div>'
+    : '<input type="text" id="q" value="'+esc(S.q)+'" placeholder="請輸入長輩姓名" autocomplete="off"><div class="sugg" id="suggBox"></div><div class="smsg" id="suggMsg"></div>';
+  var left='<div class="ph"><span class="pi">'+ICO_ONE+'</span>長輩資料</div><div class="field"><label>長輩的姓名<span class="req">＊</span></label>'+pickedHtml+'<div class="err">'+esc(S.err.res||"")+'</div><div id="alertBox"></div></div><div id="famBox"></div><div class="field"><label>想跟我們說的話<span class="opt">（選填）</span></label><textarea id="note" maxlength="200" placeholder="如有需要，可在這裡留言。">'+esc(S.note)+'</textarea></div>';
   var f=S.fam;
-  var right=''
-    +'<div class="field"><label>您的姓名 <span class="req">＊</span></label><input type="text" id="fname" value="'+esc(f.name)+'" placeholder="例如：王大華" autocomplete="off"><div class="err">'+esc(S.err.name||"")+'</div></div>'
-    +'<div class="field"><label>與長輩的關係 <span class="req">＊</span></label><div class="rels">'+(f.rel&&RELS.indexOf(f.rel)<0?[f.rel]:[]).concat(RELS).map(function(r){return '<button type="button" class="chip'+(f.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
-    +'<div class="field"><label>聯絡電話 <span class="req">＊</span></label>'
-    +(f.locked? '<div class="phoneLock"><div class="v">'+esc(f.masked)+'　（沿用上次登記的電話）</div><button type="button" id="chgPhone">更改電話</button></div>'
-               : '<input type="tel" id="fphone" value="'+esc(f.phone)+'" placeholder="例如：0912345678" autocomplete="off">')+'<div class="err">'+esc(S.err.phone||"")+'</div></div>';
-  return { body:'<h1>請填寫探視資料</h1><p class="sub">先輸入長輩姓名並點選，系統會帶出之前預約過的家屬資料</p><div class="two" style="grid-template-columns:1fr 1fr"><div class="panel">'+left+'</div><div class="panel">'+right+'</div></div>',
-    nav:'<button class="btn sec" id="back1">← 上一步</button><span class="hint"></span><button class="btn main" id="to3">下一步 →</button>' };
+  var right='<div class="ph"><span class="pi">'+ICO_TWO+'</span>家屬資料</div>'
+    +'<div class="field"><label>您的姓名<span class="req">＊</span></label><input type="text" id="fname" value="'+esc(f.name)+'" placeholder="請輸入您的姓名" autocomplete="off"><div class="err">'+esc(S.err.name||"")+'</div></div>'
+    +'<div class="field"><label>與長輩的關係<span class="req">＊</span></label><div class="rels">'+(f.rel&&RELS.indexOf(f.rel)<0?[f.rel]:[]).concat(RELS).map(function(r){return '<button type="button" class="chip'+(f.rel===r?' on':'')+'" data-rel="'+r+'">'+r+'</button>';}).join("")+'</div><div class="err">'+esc(S.err.rel||"")+'</div></div>'
+    +'<div class="field"><label>聯絡電話<span class="req">＊</span></label>'
+    +(f.locked? '<div class="phoneLock"><div class="v">'+esc(f.masked)+'</div><button type="button" id="chgPhone">更改電話</button></div><div class="note">沿用上次登記的電話</div>'
+               : '<input type="tel" id="fphone" value="'+esc(f.phone)+'" placeholder="請輸入手機或市話" autocomplete="off"><div class="note"><span style="color:var(--red)">＊</span> 為必填欄位</div>')+'<div class="err">'+esc(S.err.phone||"")+'</div></div>';
+  return { title:'請填寫探視資料', sub:S.resident?'已帶入上次的家屬資料，請確認是否正確。':'先輸入長輩姓名並點選，再填寫您的聯絡資料。',
+    body:'<div class="two" style="grid-template-columns:1fr 1fr"><div class="panel">'+left+'</div><div class="panel">'+right+'</div></div>',
+    nav:'<button class="btn sec" id="back1">上一步</button><span class="hint"></span><button class="btn main" id="to3">下一步 →</button>' };
 }
 function paintSugg(){
   var box=document.getElementById("suggBox"), msg=document.getElementById("suggMsg"); if(!box||!msg) return;
@@ -294,9 +349,9 @@ function paintFams(){
   var h='';
   if(S.famState==="loading") h='<div class="smsg">正在找這位長輩之前預約過的家屬…</div>';
   else if(S.famState==="ok" && S.fams.length){
-    h='<div class="field"><label>之前預約過的家屬<span class="opt">（點一下自動帶入）</span></label><div class="famrow">'
+    h='<div class="field"><label>之前預約過的家屬<span class="opt">（點選帶入）</span></label><div class="famrow">'
       +S.fams.map(function(f,i){return '<button type="button" class="fam'+(S.fam.id===f.fid?' on':'')+'" data-fam="'+i+'">'+esc(f.name)+'（'+esc(f.relation)+'）<small>'+esc(f.phoneMasked||"")+'</small></button>';}).join("")
-      +'<button type="button" class="fam" data-fam="new">＋ 我是其他家屬</button></div></div>';
+      +'<button type="button" class="fam new" data-fam="new"><b style="font-size:1.8rem">＋</b>我是其他家屬</button></div></div>';
   }
   box.innerHTML=h;
   box.querySelectorAll("[data-fam]").forEach(function(b){ b.onclick=function(){
@@ -314,20 +369,28 @@ function paintAlert(){
 /* --- step 3 --- */
 function slotListText(){ return S.basket.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;}).map(function(b){return fmtDate(b.date)+" "+b.time;}); }
 function phoneShow(){ return S.fam.locked? S.fam.masked : S.fam.phone; }
+function slotRowsHtml(){
+  var by={}, order=[];
+  S.basket.slice().sort(function(a,b){return (a.date+a.time)<(b.date+b.time)?-1:1;}).forEach(function(b){ if(!by[b.date]){by[b.date]=[];order.push(b.date);} by[b.date].push(b.time); });
+  return order.map(function(ds,i){ var d=new Date(ds+"T00:00:00");
+    return '<div class="r"><div class="k">'+(i?'':'探視日期與時段')+'</div><div class="v">'+d.getFullYear()+' 年 '+(d.getMonth()+1)+' 月 '+d.getDate()+' 日（週'+WD[d.getDay()]+'）'+by[ds].map(function(t){return '<span class="pill">'+t+'</span>';}).join("")+'</div></div>'; }).join("");
+}
 function step3(){
-  var rows='<div class="r"><span>探視長輩</span><span>'+esc(S.resident.name)+'</span></div>'
-    +'<div class="r"><span>探視日期時段</span><span>'+slotListText().map(esc).join("<br>")+'</span></div>'
-    +'<div class="r"><span>探視家屬</span><span>'+esc(S.fam.name)+'（'+esc(S.fam.rel)+'）</span></div>'
-    +'<div class="r"><span>聯絡電話</span><span>'+esc(phoneShow())+'</span></div>'
-    +(S.note.trim()?'<div class="r"><span>備註</span><span>'+esc(S.note.trim())+'</span></div>':'');
-  return { body:'<h1>請確認預約內容</h1><p class="sub">確認無誤後按「確認預約」</p><div class="sum">'+rows+'</div>'+(S.sendErr?'<div class="alert" style="max-width:62rem;font-size:1.3rem">'+esc(S.sendErr)+'</div>':''),
-    nav:'<button class="btn sec" id="back2"'+(S.sending?' disabled':'')+'>← 上一步</button><span class="hint"></span><button class="btn main" id="send"'+(S.sending?' disabled':'')+'>'+(S.sending?'送出中…':'確認預約')+'</button>' };
+  var rows='<div class="r"><div class="k">探視長輩</div><div class="v">'+esc(S.resident.name)+'</div></div>'
+    +slotRowsHtml()
+    +'<div class="r"><div class="k">探視家屬</div><div class="v">'+esc(S.fam.name)+'（'+esc(S.fam.rel)+'）</div></div>'
+    +'<div class="r"><div class="k">聯絡電話</div><div class="v">'+esc(phoneShow())+'</div></div>'
+    +(S.note.trim()?'<div class="r"><div class="k">備註</div><div class="v" style="font-size:1.5rem">'+esc(S.note.trim())+'</div></div>':'');
+  return { title:'請確認預約內容', sub:'確認無誤後，請按「確認預約」。',
+    body:'<div class="sum"><div class="sh">'+ICO_CLIP+'預約資訊</div>'+rows+'</div>'+(S.sendErr?'<div class="alert" style="font-size:1.3rem">'+esc(S.sendErr)+'</div>':'')+'<div class="center sub" style="margin-top:.6rem">如需修改，請按「上一步」。</div>',
+    nav:'<button class="btn sec" id="back2"'+(S.sending?' disabled':'')+'>← 上一步</button><span class="hint"></span><button class="btn main" id="send"'+(S.sending?' disabled':'')+'>'+(S.sending?'送出中…':'確認預約 ✓')+'</button>' };
 }
 function renderDone(){
-  $app.innerHTML='<div class="body"><div class="done"><div class="ok">✓</div><h1>預約完成，謝謝您！</h1><p>我們已收到您的探視預約</p><div class="sum">'
-    +'<div class="r"><span>探視長輩</span><span>'+esc(S.resident.name)+'</span></div><div class="r"><span>日期時段</span><span>'+slotListText().map(esc).join("<br>")+'</span></div></div>'
-    +'<p><b id="dc">20</b> 秒後自動回到首頁</p><div><button class="btn main" id="goHome">回首頁</button> <button class="btn sec" id="again">再預約一位</button></div></div></div>';
-  var n=20,t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
+  var rows='<div class="r"><div class="k">探視長輩</div><div class="v">'+esc(S.resident.name)+'</div></div>'+slotRowsHtml().replace('<div class="k"></div>','<div class="k"></div>');
+  $app.innerHTML=headerHtml()+'<div class="body"><div class="done"><img class="wr" src="../img/wreath.png" alt=""><h1>預約完成，謝謝您！</h1><p class="sub">我們已收到您的探視預約。</p><div class="sum">'+rows+'</div>'
+    +'<div class="cd"><span id="dc">15</span> 秒後自動回到首頁。</div><div class="btns"><button class="btn main" id="goHome">回首頁</button><button class="btn sec" id="again">再預約一位</button></div></div></div>';
+  var hb=document.getElementById("hb"); if(hb) hb.onclick=home;
+  var n=15,t=setInterval(function(){ n--; var e=document.getElementById("dc"); if(e) e.textContent=n; if(n<=0){ clearInterval(t); home(); } },1000);
   document.getElementById("goHome").onclick=function(){ clearInterval(t); home(); };
   document.getElementById("again").onclick=function(){ clearInterval(t); reset(); };
 }
