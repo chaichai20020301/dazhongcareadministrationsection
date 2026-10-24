@@ -135,7 +135,7 @@
       photoFail:'照片讀取失敗，可能後端還沒重新部署，請稍後再試', noPhotos:'這批沒有照片',
       photoPurged:'已超過照片保留時限（六個月），沒有照片',
       regDate:'登記', expiry:'效期', close:'關閉',
-      roleNurse:'護理', roleCare:'照服', roleAdmin:'行政',
+      roleNurse:'護理', roleNurseAdmin:'護理行政', roleCare:'照服', roleAdmin:'行政',
       confirmOk:'已確認：', confirmErr:'確認失敗：',
       searchPh:'搜尋住民：中文姓名或拼音', clear:'清除', noMatch:'找不到符合的住民'
     },
@@ -151,7 +151,7 @@
       photoFail:'Gagal memuat foto, backend mungkin belum di-deploy', noPhotos:'Tidak ada foto',
       photoPurged:'Melewati batas simpan (6 bulan), tidak ada foto',
       regDate:'Terdaftar', expiry:'Kedaluwarsa', close:'Tutup',
-      roleNurse:'Perawat', roleCare:'Pengasuh', roleAdmin:'Admin',
+      roleNurse:'Perawat', roleNurseAdmin:'Administrasi Keperawatan', roleCare:'Pengasuh', roleAdmin:'Admin',
       confirmOk:'Terkonfirmasi: ', confirmErr:'Gagal konfirmasi: ',
       searchPh:'Cari penghuni: nama Mandarin atau romanisasi', clear:'Hapus', noMatch:'Tidak ada penghuni yang cocok'
     },
@@ -167,7 +167,7 @@
       photoFail:'Tải ảnh thất bại, backend có thể chưa triển khai', noPhotos:'Không có ảnh',
       photoPurged:'Quá hạn lưu (6 tháng), không có ảnh',
       regDate:'Đăng ký', expiry:'HSD', close:'Đóng',
-      roleNurse:'Điều dưỡng', roleCare:'Hộ lý', roleAdmin:'Hành chính',
+      roleNurse:'Điều dưỡng', roleNurseAdmin:'Hành chính điều dưỡng', roleCare:'Hộ lý', roleAdmin:'Hành chính',
       confirmOk:'Đã xác nhận: ', confirmErr:'Xác nhận thất bại: ',
       searchPh:'Tìm cư dân: tên tiếng Trung hoặc phiên âm', clear:'Xóa', noMatch:'Không tìm thấy cư dân phù hợp'
     }
@@ -186,6 +186,7 @@
   function roleLabel(){
     var r = roleKey();
     if (r === 'nurse') return t('roleNurse');
+    if (r === 'nurseadmin') return t('roleNurseAdmin');
     if (r === 'care') return t('roleCare');
     if (r === 'admin') return t('roleAdmin');
     return '';
@@ -194,6 +195,7 @@
   function roleForSheet(){
     var r = roleKey();
     if (r === 'nurse') return '護理';
+    if (r === 'nurseadmin') return '護理行政';
     if (r === 'care') return '照服';
     if (r === 'admin') return '行政';
     return r || '';

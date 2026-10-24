@@ -57,7 +57,7 @@ h1{margin:6px 0 4px;font-size:24px}
 <div class="modal" id="modal"><div class="box">
   <h2 id="mt">新增人員</h2>
   <div class="f"><label for="fName">姓名</label><input id="fName" type="text" maxlength="20" autocomplete="off"><div class="hint" id="nameHint">登入時要打的姓名（不分大小寫、空白）。</div></div>
-  <div class="f"><label for="fRole">身份</label><select id="fRole"><option value="manager">主管</option><option value="admin">行政</option><option value="nurse">護理</option><option value="care">照服</option></select></div>
+  <div class="f"><label for="fRole">身份</label><select id="fRole"><option value="manager">主管</option><option value="admin">行政</option><option value="nurseadmin">護理行政</option><option value="nurse">護理</option><option value="care">照服</option></select></div>
   <div class="f"><label for="fCode">通行碼</label><input id="fCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password" placeholder="6 位數字"><div class="hint" id="codeHint">每人自己的 6 位數字，不要重複、不要用 123456 或生日。</div></div>
   <div class="f chk"><label><input id="fActive" type="checkbox" checked> 啟用（取消勾選＝停用，無法登入）</label></div>
   <div class="msg err" id="fMsg"></div>
@@ -67,7 +67,7 @@ h1{margin:6px 0 4px;font-size:24px}
 <script>
 var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1LEZoMrWlUGQ8TSETNExaMLHZglE_zhEyTIs_rrDf8g8/exec";
 var $ = function(id){ return document.getElementById(id); };
-var ROLES = { manager:"主管", admin:"行政", nurse:"護理", care:"照服" };
+var ROLES = { manager:"主管", admin:"行政", nurseadmin:"護理行政", nurse:"護理", care:"照服" };
 var people = [], editing = null, saving = false;
 function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
 function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }

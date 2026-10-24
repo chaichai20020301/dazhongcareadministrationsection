@@ -213,7 +213,7 @@ input:focus{outline:none;border-color:#4f8c3a}
 
   // 入口網站首頁（角色不符時提供返回連結，可依實際入口網址調整）
   var PORTAL_HOME = "../index.html";
-  var ROLES_ALLOWED = { admin:1, nurse:1, care:1 }; // C 頁允許：行政／護理／照服
+  var ROLES_ALLOWED = { admin:1, nurseadmin:1, nurse:1, care:1 }; // C 頁允許：行政／護理行政／護理／照服
 
   // 以整頁通知取代白畫面（角色不符、通行碼不符、忙碌）
   function showNotice(msg, withBack){
