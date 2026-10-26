@@ -6,35 +6,75 @@
 <title>探視名單查詢</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-html,body{margin:0;padding:0;background:#f1ede5;font-family:'Noto Sans TC',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html,body{margin:0;padding:0;background:#FAF8EF;font-family:'Noto Sans TC',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 *{box-sizing:border-box}
 button{font-family:inherit;cursor:pointer}
 input{font-family:inherit}
-input:focus{outline:none;border-color:#4f8c3a}
+input:focus{outline:none;border-color:#14563F}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes riseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.ld{display:inline-block;vertical-align:middle;width:16px;height:16px;border:2px solid #e0dbd1;border-top-color:#4f8c3a;border-radius:50%;animation:spin .9s linear infinite}
+.ld{display:inline-block;vertical-align:middle;width:16px;height:16px;border:2px solid #D3D8C8;border-top-color:#14563F;border-radius:50%;animation:spin .9s linear infinite}
 .card{animation:riseIn .3s ease both}
 .langbtn{border:1px solid rgba(255,255,255,.5);background:transparent;color:#fff;padding:5px 10px;border-radius:20px;font:700 12px 'Noto Sans TC';opacity:.7}
-.langbtn.on{background:#fff;color:#4f8c3a;opacity:1;border-color:#fff}
+.langbtn.on{background:#fff;color:#14563F;opacity:1;border-color:#fff}
 #app-bg{min-height:100vh;padding:22px 14px 60px}
 #app-shell{max-width:560px;margin:0 auto}
 @media (min-width:768px){#app-bg{padding:36px 20px 72px}#app-shell{max-width:680px}}
 @media (min-width:1024px){#app-shell{max-width:760px}}
+
+/* ===== 水彩風（同入口網站）===== */
+html,body{background:#FAF8EF!important}
+#app-bg{position:relative;z-index:1}
+.v-page-leaf{position:fixed;bottom:0;width:105px;z-index:0;pointer-events:none}
+.v-page-leaf.bl{left:0}.v-page-leaf.br{right:0}
+input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.12)}
+#btn-today,#btn-refresh{border-radius:999px!important}
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:2147483647;display:flex;align-items:center;gap:14px;padding:0 20px;
+  background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8;box-sizing:border-box}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#14563F;color:#fff!important;border-radius:999px;
+  font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:#14563F;border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-hero{position:relative;overflow:hidden;isolation:isolate;min-height:150px;padding:24px 24px 20px;background:#F5F6E6}
+.v-hero-leaf{position:absolute;top:0;z-index:-1;opacity:.75;pointer-events:none}
+.v-hero-leaf.l{left:0;width:90px}.v-hero-leaf.r{right:0;width:62px}
+.v-hero-art{position:absolute;right:0;bottom:0;height:100%;width:auto;max-width:55%;object-fit:contain;object-position:right bottom;z-index:-1}
+.v-hero-row{display:flex;flex-direction:column;gap:14px;max-width:62%}
+.v-hero-title{font:900 26px/1.3 'Noto Serif TC',serif;color:#092F25;letter-spacing:.03em}
+.v-hero-sub{margin-top:6px;font:500 14px/1.7 'Noto Sans TC';color:#4D695A}
+.v-langs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.v-langs .v-ico{width:22px;height:22px;color:#14563F;margin-right:2px}
+.v-ico{display:inline-block;flex:none;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.langbtn{border:1px solid #B5CDA2!important;background:#FFFDF8!important;color:#14563F!important;opacity:1!important;padding:6px 13px!important;border-radius:999px!important}
+.langbtn.on{background:#14563F!important;color:#fff!important;border-color:#14563F!important}
+.v-empty-img{display:block;width:120px;height:auto;margin:0 auto 8px}
+@media (max-width:600px){
+  .v-topbar{height:56px;padding:0 12px;gap:10px}
+  body{padding-top:56px!important}
+  .v-tb-logo{display:none}
+  .v-hero{padding:20px 18px}
+  .v-hero-row{max-width:100%}
+  .v-hero-art{opacity:.45}
+  .v-hero-title{font-size:23px}
+  .v-page-leaf{width:60px;opacity:.6}
+}
 </style>
 </head>
 <body>
-<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<!--BACK_TO_PORTAL--><style>body{padding-top:64px !important}</style><div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">探視名單</span></div>
+<img class="v-page-leaf bl" src="../kiosk/img/n-c-bl.webp" alt=""><img class="v-page-leaf br" src="../kiosk/img/n-c-br.webp" alt="">
 <div id="app-bg">
 <div id="app-shell">
-<div style="background:#faf8f4;border:1px solid #e7e1d6;border-radius:8px;overflow:hidden;box-shadow:0 6px 26px rgba(79,140,58,.10)">
-<div style="padding:22px 22px 18px;background:#4f8c3a;color:#fff">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+<div style="background:#FFFDF8;border:1px solid #E3E5D8;border-radius:20px;overflow:hidden;box-shadow:0 6px 26px rgba(23,59,37,.08)">
+<div class="v-hero">
+<img class="v-hero-leaf l" src="../kiosk/img/n-c-tl.webp" alt=""><img class="v-hero-leaf r" src="../kiosk/img/n-c-tr.webp" alt="">
+<img class="v-hero-art" src="../assets/visit/banner.webp" alt="">
+<div class="v-hero-row">
 <div>
-<div id="t-title" style="font:700 22px/1.3 'Noto Serif TC';color:#fff">探視名單查詢</div>
-<div id="t-sub" style="margin-top:5px;font:300 13px/1.7 'Noto Sans TC';color:#e2f0d3"></div>
+<div id="t-title" class="v-hero-title">探視名單查詢</div>
+<div id="t-sub" class="v-hero-sub"></div>
 </div>
-<div style="display:flex;gap:5px;flex:none">
+<div class="v-langs"><i class="v-ico" style="--ico:url(../assets/visit/icon-language.webp)"></i>
 <button class="langbtn" data-lang="zh">中</button>
 <button class="langbtn" data-lang="id">ID</button>
 <button class="langbtn" data-lang="vi">VI</button>
@@ -45,23 +85,23 @@ input:focus{outline:none;border-color:#4f8c3a}
 <div style="padding:16px 16px 20px">
 <div style="display:flex;flex-wrap:wrap;gap:9px;align-items:flex-end;padding:0 2px 12px">
 <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px">
-<label id="lab-date" style="font:700 11.5px 'Noto Sans TC';color:#7d766c"></label>
-<input type="date" id="q-date" style="width:100%;padding:11px 12px;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:700 15px 'Noto Sans TC';color:#4f8c3a">
+<label id="lab-date" style="font:700 11.5px 'Noto Sans TC';color:#4D695A"></label>
+<input type="date" id="q-date" style="width:100%;padding:11px 12px;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:700 15px 'Noto Sans TC';color:#14563F">
 </div>
 <div style="flex:2;min-width:160px;display:flex;flex-direction:column;gap:5px">
-<label id="lab-name" style="font:700 11.5px 'Noto Sans TC';color:#7d766c"></label>
-<input type="text" id="q-name" style="width:100%;padding:11px 12px;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 15px 'Noto Sans TC';color:#2a2926">
+<label id="lab-name" style="font:700 11.5px 'Noto Sans TC';color:#4D695A"></label>
+<input type="text" id="q-name" style="width:100%;padding:11px 12px;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 15px 'Noto Sans TC';color:#092F25">
 </div>
-<button id="btn-today" style="flex:none;padding:11px 15px;border:1px solid #e0dbd1;background:#fff;color:#4f8c3a;border-radius:6px;font:700 13px 'Noto Sans TC'"></button>
+<button id="btn-today" style="flex:none;padding:11px 15px;border:1px solid #D3D8C8;background:#fff;color:#14563F;border-radius:12px;font:700 13px 'Noto Sans TC'"></button>
 </div>
 <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 10px">
-<div id="t-count" style="font:700 13px 'Noto Sans TC';color:#7d766c"></div>
-<button id="btn-refresh" style="border:1px solid #e0dbd1;background:#fff;color:#4f8c3a;padding:7px 14px;border-radius:20px;font:700 12.5px 'Noto Sans TC'"></button>
+<div id="t-count" style="font:700 13px 'Noto Sans TC';color:#4D695A"></div>
+<button id="btn-refresh" style="border:1px solid #D3D8C8;background:#fff;color:#14563F;padding:7px 14px;border-radius:20px;font:700 12.5px 'Noto Sans TC'"></button>
 </div>
 <div id="list" style="display:flex;flex-direction:column;gap:10px"></div>
 </div>
 </div>
-<div id="sync" style="margin-top:16px;text-align:center;font:400 11px 'Noto Sans TC';color:#c6bfb2;letter-spacing:.08em"></div>
+<div id="sync" style="margin-top:16px;text-align:center;font:400 11px 'Noto Sans TC';color:#A7B3AA;letter-spacing:.08em"></div>
 </div>
 </div>
 
@@ -145,7 +185,7 @@ input:focus{outline:none;border-color:#4f8c3a}
     var T = I18N[lang];
     var listEl = $("list");
     if(cache === null){
-      listEl.innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;display:flex;align-items:center;justify-content:center;gap:9px"><span class="ld"></span><span style="font:400 14px \'Noto Sans TC\';color:#b6ae9f">'+esc(T.loading)+'</span></div>';
+      listEl.innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #E3E5D8;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:9px"><span class="ld"></span><span style="font:400 14px \'Noto Sans TC\';color:#7F9186">'+esc(T.loading)+'</span></div>';
       $("t-count").innerText = "";
       return;
     }
@@ -160,7 +200,7 @@ input:focus{outline:none;border-color:#4f8c3a}
     }
     $("t-count").innerText = T.count(rows.length);
     if(!rows.length){
-      listEl.innerHTML = '<div style="padding:40px 20px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 15px \'Noto Sans TC\';color:#b6ae9f">'+esc(searchMode ? T.emptySearch : T.empty)+'</div>';
+      listEl.innerHTML = '<div style="padding:40px 20px;text-align:center;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 15px \'Noto Sans TC\';color:#7F9186">'+'<img class="v-empty-img" src="../assets/'+(searchMode?'common/state-empty':'visit/state-no-visit')+'.webp" alt="">'+esc(searchMode ? T.emptySearch : T.empty)+'</div>';
       return;
     }
     listEl.innerHTML = rows.map(function(r){
@@ -168,20 +208,20 @@ input:focus{outline:none;border-color:#4f8c3a}
       var name = esc(nameNoBed(r.residentName || r.name || ""));
       var fam = esc(r.familyName || "");
       var time = esc(r.time || "");
-      var dateTag = searchMode ? '<span style="font:400 11px \'Noto Sans TC\';color:#a79f94">'+esc(normDate(r.date))+'</span>' : '';
-      return '<div class="card" style="display:flex;gap:12px;padding:14px;background:#fff;border:1px solid #e7e1d6;border-radius:6px;align-items:stretch">'
+      var dateTag = searchMode ? '<span style="font:400 11px \'Noto Sans TC\';color:#7A8C80">'+esc(normDate(r.date))+'</span>' : '';
+      return '<div class="card" style="display:flex;gap:12px;padding:14px;background:#fff;border:1px solid #E3E5D8;border-radius:12px;align-items:stretch">'
         + '<div style="width:60px;flex:none;display:flex;flex-direction:column;gap:4px">'
-          + '<div style="padding:8px 0;background:#eef5e6;border-radius:5px;text-align:center;font:700 15px \'Noto Serif TC\';color:#4f8c3a">'+time+'</div>'
-          + (bed ? '<div style="padding:4px 0;background:#f5f2ec;border:1px solid #e7e1d6;border-radius:5px;text-align:center;font:700 11px \'Noto Sans TC\';color:#7d766c;word-break:break-all">'+esc(bed)+'</div>' : '')
+          + '<div style="padding:8px 0;background:#EAF3DC;border-radius:10px;text-align:center;font:700 15px \'Noto Serif TC\';color:#14563F">'+time+'</div>'
+          + (bed ? '<div style="padding:4px 0;background:#F3F4EA;border:1px solid #E3E5D8;border-radius:10px;text-align:center;font:700 11px \'Noto Sans TC\';color:#4D695A;word-break:break-all">'+esc(bed)+'</div>' : '')
         + '</div>'
         + '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;justify-content:center">'
-          + '<div style="display:flex;align-items:baseline;gap:8px"><span style="font:700 18px \'Noto Sans TC\';color:#2a2926;word-break:break-all">'+name+'</span>'+dateTag+'</div>'
-          + (fam ? '<div style="font:400 13px \'Noto Sans TC\';color:#857e73">'+esc(T.family)+'：'+fam+'</div>' : '')
+          + '<div style="display:flex;align-items:baseline;gap:8px"><span style="font:700 18px \'Noto Sans TC\';color:#092F25;word-break:break-all">'+name+'</span>'+dateTag+'</div>'
+          + (fam ? '<div style="font:400 13px \'Noto Sans TC\';color:#4D695A">'+esc(T.family)+'：'+fam+'</div>' : '')
         + '</div></div>';
     }).join("");
   }
 
-  function setSync(text, err){ $("sync").innerText = text; $("sync").style.color = err ? "#a8763c" : "#c6bfb2"; }
+  function setSync(text, err){ $("sync").innerText = text; $("sync").style.color = err ? "#B65B16" : "#A7B3AA"; }
 
   var fetching = false;
   function load(){
@@ -206,7 +246,7 @@ input:focus{outline:none;border-color:#4f8c3a}
       })
       .catch(function(){
         setSync(T.offline, true);
-        if(cache === null){ $("list").innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 14px \'Noto Sans TC\';color:#a8763c">'+esc(T.offline)+'</div>'; }
+        if(cache === null){ $("list").innerHTML = '<div style="padding:34px;text-align:center;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 14px \'Noto Sans TC\';color:#B65B16"><img class="v-empty-img" src="../assets/common/state-offline.webp" alt="">'+esc(T.offline)+'</div>'; }
       })
       .then(function(){ fetching = false; });
   }
@@ -217,8 +257,8 @@ input:focus{outline:none;border-color:#4f8c3a}
 
   // 以整頁通知取代白畫面（角色不符、通行碼不符、忙碌）
   function showNotice(msg, withBack){
-    var html = '<div style="padding:40px 22px;text-align:center;background:#fff;border:1px solid #e7e1d6;border-radius:6px;font:400 15px/1.8 \'Noto Sans TC\';color:#7a2b22">' + esc(msg) + '</div>';
-    if(withBack){ html += '<a href="' + PORTAL_HOME + '" style="display:block;margin-top:12px;text-align:center;padding:13px;background:#4f8c3a;color:#fff;border-radius:6px;font:700 14px \'Noto Sans TC\';text-decoration:none">' + esc(I18N[lang].backPortal) + '</a>'; }
+    var html = '<div style="padding:40px 22px;text-align:center;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 15px/1.8 \'Noto Sans TC\';color:#A63124"><img class="v-empty-img" src="../assets/common/state-locked.webp" alt="">' + esc(msg) + '</div>';
+    if(withBack){ html += '<a href="' + PORTAL_HOME + '" style="display:block;margin-top:12px;text-align:center;padding:13px;background:#14563F;color:#fff;border-radius:12px;font:700 14px \'Noto Sans TC\';text-decoration:none">' + esc(I18N[lang].backPortal) + '</a>'; }
     $("list").innerHTML = html;
     $("t-count").innerText = "";
   }
