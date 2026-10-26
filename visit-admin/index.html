@@ -291,6 +291,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
       const WEEKEND_LIMIT = P.weekendLimit ?? 8;
       const SHOW_REMAINING = P.showRemaining ?? true;
       const TEST_MODE = P.testMode ?? false;
+      const SUBMIT_TIMEOUT_MS = 45000; // 送出預約最多等 45 秒（同機台版）
 
       const $ = (id) => document.getElementById(id);
       const show = (id, d = "flex") => { const e = $(id); if (e) e.style.display = d; };
@@ -870,10 +871,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.5}
               const results = await Promise.all(Object.keys(byTime).map(t => {
                 const data = { residentName: resName, familyName: famName, relationship: relation, phone, note: noteInput, time: t, dates: byTime[t] };
                 if (isStaffOverride) { if (authToken) data.token = authToken; else if (staffPwd) data.pwd = staffPwd; } // 工作人員特許：後端略過額滿/隔離驗證
-                return fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data) })
-                  .then(r => r.json()).catch(() => ({ ok: false, error: "network" }));
+                const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), SUBMIT_TIMEOUT_MS); // 等待上限，避免網路卡住一直轉圈
+                return fetch(SCRIPT_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(data), signal: ctl.signal })
+                  .then(r => r.json()).catch(e => ({ ok: false, error: e && e.name === "AbortError" ? "timeout" : "network" }))
+                  .finally(() => clearTimeout(to));
               }));
               const bad = results.find(r => r && r.ok === false);
+              if (bad && bad.error === "timeout") {
+                // 逾時不代表沒送出（可能已寫入、只是回應沒回來），請先到名單確認，避免重複預約
+                resetBtn(); fetchData();
+                showConfirmPrompt("系統回應太久", "等候超過 45 秒，系統沒有回應。\n\n這筆預約「可能已經送出」，請先到右上角「管理後台」→「預約清單」確認有沒有這筆；\n確定沒有，再重新按「送出預約」，以免重複預約。", () => {}, "我知道了");
+                return;
+              }
               if (bad) { showStatusMsg(errMsg(bad.error)); resetBtn(); fetchData(); return; }
             } catch (e) { showStatusMsg("網路錯誤，送出失敗，請再試一次。"); resetBtn(); return; }
             allSlots.forEach(s => savePersistedReservation(s.date, s.time)); // 僅成功才記入本地暫存
