@@ -28,6 +28,8 @@ h1{margin:6px 0 4px;font-size:24px}
 .tag.m{background:#f6e7c8;color:var(--gold)}.tag.x{background:#eee;color:#777}
 .act{display:flex;gap:6px;justify-content:flex-end}
 .act button{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+.act button.code{min-width:84px;font-variant-numeric:tabular-nums}
+.act button.code.on{background:#f6e7c8;border-color:#e6cf9f;color:var(--gold);font-weight:700;letter-spacing:2px}
 .msg{min-height:22px;margin:8px 2px;font-size:14px;font-weight:700}
 .msg.err{color:var(--red)}.msg.ok{color:var(--green-d)}
 .modal{position:fixed;inset:0;background:rgba(28,43,35,.5);display:none;align-items:center;justify-content:center;padding:16px;z-index:50}
@@ -48,7 +50,7 @@ h1{margin:6px 0 4px;font-size:24px}
 <!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
 <main>
   <h1>人員名單管理</h1>
-  <p class="sub">這裡管理誰可以登入入口網站、是什麼身份。<b>系統不會顯示任何人的通行碼</b>；要換通行碼請按「編輯」直接設定新的 6 位數字。停用或改身份後，最多 5 分鐘內各系統生效。</p>
+  <p class="sub">這裡管理誰可以登入入口網站、是什麼身份。同仁忘記通行碼時，按該員的「看通行碼」查看（20 秒後自動隱藏，<b>每次查看都會留下紀錄</b>）；要換通行碼請按「編輯」直接設定新的 6 位數字。停用或改身份後，最多 5 分鐘內各系統生效。</p>
   <div class="bar"><button class="btn main" id="add">＋ 新增人員</button><button class="btn sec" id="reload">重新整理</button></div>
   <div class="msg" id="msg"></div>
   <div class="tbl" id="tbl"><div class="empty">載入中…</div></div>
@@ -90,11 +92,23 @@ function load(){
 function draw(){
   if(!people.length){ $("tbl").innerHTML='<div class="empty">還沒有任何人員</div>'; return; }
   var rows=people.map(function(p,i){
-    return '<div class="row'+(p.active?'':' off')+'"><div><b>'+esc(p.name)+'</b></div><div class="c-role"><span class="tag'+(p.role==="manager"?' m':'')+'">'+esc(ROLES[p.role]||p.role)+'</span></div><div class="c-st"><span class="tag'+(p.active?'':' x')+'">'+(p.active?'啟用':'停用')+'</span></div><div class="c-last">'+(p.last?esc(p.last):'尚未登入')+'</div><div class="act"><button data-e="'+i+'">編輯</button></div></div>';
+    return '<div class="row'+(p.active?'':' off')+'"><div><b>'+esc(p.name)+'</b></div><div class="c-role"><span class="tag'+(p.role==="manager"?' m':'')+'">'+esc(ROLES[p.role]||p.role)+'</span></div><div class="c-st"><span class="tag'+(p.active?'':' x')+'">'+(p.active?'啟用':'停用')+'</span></div><div class="c-last">'+(p.last?esc(p.last):'尚未登入')+'</div><div class="act"><button class="code" data-c="'+i+'">看通行碼</button><button data-e="'+i+'">編輯</button></div></div>';
   }).join("");
   $("tbl").innerHTML='<div class="row h"><div>姓名</div><div>身份</div><div>狀態</div><div>最近登入</div><div></div></div>'+rows;
   $("tbl").querySelectorAll("[data-e]").forEach(function(b){ b.onclick=function(){ openForm(people[+b.dataset.e]); }; });
+  $("tbl").querySelectorAll("[data-c]").forEach(function(b){ b.onclick=function(){ showCode(b, people[+b.dataset.c]); }; });
 }
+// 查看單一人員的通行碼（給忘記的同仁）；20 秒後自動隱藏，每次查看後端都會記錄
+function showCode(b,p){
+  if(b.classList.contains("on")){ hideCode(b); return; }
+  b.disabled=true; b.textContent="查詢中…";
+  call({action:"people.code",name:p.name}).then(function(j){
+    b.disabled=false;
+    if(j && j.ok){ b.textContent=j.code; b.classList.add("on"); b.title="再按一下隱藏"; clearTimeout(b._t); b._t=setTimeout(function(){ hideCode(b); },20000); }
+    else { b.textContent="看通行碼"; say($("msg"), j&&j.error==="unknown action"?"入口認證後端還沒更新成新版本，暫時無法查看通行碼。":(ERR[j&&j.error]||"查詢失敗，請稍後再試。")); }
+  }).catch(function(e){ b.disabled=false; b.textContent="看通行碼"; if(e.message!=="unauthorized") say($("msg"),"連線失敗，請檢查網路後再試。"); });
+}
+function hideCode(b){ clearTimeout(b._t); b.classList.remove("on"); b.textContent="看通行碼"; b.title=""; }
 function openForm(p){
   editing=p||null; $("mt").textContent=p?"編輯人員":"新增人員";
   $("fName").value=p?p.name:""; $("fName").disabled=!!p; $("fRole").value=p?p.role:"nurse"; $("fCode").value="";
@@ -104,7 +118,7 @@ function openForm(p){
   say($("fMsg"),""); $("modal").classList.add("show"); setTimeout(function(){ try{ (p?$("fCode"):$("fName")).focus(); }catch(e){} },30);
 }
 function closeForm(){ $("modal").classList.remove("show"); }
-var ERR={forbidden:"只有主管可以做這個操作。",invalid:"資料不正確：姓名 1～20 字、通行碼要是 6 位數字（新增人員必填）。",last_manager:"不能讓系統沒有任何「啟用中的主管」。請先設定另一位主管。",busy:"系統忙碌中，請稍後再試。"};
+var ERR={forbidden:"只有主管可以做這個操作。",invalid:"資料不正確：姓名 1～20 字、通行碼要是 6 位數字（新增人員必填）。",last_manager:"不能讓系統沒有任何「啟用中的主管」。請先設定另一位主管。",busy:"系統忙碌中，請稍後再試。",exists:"名單裡已經有同名的人（不分大小寫、空白）。名字一樣的同仁請加上能分辨的字，例如「(2樓)」或中文名字；要改原本那位請按他的「編輯」。",not_found:"名單裡找不到這個人，請重新整理。"};
 function save(){
   if(saving) return;
   var name=$("fName").value.trim(), role=$("fRole").value, code=$("fCode").value.trim(), active=$("fActive").checked;
@@ -112,7 +126,7 @@ function save(){
   if(code && !/^\d{6}$/.test(code)){ say($("fMsg"),"通行碼必須是 6 位數字。"); return; }
   if(!editing && !code){ say($("fMsg"),"新增人員必須設定 6 位數通行碼。"); return; }
   if(/^(\d)\1{5}$/.test(code) || code==="123456" || code==="654321"){ say($("fMsg"),"通行碼太容易猜，請換一組。"); return; }
-  var payload={action:"people.save",name:name,role:role,active:active}; if(code) payload.code=code;
+  var payload={action:"people.save",name:name,role:role,active:active}; if(code) payload.code=code; if(!editing) payload.mode="add";
   saving=true; $("save").disabled=true; say($("fMsg"),"");
   call(payload).then(function(j){
     saving=false; $("save").disabled=false;
