@@ -32,6 +32,15 @@
   .list .r:hover{background:var(--accent)}
   .list .r.sel{background:var(--sel);border-left:4px solid var(--brand)}
   .list .r .bed{color:var(--muted);font-size:13px}
+  .list .r.has-hits{flex-wrap:wrap}
+  .list .r .hits{flex-basis:100%;font-size:12.5px;color:var(--brand-d);line-height:1.5}
+  .list .r .hits .end{color:var(--muted)}
+  .isearch{display:flex;gap:6px;margin-top:6px}
+  .isearch select{flex:1;min-width:0;padding:7px 6px;border:1px solid var(--line);border-radius:8px;font-size:14px;background:#fff;color:var(--text)}
+  .scount{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .scount a{color:var(--brand-d);cursor:pointer;text-decoration:underline;margin-left:6px}
+  .ro-note{background:#fff8e6;border:1px solid #f0dca8;color:#7a5a12;border-radius:8px;padding:8px 12px;margin:0 0 10px;font-size:14px}
+  .readonly .acard-fields input,.readonly .acard-fields select{background:#f7f8f5;color:var(--text);opacity:1;-webkit-text-fill-color:var(--text)}
   .detail{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:300px;padding:16px}
   .detail .empty{color:var(--muted);text-align:center;padding:60px 0}
   .rhead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:2px solid var(--brand);padding-bottom:10px;margin-bottom:6px}
@@ -190,14 +199,16 @@
   <button class="btn-set" id="btnRefresh" onclick="refreshAll()" title="重新抓取住民名單與計費資料">🔄 刷新</button>
   <button class="btn-set" id="btnExport" onclick="exportCSV()" title="匯出目前所有進行中的計價項目（Excel可開）">⤓ 匯出總表</button>
   <button class="btn-set" id="btnResidents" onclick="openResidentsAdmin()" style="display:none">👤 住民管理</button>
-  <button class="btn-set" onclick="openSettings()">⚙ 價目設定</button>
+  <button class="btn-set" id="btnSettings" onclick="openSettings()" style="display:none">⚙ 價目設定</button>
   <span class="user" id="userTag"></span>
 </header>
 
 <div class="wrap">
   <div class="list">
     <div class="floorbar" id="floorBar"></div>
-    <div class="search"><input id="q" placeholder="搜尋 床號 或 姓名…" oninput="renderList()"></div>
+    <div class="search"><input id="q" placeholder="搜尋 床號、姓名，或項目內容（如 薦骨、BID）…" oninput="renderList()">
+      <div class="isearch"><select id="qGroup" onchange="onQGroup()"><option value="">全部大項目</option></select><select id="qItem" onchange="renderList()"><option value="">全部小項目</option></select></div>
+      <div class="scount" id="sCount"></div></div>
     <div class="items" id="resList"><div class="loading">載入中…<br><span style="font-size:12px">（後端喚醒中，第一次可能需 10–30 秒）</span></div></div>
   </div>
   <div class="detail" id="detail">
@@ -284,9 +295,15 @@ function ridOf(bed,name){ return (bed||'')+'｜'+(name||''); }
 function onBoot(d){
   STATE.residents=d.residents; STATE.beds=d.beds||[]; STATE.catalog=d.catalog; STATE.rules=d.rules||[];
   STATE.config=d.config; STATE.user=d.user; STATE.isAdmin=!!d.isAdmin;
+  // 護理＝只能看不能改（後端也會擋）；舊版後端沒回 role 時，用入口登入的身份判斷
+  var role=d.role||(function(){try{return localStorage.getItem('portal_role')||'';}catch(e){return '';}})();
+  STATE.readOnly=(role==='nurse');
+  document.body.classList.toggle('readonly',STATE.readOnly);
+  var bs=document.getElementById('btnSettings'); if(bs) bs.style.display=STATE.readOnly?'none':'';
+  fillQGroups();
   STATE.residents.forEach(function(r){ if(!r.rid) r.rid=ridOf(r.bed,r.name); });
   document.getElementById('userTag').textContent='操作者：'+d.user;
-  var br=document.getElementById('btnResidents'); if(br) br.style.display=STATE.isAdmin?'':'none';
+  var br=document.getElementById('btnResidents'); if(br) br.style.display=(STATE.isAdmin&&!STATE.readOnly)?'':'none';
   renderList();   // 名單來自 bootstrap，先顯示，不必等計費資料
   loadData();
 }
@@ -322,19 +339,67 @@ function renderFloors(){
   bar.innerHTML=html;
 }
 function setFloor(f){ STATE.floor=f; renderList(); }
+// ===== 搜尋：床號/姓名，或依 大項目／小項目／內容（部位、換藥、日期、負擔方、名字）=====
+function fillQGroups(){
+  var sel=document.getElementById('qGroup'); if(!sel) return; var cur=sel.value;
+  sel.innerHTML='<option value="">全部大項目</option>'+groupsOf().order.map(function(g){return '<option value="'+esc(g)+'"'+(g===cur?' selected':'')+'>'+esc(g)+'</option>';}).join('');
+  onQGroup(true);
+}
+function onQGroup(keep){
+  var g=gval('qGroup'), sel=document.getElementById('qItem'); if(!sel) return; var cur=keep?sel.value:'';
+  var kids=g?(groupsOf().map[g]||[]):STATE.catalog;
+  sel.innerHTML='<option value="">全部小項目</option>'+kids.map(function(c){return '<option value="'+esc(c.key)+'"'+(c.key===cur?' selected':'')+'>'+esc(c.label)+'</option>';}).join('');
+  renderList();
+}
+function clearSearch(){ document.getElementById('q').value=''; document.getElementById('qGroup').value=''; onQGroup(); }
+// 某住民所有計費項目（含已結束），每筆附可搜尋的文字
+function resEntries(rid){
+  var row=STATE.data[rid], out=[]; if(!row||!row.items) return out;
+  STATE.catalog.forEach(function(c){
+    var raw=row.items[c.key];
+    if(isWound(c.key)){
+      parseWounds(raw).forEach(function(w){
+        out.push({c:c, ended:!!w.e, title:c.label+(w.loc?('・'+w.loc):''),
+          text:[c.group,c.label,w.loc,w.freq,w.s,w.e,w.payer,w.pname,(w.payer?w.payer+'負擔':'')].join(' ')});
+      });
+    } else {
+      var pv=parseVal(c.key,raw); if(!pv.active) return;
+      out.push({c:c, ended:!!pv.end, title:c.label,
+        text:[c.group,c.label,pv.date,pv.raw,pv.end,pv.payer,pv.payerName,(pv.payer?pv.payer+'負擔':'')].join(' ')});
+    }
+  });
+  return out;
+}
 function renderList(){
-  var q=(document.getElementById('q').value||'').toLowerCase();
+  var q=(document.getElementById('q').value||'').trim().toLowerCase();
+  var g=gval('qGroup'), k=gval('qItem'), byItem=!!(g||k);
   renderFloors();
   var box=document.getElementById('resList'); box.innerHTML='';
-  STATE.residents.filter(function(r){
-    if(STATE.floor && floorOf(r.bed)!==STATE.floor) return false;
-    if(!q)return true; return (String(r.bed)+r.name).toLowerCase().indexOf(q)>=0;
-  }).forEach(function(r){
-    var d=document.createElement('div'); d.className='r'+(STATE.current===r.rid?' sel':'');
-    d.innerHTML='<span>'+esc(r.name)+'</span><span class="bed">'+esc(r.bed)+'</span>';
+  var n=0, hitItems=0;
+  STATE.residents.forEach(function(r){
+    if(STATE.floor && floorOf(r.bed)!==STATE.floor) return;
+    var nameHit=!q || (String(r.bed)+r.name).toLowerCase().indexOf(q)>=0;
+    var hits=[];
+    if(byItem || q){
+      hits=resEntries(r.rid).filter(function(e){
+        if(g && e.c.group!==g) return false;
+        if(k && e.c.key!==k) return false;
+        return nameHit || e.text.toLowerCase().indexOf(q)>=0;
+      });
+    }
+    if(byItem){ if(!hits.length) return; }                 // 選了項目：只列有這項的住民
+    else if(!nameHit && !hits.length) return;            // 只打字：姓名/床號或項目內容符合
+    if(!byItem && nameHit) hits=[];                      // 純找人時不列項目
+    n++; hitItems+=hits.length;
+    var d=document.createElement('div'); d.className='r'+(STATE.current===r.rid?' sel':'')+(hits.length?' has-hits':'');
+    d.innerHTML='<span>'+esc(r.name)+'</span><span class="bed">'+esc(r.bed)+'</span>'
+      +(hits.length?'<span class="hits">'+hits.map(function(e){return e.ended?'<span class="end">'+esc(e.title)+'（已結束）</span>':esc(e.title);}).join('、')+'</span>':'');
     d.onclick=(function(rid){return function(){openResident(rid);};})(r.rid);
     box.appendChild(d);
   });
+  var sc=document.getElementById('sCount');
+  if(sc) sc.innerHTML=(q||byItem)?('找到 '+n+' 位住民'+(hitItems?('，'+hitItems+' 筆項目'):'')+'<a onclick="clearSearch()">清除</a>'):'';
+  if(!n && (q||byItem)) box.innerHTML='<div class="loading">沒有符合的住民</div>';
 }
 
 function groupsOf(){
@@ -376,7 +441,7 @@ function catByKey(key){return STATE.catalog.filter(function(c){return c.key===ke
 function stripEnd(val){ val=(val==null?'':String(val)); var m=val.match(/⟦([^⟧]*)⟧\s*$/); if(m){ return {base:val.slice(0,m.index).replace(/\s+$/,''), end:(m[1]||'').trim()}; } return {base:val, end:''}; }
 function endTag(d){ d=(d||'').trim(); return d?(' ⟦'+d+'⟧'):''; }
 function gval(id){var e=document.getElementById(id);return e?e.value:'';}
-// 負擔方：把「⟨機構⟩／⟨照服員:姓名⟩」標記存在值尾巴；無標記＝家屬（相容舊資料）
+// 負擔方：把「⟨機構⟩／⟨照服員:姓名⟩／⟨其他住民:姓名⟩」標記存在值尾巴；無標記＝家屬（相容舊資料）
 function stripPayer(val){
   val=(val==null?'':String(val)); var payer='家屬', name='';
   var m=val.match(/⟨([^⟩]*)⟩\s*$/);
@@ -400,9 +465,28 @@ function parseVal(key,val){
   return out;
 }
 function combineWound(loc,d,freq){ loc=(loc||'').trim(); d=(d||'').trim(); freq=(freq||'').trim(); if(!loc&&!d&&!freq) return ''; var v=loc+'｜'+d; if(freq) v+='｜'+freq; return v; }
-// 負擔方下拉；家屬(預設)/機構/照服員
+// 負擔方下拉；家屬(預設)/機構/照服員/其他住民
+// 需要指名的負擔方 → 名字欄的提示文字
+var PAYER_NAMED={'照服員':'照服員姓名（多位用、分隔）','其他住民':'住民姓名（多位用、分隔）'};
+function needsName(p){ return PAYER_NAMED.hasOwnProperty(p); }
+// 依負擔方切換名字欄：顯示/隱藏、提示文字；其他住民可從住民名單挑
+function applyPayerName(el,payer,clear){
+  if(!el) return; var show=needsName(payer);
+  el.style.display=show?'':'none'; if(!show||clear) el.value='';
+  if(show) el.placeholder=PAYER_NAMED[payer];
+  if(payer==='其他住民'){ ensureResNames(); el.setAttribute('list','resNames'); } else el.removeAttribute('list');
+}
+function ensureResNames(){
+  var dl=document.getElementById('resNames'); if(!dl){ dl=document.createElement('datalist'); dl.id='resNames'; document.body.appendChild(dl); }
+  var cur=(curRes().name||'');
+  dl.innerHTML=(STATE.residents||[]).filter(function(r){return r.name&&r.name!==cur;}).map(function(r){return '<option value="'+esc(r.name)+'">'+esc(r.bed||'')+'</option>';}).join('');
+}
+function payerNameInput(id,payer,val,onchg){
+  var show=needsName(payer);
+  return '<input type="text" class="payn" id="'+id+'" value="'+esc(val||'')+'" placeholder="'+esc(PAYER_NAMED[payer]||'')+'"'+(payer==='其他住民'?' list="resNames"':'')+' style="'+(show?'':'display:none')+'" onchange="'+onchg+'">';
+}
 function payerSelectHtml(id,cur,onchg){
-  var opts=['家屬','機構','照服員'].map(function(p){return '<option'+(p===cur?' selected':'')+'>'+esc(p)+'</option>';}).join('');
+  var opts=['家屬','機構','照服員','其他住民'].map(function(p){return '<option'+(p===cur?' selected':'')+'>'+esc(p)+'</option>';}).join('');
   return '<select id="'+id+'" onchange="'+onchg+'">'+opts+'</select>';
 }
 // 目前這格已存的 base/end/payer（供保留用）
@@ -416,9 +500,9 @@ function saveRow(key){
 }
 // 只改負擔方，保留起訖
 function savePayer(key,payer,name){ var st=curStored(key); save(key, st.base + endTag(st.end) + payerTag(payer,name)); }
-// 只有「照服員」需要細計是哪一位；機構/家屬都不填
-function onCardPayerChange(key){ var payer=gval('pay_'+key); var el=document.getElementById('payn_'+key); var show=(payer==='照服員'); if(el){ el.style.display=show?'':'none'; if(!show) el.value=''; } savePayer(key,payer,(show&&el)?el.value:''); }
-function onAddPayerChange(){ var payer=gval('ap_payer_sel'); var el=document.getElementById('ap_payer_name'); var show=(payer==='照服員'); if(el){ el.style.display=show?'':'none'; if(!show) el.value=''; } }
+// 「照服員」「其他住民」需要指名；機構/家屬都不填
+function onCardPayerChange(key){ var payer=gval('pay_'+key); var el=document.getElementById('payn_'+key); applyPayerName(el,payer,true); savePayer(key,payer,''); }
+function onAddPayerChange(){ applyPayerName(document.getElementById('ap_payer_name'),gval('ap_payer_sel'),true); }
 
 function curRes(){ var rid=STATE.current;
   return STATE.residents.filter(function(x){return x.rid===rid;})[0] || STATE.data[rid] || {}; }
@@ -427,9 +511,10 @@ function openResident(rid){
   var r=curRes();
   var html='<div class="rhead"><span class="name">'+esc(r.name||'')+'</span>'
     +'<span class="bed">'+esc(r.bed||'')+'</span></div>';
+  if(STATE.readOnly) html+='<div class="ro-note">👀 護理身份只能查看，不能新增或修改。需要變更請找行政。</div>';
   html+='<h3 class="sec">目前進行中的計費項目</h3>';
   html+='<div id="activeList"></div>';
-  html+='<div class="addbar"><button class="btn-add" onclick="openAddPanel()">＋ 新增計費項目</button></div>';
+  if(!STATE.readOnly) html+='<div class="addbar"><button class="btn-add" onclick="openAddPanel()">＋ 新增計費項目</button></div>';
   html+='<div class="total"><span class="hint">＊只記錄各計費項目的「起始～結束」；填了「結束」日期就會移到下方「已結束」（歷史仍保留）。</span>'
      +'<span class="saving" id="savingTag"></span></div>';
   document.getElementById('detail').innerHTML=html;
@@ -446,9 +531,8 @@ function acardFields(c, pv){
   }
   f+=fld('起始','<input type="date" class="sd" id="s_'+k+'" value="'+esc(pv.date||'')+'" onchange="saveRow(\''+k+'\')">');
   f+=fld('結束','<input type="date" class="sd" id="e_'+k+'" value="'+esc(pv.end||'')+'" onchange="saveRow(\''+k+'\')">');
-  var showName=(pv.payer==='照服員');
   f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+k, pv.payer||'家屬', "onCardPayerChange('"+k+"')")
-    +'<input type="text" class="payn" id="payn_'+k+'" value="'+esc(pv.payerName||'')+'" placeholder="照服員姓名（多位用、分隔）" style="'+(showName?'':'display:none')+'" onchange="savePayer(\''+k+'\',gval(\'pay_'+k+'\'),this.value)"></span>');
+    +payerNameInput('payn_'+k, pv.payer, pv.payerName, "savePayer('"+k+"',gval('pay_"+k+"'),this.value)")+'</span>');
   return f;
 }
 function acardHtml(c, pv){
@@ -469,11 +553,11 @@ function parseWounds(val){
 }
 function woundFreqValIdx(key,i){ var s=gval('wf_'+key+'_'+i); if(s==='__num__'){ var n=(gval('wfn_'+key+'_'+i)||'').trim(); return n?(n+'次/日'):''; } return s; }
 function onWoundFreqChangeIdx(key,i){ var show=(gval('wf_'+key+'_'+i)==='__num__'); var n=document.getElementById('wfn_'+key+'_'+i), u=document.getElementById('wfn_'+key+'_'+i+'_u'); if(n)n.style.display=show?'':'none'; if(u)u.style.display=show?'':'none'; saveWoundEntry(key,i); }
-function onWoundPayerChange(key,i){ var show=(gval('pay_'+key+'_'+i)==='照服員'); var el=document.getElementById('payn_'+key+'_'+i); if(el){ el.style.display=show?'':'none'; if(!show) el.value=''; } saveWoundEntry(key,i); }
+function onWoundPayerChange(key,i){ var payer=gval('pay_'+key+'_'+i); var el=document.getElementById('payn_'+key+'_'+i); applyPayerName(el,payer,true); saveWoundEntry(key,i); }
 function saveWoundEntry(key,i){
   if(!gval('loc_'+key+'_'+i).trim()){ alert('傷口必須填寫部位。'); renderActive(); return; }
   var arr=parseWounds(curRaw(key));
-  var payer=gval('pay_'+key+'_'+i)||'家屬', pname=(payer==='照服員')?(gval('payn_'+key+'_'+i)||''):'';
+  var payer=gval('pay_'+key+'_'+i)||'家屬', pname=needsName(payer)?(gval('payn_'+key+'_'+i)||''):'';
   arr[i]={loc:gval('loc_'+key+'_'+i).trim(), freq:woundFreqValIdx(key,i), s:gval('s_'+key+'_'+i), e:gval('e_'+key+'_'+i), payer:payer, pname:pname};
   save(key, JSON.stringify(arr));
 }
@@ -484,9 +568,8 @@ function woundFields(c,w,i){
   f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf_'+key+'_'+i,'wfn_'+key+'_'+i, w.freq||'', "onWoundFreqChangeIdx('"+key+"',"+i+")", "saveWoundEntry('"+key+"',"+i+")")+'</span>');
   f+=fld('起始','<input type="date" class="sd" id="s_'+key+'_'+i+'" value="'+esc(w.s||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
   f+=fld('結束','<input type="date" class="sd" id="e_'+key+'_'+i+'" value="'+esc(w.e||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
-  var showName=(w.payer==='照服員');
   f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+key+'_'+i, w.payer||'家屬', "onWoundPayerChange('"+key+"',"+i+")")
-    +'<input type="text" class="payn" id="payn_'+key+'_'+i+'" value="'+esc(w.pname||'')+'" placeholder="照服員姓名（多位用、分隔）" style="'+(showName?'':'display:none')+'" onchange="saveWoundEntry(\''+key+'\','+i+')"></span>');
+    +payerNameInput('payn_'+key+'_'+i, w.payer, w.pname, "saveWoundEntry('"+key+"',"+i+")")+'</span>');
   return f;
 }
 function woundCardHtml(c,w,i){
@@ -499,6 +582,7 @@ function woundCardHtml(c,w,i){
 // 進行中在上、已結束在下
 function renderActive(){
   var box=document.getElementById('activeList'); if(!box) return;
+  ensureResNames();
   var row=STATE.data[STATE.current]||{items:{}};
   var prog=[], ended=[];
   STATE.catalog.forEach(function(c){
@@ -512,13 +596,19 @@ function renderActive(){
   });
   var html = prog.length ? prog.join('') : '<div class="s-empty">目前沒有進行中的計費項目，請按下方「＋ 新增計費項目」加入。</div>';
   if(ended.length){ html+='<h4 class="sec-end">已結束</h4>'+ended.join(''); }
+  if(STATE.readOnly) html=html.replace('請按下方「＋ 新增計費項目」加入。','');
   box.innerHTML=html;
+  if(STATE.readOnly){   // 唯讀：欄位鎖住、移除鍵拿掉
+    box.querySelectorAll('input,select').forEach(function(el){ el.disabled=true; });
+    box.querySelectorAll('.rm-fld').forEach(function(el){ el.remove(); });
+  }
 }
 
 function removeItem(key,label){ if(confirm('確定移除「'+label+'」？（連歷史一起清除）')) save(key,''); }
 
 // ===== 新增項目：大項目 → 小項目/頻率 → 內容 =====
 function openAddPanel(){
+  if(STATE.readOnly){ alert('護理身份只能查看，不能新增。'); return; }
   var gs=groupsOf();
   var groupOpts='<option value="">— 請選擇 —</option>'+gs.order.map(function(g){return '<option value="'+esc(g)+'">'+esc(g)+'</option>';}).join('');
   var html='<h3 class="modal-title">＋ 新增計費項目</h3>'
@@ -528,7 +618,7 @@ function openAddPanel(){
     +'<div class="row" id="ap_payer" style="display:none"><span class="step">④ 負擔方</span>'
       +payerSelectHtml('ap_payer_sel','家屬','onAddPayerChange()')
       +' <input type="text" id="ap_payer_name" placeholder="照服員姓名（多位用、分隔）" style="display:none;width:200px">'
-      +' <span class="lbl">預設家屬；機構造成選「機構」即可，照服員造成請選「照服員」並指名（可多位，用、分隔）</span></div>'
+      +' <span class="lbl">預設家屬；機構造成選「機構」即可；照服員或其他住民造成，請選對應項目並填名字（可多位，用、分隔）</span></div>'
     +'<div class="row"><button class="btn-add" onclick="addConfirm()">加入</button> <button class="btn-rm" onclick="closeAddPanel()">取消</button></div>';
   var p=document.getElementById('addPanel'); p.innerHTML=html;
   var o=document.getElementById('addOverlay'); if(o) o.classList.add('show');
@@ -555,8 +645,8 @@ function addConfirm(){
   var key=gval('ap_item'); if(!key){alert('請選擇項目');return;}
   var c=catByKey(key);
   var payer=gval('ap_payer_sel')||'家屬', pname=gval('ap_payer_name')||'';
-  if(payer!=='照服員') pname='';                                  // 機構不用細計
-  if(payer==='照服員' && !pname.trim()){ alert('請指名造成的照服員姓名（多位用、分隔）'); return; }
+  if(!needsName(payer)) pname='';                                 // 機構不用細計
+  if(needsName(payer) && !pname.trim()){ alert('請填寫造成的'+payer+'姓名（多位用、分隔）'); return; }
   if(isWound(key)){                                               // 傷口＝加一處（可多筆，不覆蓋）
     if(!gval('ap_loc').trim()){ alert('傷口必須填寫部位。'); return; }
     var afreq=(gval('ap_freq')==='__num__')?((gval('ap_freqn')||'').trim()?gval('ap_freqn').trim()+'次/日':''):gval('ap_freq');
@@ -572,7 +662,7 @@ function addConfirm(){
 
 // ===== 住民管理頁（限管理者，寫回主名單）=====
 function gv(id){ var e=document.getElementById(id); return e?(e.value||'').trim():''; }
-function openResidentsAdmin(){ if(!STATE.isAdmin){ alert('沒有住民管理權限'); return; } renderResidentsAdmin(); }
+function openResidentsAdmin(){ if(!STATE.isAdmin || STATE.readOnly){ alert('沒有住民管理權限'); return; } renderResidentsAdmin(); }
 // 空床清單（主名單裡目前沒人的床位）
 function emptyBeds(){ return (STATE.beds||[]).filter(function(b){ return !b.name; }).map(function(b){ return b.bed; }); }
 // 產生床號下拉：選項＝空床＋（可選）目前這床；cur 為預設選取的床號
@@ -631,6 +721,7 @@ function raDischarge(i){
 
 // ===== 計費項目設定頁（只管項目名稱與分區，無金額）=====
 function openSettings(){
+  if(STATE.readOnly){ alert('護理身份只能查看。'); return; }
   STATE.editCatalog=(STATE.catalog||[]).map(function(c){return {group:c.group,key:c.key,label:c.label,type:c.type,options:c.options,price:c.price,mode:c.mode,note:c.note};});
   renderSettings();
 }
@@ -698,6 +789,7 @@ function calcTotal(row,days){
 
 function save(key,value){
   var rid=STATE.current; if(!rid)return;
+  if(STATE.readOnly){ alert('護理身份只能查看，不能修改。'); renderActive(); return; }
   if(!STATE.data[rid]) STATE.data[rid]={items:{}};
   STATE.data[rid].items[key]=value;
   renderActive();
@@ -712,7 +804,7 @@ function save(key,value){
 function csvCell(s){ s=(s==null?'':String(s)); return /[",\n\r]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; }
 function stamp(){ var d=new Date(),p=function(n){return('0'+n).slice(-2);}; return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes()); }
 function exportCSV(){
-  var head=['床號','姓名','住民編號','大項目','項目','部位','換藥次數','起始日','結束日','狀態','負擔方','照服員/原因'];
+  var head=['床號','姓名','住民編號','大項目','項目','部位','換藥次數','起始日','結束日','狀態','負擔方','指名（照服員／住民）'];
   var list=[];
   Object.keys(STATE.data||{}).forEach(function(rid){
     var r=STATE.data[rid]; if(!r||!r.items) return;
