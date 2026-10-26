@@ -6,11 +6,11 @@
 <title>住民物品・消耗品（護理／照服）</title>
 <style>
   :root{
-    --bg:#F5F4EE; --ink:#1F2320; --sub:#45483F; --sub2:#6A6E62; --sub3:#8A8E80;
-    --green:#3E7530; --green2:#5C9A45; --gl:#E3F0D5; --gl2:#F4FAEE; --gd:#D8EBC4;
-    --line:rgba(31,35,32,.16); --line2:rgba(31,35,32,.22);
-    --warn:#A8431F; --warnbg:#FDF1EC; --warnln:#C4552F;
-    --err:#8F3F2C; --errbg:#FBEEE9; --errln:#B4553C;
+    --bg:#FAF8EF; --ink:#092F25; --sub:#3E5A4C; --sub2:#4D695A; --sub3:#7A8C80;
+    --green:#8A4A12; --green2:#B65B16; --gl:#FFF0D7; --gl2:#FFF7EA; --gd:#F6DDB8;
+    --line:#E3E5D8; --line2:#D3D8C8;
+    --warn:#A63124; --warnbg:#FBECE9; --warnln:#E7C3BD;
+    --err:#8E2E22; --errbg:#FBECE9; --errln:#E7C3BD;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -39,10 +39,10 @@
     background:var(--green2);color:#fff;font-size:14px;cursor:pointer}
   .btn:hover{background:var(--green);border-color:var(--green)}
   .btn:disabled{opacity:.5;cursor:default}
-  .btn.ghost{background:var(--gl2);color:var(--green);border-color:rgba(92,154,69,.5)}
+  .btn.ghost{background:var(--gl2);color:var(--green);border-color:rgba(182,91,22,.5)}
   .btn.ghost:hover{background:var(--gl)}
   .ok{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:10px;
-    background:var(--gl2);border:1px solid rgba(92,154,69,.45);color:var(--green);font-size:12.5px}
+    background:var(--gl2);border:1px solid rgba(182,91,22,.45);color:var(--green);font-size:12.5px}
   .actions{margin-top:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .hint{color:var(--warn);font-size:12.5px}
   .empty{padding:20px 14px;border:1px dashed var(--line2);border-radius:12px;text-align:center;
@@ -92,19 +92,57 @@
     .thumbs .t img{height:clamp(110px,12vw,170px)}
     .toast{max-width:560px}
   }
+
+  /* ===== 水彩風（同入口網站；物品系統主色＝橘）===== */
+  body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+  .wrap{position:relative;z-index:1}
+  .v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:2147483647;display:flex;align-items:center;gap:14px;padding:0 20px;
+    background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8;box-sizing:border-box}
+  .v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#14563F;color:#fff!important;border-radius:999px;
+    font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+  .v-tb-logo{height:40px;width:auto;flex:none}
+  .v-tb-title{font:900 19px 'Noto Serif TC',serif;color:#B65B16;border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+  header{position:relative;overflow:hidden;isolation:isolate;background:#FFF5E6;border:0;border-radius:20px;margin:12px 0 10px;padding:16px 20px 16px 84px;min-height:84px}
+  .v-hd-leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.75;z-index:-1}
+  .v-hd-art{position:absolute;right:120px;bottom:0;height:100%;width:auto;max-width:40%;object-fit:contain;object-position:right bottom;z-index:-1}
+  h1{font:900 24px/1.25 'Noto Serif TC',serif;color:#092F25;letter-spacing:.03em}
+  .langs button{border-radius:999px;background:#FFFDF8;padding:6px 12px}
+  h2{display:flex;align-items:center;gap:8px;font-size:16px;letter-spacing:.04em;color:#092F25;text-transform:none}
+  .v-h2-ico{width:26px;height:26px}
+  .card{border-radius:18px;background:#FFFDF8;padding:14px 16px}
+  .btn,.ok,.refresh,.searchbox button,.langs button{border-radius:999px}
+  .searchbox input{border-radius:12px}
+  .empty::before{content:"";display:block;width:110px;height:110px;margin:0 auto 6px;background:url(../assets/common/state-empty.webp) center/contain no-repeat}
+  .empty{border-radius:18px;background:#FFFDF8}
+  .toast{background:#14563F;border-radius:999px}
+  @media (orientation:landscape) and (min-width:820px){
+    .wrap{height:calc(100vh - 64px);height:calc(100dvh - 64px)}
+    header{position:relative;margin:12px 0 4px;padding:14px 20px 14px 84px}
+  }
+  @media (max-width:600px){
+    .v-topbar{height:56px;padding:0 12px;gap:10px}
+    body{padding-top:56px!important}
+    .v-tb-logo{display:none}
+    header{padding:14px 14px 14px 56px;min-height:72px}
+    .v-hd-art{right:0;opacity:.35;max-width:55%}
+    h1{font-size:18px}
+    header{padding-left:48px}
+  }
 </style>
 </head>
 <body>
-<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<!--BACK_TO_PORTAL--><style>body{padding-top:64px !important}</style><div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">物品確認</span></div>
 <div class="wrap">
   <header>
+    <img class="v-hd-leaf" src="../kiosk/img/n-o-l.webp" alt="">
+    <img class="v-hd-art" src="../assets/items/banner.webp" alt="">
     <h1 id="title"></h1>
     <div class="langs" id="langs"></div>
   </header>
 
   <div class="cols">
   <section id="secConfirm">
-    <h2 id="hConfirm"></h2>
+    <h2><img class="v-h2-ico" src="../assets/items/icon-confirm.webp" alt=""><span id="hConfirm"></span></h2>
     <div class="toolbar">
       <span class="who" id="whoConfirm"></span>
       <button class="refresh" id="refreshR"></button>
@@ -117,7 +155,7 @@
   </section>
 
   <section id="secConsum">
-    <h2 id="hConsum"></h2>
+    <h2><img class="v-h2-ico" src="../assets/items/icon-fruit.webp" alt=""><span id="hConsum"></span></h2>
     <div class="toolbar">
       <span class="who" id="whoConsum"></span>
       <button class="refresh" id="refreshC"></button>

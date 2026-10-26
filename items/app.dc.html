@@ -14,19 +14,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="用品清單">
-<meta name="theme-color" content="#5C9A45">
+<meta name="theme-color" content="#B65B16">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;700&family=Barlow+Condensed:wght@400;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
 <style>
 html,body{height:100%;overflow:hidden}
-body{margin:0;background:#F5F4EE;color:#1F2320;font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-a{color:#3E7530;text-decoration:none}a:hover{color:#5C9A45}
+body{margin:0;background:#FAF8EF;color:#092F25;font-family:"Barlow","Noto Sans TC",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#8A4A12;text-decoration:none}a:hover{color:#B65B16}
 *{box-sizing:border-box}
 input,select,button,textarea{font-family:inherit}
-::selection{background:#D8EBC4}
+::selection{background:#F6DDB8}
 </style>
 <template id="__bundler_thumbnail">
-<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#E3F0D5"/><g fill="#5C9A45"><rect x="60" y="52" width="80" height="100" rx="4"/><rect x="72" y="70" width="56" height="6" fill="#E3F0D5"/><rect x="72" y="86" width="56" height="6" fill="#E3F0D5"/><rect x="72" y="102" width="34" height="6" fill="#E3F0D5"/></g><circle cx="140" cy="140" r="26" fill="#3E7530"/><g fill="#E3F0D5"><rect x="128" y="132" width="24" height="17" rx="3"/><circle cx="140" cy="141" r="5" fill="#3E7530"/><rect x="134" y="128" width="12" height="5" rx="2"/></g></svg>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#FFF0D7"/><g fill="#B65B16"><rect x="60" y="52" width="80" height="100" rx="4"/><rect x="72" y="70" width="56" height="6" fill="#FFF0D7"/><rect x="72" y="86" width="56" height="6" fill="#FFF0D7"/><rect x="72" y="102" width="34" height="6" fill="#FFF0D7"/></g><circle cx="140" cy="140" r="26" fill="#8A4A12"/><g fill="#FFF0D7"><rect x="128" y="132" width="24" height="17" rx="3"/><circle cx="140" cy="141" r="5" fill="#8A4A12"/><rect x="134" y="128" width="12" height="5" rx="2"/></g></svg>
 </template>
 <style>
 @keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -37,28 +37,28 @@ input,select,button,textarea{font-family:inherit}
 
   <div style="display:none">
     <img src="logo-small.png" alt="線東大眾護理之家" style="height:52px;width:auto;display:block">
-    <div style="font:600 11px/1 'Barlow Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#4E8C3C">互動原型 · v1 · 手機優先</div>
+    <div style="font:600 11px/1 'Barlow Condensed',sans-serif;letter-spacing:.18em;text-transform:uppercase;color:#9A4A10">互動原型 · v1 · 手機優先</div>
     <h1 style="margin:0;font:600 34px/1.05 'Barlow Condensed','Noto Sans TC',sans-serif;letter-spacing:.01em">住民用品清單 — 拍照製表程式</h1>
-    <p style="margin:0;max-width:760px;font-size:14.5px;line-height:1.65;color:#45483F;text-wrap:pretty">用手機填表頭 → 一鍵加常用品項 → 現場拍照 → 自動排版成跟現在一樣的 Word 清單並自動命名。物品同時寫進雲端資料庫，之後增減、退住核對歸還都從同一筆資料走。</p>
+    <p style="margin:0;max-width:760px;font-size:14.5px;line-height:1.65;color:#3E5A4C;text-wrap:pretty">用手機填表頭 → 一鍵加常用品項 → 現場拍照 → 自動排版成跟現在一樣的 Word 清單並自動命名。物品同時寫進雲端資料庫，之後增減、退住核對歸還都從同一筆資料走。</p>
   </div>
 
   <div style="display:contents">
 
     <div style="display:none">
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">流程</div>
-        <div style="display:flex;flex-direction:column;gap:1px;border-top:1px solid rgba(31,35,32,.16)">
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">01</span><span style="font-size:13.5px;line-height:1.5">選住民（或新建）－ 姓名中英文、床號自動帶入</span></div>
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">02</span><span style="font-size:13.5px;line-height:1.5">品項：常用一鍵加入、可自訂、數量 ±</span></div>
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">03</span><span style="font-size:13.5px;line-height:1.5">拍照：張數不限、可刪可補、可標到品項</span></div>
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">04</span><span style="font-size:13.5px;line-height:1.5">預覽：Word 版面所見即所得、檔名可改</span></div>
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">05</span><span style="font-size:13.5px;line-height:1.5">匯出 .docx ＋ 存雲端硬碟資料庫</span></div>
-          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(31,35,32,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#5C9A45">06</span><span style="font-size:13.5px;line-height:1.5">退住：逐項核對歸還、記錄誰點收</span></div>
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4D695A">流程</div>
+        <div style="display:flex;flex-direction:column;gap:1px;border-top:1px solid rgba(9,47,37,.16)">
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">01</span><span style="font-size:13.5px;line-height:1.5">選住民（或新建）－ 姓名中英文、床號自動帶入</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">02</span><span style="font-size:13.5px;line-height:1.5">品項：常用一鍵加入、可自訂、數量 ±</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">03</span><span style="font-size:13.5px;line-height:1.5">拍照：張數不限、可刪可補、可標到品項</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">04</span><span style="font-size:13.5px;line-height:1.5">預覽：Word 版面所見即所得、檔名可改</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">05</span><span style="font-size:13.5px;line-height:1.5">匯出 .docx ＋ 存雲端硬碟資料庫</span></div>
+          <div style="display:grid;grid-template-columns:26px 1fr;gap:10px;padding:9px 0;border-bottom:1px solid rgba(9,47,37,.16)"><span style="font:600 12px 'Barlow Condensed',sans-serif;color:#B65B16">06</span><span style="font-size:13.5px;line-height:1.5">退住：逐項核對歸還、記錄誰點收</span></div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">我做的假設</div>
-        <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.55;color:#45483F">
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4D695A">我做的假設</div>
+        <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:13.5px;line-height:1.55;color:#3E5A4C">
           <li>不再手寫表單，紙本表頭欄位全部搬成輸入</li>
           <li>照片直接叫手機相機，不經相簿也行</li>
           <li>日期預設今天（民國），可改</li>
@@ -68,10 +68,10 @@ input,select,button,textarea{font-family:inherit}
         </ul>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">跳到畫面</div>
+        <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4D695A">跳到畫面</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px">
           <sc-for list="{{ jumps }}" as="j" hint-placeholder-count="6">
-            <button type="button" onClick="{{ j.go }}" style="padding:5px 9px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;border-radius:10px;font-size:12.5px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ j.label }}</button>
+            <button type="button" onClick="{{ j.go }}" style="padding:5px 9px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#092F25;border-radius:14px;font-size:12.5px;cursor:pointer" style-hover="background:#FFF0D7;border-color:#B65B16">{{ j.label }}</button>
           </sc-for>
         </div>
       </div>
@@ -79,43 +79,50 @@ input,select,button,textarea{font-family:inherit}
 
     <div style="position:fixed;inset:0;display:flex;flex-direction:column">
 
-      <div style="flex:1;min-height:0;background:#FCFCF9;display:flex;flex-direction:column;overflow:hidden;position:relative">
+      <div style="flex:1;min-height:0;background:#FFFDF8;display:flex;flex-direction:column;overflow:hidden;position:relative">
 
-        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;font:500 12px 'Barlow',sans-serif;color:#6A6E62;border-bottom:1px solid rgba(31,35,32,.1)">
-          <img src="logo-small.png" alt="線東大眾護理之家" style="height:22px;width:auto;display:block">
+        <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;font:500 12px 'Barlow',sans-serif;color:#4D695A;border-bottom:1px solid rgba(9,47,37,.1)">
+          <img src="../portal-img/logo.png" alt="線東大眾護理之家" style="height:30px;width:auto;display:none">
           <span>{{ syncLabel }}</span>
         </div>
 
-        <div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(31,35,32,.16)">
-          <button type="button" onClick="{{ back }}" style="width:30px;height:30px;flex:none;border-radius:10px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font-size:15px;line-height:1;cursor:pointer;display:{{ backDisplay }}" style-hover="background:#E3F0D5;border-color:#5C9A45">‹</button>
-          <button type="button" onClick="{{ goHub }}" title="回到選擇物品／消耗品的主選單" style="height:30px;flex:none;padding:0 10px;border-radius:10px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font:600 12.5px/1 'Barlow Condensed','Noto Sans TC',sans-serif;cursor:pointer;white-space:nowrap;display:{{ backDisplay }}" style-hover="background:#E3F0D5;border-color:#5C9A45">⌂ 主選單</button>
+        <div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(9,47,37,.16)">
+          <button type="button" onClick="{{ back }}" style="width:30px;height:30px;flex:none;border-radius:14px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#092F25;font-size:15px;line-height:1;cursor:pointer;display:{{ backDisplay }}" style-hover="background:#FFF0D7;border-color:#B65B16">‹</button>
+          <button type="button" onClick="{{ goHub }}" title="回到選擇物品／消耗品的主選單" style="height:30px;flex:none;padding:0 10px;border-radius:14px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#092F25;font:600 12.5px/1 'Barlow Condensed','Noto Sans TC',sans-serif;cursor:pointer;white-space:nowrap;display:{{ backDisplay }}" style-hover="background:#FFF0D7;border-color:#B65B16">⌂ 主選單</button>
           <div style="flex:1;min-width:0">
-            <div style="font:600 17px/1.15 'Barlow Condensed','Noto Sans TC',sans-serif">{{ title }}</div>
-            <div style="font-size:11.5px;color:#8A8E80;margin-top:2px">{{ subtitle }}</div>
+            <div style="font:900 19px/1.2 'Noto Serif TC','Noto Sans TC',serif;color:#092F25">{{ title }}</div>
+            <div style="font-size:11.5px;color:#7A8C80;margin-top:2px">{{ subtitle }}</div>
           </div>
-          <div style="font:600 11px 'Barlow Condensed',sans-serif;letter-spacing:.1em;color:#4E8C3C">{{ stepLabel }}</div>
+          <div style="font:600 11px 'Barlow Condensed',sans-serif;letter-spacing:.1em;color:#9A4A10">{{ stepLabel }}</div>
         </div>
 
-        <div style="flex:1;overflow-y:auto;padding:16px">
+        <div style="flex:1;overflow-y:auto;padding:16px max(16px, calc((100% - 1080px) / 2)) 24px">
 
           <sc-if value="{{ isHub }}" hint-placeholder-val="{{ true }}">
-            <div style="display:grid;grid-template-columns:1fr;gap:14px;padding-top:6px">
+            <div style="position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:120px;margin-bottom:14px;padding:18px 22px 18px clamp(52px, 9vw, 96px);background:#FFF5E6;border-radius:22px">
+              <img src="../kiosk/img/n-o-l.webp" alt="" style="position:absolute;left:0;top:0;height:100%;width:auto;opacity:.8;z-index:-1">
+              <img src="../assets/items/banner.webp" alt="" style="position:absolute;right:0;bottom:0;height:100%;width:auto;max-width:52%;object-fit:contain;object-position:right bottom;z-index:-1;opacity:.9">
+              <div style="max-width:max(56%, calc(560px - 20%));text-shadow:0 0 10px #FFF5E6,0 0 4px #FFF5E6"><div style="font:900 clamp(22px, 3vw, 26px)/1.25 'Noto Serif TC',serif;color:#092F25">住民物品登記</div><div style="margin-top:4px;font-size:14px;line-height:1.6;color:#4D695A;max-width:22em">逐件登記、拍照製表、退住核對，消耗品提醒家屬補貨。</div></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;padding-top:2px">
               <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
-                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
-                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8E2E22">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2018">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">重新上傳</button>
                 </div>
               </sc-if>
-              <button type="button" onClick="{{ goItems }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(31,35,32,.18);background:#fff;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4E8C3C">01</span>
-                <span style="font:600 22px/1.2 'Barlow Condensed','Noto Sans TC',sans-serif">住民用品清單</span>
-                <span style="font-size:13px;line-height:1.65;color:#6A6E62">家屬帶來的隨身物品逐件登記、拍照、製表存雲端。退住時逐項核對歸還。</span>
+              <button type="button" onClick="{{ goItems }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(9,47,37,.18);background:#fff;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16;background:#FFF7EA">
+                <img src="../assets/items/menu-belongings.webp" alt="" style="width:100%;max-width:260px;height:150px;object-fit:contain;align-self:center">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#9A4A10">01</span>
+                <span style="font:900 23px/1.2 'Noto Serif TC','Noto Sans TC',serif">住民用品清單</span>
+                <span style="font-size:13px;line-height:1.65;color:#4D695A">家屬帶來的隨身物品逐件登記、拍照、製表存雲端。退住時逐項核對歸還。</span>
               </button>
-              <button type="button" onClick="{{ goConsum }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(31,35,32,.18);background:#fff;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4E8C3C">02</span>
-                <span style="font:600 22px/1.2 'Barlow Condensed','Noto Sans TC',sans-serif">消耗品及食品</span>
-                <span style="font-size:13px;line-height:1.65;color:#6A6E62">拍照自動加上日期與住民姓名，直接分享到 LINE 群組；可設定何時提醒家屬再帶來。</span>
+              <button type="button" onClick="{{ goConsum }}" style="display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;padding:22px;border:1px solid rgba(9,47,37,.18);background:#fff;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16;background:#FFF7EA">
+                <img src="../assets/items/menu-consumables.webp" alt="" style="width:100%;max-width:260px;height:150px;object-fit:contain;align-self:center">
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#9A4A10">02</span>
+                <span style="font:900 23px/1.2 'Noto Serif TC','Noto Sans TC',serif">消耗品及食品</span>
+                <span style="font-size:13px;line-height:1.65;color:#4D695A">拍照自動加上日期與住民姓名，直接分享到 LINE 群組；可設定何時提醒家屬再帶來。</span>
               </button>
             </div>
           </sc-if>
@@ -123,62 +130,62 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isCHome }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
               <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
-                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
-                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8E2E22">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2018">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">重新上傳</button>
                 </div>
               </sc-if>
               <sc-if value="{{ hasConsumErr }}" hint-placeholder-val="{{ false }}">
-                <div style="padding:11px;border:1px solid #B4553C;background:#FBEEE9;font-size:12.5px;line-height:1.6;color:#8F3F2C;border-radius:10px">{{ consumErr }}</div>
+                <div style="padding:11px;border:1px solid #A63124;background:#FBECE9;font-size:12.5px;line-height:1.6;color:#8E2E22;border-radius:14px">{{ consumErr }}</div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;gap:8px">
-                  <input value="{{ cQuery }}" onChange="{{ onCQuery }}" placeholder="查詢：床號 / 姓名 / 品項 / 日期" style="flex:1;min-width:0;padding:11px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
-                  <button type="button" onClick="{{ clearCQuery }}" style="flex:none;padding:11px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">清除</button>
+                  <input value="{{ cQuery }}" onChange="{{ onCQuery }}" placeholder="查詢：床號 / 姓名 / 品項 / 日期" style="flex:1;min-width:0;padding:11px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
+                  <button type="button" onClick="{{ clearCQuery }}" style="flex:none;padding:11px 14px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">清除</button>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                  <span style="flex:1;min-width:0;font-size:11.5px;color:#8A8E80">{{ cResultCount }}</span>
-                  <button type="button" onClick="{{ refreshConsum }}" style="padding:3px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;color:#3E7530">↻ 重新整理</button>
+                  <span style="flex:1;min-width:0;font-size:11.5px;color:#7A8C80">{{ cResultCount }}</span>
+                  <button type="button" onClick="{{ refreshConsum }}" style="padding:3px 8px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#4D695A;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16;color:#8A4A12">↻ 重新整理</button>
                 </div>
               </div>
 
               <sc-if value="{{ cSearching }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;flex-direction:column;gap:10px">
                   <sc-if value="{{ noCResult }}" hint-placeholder-val="{{ false }}">
-                    <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">找不到符合的登記紀錄</div>
+                    <div style="padding:22px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px">找不到符合的登記紀錄</div>
                   </sc-if>
                   <sc-for list="{{ cResults }}" as="r" hint-placeholder-count="0">
-                    <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                    <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(9,47,37,.16);background:#fff;border-radius:14px">
                       <span style="display:flex;flex-direction:column;gap:4px">
                         <span style="font-size:15px;font-weight:500">{{ r.title }}</span>
-                        <span style="font-size:13.5px;line-height:1.6;color:#3F443C">{{ r.items }}</span>
-                        <span style="font-size:11.5px;color:#8A8E80">{{ r.meta }}</span>
+                        <span style="font-size:13.5px;line-height:1.6;color:#3E5A4C">{{ r.items }}</span>
+                        <span style="font-size:11.5px;color:#7A8C80">{{ r.meta }}</span>
                       </span>
                       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                         <span style="font-size:12px;color:{{ r.photoNoteFg }}">{{ r.photoNote }}</span>
                         <sc-if value="{{ r.canOpen }}" hint-placeholder-val="{{ false }}">
-                          <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(92,154,69,.45);background:#F4FAEE;color:#3E7530;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ r.toggleLabel }}</button>
+                          <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(182,91,22,.45);background:#FFF7EA;color:#8A4A12;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">{{ r.toggleLabel }}</button>
                         </sc-if>
                       </div>
                       <sc-if value="{{ r.loading }}" hint-placeholder-val="{{ false }}">
-                        <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">從雲端讀取照片…</div>
+                        <div style="padding:14px;border:1px dashed rgba(9,47,37,.24);text-align:center;font-size:12.5px;color:#7A8C80;border-radius:14px">從雲端讀取照片…</div>
                       </sc-if>
                       <sc-if value="{{ r.hasErr }}" hint-placeholder-val="{{ false }}">
-                        <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #B4553C;background:#FBEEE9;border-radius:10px">
-                          <span style="font-size:12.5px;line-height:1.6;color:#8F3F2C">{{ r.errMsg }}</span>
-                          <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #B4553C;background:#B4553C;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#8F3F2C">重試</button>
+                        <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                          <span style="font-size:12.5px;line-height:1.6;color:#8E2E22">{{ r.errMsg }}</span>
+                          <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">重試</button>
                         </div>
                       </sc-if>
                       <sc-if value="{{ r.empty }}" hint-placeholder-val="{{ false }}">
-                        <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">雲端已經找不到這批照片</div>
+                        <div style="padding:14px;border:1px dashed rgba(9,47,37,.24);text-align:center;font-size:12.5px;color:#7A8C80;border-radius:14px"><img src="../assets/items/state-no-photo.webp" alt="" style="width:90px;height:auto;display:block;margin:0 auto 6px">雲端已經找不到這批照片</div>
                       </sc-if>
                       <sc-if value="{{ r.loaded }}" hint-placeholder-val="{{ false }}">
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                           <sc-for list="{{ r.photos }}" as="p" hint-placeholder-count="0">
                             <span style="display:flex;flex-direction:column;gap:4px">
-                              <span style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</span>
-                              <span style="font-size:10.5px;color:#8A8E80">{{ p.label }}</span>
+                              <span style="border:1px solid rgba(9,47,37,.16);border-radius:14px;overflow:hidden">{{ p.img }}</span>
+                              <span style="font-size:10.5px;color:#7A8C80">{{ p.label }}</span>
                             </span>
                           </sc-for>
                         </div>
@@ -190,70 +197,70 @@ input,select,button,textarea{font-family:inherit}
 
               <sc-if value="{{ showBrowse }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">今天要提醒的住民</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">今天要提醒的住民</span>
                 <sc-if value="{{ noDue }}" hint-placeholder-val="{{ true }}">
-                  <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">今天沒有要提醒的住民</div>
+                  <div style="padding:22px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px"><img src="../assets/items/state-no-reminder.webp" alt="" style="width:110px;height:auto;display:block;margin:0 auto 6px">今天沒有要提醒的住民</div>
                 </sc-if>
                 <sc-for list="{{ dueList }}" as="r" hint-placeholder-count="0">
-                  <div style="display:flex;gap:10px;align-items:center;padding:12px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:10px">
+                  <div style="display:flex;gap:10px;align-items:center;padding:12px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:14px">
                     <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
                       <span style="font-size:14.5px;font-weight:500">{{ r.title }}</span>
                       <span style="font-size:11.5px;color:#7A6432">{{ r.sub }}</span>
                     </span>
-                    <button type="button" onClick="{{ r.done }}" style="flex:none;padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A0721F">已提醒</button>
+                    <button type="button" onClick="{{ r.done }}" style="flex:none;padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#A0721F">已提醒</button>
                   </div>
                 </sc-for>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">最近登記</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">最近登記</span>
                 <sc-if value="{{ noRecent }}" hint-placeholder-val="{{ true }}">
-                  <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">還沒有消耗品登記紀錄</div>
+                  <div style="padding:22px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px">還沒有消耗品登記紀錄</div>
                 </sc-if>
                 <sc-for list="{{ recentConsum }}" as="r" hint-placeholder-count="0">
-                  <div style="display:flex;flex-direction:column;gap:8px;padding:11px 12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:11px 12px;border:1px solid rgba(9,47,37,.16);background:#fff;border-radius:14px">
                     <div style="display:flex;align-items:center;gap:10px">
                       <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
                         <span style="font-size:14px;font-weight:500">{{ r.title }}</span>
-                        <span style="font-size:11.5px;color:#8A8E80">{{ r.sub }}</span>
+                        <span style="font-size:11.5px;color:#7A8C80">{{ r.sub }}</span>
                       </span>
                       <sc-if value="{{ r.notConfirming }}" hint-placeholder-val="{{ true }}">
-                        <button type="button" onClick="{{ r.ask }}" style="flex:none;padding:5px 10px;border:1px solid rgba(196,85,47,.5);background:transparent;color:#A8431F;font-size:12px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC;border-color:#C4552F">刪除</button>
+                        <button type="button" onClick="{{ r.ask }}" style="flex:none;padding:5px 10px;border:1px solid rgba(166,49,36,.5);background:transparent;color:#8E2E22;font-size:12px;cursor:pointer;border-radius:14px" style-hover="background:#FBECE9;border-color:#A63124">刪除</button>
                       </sc-if>
                     </div>
                     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
                       <span style="font-size:12px;color:{{ r.photoNoteFg }}">{{ r.photoNote }}</span>
                       <sc-if value="{{ r.canOpen }}" hint-placeholder-val="{{ false }}">
-                        <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(92,154,69,.45);background:#F4FAEE;color:#3E7530;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ r.toggleLabel }}</button>
+                        <button type="button" onClick="{{ r.toggle }}" style="padding:5px 11px;border:1px solid rgba(182,91,22,.45);background:#FFF7EA;color:#8A4A12;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">{{ r.toggleLabel }}</button>
                       </sc-if>
                     </div>
                     <sc-if value="{{ r.loading }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">從雲端讀取照片…</div>
+                      <div style="padding:14px;border:1px dashed rgba(9,47,37,.24);text-align:center;font-size:12.5px;color:#7A8C80;border-radius:14px">從雲端讀取照片…</div>
                     </sc-if>
                     <sc-if value="{{ r.hasErr }}" hint-placeholder-val="{{ false }}">
-                      <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #B4553C;background:#FBEEE9;border-radius:10px">
-                        <span style="font-size:12.5px;line-height:1.6;color:#8F3F2C">{{ r.errMsg }}</span>
-                        <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #B4553C;background:#B4553C;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#8F3F2C">重試</button>
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:11px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                        <span style="font-size:12.5px;line-height:1.6;color:#8E2E22">{{ r.errMsg }}</span>
+                        <button type="button" onClick="{{ r.retry }}" style="align-self:flex-start;padding:6px 12px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">重試</button>
                       </div>
                     </sc-if>
                     <sc-if value="{{ r.empty }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:14px;border:1px dashed rgba(31,35,32,.24);text-align:center;font-size:12.5px;color:#8A8E80;border-radius:10px">雲端已經找不到這批照片</div>
+                      <div style="padding:14px;border:1px dashed rgba(9,47,37,.24);text-align:center;font-size:12.5px;color:#7A8C80;border-radius:14px"><img src="../assets/items/state-no-photo.webp" alt="" style="width:90px;height:auto;display:block;margin:0 auto 6px">雲端已經找不到這批照片</div>
                     </sc-if>
                     <sc-if value="{{ r.loaded }}" hint-placeholder-val="{{ false }}">
                       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
                         <sc-for list="{{ r.photos }}" as="p" hint-placeholder-count="0">
                           <span style="display:flex;flex-direction:column;gap:4px">
-                            <span style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</span>
-                            <span style="font-size:10.5px;color:#8A8E80">{{ p.label }}</span>
+                            <span style="border:1px solid rgba(9,47,37,.16);border-radius:14px;overflow:hidden">{{ p.img }}</span>
+                            <span style="font-size:10.5px;color:#7A8C80">{{ p.label }}</span>
                           </span>
                         </sc-for>
                       </div>
                     </sc-if>
                     <sc-if value="{{ r.confirming }}" hint-placeholder-val="{{ false }}">
-                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
-                        <span style="font-size:12.5px;line-height:1.6;color:#5A2E1C">{{ r.delMsg }}</span>
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                        <span style="font-size:12.5px;line-height:1.6;color:#5A2018">{{ r.delMsg }}</span>
                         <div style="display:flex;gap:6px">
-                          <button type="button" onClick="{{ r.del }}" style="padding:7px 13px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">確定刪除</button>
-                          <button type="button" onClick="{{ r.cancel }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px">不要</button>
+                          <button type="button" onClick="{{ r.del }}" style="padding:7px 13px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">確定刪除</button>
+                          <button type="button" onClick="{{ r.cancel }}" style="padding:7px 13px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px">不要</button>
                         </div>
                       </div>
                     </sc-if>
@@ -266,71 +273,71 @@ input,select,button,textarea{font-family:inherit}
 
           <sc-if value="{{ isCNew }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
-              <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px">
-                <label style="font-size:12px;color:#3E7530">選擇住民</label>
-                <select value="{{ cRosterSel }}" onChange="{{ onCRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background-color:#fff;color:#1F2320;font-size:15px;border-radius:10px">{{ cRosterOptionEls }}</select>
-                <span style="font-size:12px;color:#6A6E62">{{ cCaptionPreview }}</span>
+              <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(182,91,22,.35);background:#FFF7EA;border-radius:14px">
+                <label style="font-size:12px;color:#8A4A12">選擇住民</label>
+                <select value="{{ cRosterSel }}" onChange="{{ onCRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background-color:#fff;color:#092F25;font-size:15px;border-radius:14px">{{ cRosterOptionEls }}</select>
+                <span style="font-size:12px;color:#4D695A">{{ cCaptionPreview }}</span>
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">登記日期</label>
-                <input type="date" value="{{ cDateIso }}" onChange="{{ onCDateIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">登記日期</label>
+                <input type="date" value="{{ cDateIso }}" onChange="{{ onCDateIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;color:#092F25;font-size:15px;border-radius:14px">
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">品項 · 點一下加入</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">品項 · 點一下加入</span>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
                   <sc-for list="{{ cPresets }}" as="c" hint-placeholder-count="6">
-                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                    <button type="button" onClick="{{ c.add }}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px 6px 8px;border:1px solid #EDC58D;background:#FFFDF8;color:#092F25;font-size:14px;cursor:pointer;border-radius:999px" style-hover="background:#FFF0D7;border-color:#B65B16"><img src="{{ c.icon }}" alt="" style="width:26px;height:26px;display:block">{{ c.label }}</button>
                   </sc-for>
                 </div>
                 <div style="display:flex;gap:8px">
-                  <input value="{{ cCustom }}" onChange="{{ onCCustom }}" placeholder="其他品項" style="flex:1;min-width:0;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
-                  <button type="button" onClick="{{ addCCustom }}" style="flex:none;padding:10px 16px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">加入</button>
+                  <input value="{{ cCustom }}" onChange="{{ onCCustom }}" placeholder="其他品項" style="flex:1;min-width:0;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
+                  <button type="button" onClick="{{ addCCustom }}" style="flex:none;padding:10px 16px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:14px;cursor:pointer;border-radius:14px" style-hover="background:#9A4A10">加入</button>
                 </div>
                 <sc-if value="{{ noCItems }}" hint-placeholder-val="{{ true }}">
-                  <div style="padding:18px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">尚未加入品項</div>
+                  <div style="padding:18px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px">尚未加入品項</div>
                 </sc-if>
                 <sc-for list="{{ cItems }}" as="it" hint-placeholder-count="0">
-                  <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                  <div style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;border:1px solid rgba(9,47,37,.16);background:#fff;border-radius:14px">
                     <div style="display:flex;align-items:center;gap:10px">
                       <span style="flex:1;min-width:0;font-size:14.5px">{{ it.label }}</span>
-                      <button type="button" onClick="{{ it.dec }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">−</button>
+                      <button type="button" onClick="{{ it.dec }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">−</button>
                       <span style="flex:none;min-width:22px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ it.qty }}</span>
-                      <button type="button" onClick="{{ it.inc }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">＋</button>
+                      <button type="button" onClick="{{ it.inc }}" style="width:32px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:16px;line-height:1;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">＋</button>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px">
-                      <label style="flex:none;font-size:12px;color:#6A6E62">有效期限（選填）</label>
-                      <input type="date" value="{{ it.expiryIso }}" onChange="{{ it.onExpiry }}" style="flex:1;min-width:0;padding:8px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:14px;border-radius:10px">
+                      <label style="flex:none;font-size:12px;color:#4D695A">有效期限（選填）</label>
+                      <input type="date" value="{{ it.expiryIso }}" onChange="{{ it.onExpiry }}" style="flex:1;min-width:0;padding:8px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;color:#092F25;font-size:14px;border-radius:14px">
                     </div>
                   </div>
                 </sc-for>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">何時提醒家屬再帶來（選填）</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">何時提醒家屬再帶來（選填）</span>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
                   <sc-for list="{{ remindQuick }}" as="q" hint-placeholder-count="5">
-                    <button type="button" onClick="{{ q.set }}" style="padding:7px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ q.label }}</button>
+                    <button type="button" onClick="{{ q.set }}" style="padding:7px 10px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">{{ q.label }}</button>
                   </sc-for>
                 </div>
-                <input type="date" value="{{ cRemindIso }}" onChange="{{ onCRemindIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:15px;border-radius:10px">
+                <input type="date" value="{{ cRemindIso }}" onChange="{{ onCRemindIso }}" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;color:#092F25;font-size:15px;border-radius:14px">
               </div>
             </div>
           </sc-if>
 
           <sc-if value="{{ isCPhotos }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
-              <div style="padding:11px 12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px;font-size:13px;line-height:1.65;color:#3E7530">每張照片下方會加上：{{ cCaptionPreview }}</div>
-              <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:1px dashed rgba(92,154,69,.55);background:#F4FAEE;color:#3E7530;font-size:14.5px;cursor:pointer;border-radius:10px">
+              <div style="padding:11px 12px;border:1px solid rgba(182,91,22,.35);background:#FFF7EA;border-radius:14px;font-size:13px;line-height:1.65;color:#8A4A12">每張照片下方會加上：{{ cCaptionPreview }}</div>
+              <label style="display:flex;align-items:center;justify-content:center;gap:8px;padding:16px;border:1px dashed rgba(182,91,22,.55);background:#FFF7EA;color:#8A4A12;font-size:14.5px;cursor:pointer;border-radius:14px">
                 ＋ 拍照或選相片
                 <input type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onCFiles }}" style="display:none">
               </label>
               <sc-if value="{{ noCShots }}" hint-placeholder-val="{{ true }}">
-                <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">還沒有照片</div>
+                <div style="padding:22px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px">還沒有照片</div>
               </sc-if>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                 <sc-for list="{{ cShots }}" as="p" hint-placeholder-count="0">
-                  <div style="position:relative;border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">
+                  <div style="position:relative;border:1px solid rgba(9,47,37,.16);border-radius:14px;overflow:hidden">
                     {{ p.thumb }}
-                    <button type="button" onClick="{{ p.del }}" style="position:absolute;top:6px;right:6px;width:26px;height:26px;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:14px;line-height:1;cursor:pointer;border-radius:10px">×</button>
+                    <button type="button" onClick="{{ p.del }}" style="position:absolute;top:6px;right:6px;width:26px;height:26px;border:none;background:rgba(0,0,0,.55);color:#fff;font-size:14px;line-height:1;cursor:pointer;border-radius:14px">×</button>
                   </div>
                 </sc-for>
               </div>
@@ -339,11 +346,11 @@ input,select,button,textarea{font-family:inherit}
 
           <sc-if value="{{ isCDone }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
-              <div style="padding:11px 12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px;font-size:13px;line-height:1.65;color:#3E7530">{{ cSummary }}</div>
-              <div style="padding:10px 12px;border:1px solid {{ cSaveBorder }};background:{{ cSaveBg }};color:{{ cSaveFg }};border-radius:10px;font-size:13px;line-height:1.6">{{ cSaveMsg }}</div>
+              <div style="padding:11px 12px;border:1px solid rgba(182,91,22,.35);background:#FFF7EA;border-radius:14px;font-size:13px;line-height:1.65;color:#8A4A12">{{ cSummary }}</div>
+              <div style="padding:10px 12px;border:1px solid {{ cSaveBorder }};background:{{ cSaveBg }};color:{{ cSaveFg }};border-radius:14px;font-size:13px;line-height:1.6">{{ cSaveMsg }}</div>
               <div style="display:flex;flex-direction:column;gap:10px">
                 <sc-for list="{{ cStamped }}" as="p" hint-placeholder-count="1">
-                  <div style="border:1px solid rgba(31,35,32,.16);border-radius:10px;overflow:hidden">{{ p.img }}</div>
+                  <div style="border:1px solid rgba(9,47,37,.16);border-radius:14px;overflow:hidden">{{ p.img }}</div>
                 </sc-for>
               </div>
             </div>
@@ -352,53 +359,53 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
               <sc-if value="{{ hasDbError }}" hint-placeholder-val="{{ false }}">
-                <div style="border:1px solid #B4553C;background:#FBEEE9;padding:11px;display:flex;flex-direction:column;gap:8px">
-                  <div style="font-size:13px;font-weight:500;color:#8F3F2C">雲端資料庫連線失敗</div>
-                  <div style="font-size:12px;line-height:1.5;color:#45483F;word-break:break-all">{{ dbError }}</div>
-                  <button type="button" onClick="{{ retryDb }}" style="align-self:flex-start;padding:6px 11px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:12.5px;cursor:pointer">重試</button>
+                <div style="border:1px solid #A63124;background:#FBECE9;padding:11px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:13px;font-weight:500;color:#8E2E22">雲端資料庫連線失敗</div>
+                  <div style="font-size:12px;line-height:1.5;color:#3E5A4C;word-break:break-all">{{ dbError }}</div>
+                  <button type="button" onClick="{{ retryDb }}" style="align-self:flex-start;padding:6px 11px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:12.5px;cursor:pointer">重試</button>
                 </div>
               </sc-if>
               <sc-if value="{{ hasPending }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#A8431F">待補上傳</span>
-                  <span style="font-size:13px;line-height:1.65;color:#5A2E1C">{{ pendingMsg }}</span>
-                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">重新上傳</button>
+                <div style="display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#8E2E22">待補上傳</span>
+                  <span style="font-size:13px;line-height:1.65;color:#5A2018">{{ pendingMsg }}</span>
+                  <button type="button" onClick="{{ retryPending }}" style="align-self:flex-start;padding:7px 14px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">重新上傳</button>
                 </div>
               </sc-if>
-              <button type="button" onClick="{{ goDropoff }}" style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(92,154,69,.4);background:#F4FAEE;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45;background:#E3F0D5">
+              <button type="button" onClick="{{ goDropoff }}" style="display:flex;align-items:center;gap:10px;padding:12px;border:1px solid rgba(182,91,22,.4);background:#FFF7EA;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16;background:#FFF0D7">
                 <span style="flex:1;min-width:0;text-align:left;display:flex;flex-direction:column;gap:2px">
-                  <span style="font-size:14px;font-weight:600;color:#3E7530">家屬寄放待點收 {{ dropoffBadge }}</span>
-                  <span style="font-size:11.5px;color:#6A6E62">機台家屬登記的物品，點收後轉入住民清單</span>
+                  <span style="font-size:14px;font-weight:600;color:#8A4A12">家屬寄放待點收 {{ dropoffBadge }}</span>
+                  <span style="font-size:11.5px;color:#4D695A">機台家屬登記的物品，點收後轉入住民清單</span>
                 </span>
-                <span style="flex:none;font-size:12px;color:#4E8C3C">前往 ›</span>
+                <span style="flex:none;font-size:12px;color:#9A4A10">前往 ›</span>
               </button>
-              <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="搜尋床號或姓名" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+              <input value="{{ query }}" onChange="{{ onQuery }}" placeholder="搜尋床號或姓名" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
               <div style="display:flex;align-items:baseline;justify-content:space-between">
                 <div style="display:flex;align-items:center;gap:8px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">住民物品資料庫</span>
-                  <button type="button" onClick="{{ toggleLeft }}" style="padding:3px 8px;border:1px solid {{ leftBtnBorder }};background:{{ leftBtnBg }};color:{{ leftBtnFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">{{ leftBtnLabel }}</button>
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">住民物品資料庫</span>
+                  <button type="button" onClick="{{ toggleLeft }}" style="padding:3px 8px;border:1px solid {{ leftBtnBorder }};background:{{ leftBtnBg }};color:{{ leftBtnFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">{{ leftBtnLabel }}</button>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
                   <div style="display:flex;gap:4px">
-                    <button type="button" onClick="{{ byBed }}" style="padding:3px 8px;border:1px solid {{ sortBedBorder }};background:{{ sortBedBg }};color:{{ sortBedFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45">房號</button>
-                    <button type="button" onClick="{{ byDate }}" style="padding:3px 8px;border:1px solid {{ sortDateBorder }};background:{{ sortDateBg }};color:{{ sortDateFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45">建立日</button>
+                    <button type="button" onClick="{{ byBed }}" style="padding:3px 8px;border:1px solid {{ sortBedBorder }};background:{{ sortBedBg }};color:{{ sortBedFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px;white-space:nowrap" style-hover="border-color:#B65B16">房號</button>
+                    <button type="button" onClick="{{ byDate }}" style="padding:3px 8px;border:1px solid {{ sortDateBorder }};background:{{ sortDateBg }};color:{{ sortDateFg }};font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px;white-space:nowrap" style-hover="border-color:#B65B16">建立日</button>
                   </div>
-                  <span style="font-size:11.5px;color:#8A8E80">{{ residentCount }} 位</span>
-                  <button type="button" onClick="{{ refreshDb }}" disabled="{{ refreshing }}" style="padding:3px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45;color:#3E7530">{{ refreshLabel }}</button>
+                  <span style="font-size:11.5px;color:#7A8C80">{{ residentCount }} 位</span>
+                  <button type="button" onClick="{{ refreshDb }}" disabled="{{ refreshing }}" style="padding:3px 8px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#4D695A;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px;white-space:nowrap" style-hover="border-color:#B65B16;color:#8A4A12">{{ refreshLabel }}</button>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <sc-if value="{{ noResidents }}" hint-placeholder-val="{{ false }}">
-                  <div style="padding:26px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;line-height:1.6;color:#8A8E80">{{ emptyMsg }}</div>
+                  <div style="padding:26px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;line-height:1.6;color:#7A8C80">{{ emptyMsg }}</div>
                 </sc-if>
                 <sc-for list="{{ visibleResidents }}" as="r" hint-placeholder-count="4">
-                  <button type="button" onClick="{{ r.open }}" style="width:100%;text-align:left;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;border-radius:10px" style-hover="border-color:#5C9A45;background:#F4F9EC">
-                    <span style="flex:none;width:52px;font:600 16px/1 'Barlow Condensed',sans-serif;color:#3E7530">{{ r.bed }}</span>
+                  <button type="button" onClick="{{ r.open }}" style="width:100%;text-align:left;padding:12px;border:1px solid rgba(9,47,37,.16);background:#fff;cursor:pointer;display:flex;gap:12px;align-items:center;border-radius:14px" style-hover="border-color:#B65B16;background:#FFF7EA">
+                    <span style="flex:none;width:52px;font:600 16px/1 'Barlow Condensed',sans-serif;color:#8A4A12">{{ r.bed }}</span>
                     <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
                       <span style="font-size:14.5px;font-weight:500">{{ r.name }}</span>
-                      <span style="font-size:11.5px;color:#8A8E80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.summary }}</span>
+                      <span style="font-size:11.5px;color:#7A8C80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.summary }}</span>
                     </span>
-                    <span style="flex:none;font-size:11.5px;color:#4E8C3C">{{ r.itemCount }} 件 ›</span>
+                    <span style="flex:none;font-size:11.5px;color:#9A4A10">{{ r.itemCount }} 件 ›</span>
                   </button>
                 </sc-for>
               </div>
@@ -408,68 +415,68 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isBasic }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
               <sc-if value="{{ hasRoster }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;border-radius:10px">
+                <div style="display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid rgba(182,91,22,.35);background:#FFF7EA;border-radius:14px">
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
-                    <label style="font-size:12px;color:#3E7530">從住民名單帶入</label>
-                    <button type="button" onClick="{{ refreshRoster }}" style="flex:none;padding:2px 8px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#6A6E62;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:10px;white-space:nowrap" style-hover="border-color:#5C9A45;color:#3E7530">↻ 重新讀取</button>
+                    <label style="font-size:12px;color:#8A4A12">從住民名單帶入</label>
+                    <button type="button" onClick="{{ refreshRoster }}" style="flex:none;padding:2px 8px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#4D695A;font-size:11.5px;line-height:1.4;cursor:pointer;border-radius:14px;white-space:nowrap" style-hover="border-color:#B65B16;color:#8A4A12">↻ 重新讀取</button>
                   </div>
-                  <select value="{{ rosterSel }}" onChange="{{ onRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background-color:#fff;color:#1F2320;font-size:15px;border-radius:10px">{{ rosterOptionEls }}</select>
+                  <select value="{{ rosterSel }}" onChange="{{ onRosterSel }}" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background-color:#fff;color:#092F25;font-size:15px;border-radius:14px">{{ rosterOptionEls }}</select>
                   <sc-if value="{{ hasDup }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:10px">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C08A2E;background:#FCF6E8;border-radius:14px">
                       <span style="font-size:13px;line-height:1.6;color:#5A4318">{{ dupMsg }}</span>
                       <div style="display:flex;gap:6px;flex-wrap:wrap">
-                        <button type="button" onClick="{{ openDup }}" style="padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A0721F">看舊紀錄</button>
-                        <button type="button" onClick="{{ dismissDup }}" style="padding:6px 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">繼續新增</button>
+                        <button type="button" onClick="{{ openDup }}" style="padding:6px 12px;border:1px solid #C08A2E;background:#C08A2E;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#A0721F">看舊紀錄</button>
+                        <button type="button" onClick="{{ dismissDup }}" style="padding:6px 12px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">繼續新增</button>
                       </div>
                     </div>
                   </sc-if>
                   <sc-if value="{{ hasBedDiff }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(31,35,32,.22);background:#fff;border-radius:10px">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(9,47,37,.22);background:#fff;border-radius:14px">
                       <span style="font-size:13px;line-height:1.6">{{ bedDiffMsg }}</span>
                       <div style="display:flex;gap:6px;flex-wrap:wrap">
-                        <button type="button" onClick="{{ useNewBed }}" style="padding:6px 12px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">用名單床號</button>
-                        <button type="button" onClick="{{ keepOldBed }}" style="padding:6px 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">維持舊床號</button>
+                        <button type="button" onClick="{{ useNewBed }}" style="padding:6px 12px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#9A4A10">用名單床號</button>
+                        <button type="button" onClick="{{ keepOldBed }}" style="padding:6px 12px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">維持舊床號</button>
                       </div>
                     </div>
                   </sc-if>
                   <sc-if value="{{ hasRosterNote }}" hint-placeholder-val="{{ false }}">
-                    <span style="font-size:12px;color:#6A6E62">{{ rosterNote }}</span>
+                    <span style="font-size:12px;color:#4D695A">{{ rosterNote }}</span>
                   </sc-if>
                 </div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">住民姓名（中文）</label>
-                <input value="{{ draftName }}" onChange="{{ onName }}" placeholder="例：呂勝雄" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">住民姓名（中文）</label>
+                <input value="{{ draftName }}" onChange="{{ onName }}" placeholder="例：呂勝雄" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">英文名</label>
-                <input value="{{ draftEn }}" onChange="{{ onEn }}" placeholder="例：Sheng Syong" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">英文名</label>
+                <input value="{{ draftEn }}" onChange="{{ onEn }}" placeholder="例：Sheng Syong" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
                 <div style="display:flex;flex-direction:column;gap:6px">
-                  <label style="font-size:12px;color:#6A6E62">床號</label>
-                  <input value="{{ draftBed }}" onChange="{{ onBed }}" placeholder="506-1" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                  <label style="font-size:12px;color:#4D695A">床號</label>
+                  <input value="{{ draftBed }}" onChange="{{ onBed }}" placeholder="506-1" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
                 </div>
                 <div style="display:flex;flex-direction:column;gap:6px">
-                  <label style="font-size:12px;color:#6A6E62">日期（民國）</label>
-                  <input value="{{ draftDate }}" onChange="{{ onDate }}" placeholder="115.7.28" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                  <label style="font-size:12px;color:#4D695A">日期（民國）</label>
+                  <input value="{{ draftDate }}" onChange="{{ onDate }}" placeholder="115.7.28" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">製表日（民國）— 用在檔名</label>
-                <input value="{{ draftMakeDate }}" onChange="{{ onMakeDate }}" placeholder="115.8.03" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">製表日（民國）— 用在檔名</label>
+                <input value="{{ draftMakeDate }}" onChange="{{ onMakeDate }}" placeholder="115.8.03" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <label style="font-size:12px;color:#6A6E62">點收人員身份（可多選）</label>
+                <label style="font-size:12px;color:#4D695A">點收人員身份（可多選）</label>
                 <div style="display:flex;gap:8px">
                   <sc-for list="{{ receiverOpts }}" as="o" hint-placeholder-count="3">
-                    <button type="button" onClick="{{ o.toggle }}" style="flex:1;padding:10px 4px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};font-size:13.5px;cursor:pointer;border-radius:10px">{{ o.label }}</button>
+                    <button type="button" onClick="{{ o.toggle }}" style="flex:1;padding:10px 4px;border:1px solid {{ o.border }};background:{{ o.bg }};color:{{ o.fg }};font-size:13.5px;cursor:pointer;border-radius:14px">{{ o.label }}</button>
                   </sc-for>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">點收人</label>
-                <input value="{{ draftReceiverName }}" onChange="{{ onReceiverName }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">點收人</label>
+                <input value="{{ draftReceiverName }}" onChange="{{ onReceiverName }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
             </div>
           </sc-if>
@@ -477,41 +484,41 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isItems }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">常用品項 · 點一下加入</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">常用品項 · 點一下加入</span>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
                   <sc-for list="{{ commonItems }}" as="c" hint-placeholder-count="10">
-                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                    <button type="button" onClick="{{ c.add }}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px 6px 8px;border:1px solid #EDC58D;background:#FFFDF8;color:#092F25;font-size:14px;cursor:pointer;border-radius:999px" style-hover="background:#FFF0D7;border-color:#B65B16"><img src="{{ c.icon }}" alt="" style="width:26px;height:26px;display:block">{{ c.label }}</button>
                   </sc-for>
                 </div>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">衣物 · 點一下加入</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">衣物 · 點一下加入</span>
                 <div style="display:flex;flex-wrap:wrap;gap:6px">
                   <sc-for list="{{ clothesItems }}" as="c" hint-placeholder-count="12">
-                    <button type="button" onClick="{{ c.add }}" style="padding:7px 10px;border:1px solid rgba(92,154,69,.35);background:#F4FAEE;color:#1F2320;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">＋{{ c.label }}</button>
+                    <button type="button" onClick="{{ c.add }}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px 6px 8px;border:1px solid #EDC58D;background:#FFFDF8;color:#092F25;font-size:14px;cursor:pointer;border-radius:999px" style-hover="background:#FFF0D7;border-color:#B65B16"><img src="{{ c.icon }}" alt="" style="width:26px;height:26px;display:block">{{ c.label }}</button>
                   </sc-for>
                 </div>
               </div>
               <div style="display:flex;gap:8px">
-                <input value="{{ customItem }}" onChange="{{ onCustomItem }}" placeholder="自訂品項名稱" style="flex:1;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
-                <button type="button" onClick="{{ addCustom }}" style="flex:none;padding:0 16px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#3E7530">加入</button>
+                <input value="{{ customItem }}" onChange="{{ onCustomItem }}" placeholder="自訂品項名稱" style="flex:1;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
+                <button type="button" onClick="{{ addCustom }}" style="flex:none;padding:0 16px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:14px;cursor:pointer;border-radius:14px" style-hover="background:#8A4A12">加入</button>
               </div>
-              <div style="height:1px;background:rgba(31,35,32,.16)"></div>
+              <div style="height:1px;background:rgba(9,47,37,.16)"></div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;align-items:baseline;justify-content:space-between">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">本次清單</span>
-                  <span style="font-size:11.5px;color:#8A8E80">{{ draftItemCount }} 項</span>
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">本次清單</span>
+                  <span style="font-size:11.5px;color:#7A8C80">{{ draftItemCount }} 項</span>
                 </div>
                 <sc-if value="{{ draftEmpty }}" hint-placeholder-val="{{ false }}">
-                  <div style="padding:22px 12px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80">還沒有品項 — 從上面常用品項點選，或自訂</div>
+                  <div style="padding:22px 12px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80">還沒有品項 — 從上面常用品項點選，或自訂</div>
                 </sc-if>
                 <sc-for list="{{ draftItems }}" as="it" hint-placeholder-count="2">
-                  <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(31,35,32,.16);background:#fff">
+                  <div style="display:flex;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(9,47,37,.16);background:#fff">
                     <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
-                    <button type="button" onClick="{{ it.dec }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#E3F0D5">−</button>
+                    <button type="button" onClick="{{ it.dec }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#FFF0D7">−</button>
                     <span style="width:44px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ it.qtyLabel }}</span>
-                    <button type="button" onClick="{{ it.inc }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#E3F0D5">＋</button>
-                    <button type="button" onClick="{{ it.remove }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(31,35,32,.16);background:transparent;color:#8A8E80;font-size:13px;line-height:1;cursor:pointer" style-hover="color:#1F2320;border-color:#1F2320">✕</button>
+                    <button type="button" onClick="{{ it.inc }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:15px;line-height:1;cursor:pointer" style-hover="background:#FFF0D7">＋</button>
+                    <button type="button" onClick="{{ it.remove }}" style="width:28px;height:28px;flex:none;border:1px solid rgba(9,47,37,.16);background:transparent;color:#7A8C80;font-size:13px;line-height:1;cursor:pointer" style-hover="color:#092F25;border-color:#092F25">✕</button>
                   </div>
                 </sc-for>
               </div>
@@ -521,24 +528,24 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isPhotos }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
               <div style="display:flex;gap:8px">
-                <label for="camInput" style="flex:1;padding:13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14.5px;text-align:center;cursor:pointer" style-hover="background:#3E7530">開相機拍照</label>
-                <label for="fileInput" style="flex:none;padding:13px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14.5px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">從相簿</label>
+                <label for="camInput" style="flex:1;padding:13px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:14.5px;text-align:center;cursor:pointer" style-hover="background:#8A4A12">開相機拍照</label>
+                <label for="fileInput" style="flex:none;padding:13px 14px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:14.5px;cursor:pointer" style-hover="background:#FFF0D7;border-color:#B65B16">從相簿</label>
               </div>
               <input id="camInput" type="file" accept="image/*" capture="environment" multiple="{{ true }}" onChange="{{ onPickPhoto }}" style="display:none">
               <input id="fileInput" type="file" accept="image/*" multiple="{{ true }}" onChange="{{ onPickPhoto }}" style="display:none">
-              <div style="font-size:12.5px;color:#8A8E80;line-height:1.5">Word 是橫式一頁六格：第 1 頁左上放打字清單、其餘 5 格放照片；超過 5 張自動續頁，第 2 頁起每頁 6 張，檔名的「共 N 頁」會自動算。</div>
+              <div style="font-size:12.5px;color:#7A8C80;line-height:1.5">Word 是橫式一頁六格：第 1 頁左上放打字清單、其餘 5 格放照片；超過 5 張自動續頁，第 2 頁起每頁 6 張，檔名的「共 N 頁」會自動算。</div>
               <sc-if value="{{ noPhotos }}" hint-placeholder-val="{{ false }}">
-                <div style="height:200px;border:1px dashed rgba(31,35,32,.28);display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,#F1F0E8 0 8px,#E8E7DE 8px 16px);font:12px ui-monospace,Menlo,monospace;color:#6A6E62">尚無照片 — 物品照 / 表單照</div>
+                <div style="height:200px;border:1px dashed rgba(9,47,37,.28);display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,#F3F4EA 0 8px,#E3E5D8 8px 16px);font:12px ui-monospace,Menlo,monospace;color:#4D695A">尚無照片 — 物品照 / 表單照</div>
               </sc-if>
               <sc-if value="{{ hasPhotos }}" hint-placeholder-val="{{ false }}">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                 <sc-for list="{{ photos }}" as="p" hint-placeholder-count="0">
-                  <div style="display:flex;flex-direction:column;gap:6px;border:1px solid rgba(31,35,32,.16);background:#fff;padding:6px">
-                    <div style="position:relative;height:120px;background:repeating-linear-gradient(45deg,#F1F0E8 0 8px,#E8E7DE 8px 16px);overflow:hidden">
+                  <div style="display:flex;flex-direction:column;gap:6px;border:1px solid rgba(9,47,37,.16);background:#fff;padding:6px">
+                    <div style="position:relative;height:120px;background:repeating-linear-gradient(45deg,#F3F4EA 0 8px,#E3E5D8 8px 16px);overflow:hidden">
                       {{ p.thumb }}
-                      <button type="button" onClick="{{ p.remove }}" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border:1px solid rgba(31,35,32,.3);background:rgba(255,255,255,.9);font-size:12px;line-height:1;cursor:pointer">✕</button>
+                      <button type="button" onClick="{{ p.remove }}" style="position:absolute;top:4px;right:4px;width:24px;height:24px;border:1px solid rgba(9,47,37,.3);background:rgba(255,255,255,.9);font-size:12px;line-height:1;cursor:pointer">✕</button>
                     </div>
-                    <select value="{{ p.tag }}" onChange="{{ p.setTag }}" style="width:100%;padding:6px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:12.5px;border-radius:10px">
+                    <select value="{{ p.tag }}" onChange="{{ p.setTag }}" style="width:100%;padding:6px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:12.5px;border-radius:14px">
                       <sc-for list="{{ tagOpts }}" as="t" hint-placeholder-count="3">
                         <option value="{{ t.value }}">{{ t.label }}</option>
                       </sc-for>
@@ -553,179 +560,179 @@ input,select,button,textarea{font-family:inherit}
           <sc-if value="{{ isPreview }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:14px">
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">檔名（可改）</label>
-                <textarea value="{{ fileName }}" onChange="{{ onFileName }}" rows="2" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:12.5px;line-height:1.5;border-radius:10px;resize:none"></textarea>
-                <button type="button" onClick="{{ resetFileName }}" style="align-self:flex-start;padding:5px 9px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12px;cursor:pointer" style-hover="background:#E3F0D5;border-color:#5C9A45">重新自動產生</button>
+                <label style="font-size:12px;color:#4D695A">檔名（可改）</label>
+                <textarea value="{{ fileName }}" onChange="{{ onFileName }}" rows="2" style="width:100%;padding:9px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:12.5px;line-height:1.5;border-radius:14px;resize:none"></textarea>
+                <button type="button" onClick="{{ resetFileName }}" style="align-self:flex-start;padding:5px 9px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12px;cursor:pointer" style-hover="background:#FFF0D7;border-color:#B65B16">重新自動產生</button>
               </div>
-              <div style="font-size:11.5px;color:#8A8E80">A4 橫式六格 · 共 {{ totalPages }} 頁 · {{ photoCount }} 張照片</div>
-              <div style="border:1px solid rgba(31,35,32,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+              <div style="font-size:11.5px;color:#7A8C80">A4 橫式六格 · 共 {{ totalPages }} 頁 · {{ photoCount }} 張照片</div>
+              <div style="border:1px solid rgba(9,47,37,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
                 <div style="grid-column:1 / -1;font-size:9px;font-weight:700;padding:0 2px 5px;word-break:break-all;line-height:1.3">{{ fileName }}</div>
-                <div style="border:1px solid #1F2320;padding:4px;display:flex;flex-direction:column;gap:0;min-height:150px">
+                <div style="border:1px solid #092F25;padding:4px;display:flex;flex-direction:column;gap:0;min-height:150px">
                 <div style="text-align:center;font:600 9px/1.4 'Noto Sans TC',sans-serif;padding-bottom:3px">住民用品清單</div>
-                <div style="border:1px solid #1F2320;font-size:6.5px;line-height:1.45">
-                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">住民姓名（中英文）：{{ previewName }}</div>
-                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">住民床號：{{ previewBed }}　日期：{{ previewDate }}</div>
-                  <div style="padding:2px 3px;border-bottom:1px solid #1F2320">點收人員：{{ previewReceivers }}</div>
-                  <div style="padding:4px 3px;border-bottom:1px solid #1F2320">簽章：<span style="color:#8f2f2f">{{ previewReceiverName }}</span></div>
+                <div style="border:1px solid #092F25;font-size:6.5px;line-height:1.45">
+                  <div style="padding:2px 3px;border-bottom:1px solid #092F25">住民姓名（中英文）：{{ previewName }}</div>
+                  <div style="padding:2px 3px;border-bottom:1px solid #092F25">住民床號：{{ previewBed }}　日期：{{ previewDate }}</div>
+                  <div style="padding:2px 3px;border-bottom:1px solid #092F25">點收人員：{{ previewReceivers }}</div>
+                  <div style="padding:4px 3px;border-bottom:1px solid #092F25">簽章：<span style="color:#8f2f2f">{{ previewReceiverName }}</span></div>
                   <div style="display:grid;grid-template-columns:1fr 40px">
-                    <div style="padding:2px 3px;text-align:center;border-right:1px solid #1F2320;border-bottom:1px solid #1F2320">分類</div>
-                    <div style="padding:2px 3px;text-align:center;border-bottom:1px solid #1F2320">數量</div>
+                    <div style="padding:2px 3px;text-align:center;border-right:1px solid #092F25;border-bottom:1px solid #092F25">分類</div>
+                    <div style="padding:2px 3px;text-align:center;border-bottom:1px solid #092F25">數量</div>
                   </div>
                   <sc-for list="{{ previewRows }}" as="row" hint-placeholder-count="3">
-                    <div style="display:grid;grid-template-columns:1fr 40px;border-bottom:1px solid #1F2320">
-                      <div style="padding:2px 3px;border-right:1px solid #1F2320;min-height:11px">{{ row.name }}</div>
+                    <div style="display:grid;grid-template-columns:1fr 40px;border-bottom:1px solid #092F25">
+                      <div style="padding:2px 3px;border-right:1px solid #092F25;min-height:11px">{{ row.name }}</div>
                       <div style="padding:2px 3px;text-align:center">{{ row.qty }}</div>
                     </div>
                   </sc-for>
                 </div>
                 </div>
                 <sc-for list="{{ pageCells }}" as="c" hint-placeholder-count="5">
-                  <div style="border:1px solid #1F2320;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
+                  <div style="border:1px solid #092F25;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
                 </sc-for>
               </div>
               <sc-for list="{{ extraPages }}" as="pg" hint-placeholder-count="0">
-                <div style="border:1px solid rgba(31,35,32,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
+                <div style="border:1px solid rgba(9,47,37,.3);background:#fff;padding:8px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:0">
                   <div style="grid-column:1 / -1;font-size:9px;font-weight:700;padding:0 2px 5px;line-height:1.3">{{ pg.label }}</div>
                   <sc-for list="{{ pg.cells }}" as="c" hint-placeholder-count="6">
-                    <div style="border:1px solid #1F2320;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
+                    <div style="border:1px solid #092F25;padding:4px;display:flex;align-items:center;justify-content:center;min-height:150px;overflow:hidden">{{ c.body }}</div>
                   </sc-for>
                 </div>
               </sc-for>
 
-              <div style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62;padding-top:4px">匯出前核對</div>
-              <div style="border:1px solid #1F2320;font-size:13.5px;line-height:1.55;background:#fff">
-                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">住民姓名（中英文）：<span style="font-weight:500">{{ previewName }}</span></div>
-                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">住民床號：<span style="font-weight:500">{{ previewBed }}</span>　日期：<span style="font-weight:500">{{ previewDate }}</span></div>
-                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">製表日：<span style="font-weight:500">{{ previewMakeDate }}</span></div>
-                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">點收人員：{{ previewReceivers }}</div>
-                <div style="padding:8px 10px;border-bottom:1px solid #1F2320">點收人：<span style="font-weight:500;color:#8f2f2f">{{ previewReceiverName }}</span></div>
+              <div style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A;padding-top:4px">匯出前核對</div>
+              <div style="border:1px solid #092F25;font-size:13.5px;line-height:1.55;background:#fff">
+                <div style="padding:8px 10px;border-bottom:1px solid #092F25">住民姓名（中英文）：<span style="font-weight:500">{{ previewName }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #092F25">住民床號：<span style="font-weight:500">{{ previewBed }}</span>　日期：<span style="font-weight:500">{{ previewDate }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #092F25">製表日：<span style="font-weight:500">{{ previewMakeDate }}</span></div>
+                <div style="padding:8px 10px;border-bottom:1px solid #092F25">點收人員：{{ previewReceivers }}</div>
+                <div style="padding:8px 10px;border-bottom:1px solid #092F25">點收人：<span style="font-weight:500;color:#8f2f2f">{{ previewReceiverName }}</span></div>
                 <div style="display:grid;grid-template-columns:1fr 96px">
-                  <div style="padding:6px 10px;text-align:center;border-right:1px solid #1F2320;border-bottom:1px solid #1F2320;color:#6A6E62">分類</div>
-                  <div style="padding:6px 10px;text-align:center;border-bottom:1px solid #1F2320;color:#6A6E62">數量</div>
+                  <div style="padding:6px 10px;text-align:center;border-right:1px solid #092F25;border-bottom:1px solid #092F25;color:#4D695A">分類</div>
+                  <div style="padding:6px 10px;text-align:center;border-bottom:1px solid #092F25;color:#4D695A">數量</div>
                 </div>
                 <sc-for list="{{ previewItemRows }}" as="row" hint-placeholder-count="2">
-                  <div style="display:grid;grid-template-columns:1fr 96px;border-bottom:1px solid rgba(31,35,32,.25)">
-                    <div style="padding:8px 10px;border-right:1px solid rgba(31,35,32,.25)">{{ row.name }}</div>
+                  <div style="display:grid;grid-template-columns:1fr 96px;border-bottom:1px solid rgba(9,47,37,.25)">
+                    <div style="padding:8px 10px;border-right:1px solid rgba(9,47,37,.25)">{{ row.name }}</div>
                     <div style="padding:8px 10px;text-align:center">{{ row.qty }}</div>
                   </div>
                 </sc-for>
               </div>
 
-              <div style="font-size:12px;color:#8A8E80;line-height:1.5">{{ driveHint }}</div>
+              <div style="font-size:12px;color:#7A8C80;line-height:1.5">{{ driveHint }}</div>
             </div>
           </sc-if>
 
           <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px;padding-top:24px;align-items:center;text-align:center">
-              <div style="width:56px;height:56px;border:1px solid #5C9A45;display:flex;align-items:center;justify-content:center;font-size:26px;color:#5C9A45">✓</div>
-              <div style="font:600 20px 'Barlow Condensed','Noto Sans TC',sans-serif">清單已產生</div>
-              <div style="font-size:13.5px;line-height:1.6;color:#45483F;max-width:290px;word-break:break-all">{{ fileName }}.docx</div>
-              <div style="width:100%;border:1px solid rgba(31,35,32,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;font-size:13px">
-                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">雲端硬碟</span><span>{{ driveMsg }}</span></div>
-                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">存放位置</span><span style="text-align:right">用品清單 / {{ previewBed }} {{ previewNameShort }}</span></div>
-                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">物品資料庫</span><span>已更新 {{ draftItemCount }} 項</span></div>
-                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#6A6E62">照片</span><span>{{ photoCount }} 張 · 共 {{ totalPages }} 頁</span></div>
+              <img src="../assets/items/state-saved.webp" alt="" style="width:170px;height:auto;display:block">
+              <div style="font:900 22px 'Noto Serif TC','Noto Sans TC',serif">清單已產生</div>
+              <div style="font-size:13.5px;line-height:1.6;color:#3E5A4C;max-width:290px;word-break:break-all">{{ fileName }}.docx</div>
+              <div style="width:100%;border:1px solid rgba(9,47,37,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;font-size:13px">
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#4D695A">雲端硬碟</span><span>{{ driveMsg }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#4D695A">存放位置</span><span style="text-align:right">用品清單 / {{ previewBed }} {{ previewNameShort }}</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#4D695A">物品資料庫</span><span>已更新 {{ draftItemCount }} 項</span></div>
+                <div style="display:flex;justify-content:space-between;gap:8px"><span style="color:#4D695A">照片</span><span>{{ photoCount }} 張 · 共 {{ totalPages }} 頁</span></div>
               </div>
               <sc-if value="{{ hasDriveLink }}" hint-placeholder-val="{{ false }}">
-                <a href="{{ driveLink }}" target="_blank" rel="noopener" style="font-size:13px;border-bottom:1px solid #5C9A45">在雲端硬碟開啟</a>
+                <a href="{{ driveLink }}" target="_blank" rel="noopener" style="font-size:13px;border-bottom:1px solid #B65B16">在雲端硬碟開啟</a>
               </sc-if>
             </div>
           </sc-if>
 
           <sc-if value="{{ isResident }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
-              <div style="border:1px solid rgba(31,35,32,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px">
+              <div style="border:1px solid rgba(9,47,37,.16);background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
                   <div style="font:600 19px 'Barlow Condensed','Noto Sans TC',sans-serif">{{ curBed }}　{{ curName }}</div>
                   <div style="flex:none;display:flex;gap:6px">
-                    <button type="button" onClick="{{ startMove }}" style="padding:5px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">換房</button>
-                    <button type="button" onClick="{{ fixPhotos }}" title="從垃圾桶還原照片後按這裡，重新編號並清掉重複" style="padding:5px 10px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">整理照片</button>
+                    <button type="button" onClick="{{ startMove }}" style="padding:5px 10px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">換房</button>
+                    <button type="button" onClick="{{ fixPhotos }}" title="從垃圾桶還原照片後按這裡，重新編號並清掉重複" style="padding:5px 10px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">整理照片</button>
                   </div>
                 </div>
-                <div style="font-size:12px;color:#8A8E80">最後更新 {{ curUpdated }}</div>
+                <div style="font-size:12px;color:#7A8C80">最後更新 {{ curUpdated }}</div>
                 <sc-if value="{{ movingBed }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;gap:8px;padding-top:2px">
-                    <input value="{{ newBed }}" onChange="{{ onNewBed }}" placeholder="新床號，例：510-2" style="flex:1;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
-                    <button type="button" onClick="{{ confirmMove }}" style="flex:none;padding:0 14px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#3E7530">確定</button>
-                    <button type="button" onClick="{{ cancelMove }}" style="flex:none;padding:0 12px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#E3F0D5">取消</button>
+                    <input value="{{ newBed }}" onChange="{{ onNewBed }}" placeholder="新床號，例：510-2" style="flex:1;padding:9px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
+                    <button type="button" onClick="{{ confirmMove }}" style="flex:none;padding:0 14px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#8A4A12">確定</button>
+                    <button type="button" onClick="{{ cancelMove }}" style="flex:none;padding:0 12px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#FFF0D7">取消</button>
                   </div>
                 </sc-if>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">現有物品</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">現有物品</span>
                 <sc-for list="{{ curItems }}" as="it" hint-placeholder-count="3">
                   <div style="display:flex;flex-direction:column;border:1px solid {{ it.border }};background:#fff">
                     <div style="display:flex;align-items:center;gap:8px;padding:9px 10px">
                       <button type="button" onClick="{{ it.toggleOpen }}" style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:0;border:0;background:transparent;cursor:pointer;text-align:left">
-                        <span style="font-size:14.5px;color:#1F2320">{{ it.name }}</span>
-                        <span style="font-size:11px;color:#8A8E80">{{ it.photoCountLabel }} ▾</span>
+                        <span style="font-size:14.5px;color:#092F25">{{ it.name }}</span>
+                        <span style="font-size:11px;color:#7A8C80">{{ it.photoCountLabel }} ▾</span>
                       </button>
-                      <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
-                      <button type="button" onClick="{{ it.startFix }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">修正</button>
-                      <button type="button" onClick="{{ it.startTake }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">取回</button>
+                      <span style="font-size:13px;color:#4D695A">{{ it.qtyLabel }}</span>
+                      <button type="button" onClick="{{ it.startFix }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">修正</button>
+                      <button type="button" onClick="{{ it.startTake }}" style="flex:none;padding:0 9px;height:28px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">取回</button>
                     </div>
                     <sc-if value="{{ it.fixing }}" hint-placeholder-val="{{ false }}">
-                      <div style="display:flex;flex-direction:column;gap:10px;padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F1F0E8">
-                        <div style="font-size:12.5px;line-height:1.55;color:#6A6E62">誤登記修正 — 改品名或數量會直接更新雲端資料庫，並記一筆異動；「取回」才是家屬帶回。</div>
+                      <div style="display:flex;flex-direction:column;gap:10px;padding:10px;border-top:1px solid rgba(9,47,37,.16);background:#F3F4EA">
+                        <div style="font-size:12.5px;line-height:1.55;color:#4D695A">誤登記修正 — 改品名或數量會直接更新雲端資料庫，並記一筆異動；「取回」才是家屬帶回。</div>
                         <div style="display:flex;flex-direction:column;gap:5px">
-                          <label style="font-size:11.5px;color:#8A8E80">品名</label>
-                          <input value="{{ fixName }}" onChange="{{ onFixName }}" style="width:100%;padding:9px 11px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                          <label style="font-size:11.5px;color:#7A8C80">品名</label>
+                          <input value="{{ fixName }}" onChange="{{ onFixName }}" style="width:100%;padding:9px 11px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
                         </div>
                         <div style="display:flex;gap:8px;align-items:center">
-                          <span style="font-size:13px;color:#6A6E62;flex:none">數量</span>
-                          <button type="button" onClick="{{ fixDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:10px">−</button>
+                          <span style="font-size:13px;color:#4D695A;flex:none">數量</span>
+                          <button type="button" onClick="{{ fixDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:14px">−</button>
                           <span style="width:34px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ fixQty }}</span>
-                          <button type="button" onClick="{{ fixInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:10px">＋</button>
+                          <button type="button" onClick="{{ fixInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;cursor:pointer;border-radius:14px">＋</button>
                         </div>
                         <div style="display:flex;gap:8px;flex-wrap:wrap">
-                          <button type="button" onClick="{{ it.saveFix }}" style="padding:8px 14px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">儲存修正</button>
-                          <button type="button" onClick="{{ it.cancelFix }}" style="padding:8px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px" style-hover="border-color:#5C9A45">取消</button>
+                          <button type="button" onClick="{{ it.saveFix }}" style="padding:8px 14px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#9A4A10">儲存修正</button>
+                          <button type="button" onClick="{{ it.cancelFix }}" style="padding:8px 14px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:14px" style-hover="border-color:#B65B16">取消</button>
                           <sc-if value="{{ it.confirming }}" hint-placeholder-val="{{ false }}">
-                            <span style="flex:1;min-width:100%;display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #C4552F;background:#FDF1EC;border-radius:10px">
-                              <span style="font-size:12.5px;line-height:1.6;color:#5A2E1C">{{ it.delMsg }}</span>
+                            <span style="flex:1;min-width:100%;display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid #A63124;background:#FBECE9;border-radius:14px">
+                              <span style="font-size:12.5px;line-height:1.6;color:#5A2018">{{ it.delMsg }}</span>
                               <span style="display:flex;gap:6px">
-                                <button type="button" onClick="{{ it.doDelete }}" style="padding:7px 13px;border:1px solid #C4552F;background:#C4552F;color:#fff;font-size:12.5px;cursor:pointer;border-radius:10px" style-hover="background:#A8431F">確定刪除</button>
-                                <button type="button" onClick="{{ it.cancelDelete }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:10px">不要</button>
+                                <button type="button" onClick="{{ it.doDelete }}" style="padding:7px 13px;border:1px solid #A63124;background:#A63124;color:#fff;font-size:12.5px;cursor:pointer;border-radius:14px" style-hover="background:#8E2E22">確定刪除</button>
+                                <button type="button" onClick="{{ it.cancelDelete }}" style="padding:7px 13px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:12.5px;cursor:pointer;border-radius:14px">不要</button>
                               </span>
                             </span>
                           </sc-if>
                           <sc-if value="{{ it.notConfirming }}" hint-placeholder-val="{{ true }}">
-                            <button type="button" onClick="{{ it.askDelete }}" style="padding:8px 14px;border:1px solid #C4552F;background:transparent;color:#A8431F;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC">刪除這筆</button>
+                            <button type="button" onClick="{{ it.askDelete }}" style="padding:8px 14px;border:1px solid #A63124;background:transparent;color:#8E2E22;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#FBECE9">刪除這筆</button>
                           </sc-if>
                         </div>
                       </div>
                     </sc-if>
                     <sc-if value="{{ it.open }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F4F9EC">
+                      <div style="padding:10px;border-top:1px solid rgba(9,47,37,.16);background:#FFF7EA">
                         <sc-if value="{{ it.hasShots }}" hint-placeholder-val="{{ false }}">
                           <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
                             <sc-for list="{{ it.shots }}" as="sh" hint-placeholder-count="0">
-                              <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
+                              <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(9,47,37,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
                             </sc-for>
                           </div>
                         </sc-if>
                         <sc-if value="{{ it.noShots }}" hint-placeholder-val="{{ false }}">
-                          <div style="font-size:12.5px;line-height:1.5;color:#8A8E80">尚無照片 — 重新製表並在拍照頁把照片標到「{{ it.name }}」，之後這裡就看得到。</div>
+                          <div style="font-size:12.5px;line-height:1.5;color:#7A8C80">尚無照片 — 重新製表並在拍照頁把照片標到「{{ it.name }}」，之後這裡就看得到。</div>
                         </sc-if>
                       </div>
                     </sc-if>
                     <sc-if value="{{ it.taking }}" hint-placeholder-val="{{ false }}">
-                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border-top:1px solid rgba(31,35,32,.16);background:#F4F9EC">
-                        <div style="font-size:12.5px;color:#6A6E62">家屬帶回 — 只取回這一件，會記一筆異動並更新清單；這件的照片會一起移除</div>
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border-top:1px solid rgba(9,47,37,.16);background:#FFF7EA">
+                        <div style="font-size:12.5px;color:#4D695A">家屬帶回 — 只取回這一件，會記一筆異動並更新清單；這件的照片會一起移除</div>
                         <sc-if value="{{ it.multi }}" hint-placeholder-val="{{ false }}">
                         <div style="display:flex;gap:8px;align-items:center">
-                          <span style="font-size:13px;color:#6A6E62;flex:none">數量</span>
-                          <button type="button" onClick="{{ takeDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer">−</button>
+                          <span style="font-size:13px;color:#4D695A;flex:none">數量</span>
+                          <button type="button" onClick="{{ takeDec }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;cursor:pointer">−</button>
                           <span style="width:34px;text-align:center;font:600 15px 'Barlow Condensed',sans-serif">{{ takeQty }}</span>
-                          <button type="button" onClick="{{ takeInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;cursor:pointer">＋</button>
-                          <span style="font-size:12.5px;color:#8A8E80;flex:1">/ 現有 {{ it.qtyLabel }}</span>
+                          <button type="button" onClick="{{ takeInc }}" style="width:30px;height:32px;flex:none;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;cursor:pointer">＋</button>
+                          <span style="font-size:12.5px;color:#7A8C80;flex:1">/ 現有 {{ it.qtyLabel }}</span>
                         </div>
                         </sc-if>
-                        <input value="{{ takeBy }}" onChange="{{ onTakeBy }}" placeholder="帶回者（例：長女 呂小姐）" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
-                        <input value="{{ takeMaker }}" onChange="{{ onTakeMaker }}" placeholder="點收人（會印在新清單上）" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                        <input value="{{ takeBy }}" onChange="{{ onTakeBy }}" placeholder="帶回者（例：長女 呂小姐）" style="width:100%;padding:9px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
+                        <input value="{{ takeMaker }}" onChange="{{ onTakeMaker }}" placeholder="點收人（會印在新清單上）" style="width:100%;padding:9px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
                         <div style="display:flex;gap:8px">
-                          <button type="button" onClick="{{ confirmTake }}" style="flex:1;padding:10px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#3E7530">確定帶回</button>
-                          <button type="button" onClick="{{ cancelTake }}" style="flex:none;padding:10px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#E3F0D5">取消</button>
+                          <button type="button" onClick="{{ confirmTake }}" style="flex:1;padding:10px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:14px;cursor:pointer" style-hover="background:#8A4A12">確定帶回</button>
+                          <button type="button" onClick="{{ cancelTake }}" style="flex:none;padding:10px 14px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:14px;cursor:pointer" style-hover="background:#FFF0D7">取消</button>
                         </div>
                       </div>
                     </sc-if>
@@ -734,22 +741,22 @@ input,select,button,textarea{font-family:inherit}
               </div>
               <sc-if value="{{ hasGroupShots }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;flex-direction:column;gap:8px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">合照</span>
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">合照</span>
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
                     <sc-for list="{{ groupShots }}" as="sh" hint-placeholder-count="0">
-                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
+                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(9,47,37,.2);background:#fff;cursor:pointer;overflow:hidden;display:block">{{ sh.thumb }}</button>
                     </sc-for>
                   </div>
                 </div>
               </sc-if>
               <sc-if value="{{ photosLoading }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:12.5px;color:#8A8E80">照片載入中…</div>
+                <div style="font-size:12.5px;color:#7A8C80">照片載入中…</div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">增減紀錄</span>
+                <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">增減紀錄</span>
                 <sc-for list="{{ curLog }}" as="l" hint-placeholder-count="3">
-                  <div style="display:grid;grid-template-columns:64px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid rgba(31,35,32,.12);font-size:12.5px">
-                    <span style="color:#8A8E80">{{ l.date }}</span>
+                  <div style="display:grid;grid-template-columns:64px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid rgba(9,47,37,.12);font-size:12.5px">
+                    <span style="color:#7A8C80">{{ l.date }}</span>
                     <span>{{ l.text }}</span>
                   </div>
                 </sc-for>
@@ -759,19 +766,19 @@ input,select,button,textarea{font-family:inherit}
 
           <sc-if value="{{ isReturn }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:16px">
-              <div style="font-size:13px;color:#45483F;line-height:1.6">勾選這次帶回的品項，沒勾的會留著等下次清點。完成後產生歸還清單存進該住民資料夾，並依狀況把資料夾移進「已退住」或「已退住(物品未完全歸還)」。</div>
+              <div style="font-size:13px;color:#3E5A4C;line-height:1.6">勾選這次帶回的品項，沒勾的會留著等下次清點。完成後產生歸還清單存進該住民資料夾，並依狀況把資料夾移進「已退住」或「已退住(物品未完全歸還)」。</div>
               <div style="display:flex;flex-direction:column;gap:8px">
                 <sc-for list="{{ returnItems }}" as="it" hint-placeholder-count="3">
-                  <div style="display:flex;flex-direction:column;border:1px solid {{ it.border }};background:{{ it.bg }};border-radius:10px;overflow:hidden">
+                  <div style="display:flex;flex-direction:column;border:1px solid {{ it.border }};background:{{ it.bg }};border-radius:14px;overflow:hidden">
                     <button type="button" onClick="{{ it.toggle }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;padding:11px 10px;border:0;background:transparent;cursor:pointer">
                       <span style="flex:none;width:20px;height:20px;border:1px solid {{ it.mark }};display:flex;align-items:center;justify-content:center;font-size:12px;color:{{ it.mark }}">{{ it.check }}</span>
                       <span style="flex:1;min-width:0;font-size:14.5px">{{ it.name }}</span>
-                      <span style="font-size:13px;color:#6A6E62">{{ it.qtyLabel }}</span>
+                      <span style="font-size:13px;color:#4D695A">{{ it.qtyLabel }}</span>
                     </button>
                     <sc-if value="{{ it.hasShots }}" hint-placeholder-val="{{ false }}">
                       <div style="padding:0 10px 10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
                         <sc-for list="{{ it.shots }}" as="sh" hint-placeholder-count="0">
-                          <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
+                          <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(9,47,37,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
                         </sc-for>
                       </div>
                     </sc-if>
@@ -779,75 +786,75 @@ input,select,button,textarea{font-family:inherit}
                 </sc-for>
               </div>
               <sc-if value="{{ photosLoading }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:12.5px;color:#8A8E80">照片載入中…</div>
+                <div style="font-size:12.5px;color:#7A8C80">照片載入中…</div>
               </sc-if>
               <sc-if value="{{ hasGroupShots }}" hint-placeholder-val="{{ false }}">
                 <div style="display:flex;flex-direction:column;gap:8px">
-                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#6A6E62">合照</span>
+                  <span style="font:600 12px 'Barlow Condensed',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#4D695A">合照</span>
                   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
                     <sc-for list="{{ groupShots }}" as="sh" hint-placeholder-count="0">
-                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
+                      <button type="button" onClick="{{ sh.view }}" style="padding:0;border:1px solid rgba(9,47,37,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ sh.thumb }}</button>
                     </sc-for>
                   </div>
                 </div>
               </sc-if>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">歸還給（家屬 / 代理人）</label>
-                <input value="{{ returnTo }}" onChange="{{ onReturnTo }}" placeholder="例：長女 呂小姐" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">歸還給（家屬 / 代理人）</label>
+                <input value="{{ returnTo }}" onChange="{{ onReturnTo }}" placeholder="例：長女 呂小姐" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <label style="font-size:12px;color:#6A6E62">點收人</label>
-                <input value="{{ returnBy }}" onChange="{{ onReturnBy }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:15px;border-radius:10px">
+                <label style="font-size:12px;color:#4D695A">點收人</label>
+                <input value="{{ returnBy }}" onChange="{{ onReturnBy }}" placeholder="點收並製表的人，例：黃俐穎" style="width:100%;padding:10px 12px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:15px;border-radius:14px">
               </div>
-              <div style="border:1px solid rgba(31,35,32,.16);background:#fff;padding:11px;font-size:13px;line-height:1.6">已核對歸還 <span style="font-weight:700;color:#3E7530">{{ returnedCount }}</span> / {{ returnTotal }} 項</div>
+              <div style="border:1px solid rgba(9,47,37,.16);background:#fff;padding:11px;font-size:13px;line-height:1.6">已核對歸還 <span style="font-weight:700;color:#8A4A12">{{ returnedCount }}</span> / {{ returnTotal }} 項</div>
             </div>
           </sc-if>
 
           <sc-if value="{{ isDropoff }}" hint-placeholder-val="{{ false }}">
             <div style="display:flex;flex-direction:column;gap:12px">
-              <div style="font-size:12.5px;line-height:1.6;color:#45483F">家屬在機台登記、自己拍照帶來的物品。核對實物與照片後，用「帶入新增清單」轉成該住民的正式清單（照片一起轉入），或「標記已點收／退件」。</div>
+              <div style="font-size:12.5px;line-height:1.6;color:#3E5A4C">家屬在機台登記、自己拍照帶來的物品。核對實物與照片後，用「帶入新增清單」轉成該住民的正式清單（照片一起轉入），或「標記已點收／退件」。</div>
               <sc-if value="{{ dropoffLoading }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:12.5px;color:#8A8E80">讀取中…</div>
+                <div style="font-size:12.5px;color:#7A8C80">讀取中…</div>
               </sc-if>
               <sc-if value="{{ hasDropoffErr }}" hint-placeholder-val="{{ false }}">
-                <div style="padding:11px;border:1px solid #B4553C;background:#FBEEE9;font-size:12.5px;line-height:1.6;color:#8F3F2C;border-radius:10px">{{ dropoffErrMsg }}</div>
+                <div style="padding:11px;border:1px solid #A63124;background:#FBECE9;font-size:12.5px;line-height:1.6;color:#8E2E22;border-radius:14px">{{ dropoffErrMsg }}</div>
               </sc-if>
               <sc-if value="{{ noDropoff }}" hint-placeholder-val="{{ false }}">
-                <div style="padding:22px 16px;border:1px dashed rgba(31,35,32,.28);text-align:center;font-size:13px;color:#8A8E80;border-radius:10px">目前沒有待點收的家屬寄放</div>
+                <div style="padding:22px 16px;border:1px dashed rgba(9,47,37,.28);text-align:center;font-size:13px;color:#7A8C80;border-radius:14px">目前沒有待點收的家屬寄放</div>
               </sc-if>
               <sc-for list="{{ dropoffItems }}" as="it" hint-placeholder-count="0">
-                <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(31,35,32,.16);background:#fff;border-radius:10px">
+                <div style="display:flex;flex-direction:column;gap:9px;padding:12px;border:1px solid rgba(9,47,37,.16);background:#fff;border-radius:14px">
                   <div style="display:flex;align-items:baseline;gap:8px">
                     <span style="flex:1;min-width:0;font-size:15px;font-weight:600">{{ it.residentLabel }}</span>
                     <span style="flex:none;font-size:11px;color:{{ it.bedFg }}">{{ it.bedLabel }}</span>
                   </div>
-                  <span style="font-size:13px;color:#3F443C">{{ it.family }}</span>
-                  <span style="font-size:13.5px;line-height:1.55;color:#1F2320">{{ it.itemText }}</span>
+                  <span style="font-size:13px;color:#3E5A4C">{{ it.family }}</span>
+                  <span style="font-size:13.5px;line-height:1.55;color:#092F25">{{ it.itemText }}</span>
                   <sc-if value="{{ it.hasNote }}" hint-placeholder-val="{{ false }}">
-                    <span style="font-size:12.5px;color:#6A6E62">備註：{{ it.note }}</span>
+                    <span style="font-size:12.5px;color:#4D695A">備註：{{ it.note }}</span>
                   </sc-if>
-                  <span style="font-size:11px;color:#8A8E80">{{ it.meta }}</span>
+                  <span style="font-size:11px;color:#7A8C80">{{ it.meta }}</span>
                   <sc-if value="{{ it.hasThumbs }}" hint-placeholder-val="{{ false }}">
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
                       <sc-for list="{{ it.thumbs }}" as="ph" hint-placeholder-count="0">
-                        <button type="button" onClick="{{ ph.view }}" style="padding:0;border:1px solid rgba(31,35,32,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ ph.img }}</button>
+                        <button type="button" onClick="{{ ph.view }}" style="padding:0;border:1px solid rgba(9,47,37,.2);background:#fff;cursor:pointer;overflow:hidden;display:block;border-radius:8px">{{ ph.img }}</button>
                       </sc-for>
                     </div>
                   </sc-if>
                   <div style="display:flex;gap:8px;flex-wrap:wrap">
                     <sc-if value="{{ it.hasItems }}" hint-placeholder-val="{{ false }}">
-                      <button type="button" onClick="{{ it.take }}" style="padding:8px 13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">帶入新增清單</button>
+                      <button type="button" onClick="{{ it.take }}" style="padding:8px 13px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#9A4A10">帶入新增清單</button>
                     </sc-if>
-                    <button type="button" onClick="{{ it.askConfirm }}" style="padding:8px 13px;border:1px solid rgba(92,154,69,.5);background:#F4FAEE;color:#3E7530;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5">標記已點收</button>
-                    <button type="button" onClick="{{ it.askReject }}" style="padding:8px 13px;border:1px solid rgba(196,85,47,.5);background:transparent;color:#A8431F;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#FDF1EC">退件</button>
+                    <button type="button" onClick="{{ it.askConfirm }}" style="padding:8px 13px;border:1px solid rgba(182,91,22,.5);background:#FFF7EA;color:#8A4A12;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7">標記已點收</button>
+                    <button type="button" onClick="{{ it.askReject }}" style="padding:8px 13px;border:1px solid rgba(166,49,36,.5);background:transparent;color:#8E2E22;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#FBECE9">退件</button>
                   </div>
                   <sc-if value="{{ it.acting }}" hint-placeholder-val="{{ false }}">
-                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(31,35,32,.2);background:#F1F0E8;border-radius:10px">
-                      <span style="font-size:12.5px;line-height:1.55;color:#45483F">{{ it.actMsg }}</span>
-                      <input value="{{ dropoffReceiver }}" onChange="{{ onDropoffReceiver }}" placeholder="點收人，例：黃俐穎" style="width:100%;padding:9px 10px;border:1px solid rgba(31,35,32,.22);background:#fff;font-size:14px;border-radius:10px">
+                    <div style="display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid rgba(9,47,37,.2);background:#F3F4EA;border-radius:14px">
+                      <span style="font-size:12.5px;line-height:1.55;color:#3E5A4C">{{ it.actMsg }}</span>
+                      <input value="{{ dropoffReceiver }}" onChange="{{ onDropoffReceiver }}" placeholder="點收人，例：黃俐穎" style="width:100%;padding:9px 10px;border:1px solid rgba(9,47,37,.22);background:#fff;font-size:14px;border-radius:14px">
                       <div style="display:flex;gap:6px">
-                        <button type="button" onClick="{{ it.doAct }}" style="padding:7px 13px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:13px;cursor:pointer;border-radius:10px" style-hover="background:#4E8C3C">{{ it.actBtn }}</button>
-                        <button type="button" onClick="{{ it.cancelAct }}" style="padding:7px 13px;border:1px solid rgba(31,35,32,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:10px">取消</button>
+                        <button type="button" onClick="{{ it.doAct }}" style="padding:7px 13px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:13px;cursor:pointer;border-radius:14px" style-hover="background:#9A4A10">{{ it.actBtn }}</button>
+                        <button type="button" onClick="{{ it.cancelAct }}" style="padding:7px 13px;border:1px solid rgba(9,47,37,.22);background:transparent;font-size:13px;cursor:pointer;border-radius:14px">取消</button>
                       </div>
                     </div>
                   </sc-if>
@@ -858,13 +865,13 @@ input,select,button,textarea{font-family:inherit}
 
         </div>
 
-        <div style="flex:none;border-top:1px solid rgba(31,35,32,.16);padding:12px 16px;display:{{ ctaDisplay }};gap:8px;background:#F1F0E8">
-          <button type="button" onClick="{{ secondaryAction }}" style="flex:none;padding:12px 14px;border:1px solid rgba(31,35,32,.22);background:transparent;color:#1F2320;font-size:14px;cursor:pointer;border-radius:10px" style-hover="background:#E3F0D5;border-color:#5C9A45">{{ secondaryLabel }}</button>
-          <button type="button" onClick="{{ primaryAction }}" style="flex:1;padding:12px;border:1px solid #5C9A45;background:#5C9A45;color:#fff;font-size:15px;cursor:pointer;border-radius:10px" style-hover="background:#3E7530;border-color:#3E7530">{{ primaryLabel }}</button>
+        <div style="flex:none;border-top:1px solid rgba(9,47,37,.16);padding:12px 16px;display:{{ ctaDisplay }};gap:8px;background:#F3F4EA">
+          <button type="button" onClick="{{ secondaryAction }}" style="flex:none;padding:12px 14px;border:1px solid rgba(9,47,37,.22);background:transparent;color:#092F25;font-size:14px;cursor:pointer;border-radius:14px" style-hover="background:#FFF0D7;border-color:#B65B16">{{ secondaryLabel }}</button>
+          <button type="button" onClick="{{ primaryAction }}" style="flex:1;padding:12px;border:1px solid #B65B16;background:#B65B16;color:#fff;font-size:15px;cursor:pointer;border-radius:14px" style-hover="background:#8A4A12;border-color:#8A4A12">{{ primaryLabel }}</button>
         </div>
 
         <sc-if value="{{ hasViewer }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;inset:0;background:rgba(31,35,32,.92);display:flex;flex-direction:column;z-index:5">
+          <div style="position:absolute;inset:0;background:rgba(9,47,37,.92);display:flex;flex-direction:column;z-index:5">
             <div style="flex:none;display:flex;justify-content:flex-end;padding:12px">
               <button type="button" onClick="{{ closeViewer }}" style="padding:7px 13px;border:1px solid rgba(255,255,255,.45);background:transparent;color:#fff;font-size:13px;cursor:pointer">關閉</button>
             </div>
@@ -873,15 +880,15 @@ input,select,button,textarea{font-family:inherit}
         </sc-if>
 
         <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;left:16px;right:16px;bottom:76px;padding:11px 13px;background:#22301C;color:#fff;font-size:13px;line-height:1.4;animation:toastIn .18s ease-out">{{ toast }}</div>
+          <div style="position:absolute;left:16px;right:16px;bottom:76px;padding:11px 13px;background:#14563F;color:#fff;font-size:13px;line-height:1.4;animation:toastIn .18s ease-out">{{ toast }}</div>
         </sc-if>
 
       </div>
     </div>
 
     <div style="display:none">
-      <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#6A6E62">下一步可以做</div>
-      <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:9px;font-size:13.5px;line-height:1.55;color:#45483F">
+      <div style="font:600 12px/1 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#4D695A">下一步可以做</div>
+      <ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:9px;font-size:13.5px;line-height:1.55;color:#3E5A4C">
         <li>真的產出 .docx（版面、字體、頁數與現在完全一致）</li>
         <li>接 Google Drive：自動建「用品清單 / 床號 姓名」資料夾</li>
         <li>住民名單匯入，床號姓名下拉選、不用打字</li>
@@ -889,7 +896,7 @@ input,select,button,textarea{font-family:inherit}
         <li>退住歸還清單另一份文件模板</li>
         <li>離線可用，回到 Wi-Fi 再同步</li>
       </ul>
-      <div style="margin-top:6px;font-size:12.5px;color:#8A8E80;line-height:1.55">跟我說要調整流程、欄位或畫面的哪一段，我直接改這個原型。</div>
+      <div style="margin-top:6px;font-size:12.5px;color:#7A8C80;line-height:1.55">跟我說要調整流程、欄位或畫面的哪一段，我直接改這個原型。</div>
     </div>
 
   </div>
@@ -914,6 +921,16 @@ const CLOTHES = [
 ];
 const pad2c = n => (n < 10 ? '0' + n : String(n));
 const CONSUM_PRESETS = ['水果', '餅乾', '飲品', '保健食品', '尿布', '衛生紙'];
+const ITEM_ICON = {
+  '老花眼鏡':'glasses','眼鏡盒':'glasses-case','假牙':'denture','假牙盒':'denture-box','助行器':'walker','輪椅':'wheelchair',
+  '手機':'phone','充電器':'charger','健保卡':'card','印章':'seal','手錶':'watch','收音機':'radio','保溫杯':'thermos',
+  '棉被':'quilt','拖鞋':'slippers','助聽器':'hearing-aid','念珠':'beads',
+  '短袖上衣':'tshirt','長袖上衣':'longsleeve','背心':'vest','外套':'jacket','毛衣':'sweater','睡衣':'pajamas','短褲':'shorts',
+  '長褲':'pants','內衣':'undershirt','內褲':'underwear','襪子':'socks','圍兜':'bib','帽子':'hat','圍巾':'scarf','毛巾':'towel',
+  '浴巾':'bath-towel','鞋子':'shoes','衣物':'clothes',
+  '水果':'fruit','餅乾':'cookie','飲品':'drink','保健食品':'supplement','尿布':'diaper','衛生紙':'tissue'
+};
+const itemIcon = nm => '../assets/items/icon-' + (ITEM_ICON[nm] || 'other') + '.webp';
 const UNIT = {};
 COMMON.concat(CLOTHES).forEach(c => UNIT[c.name] = c.unit);
 
@@ -1551,7 +1568,7 @@ class Component extends DCLogic {
     return {
       photoNote: purged ? '已超過照片保留時限（六個月），所以沒有照片'
         : r.photoCount ? r.photoCount + ' 張照片' : '這筆沒有照片',
-      photoNoteFg: purged ? '#A8431F' : (r.photoCount ? '#3E7530' : '#8A8E80'),
+      photoNoteFg: purged ? '#8E2E22' : (r.photoCount ? '#8A4A12' : '#7A8C80'),
       canOpen: !purged && !!r.photoCount,
       open: open,
       toggleLabel: open ? '收起照片' : '看照片',
@@ -1571,7 +1588,7 @@ class Component extends DCLogic {
         img: React.createElement('a',
           {href: p.url, target: '_blank', rel: 'noopener', style: {display: 'block'}},
           React.createElement('img', {src: p.src, alt: p.name,
-            style: {width: '100%', height: 120, objectFit: 'cover', display: 'block', background: '#EDEBE2'}})),
+            style: {width: '100%', height: 120, objectFit: 'cover', display: 'block', background: '#EEF0E6'}})),
         label: '第 ' + (i + 1) + ' 張 · 點開原圖'
       }))
     };
@@ -2065,12 +2082,12 @@ class Component extends DCLogic {
       },
       query: s.query, onQuery: (e) => this.setState({query: e.target.value}),
       sortBed: s.sortBy === 'bed', sortDate: s.sortBy === 'date',
-      sortBedBg: s.sortBy === 'bed' ? '#5C9A45' : 'transparent',
-      sortBedFg: s.sortBy === 'bed' ? '#fff' : '#6A6E62',
-      sortBedBorder: s.sortBy === 'bed' ? '#5C9A45' : 'rgba(31,35,32,.22)',
-      sortDateBg: s.sortBy === 'date' ? '#5C9A45' : 'transparent',
-      sortDateFg: s.sortBy === 'date' ? '#fff' : '#6A6E62',
-      sortDateBorder: s.sortBy === 'date' ? '#5C9A45' : 'rgba(31,35,32,.22)',
+      sortBedBg: s.sortBy === 'bed' ? '#B65B16' : 'transparent',
+      sortBedFg: s.sortBy === 'bed' ? '#fff' : '#4D695A',
+      sortBedBorder: s.sortBy === 'bed' ? '#B65B16' : 'rgba(9,47,37,.22)',
+      sortDateBg: s.sortBy === 'date' ? '#B65B16' : 'transparent',
+      sortDateFg: s.sortBy === 'date' ? '#fff' : '#4D695A',
+      sortDateBorder: s.sortBy === 'date' ? '#B65B16' : 'rgba(9,47,37,.22)',
       byBed: () => this.setState({sortBy: 'bed'}),
       byDate: () => this.setState({sortBy: 'date'}),
       residentCount: visible.length,
@@ -2081,9 +2098,9 @@ class Component extends DCLogic {
             ? '目前沒有已退住的住民'
             : '目前沒有在住住民 — 按下方「＋ 新增清單」建立' + (leftCount ? '，或點上面「已退住」查看封存名單' : '')),
       leftBtnLabel: showLeft ? '← 在住住民' : '已退住 ' + leftCount,
-      leftBtnBg: showLeft ? '#5C9A45' : 'transparent',
-      leftBtnFg: showLeft ? '#fff' : '#6A6E62',
-      leftBtnBorder: showLeft ? '#5C9A45' : 'rgba(31,35,32,.22)',
+      leftBtnBg: showLeft ? '#B65B16' : 'transparent',
+      leftBtnFg: showLeft ? '#fff' : '#4D695A',
+      leftBtnBorder: showLeft ? '#B65B16' : 'rgba(9,47,37,.22)',
       toggleLeft: () => this.setState({showLeft: !showLeft, query: ''}),
       visibleResidents: visible.map((r) => ({
         bed: r.left ? ((r.items || []).length > 0 ? '未歸還' : '已退住') : r.bed,
@@ -2120,7 +2137,7 @@ class Component extends DCLogic {
       onCDate: (e) => this.setCDraft({date: e.target.value}),
       cDateIso: this.rocToIso(cdraft.date),
       onCDateIso: (e) => this.setCDraft({date: this.isoToRoc(e.target.value)}),
-      cPresets: CONSUM_PRESETS.map(nm => ({label: nm, add: () => {
+      cPresets: CONSUM_PRESETS.map(nm => ({label: nm, icon: itemIcon(nm), add: () => {
         const items = this.cd().items.slice();
         const i = items.findIndex(x => x.name === nm);
         if (i >= 0) items[i] = Object.assign({}, items[i], {qty: items[i].qty + 1});
@@ -2173,9 +2190,9 @@ class Component extends DCLogic {
         img: React.createElement('img', {src: u, alt: '', style: {width: '100%', height: 'auto', display: 'block'}})})),
       cSaving: s.cSaving,
       cSaveMsg: s.cSaving ? '存進雲端中…' : (s.cSaved ? '✓ 已存進雲端硬碟與試算表' : '⚠ 尚未存進雲端，請按下方「存進雲端」'),
-      cSaveBg: s.cSaved ? '#F4FAEE' : (s.cSaving ? '#F1F0E8' : '#FDF1EC'),
-      cSaveBorder: s.cSaved ? 'rgba(92,154,69,.35)' : (s.cSaving ? 'rgba(31,35,32,.16)' : '#C4552F'),
-      cSaveFg: s.cSaved ? '#3E7530' : (s.cSaving ? '#6A6E62' : '#A8431F'),
+      cSaveBg: s.cSaved ? '#FFF7EA' : (s.cSaving ? '#F3F4EA' : '#FBECE9'),
+      cSaveBorder: s.cSaved ? 'rgba(182,91,22,.35)' : (s.cSaving ? 'rgba(9,47,37,.16)' : '#A63124'),
+      cSaveFg: s.cSaved ? '#8A4A12' : (s.cSaving ? '#4D695A' : '#8E2E22'),
       saveConsum: () => this.saveConsum(),
       cSummary: cdraft.items.map(x => x.name + (x.qty > 1 ? ' ×' + x.qty : '')).join('、'),
 
@@ -2294,14 +2311,14 @@ class Component extends DCLogic {
         const on = d.receivers.indexOf(label) >= 0;
         return {
           label: label,
-          bg: on ? '#5C9A45' : 'transparent', fg: on ? '#fff' : '#1F2320',
-          border: on ? '#5C9A45' : 'rgba(31,35,32,.22)',
+          bg: on ? '#B65B16' : 'transparent', fg: on ? '#fff' : '#092F25',
+          border: on ? '#B65B16' : 'rgba(9,47,37,.22)',
           toggle: () => this.setDraft({receivers: on ? d.receivers.filter(x => x !== label) : d.receivers.concat([label])})
         };
       }),
 
-      commonItems: COMMON.map(c => ({label: c.name, add: () => this.addItem(c.name, c.unit)})),
-      clothesItems: CLOTHES.map(c => ({label: c.name, add: () => this.addItem(c.name, c.unit)})),
+      commonItems: COMMON.map(c => ({label: c.name, icon: itemIcon(c.name), add: () => this.addItem(c.name, c.unit)})),
+      clothesItems: CLOTHES.map(c => ({label: c.name, icon: itemIcon(c.name), add: () => this.addItem(c.name, c.unit)})),
       customItem: s.customItem, onCustomItem: (e) => this.setState({customItem: e.target.value}),
       addCustom: () => { const v = s.customItem.trim(); if (!v) return; this.addItem(v, '個'); this.setState({customItem: ''}); },
       draftItems: d.items.map((it, i) => ({
@@ -2369,7 +2386,7 @@ class Component extends DCLogic {
         toggleOpen: () => this.setState({openItem: s.openItem === i ? -1 : i}),
         shots: shots.map(p => ({thumb: React.createElement('img', {src: p.url, alt: '', style: {width: '100%', height: 72, objectFit: 'cover', display: 'block'}}), view: () => this.setState({viewer: p.url})})),
         hasShots: shots.length > 0, noShots: shots.length === 0,
-        taking: s.takeIdx === i, border: s.takeIdx === i ? '#5C9A45' : 'rgba(31,35,32,.16)',
+        taking: s.takeIdx === i, border: s.takeIdx === i ? '#B65B16' : 'rgba(9,47,37,.16)',
         multi: (Number(it.qty) || 1) > 1,
         startTake: () => this.setState({takeIdx: i, takeQty: 1, takeBy: '', takeMaker: '', fixIdx: -1, confirmDel: -1}),
         fixing: s.fixIdx === i,
@@ -2414,8 +2431,8 @@ class Component extends DCLogic {
         const rshots = (cur.photos || []).filter(p => (p.tag || '__all') === rkey);
         return {
           name: rlabels[i] || it.name, qtyLabel: it.qty + ' ' + it.unit,
-          check: on ? '✓' : '', mark: on ? '#3E7530' : 'rgba(31,35,32,.35)',
-          bg: on ? '#eef6ff' : '#fff', border: on ? '#5C9A45' : 'rgba(31,35,32,.16)',
+          check: on ? '✓' : '', mark: on ? '#8A4A12' : 'rgba(9,47,37,.35)',
+          bg: on ? '#eef6ff' : '#fff', border: on ? '#B65B16' : 'rgba(9,47,37,.16)',
           toggle: () => this.setState(st => { const r = Object.assign({}, st.returned); r[i] = !r[i]; return {returned: r}; }),
           // 退住核對時一併看照片：點縮圖用全螢幕檢視器放大（與詳情頁同一套）
           hasShots: rshots.length > 0,
@@ -2440,7 +2457,7 @@ class Component extends DCLogic {
         return {
           residentLabel: r.residentName,
           bedLabel: matched ? r.matchedBed : '未比對',
-          bedFg: matched ? '#3E7530' : '#A8431F',
+          bedFg: matched ? '#8A4A12' : '#8E2E22',
           family: r.familyName + (r.relation ? '（' + r.relation + '）' : '') + (r.phone ? ' · ' + r.phone : ''),
           itemText: r.itemText || '—',
           hasNote: !!String(r.note || '').trim(), note: r.note,
