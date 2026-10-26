@@ -9,8 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3f6ec;--card:#fcfdf8;--ink:#26302a;--sub:#657060;--line:#e1e8d6;--g:#4a8a2e;--g2:#8cc151;--g3:#e8f2da;--teal:#3ba58c;--warm:#d98c3f;--red:#b4412f;
- --s-wait:#d98c3f;--s-hold:#7a5fb0;--s-talk:#2f7fb0;--s-bed:#158a8a;--s-in:#4f8c3a;--s-can:#8d887c}
+:root{--bg:#FAF8EF;--card:#FFFDF8;--ink:#092F25;--sub:#4D695A;--line:#E3E5D8;--g:#14563F;--g2:#8DBF6E;--g3:#EAF3DC;--teal:#27675F;--warm:#B65B16;--red:#A63124;
+ --s-wait:#B65B16;--s-hold:#9A6B2E;--s-talk:#27675F;--s-bed:#2C6E8A;--s-in:#14563F;--s-can:#8A938C}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
 button,input,select,textarea{font-family:inherit;font-size:15px;color:inherit}
@@ -164,6 +164,76 @@ details.fold .in2{margin-top:10px}
 @keyframes spn{to{transform:rotate(360deg)}}
 .load{text-align:center;padding:50px;color:var(--sub)}
 
+
+/* ===== 水彩風（同入口網站、探視預約）===== */
+body{background:var(--bg)}
+body::after{content:"";position:fixed;right:0;bottom:0;width:105px;height:105px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+.top{background:rgba(250,248,239,.96);box-shadow:none;border-bottom:1px solid var(--line);border-image:none;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.top .in,.tabs,main{max-width:1320px}
+.top .in{padding:10px 20px;gap:14px}
+.top h1{font:900 19px 'Noto Serif TC',serif;color:var(--g)}
+.top h1 img{height:40px}
+.top h1 span{border-left:1px solid #B3BDB0;padding-left:14px}
+.back{background:var(--g);box-shadow:0 3px 8px rgba(20,86,63,.22);padding:9px 16px;font-size:14px}
+.who{background:#fff;border:1px solid #DEDFD1;color:var(--g);padding:6px 14px}
+.tabs{padding:0 20px 10px;gap:8px}
+.tab{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:7px 18px;background:#FFFDF8;color:var(--sub)}
+.tab.on{background:var(--g);border-color:var(--g);color:#fff}
+.v-ico{display:inline-block;flex:none;width:18px;height:18px;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.btn{border-radius:999px}
+.btn-w{background:var(--g);color:#fff}.btn-w:hover{background:#0E4532}
+.btn-g:hover{background:#0E4532}
+.btn-o{border-color:#C9D0C2}.btn-o:hover{border-color:var(--g);color:var(--g)}
+.btn-sm{border-radius:999px}
+main{position:relative;z-index:1;padding:14px 20px 40px}
+.t-hero{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:104px;padding:14px 28px 14px 120px;margin-bottom:14px;
+  background:#F5F6E6;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.t-hero-leaf{position:absolute;left:0;top:0;width:112px;opacity:.85;z-index:-1}
+.t-hero-art{position:absolute;right:0;bottom:0;height:100%;width:auto;max-width:46%;object-fit:contain;object-position:right bottom;z-index:-1}
+.t-hero h2{font:900 30px/1.25 'Noto Serif TC',serif;color:var(--ink);letter-spacing:.04em}
+.t-hero p{color:var(--sub);font-size:15px;margin-top:2px}
+.banner{background:#FFF0D7;border-color:#EDC58D;color:#8A4A12}
+.sum{gap:12px}
+.kpi{border-radius:18px;padding:12px 18px;background:#FFFDF8}
+.kpi.on{background:var(--g3);border-color:#B5CDA2}
+.kpi b{font-size:28px;color:var(--g)}
+.search input,select.f,input.f{border-radius:12px;border-color:#D3D8C8}
+.search input{padding-left:40px}
+.search::before{content:"";width:18px;height:18px;left:13px;background:var(--sub);-webkit-mask:url(../assets/common/icon-search.webp) center/contain no-repeat;mask:url(../assets/common/icon-search.webp) center/contain no-repeat}
+.ch{border-color:#D3D8C8;background:#FFFDF8}
+.tbl{border-radius:18px}
+th{background:#EAF3DC;color:#2F6B4F}
+tr.row:hover{background:#F3F6EC}
+.rc{border-radius:16px}
+.empty::before{content:"";display:block;width:120px;height:120px;margin:0 auto 6px;background:url(../assets/common/state-empty.webp) center/contain no-repeat}
+.tag{background:#EEF0E6;color:#4D695A}
+.dh,.df{background:#FFFDF8}
+.dh h2{font:900 21px 'Noto Serif TC',serif;color:var(--ink)}
+.x{background:#EEF0E6}
+.sec,.panel{border-radius:18px}
+.sec>h3,.panel h3,details.fold>summary{color:var(--g);font-size:16px}
+.sec>h3::before,.panel h3::before{content:"";display:inline-block;width:22px;height:14px;margin-right:6px;vertical-align:-1px;background:url(../assets/common/sprig-green.webp) center/contain no-repeat}
+.sec>h3{justify-content:flex-start}
+.fl input,.fl select,.fl textarea{border-radius:10px;border-color:#D3D8C8}
+.ck span{border-color:#D3D8C8}
+.ck input:checked+span{background:var(--g3);border-color:var(--g);color:var(--g)}
+.tot{background:#EAF3DC;border-radius:14px}
+.ni::before{background:var(--g)}
+.bar div{background:#EEF0E6}
+.trend i{background:linear-gradient(#8DBF6E,#14563F)}
+.nm-box{border-radius:22px}
+.nm-h h3{display:flex;align-items:center;gap:8px}.nm-h h3 .v-ico{width:22px;height:22px}
+.nm-miss{background:#FFF0D7;color:#8A4A12}
+#toast{background:#14563F;border-radius:999px}
+@media (max-width:760px){
+  .t-hero{min-height:88px;padding:12px 16px 12px 70px;border-radius:18px}
+  .t-hero-leaf{width:70px;opacity:.5}
+  .t-hero-art{opacity:.45;max-width:60%}
+  .t-hero h2{font-size:23px}.t-hero p{font-size:13px}
+  main{padding:10px 12px 40px}
+  .top .in{padding:8px 12px}
+  .tabs{padding:0 12px 8px}
+}
 @media (max-width:760px){
   .top h1 span{display:none}
   .sum{grid-template-columns:repeat(2,1fr)}
@@ -179,14 +249,15 @@ details.fold .in2{margin-top:10px}
 <div class="top">
   <div class="in">
     <a class="back" href="../index.html">&larr; 入口網站</a>
-    <h1><img src="logo.png" alt="線東大眾護理之家"><span>參訪預約管理<small>VISIT RESERVATION ADMIN</small></span></h1>
+    <h1><img src="../portal-img/logo.png" alt="線東大眾護理之家"><span>參訪預約管理</span></h1>
     <div class="who">承辦人 <input id="who" placeholder="輸入姓名"></div>
-    <button class="btn btn-w btn-sm" onclick="openRow(null)">＋ 新增紀錄</button>
+    <button class="btn btn-w btn-sm" onclick="openRow(null)"><i class="v-ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增紀錄</button>
   </div>
-  <div class="tabs"><button class="tab on" data-t="list" onclick="tab('list')">預約清單</button><button class="tab" data-t="stats" onclick="tab('stats')">統計</button></div>
+  <div class="tabs"><button class="tab on" data-t="list" onclick="tab('list')"><i class="v-ico" style="--ico:url(../assets/common/icon-note.webp)"></i>預約清單</button><button class="tab" data-t="stats" onclick="tab('stats')"><i class="v-ico" style="--ico:url(../assets/common/icon-chart.webp)"></i>統計</button></div>
 </div>
 
 <main>
+  <div class="t-hero"><img class="t-hero-leaf" src="../kiosk/img/n-c-tl.webp" alt=""><img class="t-hero-art" src="../assets/tour/banner.webp" alt=""><div><h2>參訪預約管理</h2><p>家屬參訪詢問、訪談紀錄與入住安排，一處追蹤。</p></div></div>
   <div class="banner" id="demoBanner" style="display:none"><span>⚠️ 目前是<b>預覽模式</b>（尚未連線 Google 試算表），資料只存在這個瀏覽器；家屬版同一台瀏覽器送出的預約也會出現在這裡。</span><button class="btn btn-o btn-sm" onclick="seedDemo()">載入示範資料</button><button class="btn btn-o btn-sm" onclick="clearDemo()">清空</button></div>
 
   <div id="v-list">
@@ -194,8 +265,8 @@ details.fold .in2{margin-top:10px}
     <div class="tool">
       <div class="search"><input id="q" placeholder="搜尋姓名、電話、醫院、編號…" oninput="draw()"></div>
       <select class="f" id="fch" onchange="draw()"><option value="">所有來源</option></select>
-      <button class="btn btn-o btn-sm" onclick="exportCsv()">⬇ 匯出 CSV</button>
-      <button class="btn btn-o btn-sm" onclick="reload()">↻ 重新整理</button>
+      <button class="btn btn-o btn-sm" onclick="exportCsv()"><i class="v-ico" style="--ico:url(../assets/common/icon-download.webp)"></i>匯出 CSV</button>
+      <button class="btn btn-o btn-sm" onclick="reload()"><i class="v-ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button>
     </div>
     <div class="chips" id="schips"></div>
     <div class="tbl" id="tbl"></div>
@@ -208,7 +279,7 @@ details.fold .in2{margin-top:10px}
 <div id="mask" onclick="closeDr()"></div>
 <aside id="dr" aria-hidden="true">
   <div class="dh">
-    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知">📋 入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
+    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
     <div class="stbar" id="stbar"></div>
   </div>
   <div class="db" id="dBody"></div>
@@ -216,7 +287,7 @@ details.fold .in2{margin-top:10px}
 </aside>
 <div id="nm" class="nm" onclick="if(event.target===this)closeNotice()">
   <div class="nm-box">
-    <div class="nm-h"><h3>📋 新住民入住通知</h3><button class="x" onclick="closeNotice()" aria-label="關閉">✕</button></div>
+    <div class="nm-h"><h3><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>新住民入住通知</h3><button class="x" onclick="closeNotice()" aria-label="關閉">✕</button></div>
     <div id="nmMiss" class="nm-miss"></div>
     <textarea id="nmText" spellcheck="false"></textarea>
     <div class="nm-f"><span>可以直接在上面修改文字，再按「複製」。</span><button class="btn btn-o" onclick="closeNotice()">關閉</button><button class="btn btn-g" onclick="copyNotice()">複製通知內容</button></div>
@@ -264,7 +335,7 @@ function showDenied(){
   if(document.getElementById("denied"))return;
   const d=document.createElement("div");d.id="denied";
   d.style.cssText="position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center";
-  d.innerHTML='<div style="max-width:420px"><div style="font-size:46px">🔒</div><h2 style="color:var(--g);margin:8px 0">權限不足</h2><p style="color:var(--sub);margin-bottom:18px">這個帳號的身份無法使用「參訪預約管理」。<br>如需使用，請洽管理者。</p><a class="btn btn-g" href="../index.html" style="text-decoration:none">← 回入口網站</a></div>';
+  d.innerHTML='<div style="max-width:420px"><img src="../assets/common/state-locked.webp" alt="" style="width:150px;height:auto;margin:0 auto"><h2 style="color:var(--g);margin:8px 0">權限不足</h2><p style="color:var(--sub);margin-bottom:18px">這個帳號的身份無法使用「參訪預約管理」。<br>如需使用，請洽管理者。</p><a class="btn btn-g" href="../index.html" style="text-decoration:none">← 回入口網站</a></div>';
   document.body.appendChild(d);
 }
 function deniedFail(){showDenied();const err=new Error("權限不足");err.denied=true;throw err}   // forbidden → 顯示權限不足

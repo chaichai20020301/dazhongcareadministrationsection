@@ -10,9 +10,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#f5f8ee; --card:#fffffb; --ink:#26302a; --sub:#65705f; --line:#e1e8d6;
-  --g1:#4a8a2e; --g2:#8cc151; --g3:#e8f2da; --warm:#3ba58c; --warm2:#eaf4ec; --red:#b4412f; --teal:#3ba58c;
-  --r:18px; --sh:0 10px 34px rgba(74,138,46,.13);
+  --bg:#FAF8EF; --card:#FFFDF8; --ink:#092F25; --sub:#4D695A; --line:#E3E5D8;
+  --g1:#14563F; --g2:#8DBF6E; --g3:#EAF3DC; --warm:#B65B16; --warm2:#EAF3DC; --red:#A63124; --teal:#27675F;
+  --r:22px; --sh:0 10px 30px rgba(23,59,37,.10);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -267,6 +267,90 @@ details.opt .inner{margin-top:14px}
   .g2{grid-template-columns:1fr}
   .gal-item{aspect-ratio:4/3}
 }
+
+/* ===== 水彩風（同入口網站、探視預約）===== */
+nav{background:rgba(250,248,239,.96)}
+nav::after{height:1px;background:#E3E5D8}
+#bar{background:#14563F}
+.btn-main,.btn-g{background:#14563F;color:#fff;box-shadow:0 6px 16px rgba(20,86,63,.28)}
+.btn-main:hover,.btn-g:hover{background:#0E4532;filter:none}
+.btn-ghost{border-color:#B5CDA2;color:#14563F;background:#FFFDF8}
+/* 首屏 */
+.hero{min-height:min(88svh,780px);background:#FAF8EF;color:var(--ink)}
+.hero::after,.hero-slides,.scroll-hint{display:none}
+.hero-art img{position:absolute;right:0;bottom:0;width:min(1100px,72%);height:auto;max-height:100%;object-fit:contain;object-position:right bottom}
+.hero-leaf{position:absolute;left:0;top:64px;width:170px;opacity:.85;pointer-events:none}
+.hero .wrap{width:100%}
+.hero small{background:#EAF3DC;color:#2F6B4F;backdrop-filter:none}
+.hero h1{color:#092F25;text-shadow:none;font-family:'Noto Serif TC',serif;max-width:560px}
+.hero p{color:#4D695A;opacity:1;max-width:460px}
+.hero .btn-ghost{border-color:#B5CDA2;color:#14563F}
+section{padding:64px 0}
+.eyebrow{color:#B65B16}
+.title{color:#092F25;display:flex;align-items:center;gap:12px}
+.title-ico{width:42px;height:42px}
+.wrap{max-width:1240px}
+.sec-head{display:grid;grid-template-columns:1fr minmax(0,320px);gap:24px;align-items:center;margin-top:-40px}
+.sec-art{width:100%;height:auto;max-height:230px;object-fit:contain}
+.about-img::before{border-color:rgba(255,255,255,.6)}
+.val i,.svc i,.env-card i{filter:saturate(.75)}
+.val i{background:#EAF3DC}
+.svc{background:#FAF8EF;border-color:#E3E5D8}
+.types span{background:#EAF3DC;border-color:#B5CDA2;color:#14563F}
+.types span:hover{background:#14563F}
+.who-item::before{background:#14563F}
+#day{background:linear-gradient(180deg,#FAF8EF,#EEF4E4)}
+.illus{width:min(640px,100%);filter:none}
+.tl-item time{color:#B65B16}
+.tl-fill{background:linear-gradient(#8DBF6E,#14563F)}
+.room{border-color:#E3E5D8}
+.room-ico{width:56px;height:56px;margin:0 auto 6px;display:block}
+.room b{color:#14563F}
+.note-box{background:#EAF3DC;color:#2F6B4F}
+.step{background:#FAF8EF;padding-top:30px}
+.step::before{background:#14563F;box-shadow:0 6px 14px rgba(20,86,63,.3)}
+.step-ico{width:54px;height:54px;margin-bottom:4px}
+.qa button::after{color:#14563F}
+.final{background:#F5F6E6;color:#092F25;padding:44px 22px 0;border:1px solid #E3E5D8}
+.final::before,.final::after{display:none}
+.final p{color:#4D695A}
+.final .btn{margin-bottom:8px}
+.final-art{display:block;width:min(720px,100%);height:auto;margin:14px auto 0}
+.final h2,.final p,.final .btn{position:relative;z-index:1}
+.contact b{color:#14563F}
+/* 預約表單 */
+.ov-top{background:#FFFDF8}
+.ov-top .row,.stepper,.stepper-lb,.ov-in{max-width:920px}
+.ov-body{background:#FAF8EF url(../kiosk/img/n-c-br.webp) right bottom/110px no-repeat fixed}
+.pane h3{font:900 24px "Noto Serif TC",serif;color:#092F25}
+@media (min-width:900px){.pane[data-p="2"] .fld:has(textarea){display:inline-block;width:calc(50% - 8px);vertical-align:top}.pane[data-p="2"] .fld:has(textarea)+.fld:has(textarea){margin-left:12px}}
+.stepper i.on{background:#14563F}
+.ok-art{width:200px;height:auto;margin:0 auto}
+.consent{background:#F3F6EC;border-color:#D4E5C3;color:#2F4A3D}
+.chip input:checked+span{color:#14563F;border-color:#14563F}
+.est .tot b{color:#14563F}
+#toast{background:#14563F}
+@media (min-width:701px) and (max-width:1180px){
+  .hero-art img{width:54%}
+  .hero h1{font-size:clamp(28px,3.4vw,42px);max-width:54%}
+  .hero .wrap{padding-top:80px;padding-bottom:40px}
+  .hero{min-height:min(70svh,620px)}
+  .hero p{max-width:46%}
+  .hero small{max-width:50%}
+}
+@media (max-width:860px){
+  .sec-head{grid-template-columns:1fr;margin-top:0}
+  .sec-art{max-width:420px;margin:0 auto}
+}
+@media (max-width:700px){
+  .hero{min-height:auto;flex-direction:column;align-items:stretch;padding-bottom:0}
+  .hero .wrap{padding-top:96px;padding-bottom:10px}
+  .hero-art{position:relative;display:block;margin-top:-10px;order:2}
+  .hero-art img{position:static;width:100%;max-height:none}
+  .hero-leaf{width:100px;top:56px;opacity:.6}
+  section{padding:52px 0}
+  .title-ico{width:34px;height:34px}
+}
 </style>
 </head>
 <body>
@@ -279,6 +363,7 @@ details.opt .inner{margin-top:14px}
 
 <!-- HERO -->
 <header class="hero" id="top">
+  <picture class="hero-art"><source media="(max-width:700px)" srcset="../assets/tour/hero-mobile.webp"><img src="../assets/tour/hero.webp" alt=""></picture><img class="hero-leaf" src="../kiosk/img/n-c-tl.webp" alt="">
   <div class="hero-slides" id="heroSlides"></div>
   <div class="wrap">
     <small class="reveal in" id="heroTag"></small>
@@ -305,14 +390,14 @@ details.opt .inner{margin-top:14px}
 <section id="services"><div class="wrap">
   <div class="eyebrow reveal">SERVICES</div>
   <h2 class="title reveal d1">專業照護，細心陪伴</h2>
-  <p class="lead reveal d2">從日常起居到專業護理，我們用專業與耐心，守護每一位長輩。</p>
+  <div class="sec-head"><div><p class="lead reveal d2">從日常起居到專業護理，我們用專業與耐心，守護每一位長輩。</p></div><img class="sec-art reveal d2" src="../assets/tour/sec-services.webp" alt=""></div>
   <div class="svc-grid" id="svcs"></div>
 </div></section>
 
 <section id="who"><div class="wrap">
   <div class="eyebrow reveal">WHO WE SERVE</div>
   <h2 class="title reveal d1">適合哪些長輩</h2>
-  <p class="lead reveal d2">24 小時住宿式服務，依長輩的需要提供不同的入住型態。</p>
+  <div class="sec-head"><div><p class="lead reveal d2">24 小時住宿式服務，依長輩的需要提供不同的入住型態。</p></div><img class="sec-art reveal d2" src="../assets/tour/sec-who.webp" alt=""></div>
   <div class="types reveal d2" id="types"></div>
   <div class="who-grid" id="whoList"></div>
 </div></section>
@@ -333,7 +418,7 @@ details.opt .inner{margin-top:14px}
   <div class="eyebrow reveal">DAILY CARE</div>
   <h2 class="title reveal d1">我們的照顧專業，在每一天的生活中</h2>
   <p class="lead reveal d2">不只是生活照顧，更是生活管家，提供整合性與人性化的照護服務。</p>
-  <img class="illus reveal" id="illus" alt="" src="img/illus-life.png">
+  <img class="illus reveal" id="illus" alt="" src="../assets/tour/sec-daily.webp">
   <div class="tl" id="tl"><div class="tl-fill" id="tlFill"></div></div>
 </div></section>
 
@@ -353,7 +438,7 @@ details.opt .inner{margin-top:14px}
 
 <section id="faq"><div class="wrap">
   <div class="eyebrow reveal">FAQ</div>
-  <h2 class="title reveal d1">家屬常見問題</h2>
+  <h2 class="title reveal d1"><img class="title-ico" src="../assets/tour/icon-faq.webp" alt="">家屬常見問題</h2>
   <div class="faq" id="faqs"></div>
 </div></section>
 
@@ -362,13 +447,14 @@ details.opt .inner{margin-top:14px}
     <h2>歡迎親自來看看</h2>
     <p>留下聯絡資料，我們的行政人員會盡快與您聯繫，安排參訪時間。</p>
     <button class="btn btn-main" onclick="openBook()">預約參訪 →</button>
+    <img class="final-art" src="../assets/tour/sec-cta.webp" alt="">
   </div>
   <div class="contact" id="contact"></div>
 </div></section>
 
 <footer><img src="logo.png" alt="線東大眾護理之家" style="height:44px;margin:0 auto 10px">© 線東大眾護理之家　｜　您所填寫的資料僅用於參訪預約與入住評估</footer>
 
-<div id="fab"><button class="btn btn-main" onclick="openBook()">📅 預約參訪</button></div>
+<div id="fab"><button class="btn btn-main" onclick="openBook()">預約參訪 →</button></div>
 
 <!-- BOOKING -->
 <div id="ov" role="dialog" aria-modal="true" aria-label="預約參訪">
@@ -477,7 +563,7 @@ details.opt .inner{margin-top:14px}
 
     <div class="pane" data-p="ok">
       <div class="ok">
-        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="41"/><path d="M30 52l14 14 27-30"/></svg>
+        <img class="ok-art" src="../assets/tour/state-submitted.webp" alt="">
         <h3>預約已送出！</h3>
         <p style="color:var(--sub)" id="okMsg"></p>
         <div class="note-box" style="text-align:left;margin-top:22px">接下來：<br>① 行政人員會來電與您確認參訪時間<br>② 參訪時可事先準備長輩最近的就醫資料或藥袋<br>③ 若需更改，請直接來電告訴我們</div>
@@ -509,7 +595,7 @@ const PHOTOS = {
     {src:"img/wall.jpg",     cap:"線東大眾護理之家"},
     {src:"img/care.jpg",     cap:"溫暖的陪伴"}
   ],
-  illus:"img/illus-life.png"   // 水彩插畫（每天的照顧區塊）
+  illus:"../assets/tour/sec-daily.webp"   // 水彩插畫（每天的照顧區塊）
 };
 
 // 介紹文案（內容整理自機構現行官網 dazhongcare.com.tw，可直接在此修改）
@@ -604,14 +690,14 @@ function render(){
   $("#galDots").innerHTML=PHOTOS.gallery.map((_,i)=>`<b onclick="galTo(${i})"></b>`).join(""); galTo(0);
     $("#tl").insertAdjacentHTML("beforeend",CONTENT.care.map(d=>`<div class="tl-item reveal"><time>${d.t}</time><h3>${d.h}</h3><p>${d.d}</p></div>`).join(""));
   renderPrice();
-  $("#steps").innerHTML=CONTENT.steps.map((s,i)=>`<div class="step reveal d${i+1}"><h3>${s.h}</h3><p>${s.d}</p></div>`).join("");
+  $("#steps").innerHTML=CONTENT.steps.map((s,i)=>`<div class="step reveal d${i+1}"><img class="step-ico" src="../assets/tour/icon-step-${i+1}.webp" alt=""><h3>${s.h}</h3><p>${s.d}</p></div>`).join("");
   $("#faqs").innerHTML=CONTENT.faqs.map(f=>`<div class="qa reveal"><button type="button">${f.q}</button><div>${f.a}</div></div>`).join("");
   $$(".qa button").forEach(b=>b.onclick=()=>{const q=b.parentElement,c=q.querySelector("div"),o=q.classList.toggle("open");c.style.maxHeight=o?c.scrollHeight+30+"px":0});
   $("#contact").innerHTML=CONTENT.contact.map(c=>`<div class="reveal"><b>${c.t}</b>${c.v}</div>`).join("");
   observe();
 }
 function renderPrice(){
-  $("#rooms").innerHTML=PRICE.rooms.map((r,i)=>`<div class="room reveal d${(i%5)+1}"><h3>${r.name}</h3><b>${Number(r.price).toLocaleString()}</b><span>元／月起</span></div>`).join("");
+  $("#rooms").innerHTML=PRICE.rooms.map((r,i)=>`<div class="room reveal d${(i%5)+1}">${i<5?`<img class="room-ico" src="../assets/tour/icon-bed-${i+1}.webp" alt="">`:""}<h3>${r.name}</h3><b>${Number(r.price).toLocaleString()}</b><span>元／月起</span></div>`).join("");
   $("#priceNote").innerHTML=PRICE.note+"<br>"+PRICE.disclaimer;
   $("#condChips").innerHTML=PRICE.addons.map(a=>`<label class="chip"><input type="checkbox" name="cond" value="${a.key}"><span>${a.key}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`).join("");
   $("#roomSel").innerHTML=`<label class="chip"><input type="radio" name="roomType" value="" checked><span>尚未決定</span></label>`+PRICE.rooms.map(r=>`<label class="chip"><input type="radio" name="roomType" value="${r.name}"><span>${r.name}<b>${Number(r.price).toLocaleString()}</b></span></label>`).join("");
