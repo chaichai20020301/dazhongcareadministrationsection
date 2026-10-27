@@ -5,8 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>人員名單管理 · 線東大眾護理之家</title>
 <link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
 <style>
-:root{--green:#2f9e6b;--green-d:#1c6b48;--ink:#1c2b23;--muted:#5d6d63;--paper:#f2efe6;--card:#fffdf8;--line:#e0d8c8;--red:#b4402f;--gold:#a8702a}
+:root{--green:#B65B16;--green-d:#8A4A12;--ink:#092F25;--muted:#4D695A;--paper:#FAF8EF;--card:#FFFDF8;--line:#E3E5D8;--red:#A63124;--gold:#B65B16}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif}
 button,input,select{font-family:inherit}
@@ -44,23 +47,164 @@ h1{margin:6px 0 4px;font-size:24px}
 .btns{display:flex;gap:10px;justify-content:flex-end;margin-top:14px}
 .empty{padding:30px;text-align:center;color:var(--muted)}
 @media (max-width:640px){.row{grid-template-columns:1fr auto;grid-template-areas:"n a" "r a" "l l"}.row.h{display:none}.row .c-role{grid-area:r}.row .c-last{grid-area:l;font-size:12.5px;color:var(--muted)}.row .c-st{display:none}.act{grid-area:a}}
+/* ===== 水彩風（同入口網站；人員名單主色＝橘）===== */
+body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1400px;padding:16px 24px 40px}
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:2147483647;display:flex;align-items:center;gap:14px;padding:0 20px;
+  background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8;box-sizing:border-box}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#14563F;color:#fff!important;border-radius:999px;
+  font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:#B65B16;border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-user{display:none;margin-left:auto;align-items:center;gap:8px;padding:4px 14px 4px 5px;background:rgba(255,255,255,.75);border:1px solid #DEDFD1;border-radius:999px;
+  font:500 13.5px 'Noto Sans TC';color:#092F25;white-space:nowrap}
+.v-user b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#14563F;color:#fff;font-size:14px}
+.p-ico{display:inline-block;flex:none;width:1.15em;height:1.15em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;
+  mask:var(--ico) center/contain no-repeat;vertical-align:-.2em;margin-right:5px}
+
+/* 頁首 */
+.p-banner{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:150px;margin-bottom:16px;
+  padding:18px 24px 18px 100px;background:#FFF5E6;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.p-leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.8;z-index:-1;pointer-events:none}
+.p-art{position:absolute;right:10px;bottom:0;height:92%;width:auto;max-width:44%;object-fit:contain;object-position:right bottom;z-index:-1;pointer-events:none}
+.p-txt{max-width:56%}
+h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:#092F25;letter-spacing:.03em}
+.sub{margin:0 0 12px;font-size:13.5px;color:#4D695A}
+.sub b{color:#8A4A12;background:#FFE6C2;padding:1px 6px;border-radius:6px}
+.bar{margin:0}
+.btn{display:inline-flex;align-items:center;font-size:14.5px}
+.btn.main{background:#B65B16;box-shadow:0 3px 8px rgba(182,91,22,.22)}
+.btn.main:hover{background:#8A4A12}
+.btn.sec{background:#FFFDF8;color:#8A4A12;border:1.5px solid #EDC58D}
+.btn.sec:hover{background:#FFF5E6}
+
+/* 兩欄 */
+.p-cols{display:grid;grid-template-columns:minmax(250px,290px) minmax(0,1fr);gap:20px;align-items:start}
+.p-side{position:sticky;top:80px;display:flex;flex-direction:column;gap:12px}
+.p-card{background:#FFFDF8;border:1px solid #E3E5D8;border-radius:20px;padding:14px;box-shadow:0 4px 12px rgba(25,62,37,.04)}
+.p-ttl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 8px;font:700 15px 'Noto Sans TC';color:#092F25}
+.p-ttl::before{content:"";width:26px;height:15px;background:url(../assets/common/sprig-green.webp) center/contain no-repeat}
+.p-ttl span{flex-basis:100%;font:400 12px 'Noto Sans TC';color:#7A8C80;padding-left:32px;margin-top:-2px}
+#stats{display:flex;flex-direction:column;gap:4px}
+.p-st{display:flex;align-items:center;gap:10px;width:100%;padding:7px 12px 7px 8px;border:1px solid transparent;border-radius:14px;background:none;
+  font:500 14.5px 'Noto Sans TC';color:#3E5A4C;cursor:pointer;text-align:left}
+.p-st img,.p-st-ic{width:30px;height:30px;flex:none}
+.p-st-ic{display:grid;place-items:center;color:#B65B16;font-size:24px}.p-st-ic .p-ico{margin:0}
+.p-st b{margin-left:auto;font-size:17px;color:#092F25}
+.p-st:hover{background:#FFF5E6}
+.p-st.on{background:#FFF0D7;border-color:#EDC58D;color:#8A4A12}
+.p-note{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:#FFF0D7;border:1px solid #EDC58D;border-radius:16px;font-size:13px;line-height:1.6;color:#5E3A12}
+.p-note img{width:34px;height:34px;flex:none}
+.p-note b{color:#8A4A12;font-size:13.5px}
+.p-note2{background:#FFFDF8;border-color:#E3E5D8;color:#4D695A}
+.p-note2 img{width:30px;height:30px}
+
+/* 表格 */
+.msg{margin:0 2px 8px;min-height:0}
+.msg:empty{display:none}
+.tbl{border-radius:20px;box-shadow:0 4px 12px rgba(25,62,37,.04)}
+.row{grid-template-columns:1.1fr 1fr .8fr 1.3fr auto;padding:11px 18px;font-size:15px}
+.row.h{background:#F3F4EA;color:#4D695A}
+.row:not(.h):hover{background:#FFFAF1}
+.row.off{opacity:.5;filter:grayscale(.6)}
+.c-name b{font-size:15.5px}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:3px 11px 3px 4px;font-size:13px}
+.tag img{width:22px;height:22px}
+.tag.r-manager{background:#FFF0D7;color:#8A4A12}
+.tag.r-admin,.tag.r-care{background:#EAF3DC;color:#14563F}
+.tag.r-nurse,.tag.r-nurseadmin{background:#E6F1EE;color:#1D5049}
+.tag.st{background:#FFF5E6;color:#8A4A12;padding-left:9px}
+.tag.st .p-ico{margin-right:1px}
+.tag.x{background:#EEEEE8;color:#6F7A72}
+.c-last{font-size:13.5px;color:#4D695A}
+.c-last .p-ico{width:15px;height:15px;color:#7A8C80}
+.act button{display:inline-flex;align-items:center;border-radius:999px;border-color:#EDC58D;background:#FFFDF8;color:#8A4A12;padding:7px 14px}
+.act button:hover{background:#FFF5E6}
+.act button.code::before{content:"";width:17px;height:17px;margin-right:5px;background:currentColor;-webkit-mask:url(../assets/people/icon-eye.webp) center/contain no-repeat;mask:url(../assets/people/icon-eye.webp) center/contain no-repeat}
+.act button.code{min-width:116px;justify-content:center}
+.act button.code.on{background:#FFF0D7;border-color:#B65B16;color:#8A4A12;font-size:15px}
+@property --pp{syntax:'<percentage>';inherits:false;initial-value:100%}
+.act button.code.on::before{-webkit-mask:none;mask:none;border-radius:50%;background:conic-gradient(#B65B16 var(--pp),#F6DDB8 0);animation:p-count 20s linear forwards}
+@keyframes p-count{to{--pp:0%}}
+.act button.edit .p-ico{width:15px;height:15px;margin-right:4px}
+.empty{padding:34px 20px}
+.p-state{display:block;width:120px;height:auto;margin:0 auto 10px}
+
+/* 視窗 */
+.modal{background:rgba(9,47,37,.42)}
+.box{border-radius:22px;max-width:460px;box-shadow:0 18px 40px rgba(9,47,37,.2)}
+.box h2{font:900 21px 'Noto Serif TC',serif;color:#092F25}
+.f label{display:flex;align-items:center;color:#3E5A4C}
+.f label .p-ico{color:#B65B16}
+.f input,.f select{border-color:#D3D8C8;border-radius:12px;background:#FFFDF8}
+.f input:focus{outline:none;border-color:#B65B16;box-shadow:0 0 0 4px rgba(182,91,22,.12)}
+#fRole{display:none}
+.p-roles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.p-role{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;border:1.5px solid #E3E5D8;border-radius:14px;background:#FFFDF8;
+  font:600 13px 'Noto Sans TC';color:#3E5A4C;cursor:pointer}
+.p-role img{width:32px;height:32px}
+.p-role.on{border-color:#B65B16;background:#FFF0D7;color:#8A4A12;box-shadow:0 0 0 3px rgba(182,91,22,.12)}
+.f.chk input{accent-color:#B65B16;width:18px;height:18px}
+#fMsg:not(:empty){background:#FBECE9;border-radius:12px;padding:9px 12px;font-size:13.5px;line-height:1.6}
+
+@media (max-width:1000px){ .p-art{opacity:.35} .p-txt{max-width:100%} }
+@media (max-width:860px){
+  .p-cols{grid-template-columns:1fr}
+  .p-side{position:static}
+  #stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}
+  .p-st{white-space:nowrap;padding:6px 10px 6px 6px;gap:8px}
+  .p-st img,.p-st-ic{width:26px;height:26px}
+  .p-note2{display:none}
+}
+@media (max-width:640px){
+  main{padding:12px 12px 40px}
+  .v-topbar{height:56px;padding:0 12px;gap:10px}
+  body{padding-top:56px!important}
+  .v-tb-logo,.v-user span{display:none}
+  .v-user{padding:3px}
+  .v-tb-title{font-size:17px}
+  body::after{display:none}
+  .p-banner{padding:14px 14px 14px 60px;min-height:0}
+  .p-leaf{opacity:.45}
+  h1{font-size:22px}
+  .tbl{background:none;border:0;box-shadow:none;overflow:visible}
+  .row{background:#FFFDF8;border:1px solid #E3E5D8!important;border-radius:16px;margin-bottom:8px;padding:12px 14px;
+    grid-template-columns:1fr auto;grid-template-areas:"n r" "l l" "a a";row-gap:6px}
+  .row .c-name{grid-area:n}.row .c-role{grid-area:r}.row .c-last{grid-area:l}
+  .act{grid-area:a;justify-content:stretch}
+  .act button{flex:1;justify-content:center;padding:9px}
+  .p-roles{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .modal{align-items:flex-end;padding:0}
+  .box{border-radius:22px 22px 0 0;max-width:none;max-height:92vh;overflow:auto}
+}
 </style>
 </head>
 <body>
-<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<!--BACK_TO_PORTAL--><style>body{padding-top:64px !important}</style><div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">人員名單管理</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
+<script>(function(){try{var n=localStorage.getItem("handover_name")||"",r=localStorage.getItem("portal_role")||"",L={manager:"主管",admin:"行政",nurseadmin:"護理行政",nurse:"護理",care:"照服"};var e=document.getElementById("v-user");if(n){e.children[0].textContent=n.trim().charAt(0);e.children[1].textContent=n+(L[r]?" · "+L[r]:"");e.style.display="flex";}}catch(x){}})();</script>
 <main>
-  <h1>人員名單管理</h1>
+  <div class="p-banner"><img class="p-leaf" src="../kiosk/img/n-o-l.webp" alt=""><img class="p-art" src="../assets/people/banner.webp" alt="">
+  <div class="p-txt"><h1>人員名單管理</h1>
   <p class="sub">這裡管理誰可以登入入口網站、是什麼身份。同仁忘記通行碼時，按該員的「看通行碼」查看（20 秒後自動隱藏，<b>每次查看都會留下紀錄</b>）；要換通行碼請按「編輯」直接設定新的 6 位數字。停用或改身份後，最多 5 分鐘內各系統生效。</p>
-  <div class="bar"><button class="btn main" id="add">＋ 新增人員</button><button class="btn sec" id="reload">重新整理</button></div>
-  <div class="msg" id="msg"></div>
-  <div class="tbl" id="tbl"><div class="empty">載入中…</div></div>
+  <div class="bar"><button class="btn main" id="add"><i class="p-ico" style="--ico:url(../assets/people/icon-add.webp)"></i>新增人員</button><button class="btn sec" id="reload"><i class="p-ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button></div></div></div>
+  <div class="p-cols">
+    <aside class="p-side">
+      <div class="p-card"><div class="p-ttl">身份統計<span>點一下只看該身份</span></div><div id="stats"></div></div>
+      <div class="p-note"><img src="../assets/people/icon-log.webp" alt=""><div><b>每次查看通行碼都會留下紀錄</b><br>按「看通行碼」後 20 秒自動隱藏，再按一下也能馬上隱藏。</div></div>
+      <div class="p-note p-note2"><img src="../assets/people/icon-same-name.webp" alt=""><div>同名的同仁請在名字加上能分辨的字，例如「(2樓)」。</div></div>
+    </aside>
+    <section class="p-main">
+      <div class="msg" id="msg"></div>
+      <div class="tbl" id="tbl"><div class="empty"><img class="p-state" src="../assets/common/state-loading.webp" alt="">載入中…</div></div>
+    </section>
+  </div>
 </main>
 
 <div class="modal" id="modal"><div class="box">
   <h2 id="mt">新增人員</h2>
   <div class="f"><label for="fName">姓名</label><input id="fName" type="text" maxlength="20" autocomplete="off"><div class="hint" id="nameHint">登入時要打的姓名（不分大小寫、空白）。</div></div>
-  <div class="f"><label for="fRole">身份</label><select id="fRole"><option value="manager">主管</option><option value="admin">行政</option><option value="nurseadmin">護理行政</option><option value="nurse">護理</option><option value="care">照服</option></select></div>
-  <div class="f"><label for="fCode">通行碼</label><input id="fCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password" placeholder="6 位數字"><div class="hint" id="codeHint">每人自己的 6 位數字，不要重複、不要用 123456 或生日。</div></div>
+  <div class="f"><label for="fRole">身份</label><select id="fRole"><option value="manager">主管</option><option value="admin">行政</option><option value="nurseadmin">護理行政</option><option value="nurse">護理</option><option value="care">照服</option></select><div class="p-roles" id="roleTiles"></div></div>
+  <div class="f"><label for="fCode"><i class="p-ico" style="--ico:url(../assets/people/icon-key.webp)"></i>通行碼</label><input id="fCode" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="new-password" placeholder="6 位數字"><div class="hint" id="codeHint">每人自己的 6 位數字，不要重複、不要用 123456 或生日。</div></div>
   <div class="f chk"><label><input id="fActive" type="checkbox" checked> 啟用（取消勾選＝停用，無法登入）</label></div>
   <div class="msg err" id="fMsg"></div>
   <div class="btns"><button class="btn sec" id="cancel">取消</button><button class="btn main" id="save">儲存</button></div>
@@ -71,6 +215,34 @@ var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1
 var $ = function(id){ return document.getElementById(id); };
 var ROLES = { manager:"主管", admin:"行政", nurseadmin:"護理行政", nurse:"護理", care:"照服" };
 var people = [], editing = null, saving = false;
+var FILTER = "";   // 依身份篩選（空＝全部）
+var ROLE_ICON = function(r){ return "../assets/people/role-" + (ROLES[r] ? r : "admin") + ".webp"; };
+function pico(n){ return '<i class="p-ico" style="--ico:url(../assets/' + n + '.webp)"></i>'; }
+function pstate(n, w, t){ return '<div class="empty"><img class="p-state" src="../assets/' + n + '.webp" alt="" style="width:' + w + 'px">' + t + '</div>'; }
+function fmtLast(v){
+  if(!v) return "尚未登入";
+  var d = new Date(v); if(isNaN(d)) return esc(v);
+  var z = function(n){ return ("0"+n).slice(-2); };
+  return d.getFullYear()+"/"+z(d.getMonth()+1)+"/"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes());
+}
+function drawStats(){
+  var el = $("stats"); if(!el) return;
+  var cnt = {}; people.forEach(function(p){ cnt[p.role] = (cnt[p.role]||0) + (p.active?1:0); });
+  var off = people.filter(function(p){ return !p.active; }).length;
+  el.innerHTML = '<button class="p-st'+(FILTER===""?" on":"")+'" data-f=""><span class="p-st-ic">'+pico("people/icon-active")+'</span>全部<b>'+(people.length-off)+'</b></button>' +
+    Object.keys(ROLES).map(function(r){
+      return '<button class="p-st'+(FILTER===r?" on":"")+'" data-f="'+r+'"><img src="'+ROLE_ICON(r)+'" alt="">'+ROLES[r]+'<b>'+(cnt[r]||0)+'</b></button>';
+    }).join("") +
+    '<button class="p-st'+(FILTER==="off"?" on":"")+'" data-f="off"><span class="p-st-ic">'+pico("people/icon-disabled")+'</span>已停用<b>'+off+'</b></button>';
+  el.querySelectorAll("[data-f]").forEach(function(b){ b.onclick=function(){ FILTER=b.dataset.f; draw(); }; });
+}
+function drawRoleTiles(){
+  var box = $("roleTiles"); if(!box) return;
+  box.innerHTML = Object.keys(ROLES).map(function(r){
+    return '<button type="button" class="p-role'+($("fRole").value===r?" on":"")+'" data-r="'+r+'"><img src="'+ROLE_ICON(r)+'" alt="">'+ROLES[r]+'</button>';
+  }).join("");
+  box.querySelectorAll("[data-r]").forEach(function(b){ b.onclick=function(){ $("fRole").value=b.dataset.r; drawRoleTiles(); }; });
+}
 function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
 function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
@@ -85,15 +257,17 @@ function say(el,text,ok){ el.textContent=text||""; el.className="msg "+(ok?"ok":
 function load(){
   say($("msg"),"");
   call({action:"people.list"}).then(function(j){
-    if(!j || !j.ok){ $("tbl").innerHTML='<div class="empty">'+(j&&j.error==="forbidden"?"只有主管可以使用這個頁面。":"載入失敗，請稍後再試。")+'</div>'; return; }
+    if(!j || !j.ok){ $("tbl").innerHTML=(j&&j.error==="forbidden"?pstate("people/state-manager-only",170,"只有主管可以使用這個頁面。"):pstate("common/state-error",120,"載入失敗，請稍後再試。")); return; }
     people=j.people||[]; draw();
-  }).catch(function(e){ if(e.message!=="unauthorized") $("tbl").innerHTML='<div class="empty">連線失敗，請檢查網路後重新整理。</div>'; });
+  }).catch(function(e){ if(e.message!=="unauthorized") $("tbl").innerHTML=pstate("common/state-offline",120,"連線失敗，請檢查網路後重新整理。"); });
 }
 function draw(){
-  if(!people.length){ $("tbl").innerHTML='<div class="empty">還沒有任何人員</div>'; return; }
+  drawStats();
+  if(!people.length){ $("tbl").innerHTML=pstate("common/state-empty",110,"還沒有任何人員"); return; }
   var rows=people.map(function(p,i){
-    return '<div class="row'+(p.active?'':' off')+'"><div><b>'+esc(p.name)+'</b></div><div class="c-role"><span class="tag'+(p.role==="manager"?' m':'')+'">'+esc(ROLES[p.role]||p.role)+'</span></div><div class="c-st"><span class="tag'+(p.active?'':' x')+'">'+(p.active?'啟用':'停用')+'</span></div><div class="c-last">'+(p.last?esc(p.last):'尚未登入')+'</div><div class="act"><button class="code" data-c="'+i+'">看通行碼</button><button data-e="'+i+'">編輯</button></div></div>';
-  }).join("");
+    if(FILTER==="off" ? p.active : (FILTER && (p.role!==FILTER || !p.active))) return "";
+    return '<div class="row'+(p.active?'':' off')+'"><div class="c-name"><b>'+esc(p.name)+'</b></div><div class="c-role"><span class="tag r-'+esc(p.role)+'"><img src="'+ROLE_ICON(p.role)+'" alt="">'+esc(ROLES[p.role]||p.role)+'</span></div><div class="c-st"><span class="tag st'+(p.active?'':' x')+'">'+pico(p.active?'people/icon-active':'people/icon-disabled')+(p.active?'啟用':'停用')+'</span></div><div class="c-last">'+pico('common/icon-clock')+fmtLast(p.last)+'</div><div class="act"><button class="code" data-c="'+i+'">看通行碼</button><button class="edit" data-e="'+i+'">'+pico('common/icon-edit')+'編輯</button></div></div>';
+  }).join("") || pstate("common/state-empty",90,"這個身份目前沒有人員");
   $("tbl").innerHTML='<div class="row h"><div>姓名</div><div>身份</div><div>狀態</div><div>最近登入</div><div></div></div>'+rows;
   $("tbl").querySelectorAll("[data-e]").forEach(function(b){ b.onclick=function(){ openForm(people[+b.dataset.e]); }; });
   $("tbl").querySelectorAll("[data-c]").forEach(function(b){ b.onclick=function(){ showCode(b, people[+b.dataset.c]); }; });
@@ -112,7 +286,7 @@ function hideCode(b){ clearTimeout(b._t); b.classList.remove("on"); b.textConten
 function openForm(p){
   editing=p||null; $("mt").textContent=p?"編輯人員":"新增人員";
   $("fName").value=p?p.name:""; $("fName").disabled=!!p; $("fRole").value=p?p.role:"nurse"; $("fCode").value="";
-  $("fActive").checked=p?!!p.active:true;
+  $("fActive").checked=p?!!p.active:true; drawRoleTiles();
   $("nameHint").textContent=p?"姓名不能修改；要改名請新增一位並停用舊的。":"登入時要打的姓名（不分大小寫、空白）。";
   $("codeHint").textContent=p?"要換通行碼才填（6 位數字）；不換請留空。":"每人自己的 6 位數字，不要重複、不要用 123456 或生日。";
   say($("fMsg"),""); $("modal").classList.add("show"); setTimeout(function(){ try{ (p?$("fCode"):$("fName")).focus(); }catch(e){} },30);
