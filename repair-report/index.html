@@ -6,9 +6,9 @@
 <title>維修報修（護理／照服）</title>
 <style>
   :root{
-    --bg:#F5F4EE; --ink:#1F2320; --sub:#45483F; --sub2:#6A6E62; --sub3:#8A8E80;
-    --green:#3E7530; --green2:#5C9A45; --gl:#E3F0D5; --gl2:#F4FAEE; --gd:#D8EBC4;
-    --line:rgba(31,35,32,.16); --line2:rgba(31,35,32,.22);
+    --bg:#FAF8EF; --ink:#092F25; --sub:#3E5A4C; --sub2:#4D695A; --sub3:#7A8C80;
+    --green:#1D5049; --green2:#27675F; --gl:#E6F1EE; --gl2:#F1F7F5; --gd:#CFE3DD;
+    --line:#E3E5D8; --line2:#D3D8C8;
     --amber:#C07817; --amberbg:#FBF3E2;
     --red:#B4402F; --redbg:#FBEEE9;
     --err:#8F3F2C; --errbg:#FBEEE9; --errln:#B4553C;
@@ -36,7 +36,7 @@
     border:1px solid var(--line2);border-radius:11px;padding:12px 13px;background:#fff;-webkit-appearance:none;appearance:none}
   select{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%236A6E62' stroke-width='2'><path d='M3 5l4 4 4-4'/></svg>");
     background-repeat:no-repeat;background-position:right 13px center;padding-right:36px}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px rgba(92,154,69,.15)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--green2);box-shadow:0 0 0 3px rgba(39,103,95,.15)}
   textarea{resize:vertical;min-height:92px;line-height:1.55}
 
   .seg{display:flex;gap:8px}
@@ -76,12 +76,71 @@
   .done p{margin:0 0 22px;color:var(--sub2);font-size:14px}
   .done .no{display:inline-block;font-family:ui-monospace,Menlo,monospace;background:#fff;border:1px solid var(--line);
     border-radius:8px;padding:4px 12px;color:var(--sub);margin-bottom:22px;font-size:14px}
+
+  /* ===== 水彩風（同入口網站；維修系統主色＝淡藍綠）===== */
+  body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+  .wrap{position:relative;z-index:1}
+  .v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:2147483647;display:flex;align-items:center;gap:14px;padding:0 20px;
+    background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8;box-sizing:border-box}
+  .v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#14563F;color:#fff!important;border-radius:999px;
+    font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+  .v-tb-logo{height:40px;width:auto;flex:none}
+  .v-tb-title{font:900 19px 'Noto Serif TC',serif;color:#27675F;border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+  header{position:relative;top:auto;overflow:hidden;isolation:isolate;margin:14px 0 16px;padding:16px 20px 16px 90px;min-height:96px;
+    background:#EEF5F2;border:0;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+  .r-leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.75;z-index:-1}
+  .r-art{position:absolute;right:130px;bottom:0;height:100%;width:auto;max-width:42%;object-fit:contain;object-position:right bottom;z-index:-1}
+  h1{font:900 26px/1.25 'Noto Serif TC',serif;color:#092F25}
+  h1 .sub{font-family:'Noto Sans TC',sans-serif;font-size:13px;color:#4D695A}
+  .langs button{border-radius:999px;background:#FFFDF8;padding:6px 12px}
+  label{color:#3E5A4C}
+  select.as-tiles{display:none}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}
+  .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:84px;padding:8px 4px;border:1px solid #D3D8C8;
+    background:#FFFDF8;border-radius:14px;font:600 13.5px/1.3 'Noto Sans TC',sans-serif;color:#3E5A4C;cursor:pointer;text-align:center}
+  .tile img{width:34px;height:34px}
+  .tile:hover{border-color:#7FB3A8}
+  .tile.on{background:#27675F;border-color:#27675F;color:#fff}
+  .tile.on img{filter:brightness(0) invert(1)}
+  .tiles[data-kind="dept"]{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}
+  .tile.txt{min-height:44px;border-radius:999px;font-size:14px}
+  .seg button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px}
+  .pri-ico{width:22px;height:22px}
+  .addp{border-radius:14px}
+  .ic-cam{width:28px;height:28px;opacity:.75}
+  .btn{border-radius:999px}
+  .done-art{display:block;width:190px;height:auto;margin:0 auto 12px}
+  .done h2{font-family:'Noto Serif TC',serif;font-weight:900;color:#092F25}
+  /* 寬螢幕：左邊基本資料，右邊地點與設備 */
+  @media (min-width:900px){
+    .wrap{max-width:1180px;padding:0 20px 40px}
+    #main{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);column-gap:28px;align-items:start;
+      grid-template-areas:"err err" "rep loc" "dept loc" "pri loc" "desc cat" "photo cat" "btn btn"}
+    #main .banner{grid-area:err}
+    .f-rep{grid-area:rep}.f-dept{grid-area:dept}.f-pri{grid-area:pri}.f-desc{grid-area:desc}.f-photo{grid-area:photo}
+    .f-loc{grid-area:loc}.f-cat{grid-area:cat}
+    #f_submit{grid-area:btn;max-width:420px;justify-self:center;margin-top:4px}
+    #main .done{grid-column:1/-1}
+    .tiles{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+  }
+  @media (max-width:600px){
+    .v-topbar{height:56px;padding:0 12px;gap:10px}
+    body{padding-top:56px!important}
+    .v-tb-logo{display:none}
+    header{padding:14px 12px 14px 56px;min-height:80px}
+    .r-art{right:0;opacity:.35;max-width:55%}
+    h1{font-size:21px}
+    .tiles{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .tile{min-height:78px;font-size:12.5px}
+  }
 </style>
 </head>
 <body>
-<!--BACK_TO_PORTAL--><style>body{padding-top:46px !important}</style><div style="position:fixed;top:0;left:0;right:0;height:46px;z-index:2147483647;display:flex;align-items:center;gap:10px;padding:0 14px;background:rgba(255,253,248,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #e6ded0;box-shadow:0 2px 10px rgba(28,43,35,.06);box-sizing:border-box"><a href="../index.html" style="flex:none;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:linear-gradient(120deg,#2f9e6b,#1c6b48);color:#fff;border-radius:999px;font:600 13px/1 'Noto Sans TC','PingFang TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 10px rgba(28,107,72,.28)">&larr; 入口網站</a><span style="min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font:500 12.5px/1 'Noto Sans TC',system-ui,sans-serif;color:#93a096;letter-spacing:1px">線東大眾護理之家 · 系統整合入口</span></div>
+<!--BACK_TO_PORTAL--><style>body{padding-top:64px !important}</style><div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">維修報修</span></div>
 <div class="wrap">
   <header>
+    <img class="r-leaf" src="../portal-img/leaf-teal-l.webp" alt="">
+    <img class="r-art" src="../assets/repair/banner-report.webp" alt="">
     <h1 id="title">維修報修<span class="sub" id="subtitle">線東大眾護理之家</span></h1>
     <div class="langs" id="langs"></div>
   </header>
@@ -191,6 +250,18 @@ var state = {
   lang: (function(){ var l=localStorage.getItem('portal_lang'); return I18N[l]?l:'zh'; })(),
   submitting:false, done:null, err:''
 };
+var LOC_ICON = {'一樓護理站':'loc-nurse-station','二樓護理站':'loc-nurse-station','三樓護理站':'loc-nurse-station','住民房間':'loc-room','公共衛浴':'loc-bathroom',
+  '廚房':'loc-kitchen','餐廳':'loc-dining','洗衣間':'loc-laundry','電梯':'loc-elevator','走廊':'loc-corridor','大廳':'loc-lobby','辦公室':'loc-office','庫房':'loc-storage','屋頂/戶外':'loc-outdoor'};
+var CAT_ICON = {'水電':'cat-plumbing','照明燈具':'cat-lighting','冷氣/空調':'cat-aircon','熱水器/鍋爐':'cat-heater','門窗/門鎖':'cat-door','病床/氣墊床':'cat-bed',
+  '輪椅/助行器':'cat-wheelchair','管路/給皂機':'cat-soap','家具':'cat-furniture','資訊/網路/電話':'cat-network','消防/警報':'cat-fire','電梯':'loc-elevator','漏水/排水':'cat-leak'};
+// 圖示格子（點選後寫回原本隱藏的下拉選單與 f 的值）
+function tilesHtml(kind, cur, map){
+  return '<div class="tiles" data-kind="'+kind+'">'+OPTS[kind].map(function(o){
+    var ic = map ? (map[o.v] || 'cat-other') : '';
+    return '<button type="button" class="tile'+(o.v===cur?' on':'')+(map?'':' txt')+'" data-v="'+esc(o.v)+'">'+
+      (map ? '<img src="../assets/repair/'+ic+'.webp" alt="">' : '')+'<span>'+esc(optLabel(o))+'</span></button>';
+  }).join('')+'</div>';
+}
 var f = { reporter:'', org:'', dept:'', priority:'一般', location:'', category:'', desc:'', photos:[] };
 // 預填報修人／機構（機構為入口網固定寫入的單一機構值，無 UI）
 f.reporter = (localStorage.getItem('handover_name')||'').trim();
@@ -294,21 +365,21 @@ function renderForm(){
   var m=document.getElementById('main');
   m.innerHTML=
     '<div class="banner" id="err"></div>'+
-    '<div class="field"><label>'+esc(t('reporter'))+'<span class="req">＊</span></label>'+
+    '<div class="field f-rep"><label>'+esc(t('reporter'))+'<span class="req">＊</span></label>'+
       '<input id="f_reporter" placeholder="'+esc(t('reporterPh'))+'" value="'+esc(f.reporter)+'"></div>'+
-    '<div class="field"><label>'+esc(t('dept'))+'</label><select id="f_dept">'+optionsHtml('dept',f.dept)+'</select></div>'+
-    '<div class="field"><label>'+esc(t('priority'))+'<span class="req">＊</span></label>'+
+    '<div class="field f-dept"><label>'+esc(t('dept'))+'</label><select id="f_dept" class="as-tiles">'+optionsHtml('dept',f.dept)+'</select>'+tilesHtml('dept',f.dept,null)+'</div>'+
+    '<div class="field f-pri"><label>'+esc(t('priority'))+'<span class="req">＊</span></label>'+
       '<div class="seg" id="f_seg">'+
         ['緊急','一般','低'].map(function(v){
           var lbl = v==='緊急'?t('pUrgent'):(v==='低'?t('pLow'):t('pNormal'));
-          return '<button type="button" data-v="'+v+'" class="'+(f.priority===v?'on':'')+'"><span class="dot"></span>'+esc(lbl)+'</button>';
+          return '<button type="button" data-v="'+v+'" class="'+(f.priority===v?'on':'')+'"><img class="pri-ico" src="../assets/repair/urgency-'+(v==='緊急'?'high':v==='低'?'low':'normal')+'.webp" alt="">'+esc(lbl)+'</button>';
         }).join('')+
       '</div></div>'+
-    '<div class="field"><label>'+esc(t('location'))+'<span class="req">＊</span></label><select id="f_location">'+optionsHtml('location',f.location)+'</select></div>'+
-    '<div class="field"><label>'+esc(t('category'))+'<span class="req">＊</span></label><select id="f_category">'+optionsHtml('category',f.category)+'</select></div>'+
-    '<div class="field"><label>'+esc(t('desc'))+'<span class="req">＊</span></label>'+
+    '<div class="field f-loc"><label>'+esc(t('location'))+'<span class="req">＊</span></label><select id="f_location" class="as-tiles">'+optionsHtml('location',f.location)+'</select>'+tilesHtml('location',f.location,LOC_ICON)+'</div>'+
+    '<div class="field f-cat"><label>'+esc(t('category'))+'<span class="req">＊</span></label><select id="f_category" class="as-tiles">'+optionsHtml('category',f.category)+'</select>'+tilesHtml('category',f.category,CAT_ICON)+'</div>'+
+    '<div class="field f-desc"><label>'+esc(t('desc'))+'<span class="req">＊</span></label>'+
       '<textarea id="f_desc" placeholder="'+esc(t('descPh'))+'">'+esc(f.desc)+'</textarea></div>'+
-    '<div class="field"><label>'+esc(t('photo'))+' <span style="color:var(--sub3);font-weight:500">'+esc(t('optional'))+'</span></label>'+
+    '<div class="field f-photo"><label>'+esc(t('photo'))+' <span style="color:var(--sub3);font-weight:500">'+esc(t('optional'))+'</span></label>'+
       '<div class="photos" id="f_photos"></div></div>'+
     '<button class="btn" id="f_submit">'+esc(t('submit'))+'</button>';
 
@@ -320,6 +391,13 @@ function renderForm(){
   document.querySelectorAll('#f_seg button').forEach(function(b){
     b.onclick=function(){ document.querySelectorAll('#f_seg button').forEach(function(x){x.classList.remove('on');}); b.classList.add('on'); f.priority=b.dataset.v; };
   });
+  document.querySelectorAll('.tiles').forEach(function(box){
+    var kind=box.getAttribute('data-kind'), sel=document.getElementById('f_'+kind);
+    box.querySelectorAll('.tile').forEach(function(b){
+      b.onclick=function(){ box.querySelectorAll('.tile').forEach(function(x){x.classList.remove('on');}); b.classList.add('on');
+        f[kind]=b.getAttribute('data-v'); if(sel) sel.value=f[kind]; };
+    });
+  });
   document.getElementById('f_submit').onclick=submit;
   renderPhotos();
   if(state.err){ var e=document.getElementById('err'); e.textContent=t(state.err); e.classList.add('err'); }
@@ -330,7 +408,7 @@ function renderPhotos(){
   box.innerHTML=f.photos.map(function(b64,i){
     return '<div class="p"><img src="data:image/jpeg;base64,'+b64+'"><button type="button" class="x" data-i="'+i+'">✕</button></div>';
   }).join('')+
-  '<label class="addp"><span class="ic">＋</span>'+esc(t('addPhoto'))+'<input type="file" accept="image/*" capture="environment" multiple style="display:none"></label>';
+  '<label class="addp"><img class="ic-cam" src="../assets/common/icon-camera.webp" alt="">'+esc(t('addPhoto'))+'<input type="file" accept="image/*" capture="environment" multiple style="display:none"></label>';
   var inp=box.querySelector('input[type=file]');
   inp.onchange=function(){
     var files=Array.prototype.slice.call(inp.files); if(!files.length) return;
@@ -343,7 +421,7 @@ function renderDone(){
   var m=document.getElementById('main');
   m.innerHTML=
     '<div class="done">'+
-      '<div class="ico">✓</div>'+
+      '<img class="done-art" src="../assets/repair/state-sent.webp" alt="">'+
       '<h2>'+esc(t('okTitle'))+'</h2>'+
       '<p>'+esc(t('okMsg'))+'</p>'+
       '<div class="no">'+esc(state.done)+'</div><br>'+
