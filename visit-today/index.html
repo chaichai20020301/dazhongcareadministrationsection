@@ -58,6 +58,24 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
   .v-hero-title{font-size:23px}
   .v-page-leaf{width:60px;opacity:.6}
 }
+#print-area{display:none}
+.pr-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;margin:0 0 12px;background:#F5F6E6;border:1px solid #E3E5D8;border-radius:14px}
+.pr-row label{font:700 12.5px 'Noto Sans TC';color:#4D695A}
+.pr-row input{padding:8px 10px;background:#fff;border:1px solid #E3E5D8;border-radius:10px;font:700 14px 'Noto Sans TC';color:#14563F}
+#btn-print{margin-left:auto;padding:9px 18px;border:0;background:#14563F;color:#fff;border-radius:999px;font:700 13.5px 'Noto Sans TC';box-shadow:0 3px 8px rgba(20,86,63,.22)}
+@media print{
+  @page{size:A4;margin:14mm}
+  html,body{background:#fff!important;padding:0!important}
+  body>*:not(#print-area){display:none!important}
+  #print-area{display:block;font-family:'Noto Sans TC',sans-serif;color:#000}
+  #print-area h1{font:900 22px 'Noto Serif TC',serif;margin:0 0 4px}
+  #print-area .pr-meta{font:400 12px 'Noto Sans TC';color:#444;margin-bottom:10px}
+  #print-area table{width:100%;border-collapse:collapse}
+  #print-area th,#print-area td{border:1px solid #333;padding:7px 8px;text-align:left;font:400 14px 'Noto Sans TC';vertical-align:middle}
+  #print-area th{background:#eee;font-weight:700}
+  #print-area tr{page-break-inside:avoid}
+  #print-area td.chk{width:60px}
+}
 </style>
 </head>
 <body>
@@ -94,6 +112,7 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
 </div>
 <button id="btn-today" style="flex:none;padding:11px 15px;border:1px solid #D3D8C8;background:#fff;color:#14563F;border-radius:12px;font:700 13px 'Noto Sans TC'"></button>
 </div>
+<div class="pr-row"><label id="lab-print" for="p-date"></label><input type="date" id="p-date"><button id="btn-print"></button></div>
 <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 10px">
 <div id="t-count" style="font:700 13px 'Noto Sans TC';color:#4D695A"></div>
 <button id="btn-refresh" style="border:1px solid #D3D8C8;background:#fff;color:#14563F;padding:7px 14px;border-radius:20px;font:700 12.5px 'Noto Sans TC'"></button>
@@ -105,6 +124,7 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
 </div>
 </div>
 
+<div id="print-area"></div>
 <script>
 (function(){
   var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
@@ -117,17 +137,17 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
     zh: { title:"探視名單查詢", sub:"預設顯示今日，可依日期或住民姓名查詢", date:"日期", name:"住民姓名", namePh:"輸入姓名查詢（跨日期）",
           today:"今日", resident:"住民", family:"家屬", room:"房號",
           empty:"此日期尚無探視預約", emptySearch:"查無符合的住民", loading:"讀取中…", offline:"連線失敗，請稍後再試",
-          refresh:"重新整理", count:function(n){return "共 "+n+" 筆";}, synced:"已更新 ", locale:"zh-TW",
+          refresh:"重新整理", printDate:"列印日期", print:"列印名單", prTitle:"探視名單", prTime:"時間", prBed:"床號", prName:"住民", prCheck:"到訪", prTotal:function(n){return "共 "+n+" 筆";}, prPrinted:"列印時間：", prNone:"該日期沒有探視預約，仍要列印空白名單嗎？", prLoading:"資料還在讀取，請稍後再按一次", count:function(n){return "共 "+n+" 筆";}, synced:"已更新 ", locale:"zh-TW",
           mismatch:"通行碼與探視系統不符，請洽管理員", busy:"系統忙碌，請稍後再試", roleBlocked:"此頁僅限工作人員使用", backPortal:"返回入口網站" },
     id: { title:"Cari Daftar Kunjungan", sub:"Default hari ini; cari per tanggal atau nama penghuni", date:"Tanggal", name:"Nama penghuni", namePh:"Cari nama (semua tanggal)",
           today:"Hari ini", resident:"Penghuni", family:"Keluarga", room:"Kamar",
           empty:"Tidak ada kunjungan di tanggal ini", emptySearch:"Penghuni tidak ditemukan", loading:"Memuat…", offline:"Gagal terhubung, coba lagi",
-          refresh:"Muat ulang", count:function(n){return "Total "+n;}, synced:"Diperbarui ", locale:"id-ID",
+          refresh:"Muat ulang", printDate:"Tanggal cetak", print:"Cetak daftar", prTitle:"Daftar Kunjungan", prTime:"Jam", prBed:"Tempat tidur", prName:"Penghuni", prCheck:"Hadir", prTotal:function(n){return "Total "+n;}, prPrinted:"Dicetak: ", prNone:"Tidak ada kunjungan di tanggal ini. Tetap cetak daftar kosong?", prLoading:"Data masih dimuat, coba lagi sebentar", count:function(n){return "Total "+n;}, synced:"Diperbarui ", locale:"id-ID",
           mismatch:"Kode akses tidak cocok dengan sistem kunjungan, hubungi admin", busy:"Sistem sibuk, coba lagi nanti", roleBlocked:"Halaman ini khusus staf", backPortal:"Kembali ke portal" },
     vi: { title:"Tra cứu lịch thăm", sub:"Mặc định hôm nay; tìm theo ngày hoặc tên người cao tuổi", date:"Ngày", name:"Tên người cao tuổi", namePh:"Tìm theo tên (mọi ngày)",
           today:"Hôm nay", resident:"Người cao tuổi", family:"Người nhà", room:"Phòng",
           empty:"Ngày này chưa có lượt thăm", emptySearch:"Không tìm thấy", loading:"Đang tải…", offline:"Kết nối thất bại, thử lại",
-          refresh:"Tải lại", count:function(n){return "Tổng "+n;}, synced:"Đã cập nhật ", locale:"vi-VN",
+          refresh:"Tải lại", printDate:"Ngày in", print:"In danh sách", prTitle:"Danh sách thăm", prTime:"Giờ", prBed:"Giường", prName:"Người cao tuổi", prCheck:"Đã đến", prTotal:function(n){return "Tổng "+n;}, prPrinted:"Thời gian in: ", prNone:"Ngày này chưa có lượt thăm. Vẫn in danh sách trống?", prLoading:"Dữ liệu đang tải, thử lại sau", count:function(n){return "Tổng "+n;}, synced:"Đã cập nhật ", locale:"vi-VN",
           mismatch:"Mã truy cập không khớp hệ thống thăm, liên hệ quản trị", busy:"Hệ thống bận, thử lại sau", roleBlocked:"Trang chỉ dành cho nhân viên", backPortal:"Về trang cổng" }
   };
 
@@ -171,6 +191,8 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
     $("q-name").placeholder = T.namePh;
     $("btn-today").innerText = T.today;
     $("btn-refresh").innerText = T.refresh;
+    $("lab-print").innerText = T.printDate;
+    $("btn-print").innerText = T.print;
     var btns = document.querySelectorAll(".langbtn");
     for(var i=0;i<btns.length;i++){ btns[i].className = "langbtn" + (btns[i].getAttribute("data-lang")===lang ? " on" : ""); }
   }
@@ -219,6 +241,25 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
           + (fam ? '<div style="font:400 13px \'Noto Sans TC\';color:#4D695A">'+esc(T.family)+'：'+fam+'</div>' : '')
         + '</div></div>';
     }).join("");
+  }
+
+  function tomorrowStr(){ var d=new Date(); d.setDate(d.getDate()+1); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+  function printList(){
+    var T = I18N[lang];
+    if(cache === null){ alert(T.prLoading); return; }
+    var d = normDate($("p-date").value) || tomorrowStr();
+    var rows = cache.filter(function(r){ return normDate(r.date) === d; }).sort(cmpRow);
+    if(!rows.length && !confirm(T.prNone)) return;
+    var wd = new Date(d+"T00:00:00").toLocaleDateString(T.locale, {weekday:"long"});
+    var now = new Date();
+    var body = rows.map(function(r){
+      return "<tr><td>"+esc(r.time||"")+"</td><td>"+esc(bedOf(r))+"</td><td>"+esc(nameNoBed(r.residentName||r.name||""))+"</td><td>"+esc(r.familyName||"")+'</td><td class="chk"></td></tr>';
+    }).join("");
+    $("print-area").innerHTML = "<h1>"+esc(T.prTitle)+"　"+esc(d)+"（"+esc(wd)+"）</h1>"
+      + '<div class="pr-meta">'+esc(T.prTotal(rows.length))+"　｜　"+esc(T.prPrinted)+esc(now.toLocaleString(T.locale))+"</div>"
+      + "<table><thead><tr><th>"+esc(T.prTime)+"</th><th>"+esc(T.prBed)+"</th><th>"+esc(T.prName)+"</th><th>"+esc(T.family)+"</th><th>"+esc(T.prCheck)+"</th></tr></thead><tbody>"+body+"</tbody></table>";
+    window.print();
   }
 
   function setSync(text, err){ $("sync").innerText = text; $("sync").style.color = err ? "#B65B16" : "#A7B3AA"; }
@@ -278,6 +319,8 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
   $("q-name").addEventListener("input", render);
   $("btn-today").onclick = function(){ $("q-name").value = ""; $("q-date").value = todayStr(); render(); };
   $("btn-refresh").onclick = load;
+  $("p-date").value = tomorrowStr();
+  $("btn-print").onclick = printList;
 
   var btns = document.querySelectorAll(".langbtn");
   for(var i=0;i<btns.length;i++){
