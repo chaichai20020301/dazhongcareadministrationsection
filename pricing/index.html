@@ -207,6 +207,7 @@
   .btn-set::before{content:"";width:18px;height:18px;background:currentColor;flex:none}
   #btnRefresh::before{-webkit-mask:url(../assets/common/icon-refresh.webp) center/contain no-repeat;mask:url(../assets/common/icon-refresh.webp) center/contain no-repeat}
   #btnExport::before{-webkit-mask:url(../assets/common/icon-download.webp) center/contain no-repeat;mask:url(../assets/common/icon-download.webp) center/contain no-repeat}
+  #btnDays::before{-webkit-mask:url(../assets/common/icon-calendar-small.webp) center/contain no-repeat;mask:url(../assets/common/icon-calendar-small.webp) center/contain no-repeat}
   #btnResidents::before{-webkit-mask:url(../assets/pricing/icon-residents.webp) center/contain no-repeat;mask:url(../assets/pricing/icon-residents.webp) center/contain no-repeat}
   #btnSettings::before{-webkit-mask:url(../assets/pricing/icon-settings.webp) center/contain no-repeat;mask:url(../assets/pricing/icon-settings.webp) center/contain no-repeat}
   .wrap{position:relative;z-index:1;padding:12px 14px 16px;max-width:1500px;margin:0 auto}
@@ -250,6 +251,26 @@
     header .user{flex-basis:100%}
   }
 
+  /* 傷口計價卡片（可合併多處） */
+  .acard.wcard{flex-direction:column;align-items:stretch}
+  .acard.wcard.need{border-left-color:#C0392B}
+  .wcard .wsub{color:var(--muted);font-size:13px;margin:-4px 0 2px}
+  .wcard .wmem{padding:8px 10px;border:1px dashed var(--line);border-radius:10px;background:#FFFCF6}
+  .wcard .wmem.out{opacity:.65}
+  .wcard .mtag{font-size:12.5px;color:var(--muted);align-self:center}
+  .wcard .wr-act{align-self:flex-end;margin-left:auto}
+  .wacts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .wacts.wr-act{margin-left:0;align-self:stretch}
+  .wlog{font-size:13px;color:var(--muted)}
+  .wlog summary{cursor:pointer;font-weight:700}
+  .wlog ul{margin:4px 0 0 18px;padding:0}
+  .nbadge{background:#FDECEA;color:#A93226;border:1px solid #F1B8B0;border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700;margin-left:8px}
+  .btn-sub{background:#FFFDF8;border:1px solid #EDC58D;color:var(--brand-d);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer}
+  .btn-sub:hover{background:var(--accent)}
+  .apmerge{flex-basis:100%;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .mergelist{display:flex;flex-direction:column;gap:4px;margin:6px 0 4px;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .mergelist label{display:flex;gap:8px;align-items:center;font-size:15px;cursor:pointer}
+  .mergelist input{width:18px;height:18px}
 </style>
 </head>
 <body>
@@ -261,6 +282,7 @@
   <span class="sp"></span><img class="p-art" src="../assets/pricing/banner.webp" alt="">
   <button class="btn-set" id="btnRefresh" onclick="refreshAll()" title="重新抓取住民名單與計費資料">刷新</button>
   <button class="btn-set" id="btnExport" onclick="exportCSV()" title="匯出目前所有進行中的計價項目（Excel可開）">匯出總表</button>
+  <button class="btn-set" id="btnDays" onclick="openDaysDialog()" title="選月份，匯出每個項目在該月的期間與天數（Excel可開）">月份天數表</button>
   <button class="btn-set" id="btnResidents" onclick="openResidentsAdmin()" style="display:none">住民管理</button>
   <button class="btn-set" id="btnSettings" onclick="openSettings()" style="display:none">價目設定</button>
   <span class="user" id="userTag"></span>
@@ -421,14 +443,16 @@ function resEntries(rid){
   STATE.catalog.forEach(function(c){
     var raw=row.items[c.key];
     if(isWound(c.key)){
-      parseWounds(raw).forEach(function(w){
-        out.push({c:c, ended:!!w.e, title:c.label+(w.loc?('・'+w.loc):''),
-          text:[c.group,c.label,w.loc,w.freq,w.s,w.e,w.payer,w.pname,(w.payer?w.payer+'負擔':'')].join(' ')});
+      keyCards(row.items,c.key).forEach(function(cd){
+        var end=cardEnd(cd), locs=cardLocs(cd,!!end), mt=cd.members.map(function(m){ return [m.loc,m.freq,m.s,m.e].join(' '); }).join(' ');
+        out.push({c:c, ended:!!end, title:c.label+(locs?('・'+locs):''),
+          text:[c.group,c.label,mt,end,cd.payer,cd.pname,(cd.payer?cd.payer+'負擔':''),(cd.members.length>1?'合併':'')].join(' ')});
       });
     } else {
-      var pv=parseVal(c.key,raw); if(!pv.active) return;
-      out.push({c:c, ended:!!pv.end, title:c.label,
-        text:[c.group,c.label,pv.date,pv.raw,pv.end,pv.payer,pv.payerName,(pv.payer?pv.payer+'負擔':'')].join(' ')});
+      parseRecs(c.key,raw).forEach(function(r){
+        out.push({c:c, ended:!!r.e, title:c.label,
+          text:[c.group,c.label,r.s,r.raw,r.e,r.payer,r.pname,(r.payer?r.payer+'負擔':'')].join(' ')});
+      });
     }
   });
   return out;
@@ -494,8 +518,6 @@ function freqControlHtml(selId,numId,cur,onSelChg,onNumChg){
     +'<span class="lbl" id="'+numId+'_u"'+(show?'':' style="display:none"')+'>次/日</span>';
 }
 // 讀出換藥值（其他→N次/日）
-function woundFreqVal(key){ var s=gval('wf_'+key); if(s==='__num__'){ var n=(gval('wfn_'+key)||'').trim(); return n?(n+'次/日'):''; } return s; }
-function onWoundFreqChange(key){ var show=(gval('wf_'+key)==='__num__'); var n=document.getElementById('wfn_'+key), u=document.getElementById('wfn_'+key+'_u'); if(n)n.style.display=show?'':'none'; if(u)u.style.display=show?'':'none'; saveRow(key); }
 function onAddFreqChange(){ var show=(gval('ap_freq')==='__num__'); var n=document.getElementById('ap_freqn'), u=document.getElementById('ap_freqn_u'); if(n)n.style.display=show?'':'none'; if(u)u.style.display=show?'':'none'; }
 function today(){var d=new Date();return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
 function catByKey(key){return STATE.catalog.filter(function(c){return c.key===key;})[0];}
@@ -527,7 +549,6 @@ function parseVal(key,val){
   out.end=se.end; out.payer=sp.payer; out.payerName=sp.payerName;
   return out;
 }
-function combineWound(loc,d,freq){ loc=(loc||'').trim(); d=(d||'').trim(); freq=(freq||'').trim(); if(!loc&&!d&&!freq) return ''; var v=loc+'｜'+d; if(freq) v+='｜'+freq; return v; }
 // 負擔方下拉；家屬(預設)/機構/照服員/其他住民
 // 需要指名的負擔方 → 名字欄的提示文字
 var PAYER_NAMED={'照服員':'照服員姓名（多位用、分隔）','其他住民':'住民姓名（多位用、分隔）'};
@@ -552,20 +573,15 @@ function payerSelectHtml(id,cur,onchg){
   var opts=['家屬','機構','照服員','其他住民'].map(function(p){return '<option'+(p===cur?' selected':'')+'>'+esc(p)+'</option>';}).join('');
   return '<select id="'+id+'" onchange="'+onchg+'">'+opts+'</select>';
 }
-// 目前這格已存的 base/end/payer（供保留用）
-function curStored(key){ var row=STATE.data[STATE.current]; var raw=row&&row.items?row.items[key]:''; var sp=stripPayer(raw); var se=stripEnd(sp.base); return {base:se.base, end:se.end, payer:sp.payer, payerName:sp.payerName}; }
-// 改起始/結束/部位，保留負擔方
-function saveRow(key){
-  if(isWound(key) && !gval('loc_'+key).trim()){ alert('傷口必須填寫部位。'); renderActive(); return; }
-  var st=curStored(key);
-  var base = isWound(key) ? combineWound(gval('loc_'+key), gval('s_'+key), woundFreqVal(key)) : gval('s_'+key);
-  save(key, base + endTag(gval('e_'+key)) + payerTag(st.payer, st.payerName));
-}
-// 只改負擔方，保留起訖
-function savePayer(key,payer,name){ var st=curStored(key); save(key, st.base + endTag(st.end) + payerTag(payer,name)); }
-// 「照服員」「其他住民」需要指名；機構/家屬都不填
-function onCardPayerChange(key){ var payer=gval('pay_'+key); var el=document.getElementById('payn_'+key); applyPayerName(el,payer,true); savePayer(key,payer,''); }
-function onAddPayerChange(){ applyPayerName(document.getElementById('ap_payer_name'),gval('ap_payer_sel'),true); }
+// ===== 日期小工具（YYYY-MM-DD 字串；n＝自 1970 起的天數）=====
+function d2n(s){ var m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m?Math.round(Date.UTC(+m[1],m[2]-1,+m[3])/864e5):NaN; }
+function n2d(n){ var d=new Date(n*864e5); return d.getUTCFullYear()+'-'+('0'+(d.getUTCMonth()+1)).slice(-2)+'-'+('0'+d.getUTCDate()).slice(-2); }
+function addDays(s,k){ return n2d(d2n(s)+k); }
+function md(s){ var m=String(s||'').match(/^\d{4}-(\d{2})-(\d{2})$/); return m?((+m[1])+'/'+(+m[2])):(s||''); }
+function newId(){ return 'w'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+function dk(id){ return String(id).replace(/[^A-Za-z0-9_]/g,'_'); }   // 卡片 id → 可放進元素 id 的字
+function curItems(){ var row=STATE.data[STATE.current]; return row&&row.items?row.items:{}; }
+function onAddPayerChange(){ applyPayerName(document.getElementById('ap_payer_name'),gval('ap_payer_sel'),true); apMergeOpts(); }
 
 function curRes(){ var rid=STATE.current;
   return STATE.residents.filter(function(x){return x.rid===rid;})[0] || STATE.data[rid] || {}; }
@@ -578,96 +594,276 @@ function openResident(rid){
   html+='<h3 class="sec">目前進行中的計費項目</h3>';
   html+='<div id="activeList"></div>';
   if(!STATE.readOnly) html+='<div class="addbar"><button class="btn-add" onclick="openAddPanel()">＋ 新增計費項目</button></div>';
-  html+='<div class="total"><span class="hint">＊只記錄各計費項目的「起始～結束」；填了「結束」日期就會移到下方「已結束」（歷史仍保留）。</span>'
+  html+='<div class="total"><span class="hint">＊只記錄各計費項目的「起始～結束」；填了「結束」日期就會移到下方「已結束」。之後再新增同一個項目會另外多一筆，舊的紀錄會留著。</span>'
      +'<span class="saving" id="savingTag"></span></div>';
   document.getElementById('detail').innerHTML=html;
   renderActive();
 }
 
-// 每張卡片的欄位：部位(傷口)＋起始＋結束＋負擔方
+// 每張卡片的欄位
 function fld(label, inner){ return '<label class="fld"><span class="lbl">'+label+'</span>'+inner+'</label>'; }
-function acardFields(c, pv){
-  var k=c.key, f='';
-  if(isWound(k)){
-    f+=fld('部位','<input type="text" class="loc" id="loc_'+k+'" value="'+esc(pv.location||'')+'" placeholder="部位（必填）" onchange="saveRow(\''+k+'\')">');
-    f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf_'+k,'wfn_'+k, pv.freq||'', "onWoundFreqChange('"+k+"')", "saveRow('"+k+"')")+'</span>');
-  }
-  f+=fld('起始','<input type="date" class="sd" id="s_'+k+'" value="'+esc(pv.date||'')+'" onchange="saveRow(\''+k+'\')">');
-  f+=fld('結束','<input type="date" class="sd" id="e_'+k+'" value="'+esc(pv.end||'')+'" onchange="saveRow(\''+k+'\')">');
-  f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+k, pv.payer||'家屬', "onCardPayerChange('"+k+"')")
-    +payerNameInput('payn_'+k, pv.payer, pv.payerName, "savePayer('"+k+"',gval('pay_"+k+"'),this.value)")+'</span>');
+
+// ===== 一般項目＝可多筆：結束後再新增會另起一筆，舊的留在「已結束」=====
+// 只有一筆時存原本的格式「起始 ⟦結束⟧ ⟨負擔方⟩」；兩筆以上存 JSON 陣列 [{s,e,payer,pname}]
+function curRaw(key){ return curItems()[key]; }
+function parseRecs(key,val){
+  val=(val==null?'':String(val)).trim(); if(!val) return [];
+  if(val.charAt(0)==='['){ try{ var a=JSON.parse(val); if(Array.isArray(a)) return a; }catch(e){} }
+  var pv=parseVal(key,val); if(!pv.active) return [];
+  return [{s:pv.date||'', e:pv.end||'', payer:pv.payer||'家屬', pname:pv.payerName||'', raw:pv.raw||''}];
+}
+function recsValue(arr){
+  if(!arr.length) return '';
+  if(arr.length===1){ var r=arr[0]; return ((r.s||r.raw||'')+endTag(r.e)+payerTag(r.payer,r.pname)).trim(); }
+  return JSON.stringify(arr.map(function(r){ return {s:r.s||r.raw||'', e:r.e||'', payer:r.payer||'家屬', pname:r.pname||''}; }));
+}
+function recFields(c,r,i){
+  var k=c.key, id=k+'_'+i, f='';
+  f+=fld('起始','<input type="date" class="sd" id="s_'+id+'" value="'+esc(r.s||'')+'" onchange="saveRec(\''+k+'\','+i+')">');
+  f+=fld('結束','<input type="date" class="sd" id="e_'+id+'" value="'+esc(r.e||'')+'" onchange="saveRec(\''+k+'\','+i+')">');
+  f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+id, r.payer||'家屬', "onRecPayerChange('"+k+"',"+i+")")
+    +payerNameInput('payn_'+id, r.payer, r.pname, "saveRec('"+k+"',"+i+")")+'</span>');
   return f;
 }
-function acardHtml(c, pv){
-  var ended=!!pv.end;
-  var isOther=(pv.payer&&pv.payer!=='家屬');
-  var badges=(isOther?('<span class="pbadge">'+esc(pv.payer)+'負擔'+(pv.payerName?('・'+esc(pv.payerName)):'')+'</span>'):'')
-    +(ended?('<span class="ebadge">已結束 '+esc(pv.end)+'</span>'):'');
-  return '<div class="acard'+(ended?' ended':'')+'"><div class="acard-main"><b>'+esc(c.label)+'</b>'+badges+'</div>'
-    +'<div class="acard-fields">'+acardFields(c,pv)+'<span class="rm-fld"><button class="btn-rm" onclick="removeItem(\''+c.key+'\',\''+esc(c.label)+'\')">移除</button></span></div></div>';
+function saveRec(key,i){
+  var arr=parseRecs(key,curRaw(key)), r=arr[i]; if(!r) return;
+  var s=gval('s_'+key+'_'+i), e=gval('e_'+key+'_'+i);
+  if(!s && !r.raw){ alert('起始日不能空白。'); renderActive(); return; }
+  if(s && e && e<s){ alert('結束日不能早於起始日。'); renderActive(); return; }
+  var payer=gval('pay_'+key+'_'+i)||'家屬';
+  arr[i]={s:s||'', e:e||'', payer:payer, pname:needsName(payer)?(gval('payn_'+key+'_'+i)||'').trim():'', raw:s?'':r.raw};
+  save(key, recsValue(arr));
 }
-// ===== 傷口＝清單（可多處）：值存 JSON 陣列，每處 {loc,freq,s,e,payer,pname} =====
-function curRaw(key){ var row=STATE.data[STATE.current]; return row&&row.items?row.items[key]:''; }
+function onRecPayerChange(key,i){ applyPayerName(document.getElementById('payn_'+key+'_'+i),gval('pay_'+key+'_'+i),true); saveRec(key,i); }
+function removeRec(key,i,label){
+  if(!confirm('確定移除這筆「'+label+'」？（這筆紀錄會一起清除）')) return;
+  var arr=parseRecs(key,curRaw(key)); arr.splice(i,1); save(key, recsValue(arr));
+}
+function recCardHtml(c,r,i){
+  var ended=!!r.e, isOther=(r.payer&&r.payer!=='家屬');
+  var badges=(isOther?('<span class="pbadge">'+esc(r.payer)+'負擔'+(r.pname?('・'+esc(r.pname)):'')+'</span>'):'')
+    +(ended?('<span class="ebadge">已結束 '+esc(r.e)+'</span>'):'')
+    +((!r.s&&r.raw)?'<span class="nbadge">未填起始日</span>':'');
+  return '<div class="acard'+(ended?' ended':'')+'"><div class="acard-main"><b>'+esc(c.label)+'</b>'+badges+'</div>'
+    +'<div class="acard-fields">'+recFields(c,r,i)+'<span class="rm-fld"><button class="btn-rm" onclick="removeRec(\''+c.key+'\','+i+',\''+esc(c.label)+'\')">移除</button></span></div></div>';
+}
+
+// ===== 傷口＝計價卡片：一張卡片算一筆，可合併多處傷口 =====
+// 卡片放在「目前大小」那一格（wound_xl/l/m/s），值為 JSON 陣列，每張：
+//  {id, payer, pname,
+//   sizes:[{d:起算日,k:大小}]（第一筆的 d＝這張卡片開始計價的日子；中途改大小就多一筆）,
+//   members:[{loc,freq,s,e:結束日,out:拆出前最後一天,in:併進這張卡片的日子}],
+//   to,into（併入別張卡片時：這張的最後一天、併入哪張）, need（有傷口變動、待重選大小）, log:[{d,t}]}
+// 舊格式 {loc,freq,s,e,payer,pname}（或更舊的單筆字串）讀進來視為單獨一張
 function parseWounds(val){
   val=(val==null?'':String(val)).trim(); if(!val) return [];
   if(val.charAt(0)==='['){ try{ var a=JSON.parse(val); if(Array.isArray(a)) return a; }catch(e){} }
   var sp=stripPayer(val), se=stripEnd(sp.base), p=se.base.split('｜');   // 相容舊單筆格式
   return [{loc:(p[0]||'').trim(), s:(p[1]||'').trim(), freq:(p[2]||'').trim(), e:se.end||'', payer:sp.payer, pname:sp.payerName}];
 }
-function woundFreqValIdx(key,i){ var s=gval('wf_'+key+'_'+i); if(s==='__num__'){ var n=(gval('wfn_'+key+'_'+i)||'').trim(); return n?(n+'次/日'):''; } return s; }
-function onWoundFreqChangeIdx(key,i){ var show=(gval('wf_'+key+'_'+i)==='__num__'); var n=document.getElementById('wfn_'+key+'_'+i), u=document.getElementById('wfn_'+key+'_'+i+'_u'); if(n)n.style.display=show?'':'none'; if(u)u.style.display=show?'':'none'; saveWoundEntry(key,i); }
-function onWoundPayerChange(key,i){ var payer=gval('pay_'+key+'_'+i); var el=document.getElementById('payn_'+key+'_'+i); applyPayerName(el,payer,true); saveWoundEntry(key,i); }
-function saveWoundEntry(key,i){
-  if(!gval('loc_'+key+'_'+i).trim()){ alert('傷口必須填寫部位。'); renderActive(); return; }
-  var arr=parseWounds(curRaw(key));
-  var payer=gval('pay_'+key+'_'+i)||'家屬', pname=needsName(payer)?(gval('payn_'+key+'_'+i)||''):'';
-  arr[i]={loc:gval('loc_'+key+'_'+i).trim(), freq:woundFreqValIdx(key,i), s:gval('s_'+key+'_'+i), e:gval('e_'+key+'_'+i), payer:payer, pname:pname};
-  save(key, JSON.stringify(arr));
+function normCard(o,key,i){
+  if(o && o.members){ if(!o.id) o.id=key+'_'+i; o.sizes=o.sizes||[{d:'',k:key}]; o.log=o.log||[]; return o; }
+  return {id:key+'_'+i, payer:o.payer||'家屬', pname:o.pname||'', sizes:[{d:o.s||'',k:key}],
+    members:[{loc:o.loc||'', freq:o.freq||'', s:o.s||'', e:o.e||''}], log:[]};
 }
-function removeWoundEntry(key,i){ if(!confirm('確定移除這處傷口？（連歷史一起清除）')) return; var arr=parseWounds(curRaw(key)); arr.splice(i,1); save(key, arr.length?JSON.stringify(arr):''); }
-function woundFields(c,w,i){
-  var key=c.key;
-  var f=fld('部位','<input type="text" class="loc" id="loc_'+key+'_'+i+'" value="'+esc(w.loc||'')+'" placeholder="部位（必填）" onchange="saveWoundEntry(\''+key+'\','+i+')">');
-  f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf_'+key+'_'+i,'wfn_'+key+'_'+i, w.freq||'', "onWoundFreqChangeIdx('"+key+"',"+i+")", "saveWoundEntry('"+key+"',"+i+")")+'</span>');
-  f+=fld('起始','<input type="date" class="sd" id="s_'+key+'_'+i+'" value="'+esc(w.s||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
-  f+=fld('結束','<input type="date" class="sd" id="e_'+key+'_'+i+'" value="'+esc(w.e||'')+'" onchange="saveWoundEntry(\''+key+'\','+i+')">');
-  f+=fld('負擔','<span class="fldrow">'+payerSelectHtml('pay_'+key+'_'+i, w.payer||'家屬', "onWoundPayerChange('"+key+"',"+i+")")
-    +payerNameInput('payn_'+key+'_'+i, w.payer, w.pname, "saveWoundEntry('"+key+"',"+i+")")+'</span>');
-  return f;
+function keyCards(items,k){ return parseWounds(items?items[k]:'').map(function(o,i){ return normCard(o,k,i); }); }
+function readCards(items){ var out=[]; WOUND_KEYS.forEach(function(k){ out=out.concat(keyCards(items,k)); }); return out; }
+function findCard(cards,id){ return cards.filter(function(c){return c.id===id;})[0]; }
+function cardKey(cd){ var k=cd.sizes.length?cd.sizes[cd.sizes.length-1].k:''; return isWound(k)?k:'wound_s'; }
+function cardFrom(cd){ return cd.sizes.length?cd.sizes[0].d:''; }
+function sizeLabel(k){ var c=catByKey(k); return c?c.label:k; }
+function memEnd(m){ return m.e||m.out||''; }                 // 這處傷口在這張卡片的最後一天
+function memIn(m){ return (m['in']&&m['in']>m.s)?m['in']:m.s; }  // 這處傷口在這張卡片開始算的日子
+function liveMembers(cd){ return cd.members.filter(function(m){ return !memEnd(m); }); }
+function cardEnd(cd){
+  if(cd.to) return cd.to;
+  if(liveMembers(cd).length) return '';
+  var mx=''; cd.members.forEach(function(m){ var x=memEnd(m); if(x>mx) mx=x; }); return mx;
 }
-function woundCardHtml(c,w,i){
-  var ended=!!w.e, isOther=(w.payer&&w.payer!=='家屬');
-  var title=esc(c.label)+(w.loc?(' ‧ '+esc(w.loc)):'');
-  var badges=(isOther?('<span class="pbadge">'+esc(w.payer)+'負擔'+(w.pname?('・'+esc(w.pname)):'')+'</span>'):'')+(ended?('<span class="ebadge">已結束 '+esc(w.e)+'</span>'):'');
-  return '<div class="acard'+(ended?' ended':'')+'"><div class="acard-main"><b>'+title+'</b>'+badges+'</div>'
-    +'<div class="acard-fields">'+woundFields(c,w,i)+'<span class="rm-fld"><button class="btn-rm" onclick="removeWoundEntry(\''+c.key+'\','+i+')">移除</button></span></div></div>';
+function cardLocs(cd,all){ return (all?cd.members:liveMembers(cd)).map(function(m){return m.loc;}).join('、'); }
+function setSize(cd,d,k){ cd.sizes=cd.sizes.filter(function(z){ return z.d<d; }); cd.sizes.push({d:d,k:k}); }
+// 依目前大小分格存回；先存有內容的格、再清空的格（中途斷線最多重複一張，不會不見）
+function saveCards(cards){
+  if(STATE.readOnly){ alert('護理身份只能查看，不能修改。'); renderActive(); return; }
+  var items=curItems(), by={}, gain=[], lose=[];
+  WOUND_KEYS.forEach(function(k){ by[k]=[]; });
+  cards.forEach(function(cd){ by[cardKey(cd)].push(cd); });
+  WOUND_KEYS.forEach(function(k){
+    var v=by[k].length?JSON.stringify(by[k]):'';
+    var old=keyCards(items,k); if(v===(old.length?JSON.stringify(old):'')) return;
+    (v?gain:lose).push([k,v]);
+  });
+  gain.concat(lose).forEach(function(p){ save(p[0],p[1]); });
+}
+function memFreqVal(p){ var s=gval('wf'+p); if(s==='__num__'){ var n=(gval('wfn'+p)||'').trim(); return n?(n+'次/日'):''; } return s; }
+function onMemFreqChange(id,mi){ var p='_'+dk(id)+'_'+mi, show=(gval('wf'+p)==='__num__'); var n=document.getElementById('wfn'+p), u=document.getElementById('wfn'+p+'_u'); if(n)n.style.display=show?'':'none'; if(u)u.style.display=show?'':'none'; saveMember(id,mi); }
+function saveMember(id,mi){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return; var m=cd.members[mi]; if(!m) return;
+  var p='_'+dk(id)+'_'+mi, loc=gval('loc'+p).trim(), s=gval('s'+p), e=gval('e'+p);
+  if(!loc){ alert('傷口必須填寫部位。'); renderActive(); return; }
+  if(!s){ alert('起始日不能空白。'); renderActive(); return; }
+  if(e && e<s){ alert('結束日不能早於起始日。'); renderActive(); return; }
+  var wasLive=!memEnd(m), hadEnd=!!m.e;
+  m.loc=loc; m.freq=memFreqVal(p); m.s=s; m.e=e||'';
+  if(cd.members.length===1 && cd.sizes.length===1) cd.sizes[0].d=s;     // 單獨一處：計價起始＝傷口起始
+  if(wasLive && m.e){
+    cd.log.push({d:m.e, t:m.loc+' 結束'});
+    if(liveMembers(cd).length){ cd.need=true; cd.log.push({d:m.e, t:'剩下 '+cardLocs(cd)+'，待重新選大小'}); }
+  } else if(hadEnd && !m.e){ cd.log.push({d:today(), t:m.loc+' 取消結束日'}); }
+  saveCards(cards);
+}
+function saveCardPayer(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return; var p=dk(id);
+  var payer=gval('cpay_'+p)||'家屬';
+  cd.payer=payer; cd.pname=needsName(payer)?(gval('cpayn_'+p)||'').trim():'';
+  saveCards(cards);
+}
+function onCardPayerSel(id){ applyPayerName(document.getElementById('cpayn_'+dk(id)),gval('cpay_'+dk(id)),true); saveCardPayer(id); }
+function removeCard(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return;
+  if(!confirm('確定移除「'+sizeLabel(cardKey(cd))+'・'+cardLocs(cd,true)+'」這張傷口卡片？（紀錄會一起清除）')) return;
+  saveCards(cards.filter(function(c){ return c.id!==id; }));
+}
+function keepSize(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return;
+  cd.need=false; cd.log.push({d:today(), t:'確認大小不變（'+sizeLabel(cardKey(cd))+'）'}); saveCards(cards);
+}
+function sizeSelectHtml(id,cur){
+  return '<select id="'+id+'">'+WOUND_KEYS.map(function(k){ return '<option value="'+k+'"'+(k===cur?' selected':'')+'>'+esc(sizeLabel(k))+'</option>'; }).join('')+'</select>';
+}
+function openDlg(html){ var p=document.getElementById('addPanel'); p.innerHTML=html; var o=document.getElementById('addOverlay'); if(o) o.classList.add('show'); }
+function dlgBtns(ok,okLabel){ return '<div class="row"><button class="btn-add" onclick="'+ok+'">'+okLabel+'</button> <button class="btn-rm" onclick="closeAddPanel()">取消</button></div>'; }
+// 改大小
+function openResizeDialog(id){
+  var cd=findCard(readCards(curItems()),id); if(!cd) return;
+  openDlg('<h3 class="modal-title">改大小</h3>'
+    +'<div class="row"><span class="lbl">目前：'+esc(sizeLabel(cardKey(cd)))+'・'+esc(cardLocs(cd))+'。請依現在的傷口範圍選大小。</span></div>'
+    +'<div class="row"><span class="step">新的大小</span>'+sizeSelectHtml('dz_k',cardKey(cd))+'</div>'
+    +'<div class="row"><span class="step">從哪天起算</span><input type="date" id="dz_d" value="'+today()+'" min="'+esc(cardFrom(cd))+'"></div>'
+    +dlgBtns("resizeConfirm('"+id+"')",'確定'));
+}
+function resizeConfirm(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return;
+  var k=gval('dz_k'), d=gval('dz_d');
+  if(!d){ alert('請選擇從哪天起算。'); return; }
+  if(d<cardFrom(cd)){ alert('不能早於這張卡片開始計價的日子（'+md(cardFrom(cd))+'）。'); return; }
+  setSize(cd,d,k); cd.need=false; cd.log.push({d:d, t:'大小改為 '+sizeLabel(k)});
+  saveCards(cards); closeAddPanel();
+}
+// 合併其他傷口
+function mergeable(cards,cd){
+  return cards.filter(function(o){ return o.id!==cd.id && !cardEnd(o) && (o.payer||'家屬')===(cd.payer||'家屬') && (o.pname||'')===(cd.pname||''); });
+}
+function openMergeDialog(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return;
+  var others=mergeable(cards,cd);
+  if(!others.length){ alert('沒有可以合併的傷口。\n只有「進行中」而且「負擔方相同」的傷口才能合併。'); return; }
+  var list=others.map(function(o){ return '<label><input type="checkbox" class="mg_pick" value="'+esc(o.id)+'"> '+esc(sizeLabel(cardKey(o)))+'・'+esc(cardLocs(o))+'（'+esc(md(cardFrom(o)))+' 起）</label>'; }).join('');
+  openDlg('<h3 class="modal-title">合併計價</h3>'
+    +'<div class="row"><span class="lbl">把勾選的傷口併進「'+esc(sizeLabel(cardKey(cd)))+'・'+esc(cardLocs(cd))+'」，合併後只算一筆。每處傷口的換藥次數和起始日都會保留。</span></div>'
+    +'<div class="mergelist">'+list+'</div>'
+    +'<div class="row"><span class="step">合併後大小</span>'+sizeSelectHtml('mg_k',cardKey(cd))+'</div>'
+    +'<div class="row"><span class="step">從哪天合併</span><input type="date" id="mg_d" value="'+today()+'"></div>'
+    +dlgBtns("mergeConfirm('"+id+"')",'合併'));
+}
+function mergeConfirm(id){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return;
+  var picks=[].slice.call(document.querySelectorAll('.mg_pick:checked')).map(function(el){ return el.value; });
+  var k=gval('mg_k'), d=gval('mg_d');
+  if(!picks.length){ alert('請勾選要合併的傷口。'); return; }
+  if(!d){ alert('請選擇從哪天合併。'); return; }
+  if(d<cardFrom(cd)){ alert('合併日不能早於「'+cardLocs(cd)+'」開始計價的日子（'+md(cardFrom(cd))+'）。'); return; }
+  var names=[];
+  picks.forEach(function(pid){
+    var o=findCard(cards,pid); if(!o) return;
+    var live=liveMembers(o);
+    live.forEach(function(m){ cd.members.push({loc:m.loc, freq:m.freq, s:m.s, e:'', 'in':(d>m.s?d:'')}); names.push(m.loc); });
+    if(d<=cardFrom(o)){ cards.splice(cards.indexOf(o),1); }           // 還沒開始計價就合併：不留單獨那段
+    else { o.to=addDays(d,-1); o.into=cd.id; o.need=false; o.log.push({d:d, t:'併入「'+cardLocs(cd)+'」合併計價'}); }
+  });
+  setSize(cd,d,k); cd.need=false;
+  cd.log.push({d:d, t:'合併 '+names.join('、')+'，大小改為 '+sizeLabel(k)});
+  saveCards(cards); closeAddPanel();
+}
+// 拆出（改回單獨計價）
+function openSplitDialog(id,mi){
+  var cd=findCard(readCards(curItems()),id); if(!cd) return; var m=cd.members[mi]; if(!m) return;
+  openDlg('<h3 class="modal-title">拆出「'+esc(m.loc)+'」單獨計價</h3>'
+    +'<div class="row"><span class="lbl">「'+esc(m.loc)+'」會另開一張卡片單獨計價；原本的卡片之後會提醒重新選大小。</span></div>'
+    +'<div class="row"><span class="step">從哪天拆出</span><input type="date" id="sp_d" value="'+today()+'"></div>'
+    +'<div class="row"><span class="step">拆出後大小</span>'+sizeSelectHtml('sp_k',cardKey(cd))+'</div>'
+    +dlgBtns("splitConfirm('"+id+"',"+mi+")",'拆出'));
+}
+function splitConfirm(id,mi){
+  var cards=readCards(curItems()), cd=findCard(cards,id); if(!cd) return; var m=cd.members[mi]; if(!m) return;
+  var d=gval('sp_d'), k=gval('sp_k');
+  if(!d){ alert('請選擇從哪天拆出。'); return; }
+  if(d<=cardFrom(cd) || d<=m.s){ alert('拆出日要晚於合併計價開始的日子（'+md(cardFrom(cd))+'）和這處傷口的起始日。'); return; }
+  m.out=addDays(d,-1);
+  cards.push({id:newId(), payer:cd.payer, pname:cd.pname, sizes:[{d:d,k:k}],
+    members:[{loc:m.loc, freq:m.freq, s:m.s, e:''}], log:[{d:d, t:'從「'+cardLocs(cd,true)+'」合併計價拆出，單獨計價（'+sizeLabel(k)+'）'}]});
+  cd.log.push({d:d, t:m.loc+' 拆出，改單獨計價'});
+  if(liveMembers(cd).length){ cd.need=true; cd.log.push({d:d, t:'剩下 '+cardLocs(cd)+'，待重新選大小'}); }
+  saveCards(cards); closeAddPanel();
+}
+function memRowHtml(cd,m,mi,canSplit,lock){
+  var id=cd.id, p='_'+dk(id)+'_'+mi, dis=(lock||m.out)?' disabled':'';
+  var f=fld('部位','<input type="text" class="loc" id="loc'+p+'" value="'+esc(m.loc||'')+'" placeholder="部位（必填）"'+dis+' onchange="saveMember(\''+id+'\','+mi+')">');
+  f+=fld('換藥','<span class="fldrow">'+freqControlHtml('wf'+p,'wfn'+p, m.freq||'', "onMemFreqChange('"+id+"',"+mi+")", "saveMember('"+id+"',"+mi+")")+'</span>');
+  f+=fld('起始','<input type="date" class="sd" id="s'+p+'" value="'+esc(m.s||'')+'"'+dis+' onchange="saveMember(\''+id+'\','+mi+')">');
+  f+=fld('結束','<input type="date" class="sd" id="e'+p+'" value="'+esc(m.e||'')+'"'+dis+' onchange="saveMember(\''+id+'\','+mi+')">');
+  var tag=m.out?'<span class="mtag">'+esc(md(addDays(m.out,1)))+' 拆出，改單獨計價</span>':(m['in']?'<span class="mtag">'+esc(md(m['in']))+' 起併入</span>':'');
+  var act=(canSplit && !memEnd(m))?'<span class="wr-act"><button class="btn-sub" onclick="openSplitDialog(\''+id+'\','+mi+')">拆出</button></span>':'';
+  var h='<div class="acard-fields wmem'+(memEnd(m)?' out':'')+'">'+f+tag+act+'</div>';
+  if(lock||m.out) h=h.replace(/<select /g,'<select disabled ').replace(/<input type="number"/g,'<input type="number" disabled');
+  return h;
+}
+function woundCardHtml(cd){
+  var k=cardKey(cd), c=catByKey(k)||{label:k}, end=cardEnd(cd), live=liveMembers(cd), id=cd.id, p=dk(id);
+  var n=end?cd.members.filter(function(m){return !m.out;}).length:live.length;
+  var title=esc(c.label)+(n>1?(' ‧ 合併計價 '+n+' 處'):(' ‧ '+esc(cardLocs(cd,!!end))));
+  var isOther=(cd.payer&&cd.payer!=='家屬');
+  var badges=(isOther?('<span class="pbadge">'+esc(cd.payer)+'負擔'+(cd.pname?('・'+esc(cd.pname)):'')+'</span>'):'')
+    +(cd.need&&!end?'<span class="nbadge">傷口有變動，請重新選大小</span>':'')
+    +(cd.into?('<span class="ebadge">'+esc(md(addDays(cd.to,1)))+' 起併入合併計價</span>'):(end?('<span class="ebadge">已結束 '+esc(end)+'</span>'):''));
+  var hist=cd.sizes.length>1?('（'+cd.sizes.map(function(z){ return md(z.d)+' 起 '+esc(sizeLabel(z.k).replace(/^傷口-/,'')); }).join(' → ')+'）'):'';
+  var sub='<div class="wsub">計價自 '+esc(md(cardFrom(cd)))+hist+'</div>';
+  var payer='<div class="acard-fields">'+fld('負擔（整張卡片）','<span class="fldrow">'+payerSelectHtml('cpay_'+p, cd.payer||'家屬', "onCardPayerSel('"+id+"')")
+    +payerNameInput('cpayn_'+p, cd.payer, cd.pname, "saveCardPayer('"+id+"')")+'</span>')+'</div>';
+  if(cd.into) payer=payer.replace(/<select /g,'<select disabled ').replace(/<input /g,'<input disabled ');
+  var mems=cd.members.map(function(m,mi){ return memRowHtml(cd,m,mi,live.length>1,!!cd.into); }).join('');
+  var acts='<div class="wacts wr-act">'
+    +(!end?'<button class="btn-sub" onclick="openMergeDialog(\''+id+'\')">合併其他傷口…</button><button class="btn-sub" onclick="openResizeDialog(\''+id+'\')">改大小</button>':'')
+    +(cd.need&&!end?'<button class="btn-sub" onclick="keepSize(\''+id+'\')">大小不變</button>':'')
+    +'<button class="btn-rm" onclick="removeCard(\''+id+'\')">移除</button></div>';
+  var log=cd.log.length?('<details class="wlog"><summary>變動紀錄（'+cd.log.length+'）</summary><ul>'
+    +cd.log.map(function(x){ return '<li>'+esc(md(x.d))+'　'+esc(x.t)+'</li>'; }).join('')+'</ul></details>'):'';
+  return '<div class="acard wcard'+(end?' ended':'')+(cd.need&&!end?' need':'')+'"><div class="acard-main"><b>'+title+'</b>'+badges+'</div>'
+    +sub+payer+mems+acts+log+'</div>';
 }
 // 進行中在上、已結束在下
 function renderActive(){
   var box=document.getElementById('activeList'); if(!box) return;
   ensureResNames();
-  var row=STATE.data[STATE.current]||{items:{}};
-  var prog=[], ended=[];
+  var items=curItems(), prog=[], ended=[], woundDone=false;
   STATE.catalog.forEach(function(c){
-    var raw=row.items?row.items[c.key]:'';
     if(isWound(c.key)){
-      parseWounds(raw).forEach(function(w,i){ (w.e?ended:prog).push(woundCardHtml(c,w,i)); });
+      if(woundDone) return; woundDone=true;
+      readCards(items).sort(function(a,b){ return cardFrom(a)>cardFrom(b)?1:-1; })
+        .forEach(function(cd){ (cardEnd(cd)?ended:prog).push(woundCardHtml(cd)); });
     } else {
-      var pv=parseVal(c.key, raw); if(!pv.active) return;
-      (pv.end?ended:prog).push(acardHtml(c,pv));
+      parseRecs(c.key, items[c.key]).forEach(function(r,i){ (r.e?ended:prog).push(recCardHtml(c,r,i)); });
     }
   });
   var html = prog.length ? prog.join('') : '<div class="s-empty"><img class="p-state" src="../assets/pricing/state-no-item.webp" alt="" style="width:120px">目前沒有進行中的計費項目，請按下方「＋ 新增計費項目」加入。</div>';
   if(ended.length){ html+='<h4 class="sec-end">已結束</h4>'+ended.join(''); }
   if(STATE.readOnly) html=html.replace('請按下方「＋ 新增計費項目」加入。','');
   box.innerHTML=html;
-  if(STATE.readOnly){   // 唯讀：欄位鎖住、移除鍵拿掉
+  if(STATE.readOnly){   // 唯讀：欄位鎖住、移除與操作鍵拿掉
     box.querySelectorAll('input,select').forEach(function(el){ el.disabled=true; });
-    box.querySelectorAll('.rm-fld').forEach(function(el){ el.remove(); });
+    box.querySelectorAll('.rm-fld,.wr-act').forEach(function(el){ el.remove(); });
   }
 }
-
-function removeItem(key,label){ if(confirm('確定移除「'+label+'」？（連歷史一起清除）')) save(key,''); }
 
 // ===== 新增項目：大項目 → 小項目/頻率 → 內容 =====
 function openAddPanel(){
@@ -699,10 +895,22 @@ function apGroup(){
 }
 function apItem(){
   var key=gval('ap_item'); var ex=document.getElementById('ap_extra'); var h='';
-  if(isWound(key)){ h='<span class="step">③ 內容</span> 部位 <input type="text" id="ap_loc" placeholder="必填，如 薦骨"> <span class="lbl">換藥</span>'+freqControlHtml('ap_freq','ap_freqn','', "onAddFreqChange()", "")+' <span class="lbl">起始</span><input type="date" id="ap_date" value="'+today()+'">'; }
+  if(isWound(key)){ h='<span class="step">③ 內容</span> 部位 <input type="text" id="ap_loc" placeholder="必填，如 薦骨"> <span class="lbl">換藥</span>'+freqControlHtml('ap_freq','ap_freqn','', "onAddFreqChange()", "")+' <span class="lbl">起始</span><input type="date" id="ap_date" value="'+today()+'">'
+      +'<div class="apmerge" id="ap_mergebox" style="display:none"><span class="lbl">合併計價</span><select id="ap_merge"></select>'
+      +'<span class="lbl">選合併時，上面選的大小＝合併後的大小；起始日＝開始合併的日子</span></div>'; }
   else { h='<span class="step">③ 起始日期</span> <input type="date" id="ap_date" value="'+today()+'"> <span class="lbl">（預設今天，可直接按「加入」；結束日之後在卡片上填）</span>'; }
   ex.innerHTML=h; ex.style.display='';
   var pr=document.getElementById('ap_payer'); if(pr) pr.style.display='';
+  apMergeOpts();
+}
+// 新增傷口時：列出負擔方相同、進行中的傷口卡片，可選擇直接合併
+function apMergeOpts(){
+  var box=document.getElementById('ap_mergebox'), sel=document.getElementById('ap_merge'); if(!box||!sel) return;
+  var payer=gval('ap_payer_sel')||'家屬', cur=sel.value;
+  var list=readCards(curItems()).filter(function(o){ return !cardEnd(o) && (o.payer||'家屬')===payer; });
+  sel.innerHTML='<option value="">不合併（單獨計價）</option>'+list.map(function(o){
+    return '<option value="'+esc(o.id)+'"'+(o.id===cur?' selected':'')+'>與「'+esc(sizeLabel(cardKey(o)))+'・'+esc(cardLocs(o))+'」合併</option>'; }).join('');
+  box.style.display=list.length?'':'none';
 }
 function addConfirm(){
   var key=gval('ap_item'); if(!key){alert('請選擇項目');return;}
@@ -710,17 +918,29 @@ function addConfirm(){
   var payer=gval('ap_payer_sel')||'家屬', pname=gval('ap_payer_name')||'';
   if(!needsName(payer)) pname='';                                 // 機構不用細計
   if(needsName(payer) && !pname.trim()){ alert('請填寫造成的'+payer+'姓名（多位用、分隔）'); return; }
-  if(isWound(key)){                                               // 傷口＝加一處（可多筆，不覆蓋）
-    if(!gval('ap_loc').trim()){ alert('傷口必須填寫部位。'); return; }
+  var s=gval('ap_date')||today();
+  if(isWound(key)){                                               // 傷口＝加一處（另開一張，或併進現有卡片）
+    var loc=gval('ap_loc').trim(); if(!loc){ alert('傷口必須填寫部位。'); return; }
     var afreq=(gval('ap_freq')==='__num__')?((gval('ap_freqn')||'').trim()?gval('ap_freqn').trim()+'次/日':''):gval('ap_freq');
-    var arr=parseWounds(curRaw(key));
-    arr.push({loc:gval('ap_loc').trim(), freq:afreq, s:gval('ap_date')||today(), e:'', payer:payer, pname:pname});
-    save(key, JSON.stringify(arr)); closeAddPanel(); return;
+    var cards=readCards(curItems()), mg=gval('ap_merge');
+    if(mg){
+      var cd=findCard(cards,mg); if(!cd) return;
+      if((cd.payer||'家屬')!==payer || (cd.pname||'')!==pname.trim()){ alert('負擔方不同，不能合併計價。'); return; }
+      if(s<cardFrom(cd)){ alert('起始日不能早於「'+cardLocs(cd)+'」開始計價的日子（'+md(cardFrom(cd))+'）。'); return; }
+      cd.members.push({loc:loc, freq:afreq, s:s, e:''});
+      setSize(cd,s,key); cd.need=false;
+      cd.log.push({d:s, t:'加入 '+loc+'，合併計價，大小改為 '+sizeLabel(key)});
+    } else {
+      cards.push({id:newId(), payer:payer, pname:pname.trim(), sizes:[{d:s,k:key}], members:[{loc:loc, freq:afreq, s:s, e:''}], log:[]});
+    }
+    saveCards(cards); closeAddPanel(); return;
   }
-  var value=(gval('ap_date')||today())+payerTag(payer,pname);
-  var cur=curRaw(key);
-  if(cur && !confirm('此住民已有「'+(c?c.label:key)+'」，要覆蓋更新嗎？')) return;
-  save(key,value); closeAddPanel();
+  var label=c?c.label:key, arr=parseRecs(key,curRaw(key));         // 一般項目＝另起一筆，舊的保留
+  if(arr.some(function(r){ return !r.e; })){ alert('此住民已有進行中的「'+label+'」。\n要重新開始，請先在那張卡片填「結束」日期，再新增。'); return; }
+  var last=''; arr.forEach(function(r){ if(r.e>last) last=r.e; });
+  if(last && s<=last && !confirm('新的起始日（'+md(s)+'）沒有晚於上一筆的結束日（'+md(last)+'），兩筆日期會重疊，確定要加入嗎？')) return;
+  arr.push({s:s, e:'', payer:payer, pname:pname.trim()});
+  save(key, recsValue(arr)); closeAddPanel();
 }
 
 // ===== 住民管理頁（限管理者，寫回主名單）=====
@@ -866,34 +1086,41 @@ function save(key,value){
 // ===== 匯出當下計價總表（CSV，Excel 可直接開）=====
 function csvCell(s){ s=(s==null?'':String(s)); return /[",\n\r]/.test(s)?('"'+s.replace(/"/g,'""')+'"'):s; }
 function stamp(){ var d=new Date(),p=function(n){return('0'+n).slice(-2);}; return d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+'_'+p(d.getHours())+p(d.getMinutes()); }
+function resInfo(rid,r){ return (STATE.residents||[]).filter(function(x){return x.rid===rid;})[0]||r; }
+function memFreqText(ms){ return ms.length>1?ms.map(function(m){ return m.loc+' '+(m.freq||'—'); }).join('、'):((ms[0]&&ms[0].freq)||''); }
 function exportCSV(){
   var head=['床號','姓名','住民編號','大項目','項目','部位','換藥次數','起始日','結束日','狀態','負擔方','指名（照服員／住民）'];
   var list=[];
   Object.keys(STATE.data||{}).forEach(function(rid){
     var r=STATE.data[rid]; if(!r||!r.items) return;
-    var info=(STATE.residents||[]).filter(function(x){return x.rid===rid;})[0]||r;
+    var info=resInfo(rid,r);
     (STATE.catalog||[]).forEach(function(c){
       var raw=r.items[c.key];
       if(isWound(c.key)){
-        parseWounds(raw).forEach(function(w){
+        keyCards(r.items,c.key).forEach(function(cd){
+          var end=cardEnd(cd), ms=end?cd.members.filter(function(m){return !m.out;}):liveMembers(cd);
           list.push([ info.bed||r.bed||'', info.name||r.name||'', info.id||r.id||'',
-            c.group||'', c.label||c.key, (w.loc||''), (w.freq||''), (w.s||''), (w.e||''),
-            (w.e?'已結束':'進行中'), w.payer||'家屬', w.pname||'' ]);
+            c.group||'', (c.label||c.key)+(ms.length>1?'（合併）':''), ms.map(function(m){return m.loc;}).join('、'), memFreqText(ms),
+            cardFrom(cd), end, (cd.into?'已併入合併計價':(end?'已結束':'進行中')), cd.payer||'家屬', cd.pname||'' ]);
         });
         return;
       }
-      var pv=parseVal(c.key, raw); if(!pv.active) return;
-      list.push([ info.bed||r.bed||'', info.name||r.name||'', info.id||r.id||'',
-        c.group||'', c.label||c.key, '', '', (pv.date||''), (pv.end||''),
-        (pv.end?'已結束':'進行中'), pv.payer||'家屬', pv.payerName||'' ]);
+      parseRecs(c.key, raw).forEach(function(x){
+        list.push([ info.bed||r.bed||'', info.name||r.name||'', info.id||r.id||'',
+          c.group||'', c.label||c.key, '', '', (x.s||x.raw||''), (x.e||''),
+          (x.e?'已結束':'進行中'), x.payer||'家屬', x.pname||'' ]);
+      });
     });
   });
-  if(!list.length){ alert('目前沒有計費項目可匯出。（可先按「🔄 刷新」載入最新資料）'); return; }
+  if(!list.length){ alert('目前沒有計費項目可匯出。（可先按「刷新」載入最新資料）'); return; }
   list.sort(function(a,b){ return a[0]>b[0]?1:(a[0]<b[0]?-1:0); });
+  downloadCSV('計費項目起訖表_'+stamp()+'.csv', head, list);
+  toast('已匯出 '+list.length+' 筆計價項目');
+}
+function downloadCSV(name,head,list){
   var lines=[head.map(csvCell).join(',')];
   list.forEach(function(row){ lines.push(row.map(csvCell).join(',')); });
   var csv='﻿'+lines.join('\r\n');   // BOM 讓 Excel 正確顯示中文
-  var name='計費項目起訖表_'+stamp()+'.csv';
   try{
     var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
     var url=URL.createObjectURL(blob);
@@ -904,7 +1131,75 @@ function exportCSV(){
     // 後備：沙箱環境擋下載時，改開新視窗讓使用者自行另存
     var w=window.open('','_blank'); if(w){ w.document.write('<pre>'+esc(csv)+'</pre>'); }
   }
-  toast('已匯出 '+list.length+' 筆計價項目');
+}
+
+// ===== 月份天數表：選一個月，列出每個項目在該月的期間與天數（起訖兩天都算）=====
+function openDaysDialog(){
+  var d=new Date(), ym=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2);
+  openDlg('<h3 class="modal-title">月份天數表</h3>'
+    +'<div class="row"><span class="lbl">選一個月份，匯出每位住民每個計費項目在那個月的期間與天數（Excel 可開）。開始和結束那兩天都算；月中有變動（例如傷口合併、改大小）會分成好幾列。</span></div>'
+    +'<div class="row"><span class="step">月份</span><input type="month" id="dy_m" value="'+ym+'"></div>'
+    +dlgBtns('exportDays()','匯出'));
+}
+function monthRange(ym){ var m=String(ym||'').match(/^(\d{4})-(\d{2})$/); if(!m) return null;
+  return {a:d2n(ym+'-01'), b:Math.round(Date.UTC(+m[1],+m[2],0)/864e5)}; }
+// 傷口卡片在 [mA,mB] 內，依大小與當時有哪幾處傷口切段
+function woundSegs(cd,mA,mB){
+  var from=d2n(cardFrom(cd)); if(isNaN(from)) return [];
+  var end=cardEnd(cd), to=end?d2n(end):mB, a=Math.max(from,mA), b=Math.min(to,mB); if(a>b) return [];
+  var pts=[a];
+  cd.sizes.forEach(function(z){ pts.push(d2n(z.d)); });
+  cd.members.forEach(function(m){ pts.push(d2n(memIn(m))); if(memEnd(m)) pts.push(d2n(memEnd(m))+1); });
+  pts=pts.filter(function(x){ return !isNaN(x) && x>=a && x<=b; }).sort(function(x,y){return x-y;})
+    .filter(function(x,i,arr){ return i===0 || x!==arr[i-1]; });
+  var segs=[];
+  pts.forEach(function(p,i){
+    var q=(i+1<pts.length)?pts[i+1]-1:b, k=cd.sizes[0].k;
+    cd.sizes.forEach(function(z){ if(d2n(z.d)<=p) k=z.k; });
+    var ms=cd.members.filter(function(m){ return d2n(memIn(m))<=p && (!memEnd(m) || d2n(memEnd(m))>=p); });
+    if(!ms.length) return;
+    var sig=k+'|'+ms.map(function(m){return m.loc+'/'+m.s;}).join(','), last=segs[segs.length-1];
+    if(last && last.sig===sig && last.b===p-1){ last.b=q; return; }
+    segs.push({a:p, b:q, k:k, ms:ms, sig:sig});
+  });
+  if(cd.need && !end && segs.length && segs[segs.length-1].b===b) segs[segs.length-1].need=true;
+  return segs;
+}
+function exportDays(){
+  var ym=gval('dy_m'), R=monthRange(ym); if(!R){ alert('請選擇月份。'); return; }
+  var head=['床號','姓名','住民編號','大項目','項目','部位','換藥次數','期間起','期間迄','天數','負擔方','指名（照服員／住民）','備註'];
+  var list=[], order={};
+  (STATE.catalog||[]).forEach(function(c,i){ order[c.key]=i; });
+  Object.keys(STATE.data||{}).forEach(function(rid){
+    var r=STATE.data[rid]; if(!r||!r.items) return;
+    var info=resInfo(rid,r), base=[info.bed||r.bed||'', info.name||r.name||'', info.id||r.id||''];
+    (STATE.catalog||[]).forEach(function(c){
+      if(isWound(c.key)){
+        keyCards(r.items,c.key).forEach(function(cd){
+          woundSegs(cd,R.a,R.b).forEach(function(g){
+            var gc=catByKey(g.k)||c, merged=g.ms.length>1, note=[];
+            if(merged) note.push('合併計價');
+            if(g.need) note.push('大小待確認');
+            list.push(base.concat([gc.group||'', (gc.label||g.k)+(merged?'（合併）':''), g.ms.map(function(m){return m.loc;}).join('＋'), memFreqText(g.ms),
+              n2d(g.a), n2d(g.b), g.b-g.a+1, cd.payer||'家屬', cd.pname||'', note.join('；')]).concat([order[WOUND_KEYS[0]]||0, g.a]));   // 傷口不分大小，依日期排
+          });
+        });
+        return;
+      }
+      parseRecs(c.key, r.items[c.key]).forEach(function(x){
+        var s=d2n(x.s), note='';
+        if(isNaN(s)){ s=R.a; note='未填起始日，以整月計'; }
+        var a=Math.max(s,R.a), b=Math.min(x.e?d2n(x.e):R.b, R.b); if(isNaN(b)) b=R.b;
+        if(a>b) return;
+        list.push(base.concat([c.group||'', c.label||c.key, '', '', n2d(a), n2d(b), b-a+1, x.payer||'家屬', x.pname||'', note]).concat([order[c.key]||0, a]));
+      });
+    });
+  });
+  if(!list.length){ alert(ym.replace('-','年')+'月沒有計費項目。（可先按「刷新」載入最新資料）'); return; }
+  list.sort(function(x,y){ return x[0]!==y[0]?(x[0]>y[0]?1:-1):(x[13]-y[13] || x[14]-y[14]); });
+  list=list.map(function(x){ return x.slice(0,13); });
+  downloadCSV('計費天數表_'+ym.replace('-','年')+'月.csv', head, list);
+  closeAddPanel(); toast('已匯出 '+list.length+' 列');
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function num(n){n=Number(n)||0;return n.toLocaleString('en-US');}
