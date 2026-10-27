@@ -58,6 +58,26 @@ input:focus{border-color:#14563F!important;box-shadow:0 0 0 4px rgba(20,86,63,.1
   .v-hero-title{font-size:23px}
   .v-page-leaf{width:60px;opacity:.6}
 }
+/* ===== 滿版（同行政版）===== */
+#app-shell{max-width:1320px!important}
+@media (min-width:768px){#app-bg{padding:32px 28px 72px!important}}
+.v-hero{min-height:150px;padding:26px 40px 26px 150px}
+.v-hero-leaf.l{width:140px}.v-hero-leaf.r{width:110px}
+.v-hero-art{max-width:52%}
+.v-hero-row{max-width:68%}
+.v-hero-title{font-size:38px}
+.v-hero-sub{font-size:17px}
+@media (min-width:900px){
+  #list{display:grid!important;grid-template-columns:repeat(2,1fr);gap:12px!important}
+  #list>:only-child:not(.card){grid-column:1/-1}
+}
+@media (min-width:1280px){#list{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:600px){
+  .v-hero{padding:20px 18px}
+  .v-hero-title{font-size:24px}
+  .v-hero-sub{font-size:14px}
+  .v-hero-row{max-width:100%}
+}
 #print-area{display:none}
 .pr-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 12px;margin:0 0 12px;background:#F5F6E6;border:1px solid #E3E5D8;border-radius:14px}
 .pr-row label{font:700 12.5px 'Noto Sans TC';color:#4D695A}
