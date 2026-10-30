@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>會議系統 · 線東大眾護理之家</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#27675F;--teal-d:#1D5049;--ink:#092F25;--muted:#4D695A;--paper:#FAF8EF;--card:#FFFDF8;--line:#E3E5D8;--red:#A63124;--green:#14563F;--orange:#B65B16;
+  --t-soft:#E6F1EE;--t-line:#AACAC2;--g-soft:#EAF3DC;--g-line:#B5CDA2;--o-soft:#FFF0D7;--o-line:#EDC58D}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:16px 24px 110px}
+[hidden]{display:none!important}
+
+/* 頂列 */
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;gap:14px;padding:0 20px;
+  background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:#14563F;color:#fff!important;border-radius:999px;font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:var(--teal);border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-user{display:none;margin-left:auto;align-items:center;gap:8px;padding:4px 14px 4px 5px;background:rgba(255,255,255,.75);border:1px solid #DEDFD1;border-radius:999px;font:500 13.5px 'Noto Sans TC';color:#092F25;white-space:nowrap}
+.v-user b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-size:14px}
+body{padding-top:64px}
+.ico{display:inline-block;flex:none;width:1.15em;height:1.15em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:-.2em;margin-right:5px}
+
+/* 按鈕 */
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14.5px;cursor:pointer;white-space:nowrap}
+.btn.main{background:var(--teal);color:#fff;box-shadow:0 3px 8px rgba(39,103,95,.22)}.btn.main:hover{background:var(--teal-d)}
+.btn.sec{background:var(--card);color:var(--teal-d);border:1.5px solid var(--t-line)}.btn.sec:hover{background:var(--t-soft)}
+.btn.warn{background:var(--card);color:var(--red);border:1.5px solid #E6C9C4}
+.btn.sm{padding:6px 13px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* 頁首 */
+.banner{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:150px;margin-bottom:14px;padding:18px 24px 18px 100px;background:#E9F4F1;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.banner .leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.8;z-index:-1;pointer-events:none}
+.banner .art{position:absolute;right:16px;bottom:0;height:88%;width:auto;max-width:40%;object-fit:contain;object-position:right bottom;z-index:-1;pointer-events:none}
+.banner .txt{max-width:60%}
+h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);letter-spacing:.03em}
+.sub{margin:0 0 12px;font-size:13.5px;color:var(--muted);line-height:1.6}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* 分頁 */
+.tabs{display:flex;gap:8px;margin:0 0 14px;overflow-x:auto}
+.tab{border:1.5px solid var(--line);background:var(--card);color:var(--muted);border-radius:999px;padding:9px 20px;font:700 14.5px 'Noto Sans TC';cursor:pointer;white-space:nowrap}
+.tab.on{background:var(--teal);border-color:var(--teal);color:#fff}
+
+/* 面板、標籤 */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 4px 12px rgba(25,62,37,.04)}
+.ttl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;font:700 15.5px 'Noto Sans TC';color:var(--ink)}
+.ttl::before{content:"";width:26px;height:15px;background:url(../assets/common/sprig-green.webp) center/contain no-repeat}
+.ttl small{flex-basis:100%;font:400 12px 'Noto Sans TC';color:#7A8C80;padding-left:32px;margin-top:-4px}
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 11px;border-radius:999px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.tag.s-prep{background:var(--o-soft);color:#8A4A12}
+.tag.s-pub{background:var(--t-soft);color:#1D5049}
+.tag.s-live{background:var(--t-soft);color:#1D5049}.tag.s-live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--teal)}
+.tag.s-done{background:var(--g-soft);color:var(--green)}
+.tag.s-void{background:#EEEEE8;color:#6F7A72}
+.tag.type{background:#fff;border:1px solid var(--line);color:var(--muted)}
+.muted{color:var(--muted)}
+.msg{min-height:0;margin:0 2px 10px;font-size:14px;font-weight:700}.msg:empty{display:none}
+.msg.err{color:var(--red)}.msg.ok{color:var(--green)}
+
+/* 提醒橫幅 */
+.alert{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 12px;padding:12px 16px;background:var(--o-soft);border:1px solid var(--o-line);border-radius:16px;color:#5E3A12;font-size:14.5px;line-height:1.5}
+.alert b{color:#8A4A12}
+.alert .btn{margin-left:auto}
+.alert.t{background:var(--t-soft);border-color:var(--t-line);color:var(--teal-d)}
+
+/* 會議卡片 */
+.mlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:14px}
+.mcard{display:flex;flex-direction:column;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 4px 12px rgba(25,62,37,.04);cursor:pointer}
+.mcard:hover{border-color:var(--t-line);box-shadow:0 6px 16px rgba(39,103,95,.1)}
+.mcard h3{margin:0;font:900 18px/1.35 'Noto Serif TC',serif}
+.mrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.minfo{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.minfo span{display:inline-flex;align-items:center}
+.prog{height:8px;border-radius:999px;background:#EEF0E4;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--teal);border-radius:999px}
+.pline{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);margin-bottom:5px}
+.me-ok{color:var(--green);font-weight:700}.me-no{color:#8A4A12;font-weight:700}
+.empty{padding:34px 20px;text-align:center;color:var(--muted)}
+.empty img{display:block;width:120px;height:auto;margin:0 auto 10px}
+
+/* 詳情 */
+.dhead{position:relative;overflow:hidden;isolation:isolate;margin-bottom:14px;padding:18px 22px 18px 90px;background:#E9F4F1;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.dhead .leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.75;z-index:-1;pointer-events:none}
+.dhead h1{font-size:25px;margin-bottom:8px}
+.dinfo{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:14.5px;color:var(--ink);margin:8px 0}
+.dinfo span{display:inline-flex;align-items:center}
+.cd{display:inline-flex;align-items:center;padding:5px 14px;border-radius:999px;background:var(--o-soft);border:1px solid var(--o-line);color:#8A4A12;font-weight:700;font-size:14px}
+.cd.over{background:#EEEEE8;border-color:#D8D8CE;color:#6F7A72}
+.cols{display:grid;grid-template-columns:minmax(260px,320px) minmax(0,1fr);gap:20px;align-items:start}
+.side{position:sticky;top:80px;display:flex;flex-direction:column;gap:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;background:var(--o-soft);border:1px solid var(--o-line);color:#8A4A12;font-size:13.5px;font-weight:500}
+.chip.ok{background:var(--g-soft);border-color:var(--g-line);color:var(--green)}
+.todo{display:flex;flex-direction:column;gap:2px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14px}
+.todo:last-child{border-bottom:0}.todo small{color:var(--muted)}.todo .late{color:var(--red);font-weight:700}
+
+/* 佈告板 */
+.board{background:#F4F1E4 url(../assets/common/sprig-leaf.webp) right 12px top 10px/70px no-repeat;border:1px solid #E3DFCB;border-radius:22px;padding:16px}
+.boardbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.sect{margin:14px 2px 8px;font:700 13.5px 'Noto Sans TC';color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px 14px}
+.note{position:relative;display:flex;flex-direction:column;gap:7px;background:#fff;border-radius:6px 6px 14px 14px;padding:20px 14px 12px;box-shadow:0 3px 9px rgba(60,50,20,.13);border-top:0}
+.note::before{content:"";position:absolute;left:50%;top:-8px;width:70px;height:18px;margin-left:-35px;border-radius:3px;opacity:.75;transform:rotate(-2deg)}
+.note.t-report{background:#F6FAEE}.note.t-report::before{background:#B5CDA2}
+.note.t-pain{background:#FFF7E8}.note.t-pain::before{background:#EDC58D}
+.note.t-prop{background:#EEF6F4}.note.t-prop::before{background:#AACAC2}
+.note.fixed{background:#F3F2EA;box-shadow:0 2px 5px rgba(60,50,20,.08);padding-top:14px}
+.note.fixed::before{left:14px;top:-7px;width:16px;height:16px;margin:0;border-radius:50%;background:var(--teal);opacity:1;transform:none;box-shadow:0 2px 3px rgba(0,0,0,.2)}
+.note.sel{outline:3px solid var(--teal)}
+.note.dim{opacity:.55}
+.nt{display:flex;gap:7px;align-items:flex-start;font:700 15.5px/1.4 'Noto Sans TC'}
+.nt .ico{margin-top:2px;width:1.2em;height:1.2em}
+.t-report .nt .ico{color:var(--green)}.t-pain .nt .ico{color:var(--orange)}.t-prop .nt .ico{color:var(--teal)}
+.nmeta{font-size:13px;color:var(--muted)}
+.ndesc{font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.nwish{font-size:13.5px;line-height:1.5;padding:7px 10px;border-radius:10px;background:rgba(255,255,255,.7);border:1px dashed #C9C6B0}
+.nwish b{color:var(--teal-d)}
+.nfoot{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:4px}
+.nfoot .min{margin-right:auto;font-size:13px;color:var(--muted);font-weight:500}
+.nret{padding:7px 10px;border-radius:10px;background:#FBECE9;color:#7A2A1F;font-size:13.5px;line-height:1.5}
+.lk{border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 11px;font-size:12.5px;font-weight:700;color:var(--teal-d);cursor:pointer}
+.lk:hover{background:var(--t-soft)}.lk.w{color:var(--red);border-color:#E6C9C4}
+.tools{display:flex;gap:5px;flex-wrap:wrap}
+.tools-toggle{display:none}
+.mine-tag{position:absolute;right:10px;top:8px;font-size:11.5px;font-weight:700;color:var(--teal-d);background:var(--t-soft);border-radius:999px;padding:1px 8px}
+
+/* 底部列 */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:14px;align-items:center;padding:10px 24px;background:rgba(250,248,239,.97);border-top:1px solid var(--line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.budget{flex:1;min-width:0}
+.budget .pline{margin-bottom:4px;color:var(--ink);font-weight:500}
+.budget .prog i.over{background:var(--red)}
+.budget .over-t{color:var(--red);font-weight:700}
+.dock .btn{flex:none}
+
+/* 視窗 */
+.modal{position:fixed;inset:0;background:rgba(9,47,37,.42);display:none;align-items:center;justify-content:center;padding:16px;z-index:200}
+.modal.show{display:flex}
+.box{background:var(--card);border-radius:22px;padding:22px;width:100%;max-width:520px;max-height:92vh;overflow:auto;box-shadow:0 18px 40px rgba(9,47,37,.2)}
+.box h2{margin:0 0 14px;font:900 21px 'Noto Serif TC',serif}
+.f{margin-bottom:13px}
+.f>label{display:block;margin-bottom:5px;font-weight:700;font-size:14px;color:#3E5A4C}
+.f input[type=text],.f input[type=date],.f input[type=time],.f select,.f textarea{width:100%;padding:11px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:var(--card);color:var(--ink)}
+.f textarea{min-height:84px;resize:vertical;line-height:1.5}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(39,103,95,.12)}
+.hint{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;font:700 14px 'Noto Sans TC';color:#3E5A4C;cursor:pointer}
+.pill.on{border-color:var(--teal);background:var(--t-soft);color:var(--teal-d);box-shadow:0 0 0 3px rgba(39,103,95,.1)}
+.pill.p-report.on{border-color:var(--green);background:var(--g-soft);color:var(--green);box-shadow:0 0 0 3px rgba(20,86,63,.1)}
+.pill.p-pain.on{border-color:var(--orange);background:var(--o-soft);color:#8A4A12;box-shadow:0 0 0 3px rgba(182,91,22,.1)}
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;max-height:210px;overflow:auto;padding:8px;border:1.5px solid #D3D8C8;border-radius:12px;background:#fff}
+.pick label{display:flex;gap:6px;align-items:center;font-size:14px;font-weight:500;cursor:pointer}
+.pick input{width:17px;height:17px;accent-color:var(--teal)}
+.btns{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+.ferr{margin-top:8px;padding:9px 12px;border-radius:12px;background:#FBECE9;color:var(--red);font-size:13.5px;font-weight:700;line-height:1.6}.ferr:empty{display:none}
+.copybox{width:100%;min-height:200px;padding:12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:15px;line-height:1.6;background:#fff;white-space:pre-wrap}
+.mergebar{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:70;display:flex;gap:10px;align-items:center;padding:10px 16px;background:var(--teal-d);color:#fff;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.25);font-weight:700;font-size:14px}
+.mergebar .btn.sec{padding:6px 14px}
+
+@media (max-width:1000px){.banner .art{opacity:.3}.banner .txt{max-width:100%}.cols{grid-template-columns:1fr}.side{position:static}}
+@media (max-width:640px){
+  main{padding:12px 12px 120px}
+  .v-topbar{height:56px;padding:0 12px;gap:10px}body{padding-top:56px}
+  .v-tb-logo,.v-user span{display:none}.v-user{padding:3px}.v-tb-title{font-size:17px}
+  body::after{display:none}
+  .banner{padding:14px 14px 14px 60px;min-height:0}.banner .leaf{opacity:.45}h1{font-size:22px}
+  .dhead{padding:14px 14px 14px 56px}.dhead h1{font-size:21px}
+  .mlist,.grid{grid-template-columns:1fr}
+  .board{padding:12px}
+  .tools{display:none;width:100%}.note.open .tools{display:flex}
+  .tools-toggle{display:inline-flex}
+  .dock{padding:8px 12px;gap:10px;flex-wrap:wrap}.dock .btn{flex:1}
+  .modal{align-items:flex-end;padding:0}
+  .box{border-radius:22px 22px 0 0;max-width:none;max-height:92vh}
+  .two{grid-template-columns:1fr}
+  .alert .btn{margin-left:0;width:100%}
+  .mergebar{width:calc(100% - 24px);justify-content:space-between;bottom:92px}
+}
+</style>
+</head>
+<body>
+<div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">會議系統</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
+<main>
+  <section id="vList">
+    <div class="banner"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><img class="art" src="../kiosk/img/n-cal.webp" alt="">
+      <div class="txt"><h1>會議系統</h1><p class="sub">會前先填議題，會中好記錄，會後有人追。</p>
+        <div class="bar"><button class="btn main" id="btnNew" hidden><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>建立會議</button><button class="btn sec" id="btnReload"><i class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button></div></div></div>
+    <div class="tabs" id="tabs"><button class="tab on" data-tab="up">即將開會</button><button class="tab" data-tab="todo">待辦看板</button><button class="tab" data-tab="hist">歷史</button></div>
+    <div class="msg" id="msg"></div>
+    <div id="listBody"></div>
+  </section>
+  <section id="vDetail" hidden></section>
+</main>
+
+<div class="modal" id="mTopic"><div class="box">
+  <h2 id="tpTitle">我要提出議題</h2>
+  <div class="f"><label>類型</label><div class="pills" id="tpTypes"></div></div>
+  <div class="f"><label for="tpT">標題（必填，30 字內）</label><input id="tpT" type="text" maxlength="30" autocomplete="off"></div>
+  <div class="f"><label for="tpD">說明（選填，幾句話就好）</label><textarea id="tpD" maxlength="600"></textarea></div>
+  <div class="f"><label for="tpW" id="tpWl">希望會議幫我決定什麼</label><textarea id="tpW" maxlength="300" style="min-height:64px"></textarea><div class="hint">寫清楚想要大家決定的事，會議會更有效率。</div></div>
+  <div class="f"><label>預估需要幾分鐘</label><div class="pills" id="tpMin"></div></div>
+  <div class="ferr" id="tpErr"></div>
+  <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="tpSave">送出</button></div>
+</div></div>
+
+<div class="modal" id="mMeet"><div class="box">
+  <h2 id="mtTitle">建立會議</h2>
+  <div class="f"><label for="mtName">會議主題（必填）</label><input id="mtName" type="text" maxlength="40" placeholder="例如：11 月行政痛點會議" autocomplete="off"></div>
+  <div class="f"><label>會議類型</label><div class="pills" id="mtTypes"></div><div class="hint" id="mtTypeHint"></div></div>
+  <div class="two"><div class="f"><label for="mtDate">開會日期</label><input id="mtDate" type="date"></div><div class="f"><label for="mtPlace">地點</label><input id="mtPlace" type="text" maxlength="40" placeholder="例如：2 樓會議室"></div></div>
+  <div class="two"><div class="f"><label for="mtStart">開始</label><input id="mtStart" type="time"></div><div class="f"><label for="mtEnd">結束</label><input id="mtEnd" type="time"></div></div>
+  <div class="two"><div class="f"><label for="mtDlD">議題徵集截止（日期）</label><input id="mtDlD" type="date"></div><div class="f"><label for="mtDlT">截止時間</label><input id="mtDlT" type="time" value="12:00"></div></div>
+  <div class="f"><label>與會者</label><div class="pick" id="mtPick"></div><div class="hint"><a href="#" id="mtAll">全選</a>　<a href="#" id="mtNone">全不選</a>　已勾選 <b id="mtCnt">0</b> 人</div></div>
+  <div class="two"><div class="f"><label for="mtHost">主持人</label><select id="mtHost"></select></div><div class="f"><label for="mtRec">記錄人</label><select id="mtRec"></select></div></div>
+  <div class="ferr" id="mtErr"></div>
+  <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="mtSave">儲存</button></div>
+</div></div>
+
+<div class="modal" id="mFixed"><div class="box">
+  <h2 id="fxTitle">固定議題</h2>
+  <div class="f" id="fxTWrap"><label for="fxT">標題</label><input id="fxT" type="text" maxlength="60" autocomplete="off"></div>
+  <div class="f"><label for="fxD" id="fxDl">說明／報告內容</label><textarea id="fxD" maxlength="600"></textarea></div>
+  <div class="f" id="fxRWrap"><label for="fxR">指定報告人（選填）</label><select id="fxR"></select><div class="hint">被指定的人會在徵集期間看到「請填報告內容」的提醒。</div></div>
+  <div class="f" id="fxMWrap"><label for="fxM">預估分鐘（選填）</label><input id="fxM" type="text" inputmode="numeric" maxlength="3"></div>
+  <div class="ferr" id="fxErr"></div>
+  <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="fxSave">儲存</button></div>
+</div></div>
+
+<div class="modal" id="mReturn"><div class="box">
+  <h2>退回補充</h2><p class="muted" id="rtWho" style="margin:0 0 10px"></p>
+  <div class="f"><label for="rtNote">請對方補充什麼？（一句話）</label><input id="rtNote" type="text" maxlength="100" placeholder="例如：請補上實際發生的例子"></div>
+  <div class="ferr" id="rtErr"></div>
+  <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="rtSave">退回</button></div>
+</div></div>
+
+<div class="modal" id="mCopy"><div class="box">
+  <h2 id="cpTitle">催填訊息</h2><p class="muted" style="margin:0 0 10px;font-size:13.5px">複製後貼到 LINE 群組。</p>
+  <div class="copybox" id="cpText"></div>
+  <div class="btns"><button class="btn sec" data-close>關閉</button><button class="btn main" id="cpBtn">複製文字</button></div>
+</div></div>
+
+<div class="modal" id="mConfirm"><div class="box">
+  <h2 id="cfTitle"></h2><p id="cfText" style="margin:0;line-height:1.7"></p>
+  <div class="ferr" id="cfErr"></div>
+  <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="cfOk">確定</button></div>
+</div></div>
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbydjtF6BREEVXLy9CGpRm9JZwhOWYL500sM_R8awjTalSKFdkCaj1NNKDKzbCg0aacg/exec";   // 會議後端（Apps Script /exec 網址）
+var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1LEZoMrWlUGQ8TSETNExaMLHZglE_zhEyTIs_rrDf8g8/exec";
+var USE_ROLES = ["manager", "admin"];   // 可挑選為與會者的身份（之後開放護理等單位：在這裡加）
+var $ = function(id){ return document.getElementById(id); };
+var TOPIC_META = {
+  "報告事項": { cls:"t-report", pill:"p-report", icon:"common/icon-note", hint:"我要報告進度或分享做法" },
+  "痛點": { cls:"t-pain", pill:"p-pain", icon:"common/icon-warning", hint:"我卡住了，需要大家協助" },
+  "提案討論": { cls:"t-prop", pill:"p-prop", icon:"common/icon-info", hint:"我有一個想法想大家討論" }
+};
+var ERR = { forbidden:"這個動作只有主持人（主管）可以做。", locked:"這場會議目前不能這樣操作（可能已截止或已發布）。", invalid:"資料不完整或格式不對，請檢查後再試。",
+  wish_required:"痛點與提案請寫「希望會議幫我決定什麼」。", not_found:"找不到這筆資料，可能已被刪除，請重新整理。", conflict:"這筆資料剛剛被別人改過，請重新整理後再改。",
+  busy:"系統忙碌中，請稍後再試。", too_many:"同一場會議最多提出 20 張議題卡。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
+
+var S = { tab:"up", boot:null, detail:null, people:null, merge:null, opening:"" };
+var me = { name:"", role:"" };
+
+/* ========== 基本工具 ========== */
+function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function kick(){ try{ localStorage.removeItem("portal_token"); localStorage.removeItem("portal_exp"); }catch(e){} location.replace("../index.html"); }
+function ico(n){ return '<i class="ico" style="--ico:url(../assets/' + n + '.webp)"></i>'; }
+function isMgr(){ return me.role === "manager"; }
+function post(url, payload){
+  return fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)}).then(function(r){ return r.json(); });
+}
+function api(action, args){
+  var t = token(); if(!t){ kick(); return Promise.reject(new Error("unauthorized")); }
+  var p = { action:action, token:t }; for(var k in (args||{})) p[k] = args[k];
+  return post(SCRIPT_URL, p).then(function(j){ if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; });
+}
+function errText(j){ return ERR[j && j.error] || "操作失敗，請稍後再試。"; }
+function say(text, ok){ var el=$("msg"); el.textContent=text||""; el.className="msg "+(ok?"ok":"err"); }
+function wd(s){ return "日一二三四五六".charAt(new Date(s+"T00:00:00").getDay()); }
+function fmtDate(s){ if(!s) return ""; var a=s.split("-"); return (+a[1])+"/"+(+a[2])+"（"+wd(s)+"）"; }
+function fmtDL(s){ if(!s) return ""; var d=s.split(" "); return fmtDate(d[0])+" "+d[1]; }
+function dlTime(s){ return new Date(s.replace(" ","T")+":00+08:00").getTime(); }
+function countdown(s){
+  var ms = dlTime(s) - Date.now();
+  if(ms <= 0) return { over:true, text:"徵集已截止" };
+  var m = Math.floor(ms/60000), d = Math.floor(m/1440), h = Math.floor((m%1440)/60), mm = m%60;
+  return { over:false, text: "距離截止還有 " + (d ? d+" 天 "+h+" 小時" : h ? h+" 小時 "+mm+" 分" : mm+" 分") };
+}
+function statusTag(st){
+  var c = {"籌備中":"s-prep","議程已發布":"s-pub","會中":"s-live","已結束":"s-done","已作廢":"s-void"}[st] || "s-void";
+  return '<span class="tag '+c+'">'+esc(st)+'</span>';
+}
+function meetLen(m){
+  if(!m.start || !m.end) return 0;
+  var a=m.start.split(":"), b=m.end.split(":");
+  return (+b[0]*60 + +b[1]) - (+a[0]*60 + +a[1]);
+}
+function collecting(m){ return m.status==="籌備中" && dlTime(m.deadline) > Date.now(); }
+function pstate(img, text){ return '<div class="empty"><img src="../assets/'+img+'.webp" alt="">'+text+'</div>'; }
+
+/* ========== 開機 ========== */
+function boot(){
+  if(!token()){ kick(); return; }
+  var n=ls("handover_name"), r=ls("portal_role"), L={manager:"主管",admin:"行政",nurseadmin:"護理行政",nurse:"護理",care:"照服"}, e=$("v-user");
+  if(n){ e.children[0].textContent=n.trim().charAt(0); e.children[1].textContent=n+(L[r]?" · "+L[r]:""); e.style.display="flex"; }
+  if(r && USE_ROLES.indexOf(r) < 0){ $("listBody").innerHTML = pstate("common/state-locked","會議系統目前只開放給行政組使用。"); $("tabs").hidden=true; return; }
+  loadList(true);
+}
+function loadList(first){
+  say("");
+  if(first) $("listBody").innerHTML = pstate("common/state-loading","載入中…");
+  return api("bootstrap").then(function(j){
+    if(!j || !j.ok){ $("listBody").innerHTML = pstate(j&&j.error==="forbidden"?"common/state-locked":"common/state-error", j&&j.error==="forbidden"?"會議系統目前只開放給行政組使用。":esc(errText(j))); return; }
+    S.boot = j; me = j.me; $("btnNew").hidden = !isMgr();
+    route();
+  }).catch(function(e){ if(e.message!=="unauthorized") $("listBody").innerHTML = pstate("common/state-offline","連線失敗，請檢查網路後重新整理。"); });
+}
+function route(){
+  var m = /^#m=(.+)$/.exec(location.hash);
+  if(m){ openDetail(decodeURIComponent(m[1])); return; }
+  S.detail = null; $("vDetail").hidden = true; $("vList").hidden = false; drawList();
+}
+window.addEventListener("hashchange", function(){ if(S.boot) route(); });
+
+/* ========== 首頁 ========== */
+function drawList(){
+  document.querySelectorAll(".tab").forEach(function(b){ b.classList.toggle("on", b.dataset.tab===S.tab); });
+  var ms = S.boot.meetings, html = "";
+  if(S.tab==="up"){
+    var up = ms.filter(function(m){ return m.status==="籌備中"||m.status==="議程已發布"||m.status==="會中"; }).sort(function(a,b){ return (a.date+a.start) < (b.date+b.start) ? -1 : 1; });
+    ms.forEach(function(m){ if(m.status==="已作廢" && isMgr()) up.push(m); });
+    var alerts = up.filter(function(m){ return m.status==="籌備中" && collecting(m) && !m.iFilled; }).map(function(m){
+      return '<div class="alert">'+ico("common/icon-clock")+'<span>「<b>'+esc(m.title)+'</b>」要你填議題，截止 '+esc(fmtDL(m.deadline))+'</span><button class="btn main sm" data-open="'+esc(m.id)+'">去填寫</button></div>';
+    }).join("");
+    html = alerts + (up.length ? '<div class="mlist">'+up.map(mcard).join("")+'</div>' : pstate("common/state-empty","目前沒有即將召開的會議。"+(isMgr()?"按右上「建立會議」開始。":"")));
+  } else if(S.tab==="hist"){
+    var h = ms.filter(function(m){ return m.status==="已結束"; }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
+    html = h.length ? '<div class="mlist">'+h.map(mcard).join("")+'</div>' : pstate("common/state-empty","還沒有已結束的會議。");
+  } else {
+    html = pstate("common/state-empty","待辦看板會在下一階段開放。<br>會議決議產生的待辦，之後會集中在這裡追蹤。");
+  }
+  $("listBody").innerHTML = html;
+}
+function mcard(m){
+  var pr = m.progress || {filled:0,total:0}, pct = pr.total ? Math.round(pr.filled*100/pr.total) : 0, t="";
+  if(m.status==="籌備中"){
+    t = '<div><div class="pline"><span>議題徵集　已填 <b>'+pr.filled+'</b>／'+pr.total+'</span><span class="'+(m.iFilled?"me-ok":"me-no")+'">'+(m.iFilled?(m.myCount?"你已提交 "+m.myCount+" 項":"你已完成"):"你還沒填")+'</span></div><div class="prog"><i style="width:'+pct+'%"></i></div></div>';
+  }
+  return '<div class="mcard" data-open="'+esc(m.id)+'"><div class="mrow">'+statusTag(m.status)+'<span class="tag type">'+esc(m.type)+'</span></div><h3>'+esc(m.title)+'</h3>' +
+    '<div class="minfo"><span>'+ico("common/icon-calendar-small")+esc(fmtDate(m.date))+(m.start?" "+esc(m.start):"")+'</span>'+(m.place?'<span>'+ico("common/icon-location")+esc(m.place)+'</span>':"")+'</div>' + t +
+    '<div class="mrow" style="justify-content:flex-end"><button class="btn sec sm" data-open="'+esc(m.id)+'">進入會議</button></div></div>';
+}
+
+/* ========== 詳情 ========== */
+function openDetail(id){
+  $("vList").hidden = true; $("vDetail").hidden = false;
+  if(!S.detail || S.detail.meeting.id !== id) $("vDetail").innerHTML = pstate("common/state-loading","載入中…");
+  return api("meeting.get",{id:id}).then(function(j){
+    if(!j || !j.ok){ $("vDetail").innerHTML = '<p><a href="#" data-back>&larr; 回會議首頁</a></p>'+pstate("common/state-error",esc(errText(j))); return; }
+    S.detail = j; S.merge = null; drawDetail();
+  }).catch(function(e){ if(e.message!=="unauthorized") $("vDetail").innerHTML = '<p><a href="#" data-back>&larr; 回會議首頁</a></p>'+pstate("common/state-offline","連線失敗，請檢查網路後再試。"); });
+}
+function refreshDetail(){ return openDetail(S.detail.meeting.id); }
+function topicsOf(d){ return d.topics.filter(function(t){ return t.status!=="已合併"; }); }
+function counted(t){ return t.status==="已提交" || t.status==="已排入"; }
+
+function drawDetail(){
+  var d = S.detail, m = d.meeting, pr = d.progress, mgr = isMgr(), open = collecting(m), prep = m.status==="籌備中";
+  var cd = prep ? countdown(m.deadline) : null;
+  var h = '<p style="margin:0 0 10px"><a href="#" data-back class="muted" style="font-weight:700;text-decoration:none">&larr; 回會議首頁</a></p>';
+  h += '<div class="dhead"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><div class="mrow">'+statusTag(m.status)+'<span class="tag type">'+esc(m.type)+'</span></div><h1>'+esc(m.title)+'</h1>' +
+    '<div class="dinfo"><span>'+ico("common/icon-calendar-small")+esc(fmtDate(m.date))+(m.start?" "+esc(m.start)+(m.end?"–"+esc(m.end):""):"")+'</span>'+(m.place?'<span>'+ico("common/icon-location")+esc(m.place)+'</span>':"")+
+    '<span>'+ico("common/icon-user")+'主持人：'+esc(m.host)+'</span><span>'+ico("common/icon-note")+'記錄人：'+(m.recorder?esc(m.recorder):"尚未指定")+'</span></div>' +
+    (prep ? '<div class="mrow"><span class="cd'+(cd.over?" over":"")+'">'+ico("common/icon-clock")+esc(cd.text)+'（'+esc(fmtDL(m.deadline))+'）</span></div>' : '') +
+    (mgr && m.status!=="已結束" && m.status!=="已作廢" ? '<div class="bar" style="margin-top:10px"><button class="btn sec sm" data-act="editMeeting">'+ico("common/icon-edit")+'編輯會議</button><button class="btn warn sm" data-act="cancelMeeting">作廢會議</button></div>' : '') +
+    '</div>';
+  var pend = (pr.reporterPending||{})[me.name];
+  if(prep && pend && pend.length && open) h += '<div class="alert"><span>你被指定報告「<b>'+esc(pend.join("、"))+'</b>」，請填報告內容。</span><button class="btn main sm" data-act="fillFixed" data-id="'+esc(d.topics.filter(function(t){ return t.fixed && t.reporter===me.name && !t.desc; })[0].id)+'">去填寫</button></div>';
+  if(prep && !open && !mgr) h += '<div class="alert t">議題徵集已截止，不能再新增或修改議題；如需補充請洽主持人。</div>';
+  if(m.status==="議程已發布") h += '<div class="alert t">議程已發布。會中記錄功能會在下一階段開放。</div>';
+  h += '<div class="msg" id="dmsg"></div><div class="cols"><aside class="side">' + sideCards(d, prep) + '</aside><section>' + boardHtml(d, open) + '</section></div>';
+  $("vDetail").innerHTML = h + dockHtml(d);
+  tick();
+}
+function sideCards(d, prep){
+  var m = d.meeting, pr = d.progress, pct = pr.total ? Math.round(pr.filled*100/pr.total) : 0, h = "";
+  if(prep || m.status==="議程已發布"){
+    h += '<div class="panel"><div class="ttl">議題徵集進度</div><div class="pline"><span>已填 <b>'+pr.filled+'</b>／'+pr.total+'</span><span>'+pct+'%</span></div><div class="prog"><i style="width:'+pct+'%"></i></div>';
+    h += pr.missing.length ? '<div class="sect" style="margin:12px 0 6px">還沒填（'+pr.missing.length+' 人）</div><div class="chips">'+pr.missing.map(function(n){ return '<span class="chip">'+esc(n)+'</span>'; }).join("")+'</div>' : '<div class="sect" style="margin:12px 0 0">大家都填好了 👍</div>';
+    if(isMgr() && prep && pr.missing.length) h += '<div style="margin-top:12px"><button class="btn sec sm" data-act="remind">產生催填訊息</button></div>';
+    h += '</div>';
+  }
+  h += '<div class="panel"><div class="ttl">與會者<small>共 '+m.attendees.length+' 人</small></div><div class="chips">'+m.attendees.map(function(n){ return '<span class="chip ok">'+esc(n)+'</span>'; }).join("")+'</div></div>';
+  h += '<div class="panel"><div class="ttl">上次未結案待辦</div>' + (d.prevTodos.length ? d.prevTodos.map(function(t){
+    var late = t.due && t.due < today();
+    return '<div class="todo"><b>'+esc(t.content)+'</b><small>'+esc(t.owner||"未指定")+' · <span class="'+(late?"late":"")+'">'+(t.due?"期限 "+esc(fmtDate(t.due)):"無期限")+(late?"（逾期）":"")+'</span></small></div>';
+  }).join("") : '<div class="muted" style="font-size:14px">沒有。</div>') + '</div>';
+  return h;
+}
+function today(){ var d=new Date(), z=function(n){ return ("0"+n).slice(-2); }; return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate()); }
+
+function boardHtml(d, open){
+  var m = d.meeting, mgr = isMgr(), prep = m.status==="籌備中", ts = topicsOf(d);
+  var fixed = ts.filter(function(t){ return t.fixed; }), mem = ts.filter(function(t){ return !t.fixed; });
+  var h = '<div class="board"><div class="boardbar">' + ((open || (mgr && prep)) && m.status!=="已結束" ? '<button class="btn main" data-act="newTopic">'+ico("common/icon-plus")+'我要提出議題</button>' : '') +
+    '<span class="muted" style="font-size:13.5px">'+(m.status==="籌備中"?"大家提出的議題彼此都看得到。":"議程")+'</span></div>';
+  h += '<div class="sect">固定議題</div><div class="grid">' + fixed.map(function(t){ return noteHtml(d, t, mem, open); }).join("") + '</div>';
+  h += '<div class="sect">同仁提出的議題（'+mem.length+'）</div>';
+  h += mem.length ? '<div class="grid">' + mem.map(function(t){ return noteHtml(d, t, mem, open); }).join("") + '</div>' : pstate("common/state-empty","還沒有人提出議題。");
+  return h + '</div>';
+}
+function noteHtml(d, t, mem, open){
+  var m = d.meeting, mgr = isMgr(), mine = !t.fixed && t.proposer.split(/[,，、]/).indexOf(me.name) >= 0, prep = m.status==="籌備中", meta = TOPIC_META[t.type] || TOPIC_META["報告事項"];
+  var sel = S.merge && S.merge.ids.indexOf(t.id) >= 0, dim = t.status==="會中不討論" || t.status==="退回補充";
+  var h = '<div class="note '+(t.fixed?"fixed":meta.cls)+(sel?" sel":"")+(dim?" dim":"")+'" data-id="'+esc(t.id)+'">';
+  if(mine) h += '<span class="mine-tag">我的</span>';
+  h += '<div class="nt">'+(t.fixed?"":ico(meta.icon))+'<span>'+esc(t.title)+'</span></div>';
+  h += '<div class="nmeta">'+(t.fixed ? (t.reporter?"報告人："+esc(t.reporter):"主持人設定") : esc(t.type)+' · 提出人 '+esc(t.proposer))+'</div>';
+  if(t.status==="會中不討論") h += '<div class="nmeta"><span class="tag s-void">會中不討論，只做紀錄</span></div>';
+  if(t.status==="退回補充") h += '<div class="nret"><b>請補充：</b>'+esc(t.returnNote)+'</div>';
+  if(t.desc) h += '<div class="ndesc">'+esc(t.desc)+'</div>';
+  if(t.wish) h += '<div class="nwish"><b>希望會議決定：</b>'+esc(t.wish)+'</div>';
+  if(t.fixed && t.reporter && !t.desc && prep) h += '<div class="nmeta">（等待 '+esc(t.reporter)+' 填報告內容）</div>';
+  h += '<div class="nfoot"><span class="min">'+(t.minutes?"預估 "+t.minutes+" 分鐘":"")+'</span>';
+  var canEdit = (mine && open) || (mgr && m.status!=="已結束" && m.status!=="已作廢");
+  if(S.merge){
+    if(!t.fixed && t.id!==S.merge.ids[0]) h += '<button class="lk" data-act="pickMerge" data-id="'+esc(t.id)+'">'+(sel?"取消選取":"選取合併")+'</button>';
+  } else {
+    if(t.fixed && !mgr && t.reporter===me.name && open) h += '<button class="lk" data-act="fillFixed" data-id="'+esc(t.id)+'">填報告內容</button>';
+    if(canEdit && !t.fixed) h += '<button class="lk" data-act="editTopic" data-id="'+esc(t.id)+'">'+(t.status==="退回補充"&&mine?"補充後重送":"編輯")+'</button>';
+    if(mine && t.proposer===me.name && open) h += '<button class="lk w" data-act="delTopic" data-id="'+esc(t.id)+'">刪除</button>';
+    if(mgr && m.status!=="已結束" && m.status!=="已作廢"){
+      h += '<button class="lk tools-toggle" data-act="tools">⋯ 整理</button><span class="tools">';
+      if(t.fixed) h += '<button class="lk" data-act="editFixed" data-id="'+esc(t.id)+'">編輯／指定報告人</button>';
+      else {
+        if(prep) h += '<button class="lk" data-act="returnTopic" data-id="'+esc(t.id)+'">退回補充</button>';
+        h += '<button class="lk" data-act="startMerge" data-id="'+esc(t.id)+'">合併</button><button class="lk" data-act="mv" data-d="-1" data-id="'+esc(t.id)+'">↑ 上移</button><button class="lk" data-act="mv" data-d="1" data-id="'+esc(t.id)+'">↓ 下移</button>';
+        h += '<button class="lk" data-act="skip" data-id="'+esc(t.id)+'" data-v="'+(t.status==="會中不討論"?"0":"1")+'">'+(t.status==="會中不討論"?"改回要討論":"會中不討論")+'</button>';
+      }
+      h += '</span>';
+    }
+  }
+  return h + '</div></div>';
+}
+function dockHtml(d){
+  var m = d.meeting, mgr = isMgr(), prep = m.status==="籌備中";
+  if(!(mgr || prep)) return "";
+  var total = 0; d.topics.forEach(function(t){ if(counted(t)) total += t.minutes||0; });
+  var len = meetLen(m), pct = len ? Math.min(100, Math.round(total*100/len)) : 0, over = len && total > len;
+  var h = '<div class="dock"><div class="budget"><div class="pline"><span>議程總預估 <b class="'+(over?"over-t":"")+'">'+total+'</b> 分鐘'+(len?' ／ 會議長度 '+len+' 分鐘':'（尚未設定會議長度）')+'</span>'+(over?'<span class="over-t">超過 '+(total-len)+' 分鐘，建議刪減或延後</span>':'')+'</div>' +
+    '<div class="prog"><i class="'+(over?"over":"")+'" style="width:'+pct+'%"></i></div></div>';
+  if(mgr && prep) h += '<button class="btn main" data-act="publish">發布議程</button>';
+  else if(mgr && m.status==="議程已發布") h += '<button class="btn sec" data-act="reopen">重新開放徵集</button>';
+  return h + '</div>';
+}
+var tickTimer = setInterval(function(){ if(S.detail && !$("vDetail").hidden && S.detail.meeting.status==="籌備中"){ var cd = $("vDetail").querySelector(".cd"); if(cd){ var c=countdown(S.detail.meeting.deadline); cd.className="cd"+(c.over?" over":""); cd.lastChild.textContent=c.text+"（"+fmtDL(S.detail.meeting.deadline)+"）"; } } }, 30000);
+function tick(){}
+
+/* ========== 視窗共用 ========== */
+function showModal(id){ $(id).classList.add("show"); }
+function hideModals(){ document.querySelectorAll(".modal.show").forEach(function(x){ x.classList.remove("show"); }); }
+document.addEventListener("click", function(e){
+  var t = e.target;
+  if(t.classList && t.classList.contains("modal")) { hideModals(); return; }
+  var c = t.closest ? t.closest("[data-close]") : null; if(c){ hideModals(); return; }
+  var bk = t.closest("[data-back]"); if(bk){ e.preventDefault(); location.hash = ""; S.detail=null; loadList(); return; }
+  var op = t.closest("[data-open]"); if(op){ location.hash = "#m=" + encodeURIComponent(op.dataset.open); return; }
+  var tb = t.closest(".tab"); if(tb){ S.tab = tb.dataset.tab; drawList(); return; }
+  var a = t.closest("[data-act]"); if(a) act(a);
+});
+function setErr(id, text){ $(id).textContent = text || ""; }
+function confirmBox(title, text, okLabel, fn){
+  $("cfTitle").textContent = title; $("cfText").innerHTML = text; $("cfOk").textContent = okLabel || "確定"; setErr("cfErr","");
+  $("cfOk").onclick = function(){ $("cfOk").disabled=true; fn().then(function(j){
+    $("cfOk").disabled=false;
+    if(j && j.ok){ hideModals(); } else setErr("cfErr", errText(j));
+  }).catch(function(e){ $("cfOk").disabled=false; if(e.message!=="unauthorized") setErr("cfErr","連線失敗，請檢查網路後再試。"); }); };
+  showModal("mConfirm");
+}
+function dmsg(text, ok){ var el=$("dmsg"); if(!el) return; el.textContent=text||""; el.className="msg "+(ok?"ok":"err"); }
+function findT(id){ return S.detail.topics.filter(function(t){ return t.id===id; })[0]; }
+function simple(action, args, okText){          // 直接執行並重整詳情
+  return api(action, args).then(function(j){
+    if(j && j.ok){ return refreshDetail().then(function(){ if(okText) dmsg(okText,true); return j; }); }
+    dmsg(errText(j)); return j;
+  }).catch(function(e){ if(e.message!=="unauthorized") dmsg("連線失敗，請檢查網路後再試。"); });
+}
+
+/* ========== 動作分派 ========== */
+function act(a){
+  var k = a.dataset.act, id = a.dataset.id, d = S.detail;
+  if(k==="tools"){ a.closest(".note").classList.toggle("open"); return; }
+  if(k==="newTopic") return openTopic(null);
+  if(k==="editTopic") return openTopic(findT(id));
+  if(k==="delTopic"){ var t=findT(id); return confirmBox("刪除議題","確定要刪除「"+esc(t.title)+"」嗎？","刪除",function(){ return api("topic.delete",{id:id}).then(function(j){ if(j&&j.ok) refreshDetail(); return j; }); }); }
+  if(k==="editFixed") return openFixed(findT(id), true);
+  if(k==="fillFixed") return openFixed(findT(id), false);
+  if(k==="returnTopic") return openReturn(findT(id));
+  if(k==="skip") return void simple("topic.manage",{id:id,skip:a.dataset.v==="1"});
+  if(k==="mv") return moveTopic(id, +a.dataset.d);
+  if(k==="startMerge"){ S.merge = { ids:[id] }; drawDetail(); return mergeBar(); }
+  if(k==="pickMerge"){ var ix=S.merge.ids.indexOf(id); if(ix>=0) S.merge.ids.splice(ix,1); else S.merge.ids.push(id); drawDetail(); return mergeBar(); }
+  if(k==="remind") return openRemind();
+  if(k==="editMeeting") return openMeeting(d.meeting);
+  if(k==="cancelMeeting") return confirmBox("作廢會議","確定要作廢「"+esc(d.meeting.title)+"」嗎？資料會保留，但清單上不再顯示給同仁。","作廢",function(){ return api("meeting.cancel",{id:d.meeting.id}).then(function(j){ if(j&&j.ok){ location.hash=""; loadList(); } return j; }); });
+  if(k==="publish") return doPublish();
+  if(k==="reopen") return confirmBox("重新開放徵集","議程會回到「籌備中」，同仁在截止前可以再填或改議題。","重新開放",function(){ return api("meeting.reopen",{id:d.meeting.id}).then(function(j){ if(j&&j.ok) refreshDetail(); return j; }); });
+}
+function mergeBar(){
+  var old = document.getElementById("mergeBar"); if(old) old.remove();
+  if(!S.merge) return;
+  var b = document.createElement("div"); b.className = "mergebar"; b.id = "mergeBar";
+  b.innerHTML = '<span>合併：已選 '+S.merge.ids.length+' 張（留下第一張）</span><span><button class="btn sec" id="mgNo">取消</button> <button class="btn main" id="mgOk"'+(S.merge.ids.length<2?" disabled":"")+'>確定合併</button></span>';
+  document.body.appendChild(b);
+  $("mgNo").onclick = function(){ S.merge=null; b.remove(); drawDetail(); };
+  $("mgOk").onclick = function(){ var ids=S.merge.ids; S.merge=null; b.remove(); simple("topic.merge",{ids:ids},"已合併。"); };
+}
+function moveTopic(id, dir){
+  var all = topicsOf(S.detail), ids = all.map(function(t){ return t.id; }), i = ids.indexOf(id), j = i + dir;
+  while(j>=0 && j<all.length && all[j].fixed) j += dir;            // 只和同仁提出的議題交換位置，固定議題不動
+  if(j<0 || j>=all.length) return;
+  var tmp = ids[i]; ids[i] = ids[j]; ids[j] = tmp;
+  simple("topic.reorder",{meetingId:S.detail.meeting.id, ids:ids});
+}
+function doPublish(){
+  var d = S.detail, ts = topicsOf(d), n = ts.filter(function(t){ return t.status==="已提交"; }).length, back = ts.filter(function(t){ return t.status==="退回補充"; }).length;
+  var len = meetLen(d.meeting), total = 0; ts.forEach(function(t){ if(counted(t)) total += t.minutes||0; });
+  var txt = "會把 <b>"+n+"</b> 張議題排入議程。" + (back ? "<br>另有 "+back+" 張還在「退回補充」，不會排入。" : "") + (len && total>len ? "<br><span style='color:#A63124'>議程預估 "+total+" 分鐘，超過會議長度 "+len+" 分鐘。</span>" : "") + "<br>發布後，同仁就不能再改自己的議題卡（你仍可修改）。";
+  confirmBox("發布議程", txt, "發布", function(){ return api("meeting.publish",{id:d.meeting.id}).then(function(j){ if(j&&j.ok) refreshDetail(); return j; }); });
+}
+
+/* ========== 議題卡視窗 ========== */
+var tp = { id:null, type:"報告事項", min:5, ver:"" };
+function openTopic(t){
+  tp = { id:t?t.id:null, type:t?t.type:"報告事項", min:t?(t.minutes||5):5, ver:t?t.updatedAt:"" };
+  $("tpTitle").textContent = t ? "修改議題" : "我要提出議題";
+  $("tpT").value = t?t.title:""; $("tpD").value = t?t.desc:""; $("tpW").value = t?t.wish:""; setErr("tpErr","");
+  $("tpSave").textContent = t && t.status==="退回補充" ? "補充後重送" : "送出";
+  drawTopicPills(); showModal("mTopic"); setTimeout(function(){ try{ $("tpT").focus(); }catch(e){} }, 30);
+}
+function drawTopicPills(){
+  $("tpTypes").innerHTML = Object.keys(TOPIC_META).map(function(k){ var x=TOPIC_META[k];
+    return '<button type="button" class="pill '+x.pill+(tp.type===k?" on":"")+'" data-tt="'+k+'" title="'+x.hint+'">'+ico(x.icon)+k+'</button>'; }).join("");
+  var mins = [5,10,15,20]; if(mins.indexOf(tp.min)<0) mins.push(tp.min);
+  $("tpMin").innerHTML = mins.map(function(n){ return '<button type="button" class="pill'+(tp.min===n?" on":"")+'" data-tm="'+n+'">'+n+' 分鐘</button>'; }).join("");
+  $("tpWl").textContent = tp.type==="報告事項" ? "希望會議幫我決定什麼（選填）" : "希望會議幫我決定什麼（必填）";
+  document.querySelectorAll("[data-tt]").forEach(function(b){ b.onclick=function(){ tp.type=b.dataset.tt; drawTopicPills(); }; });
+  document.querySelectorAll("[data-tm]").forEach(function(b){ b.onclick=function(){ tp.min=+b.dataset.tm; drawTopicPills(); }; });
+}
+$("tpSave").onclick = function(){
+  var title=$("tpT").value.trim(), wish=$("tpW").value.trim();
+  if(!title){ setErr("tpErr","請填寫標題。"); return; }
+  if(tp.type!=="報告事項" && !wish){ setErr("tpErr","痛點與提案請寫「希望會議幫我決定什麼」。"); return; }
+  var args = { type:tp.type, title:title, desc:$("tpD").value.trim(), wish:wish, minutes:tp.min };
+  if(tp.id){ args.id = tp.id; args.ver = tp.ver; } else args.meetingId = S.detail.meeting.id;
+  $("tpSave").disabled = true; setErr("tpErr","");
+  api("topic.save", args).then(function(j){
+    $("tpSave").disabled = false;
+    if(j && j.ok){ hideModals(); refreshDetail().then(function(){ dmsg(tp.id?"議題已更新。":"議題已送出，截止前都可以修改。",true); }); }
+    else setErr("tpErr", errText(j));
+  }).catch(function(e){ $("tpSave").disabled=false; if(e.message!=="unauthorized") setErr("tpErr","連線失敗，請檢查網路後再試。"); });
+};
+
+/* ========== 固定議題視窗（主持人編輯；報告人填內容） ========== */
+var fx = { id:null, mgr:false, ver:"" };
+function openFixed(t, asMgr){
+  fx = { id:t.id, mgr:asMgr, ver:t.updatedAt }; setErr("fxErr","");
+  $("fxTitle").textContent = asMgr ? "編輯固定議題" : "填報告內容：" + t.title;
+  $("fxT").value = t.title; $("fxD").value = t.desc; $("fxM").value = t.minutes || "";
+  $("fxTWrap").hidden = $("fxRWrap").hidden = $("fxMWrap").hidden = !asMgr;
+  $("fxR").innerHTML = '<option value="">（不指定）</option>' + S.detail.meeting.attendees.map(function(n){ return '<option'+(n===t.reporter?" selected":"")+'>'+esc(n)+'</option>'; }).join("");
+  showModal("mFixed");
+}
+$("fxSave").onclick = function(){
+  var req, name;
+  if(fx.mgr){
+    var mi = $("fxM").value.trim();
+    if(mi && !/^\d{1,3}$/.test(mi)){ setErr("fxErr","分鐘請填數字。"); return; }
+    if(!$("fxT").value.trim()){ setErr("fxErr","請填標題。"); return; }
+    name = "topic.manage"; req = { id:fx.id, ver:fx.ver, title:$("fxT").value.trim(), desc:$("fxD").value.trim(), reporter:$("fxR").value, minutes: mi||"0" };
+  } else { name = "topic.save"; req = { id:fx.id, ver:fx.ver, desc:$("fxD").value.trim() }; }
+  $("fxSave").disabled = true; setErr("fxErr","");
+  api(name, req).then(function(j){
+    $("fxSave").disabled = false;
+    if(j && j.ok){ hideModals(); refreshDetail().then(function(){ dmsg("已儲存。",true); }); } else setErr("fxErr", errText(j));
+  }).catch(function(e){ $("fxSave").disabled=false; if(e.message!=="unauthorized") setErr("fxErr","連線失敗，請檢查網路後再試。"); });
+};
+
+/* ========== 退回補充 ========== */
+var rt = null;
+function openReturn(t){ rt = t; $("rtWho").textContent = "「"+t.title+"」（"+t.proposer+"）"; $("rtNote").value = ""; setErr("rtErr",""); showModal("mReturn"); setTimeout(function(){ $("rtNote").focus(); },30); }
+$("rtSave").onclick = function(){
+  var note = $("rtNote").value.trim(); if(!note){ setErr("rtErr","請寫一句話告訴對方要補充什麼。"); return; }
+  api("topic.return",{id:rt.id,note:note}).then(function(j){ if(j&&j.ok){ hideModals(); refreshDetail().then(function(){ dmsg("已退回，對方補充後會重新送出。",true); }); } else setErr("rtErr", errText(j)); })
+    .catch(function(e){ if(e.message!=="unauthorized") setErr("rtErr","連線失敗，請檢查網路後再試。"); });
+};
+
+/* ========== 催填訊息 ========== */
+function openRemind(){
+  var m = S.detail.meeting, miss = S.detail.progress.missing;
+  $("cpTitle").textContent = "催填訊息";
+  $("cpText").textContent = "📣【" + m.title + "】議題還沒填喔！\n\n" +
+    "🗓 開會時間：" + fmtDate(m.date) + (m.start ? " " + m.start : "") + (m.place ? "　" + m.place : "") + "\n" +
+    "⏰ 填寫截止：" + fmtDL(m.deadline) + "\n\n" +
+    "還沒填的同仁（" + miss.length + " 位）：\n" + miss.join("、") + "\n\n" +
+    "請到入口網站 → 會議系統 → 「我要提出議題」填寫。沒有議題也沒關係，可以填一則報告事項 🙏";
+  $("cpBtn").textContent = "複製文字"; showModal("mCopy");
+}
+$("cpBtn").onclick = function(){
+  var txt = $("cpText").textContent, done = function(){ $("cpBtn").textContent = "已複製 ✓"; };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fallbackCopy);
+  else fallbackCopy();
+  function fallbackCopy(){ var ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); try{ document.execCommand("copy"); done(); }catch(e){ $("cpBtn").textContent="請手動選取複製"; } ta.remove(); }
+};
+
+/* ========== 建立／編輯會議 ========== */
+var mt = { id:null, ver:"", type:"", dlTouched:false, picked:{} };
+function loadPeople(){
+  if(S.people) return Promise.resolve(S.people);
+  return post(AUTH_API, { action:"people.names", token:token() }).then(function(j){
+    if(!j || !j.ok) throw new Error(j && j.error==="unknown action" ? "noapi" : "fail");
+    S.people = (j.people||[]).filter(function(p){ return USE_ROLES.indexOf(p.role)>=0; }).map(function(p){ return p.name; });
+    return S.people;
+  });
+}
+function openMeeting(m){
+  loadPeople().then(function(people){
+    var types = Object.keys(S.boot.types);
+    mt = { id:m?m.id:null, ver:m?m.updatedAt:"", type:m?m.type:types[0], dlTouched:!!m, picked:{} };
+    var all = people.slice(); if(m) m.attendees.forEach(function(n){ if(all.indexOf(n)<0) all.push(n); });
+    all.forEach(function(n){ mt.picked[n] = m ? m.attendees.indexOf(n)>=0 : true; });
+    mt.people = all;
+    $("mtTitle").textContent = m ? "編輯會議" : "建立會議";
+    $("mtName").value = m?m.title:""; $("mtDate").value = m?m.date:""; $("mtPlace").value = m?m.place:"";
+    $("mtStart").value = m?m.start:"14:00"; $("mtEnd").value = m?m.end:"15:00";
+    if(m){ $("mtDlD").value = m.deadline.split(" ")[0]; $("mtDlT").value = m.deadline.split(" ")[1]; } else { $("mtDlD").value=""; $("mtDlT").value="12:00"; }
+    drawMeetForm(m ? m.host : me.name, m ? m.recorder : ""); setErr("mtErr",""); showModal("mMeet");
+  }).catch(function(e){
+    say(e.message==="noapi" ? "入口認證後端還沒更新成新版本（缺少同仁名單功能），請先部署入口認證的新版本。" : "讀取同仁名單失敗，請稍後再試。");
+  });
+}
+function drawMeetForm(host, rec){
+  var types = Object.keys(S.boot.types);
+  $("mtTypes").innerHTML = types.map(function(k){ return '<button type="button" class="pill'+(mt.type===k?" on":"")+'" data-mty="'+esc(k)+'">'+esc(k)+'</button>'; }).join("");
+  $("mtTypeHint").textContent = "預設固定議題：" + S.boot.types[mt.type].map(function(x){ return x.replace(/（.*）/,""); }).join("、");
+  document.querySelectorAll("[data-mty]").forEach(function(b){ b.onclick=function(){ mt.type=b.dataset.mty; drawMeetForm($("mtHost").value, $("mtRec").value); }; });
+  $("mtPick").innerHTML = mt.people.map(function(n,i){ return '<label><input type="checkbox" data-pi="'+i+'"'+(mt.picked[n]?" checked":"")+'>'+esc(n)+'</label>'; }).join("");
+  $("mtPick").querySelectorAll("input").forEach(function(c){ c.onchange=function(){ mt.picked[mt.people[+c.dataset.pi]] = c.checked; syncPeople(); }; });
+  syncPeople(host, rec);
+}
+function pickedList(){ return mt.people.filter(function(n){ return mt.picked[n]; }); }
+function syncPeople(host, rec){
+  host = host || $("mtHost").value; rec = rec != null ? rec : $("mtRec").value;
+  var l = pickedList(); $("mtCnt").textContent = l.length;
+  var hs = l.slice(); if(host && hs.indexOf(host)<0) hs.unshift(host);
+  $("mtHost").innerHTML = hs.map(function(n){ return '<option'+(n===host?" selected":"")+'>'+esc(n)+'</option>'; }).join("");
+  $("mtRec").innerHTML = '<option value="">（會前再指定）</option>' + l.map(function(n){ return '<option'+(n===rec?" selected":"")+'>'+esc(n)+'</option>'; }).join("");
+}
+$("mtAll").onclick = function(e){ e.preventDefault(); mt.people.forEach(function(n){ mt.picked[n]=true; }); drawMeetForm(); };
+$("mtNone").onclick = function(e){ e.preventDefault(); mt.people.forEach(function(n){ mt.picked[n]=false; }); drawMeetForm(); };
+$("mtDlD").onchange = function(){ mt.dlTouched = true; };
+$("mtDate").onchange = function(){            // 沒手動改過截止日時，預設是開會前一天
+  if(mt.dlTouched || !$("mtDate").value) return;
+  var d = new Date($("mtDate").value + "T00:00:00"); d.setDate(d.getDate()-1);
+  var z = function(n){ return ("0"+n).slice(-2); }; $("mtDlD").value = d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());
+};
+$("mtSave").onclick = function(){
+  var title = $("mtName").value.trim(), date = $("mtDate").value, dl = $("mtDlD").value, dt = $("mtDlT").value || "12:00", l = pickedList();
+  if(!title){ setErr("mtErr","請填寫會議主題。"); return; }
+  if(!date){ setErr("mtErr","請選開會日期。"); return; }
+  if(!dl){ setErr("mtErr","請選議題徵集的截止日期。"); return; }
+  if($("mtStart").value && $("mtEnd").value && $("mtEnd").value <= $("mtStart").value){ setErr("mtErr","結束時間要晚於開始時間。"); return; }
+  if(!l.length){ setErr("mtErr","請至少勾選一位與會者。"); return; }
+  var args = { title:title, type:mt.type, date:date, start:$("mtStart").value, end:$("mtEnd").value, place:$("mtPlace").value.trim(),
+    host:$("mtHost").value, recorder:$("mtRec").value, attendees:l, deadline: dl + " " + dt };
+  if(mt.id){ args.id = mt.id; args.ver = mt.ver; }
+  $("mtSave").disabled = true; setErr("mtErr","");
+  api(mt.id ? "meeting.update" : "meeting.create", args).then(function(j){
+    $("mtSave").disabled = false;
+    if(j && j.ok){ hideModals(); if(mt.id) refreshDetail().then(function(){ dmsg("會議已更新。",true); }); else { location.hash = "#m=" + encodeURIComponent(j.id); } }
+    else setErr("mtErr", errText(j));
+  }).catch(function(e){ $("mtSave").disabled=false; if(e.message!=="unauthorized") setErr("mtErr","連線失敗，請檢查網路後再試。"); });
+};
+
+$("btnNew").onclick = function(){ openMeeting(null); };
+$("btnReload").onclick = function(){ loadList(); };
+document.addEventListener("keydown", function(e){ if(e.key==="Escape") hideModals(); });
+boot();
+</script>
+</body>
+</html>
