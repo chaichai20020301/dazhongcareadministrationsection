@@ -168,6 +168,50 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 .mergebar{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:70;display:flex;gap:10px;align-items:center;padding:10px 16px;background:var(--teal-d);color:#fff;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.25);font-weight:700;font-size:14px}
 .mergebar .btn.sec{padding:6px 14px}
 
+/* 會中記錄 */
+.livebar{position:sticky;top:64px;z-index:50;display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;margin:0 0 12px;padding:9px 16px;background:rgba(255,253,248,.97);border:1px solid var(--t-line);border-radius:16px;box-shadow:0 4px 12px rgba(25,62,37,.06)}
+.livebar b{font:900 16px 'Noto Serif TC',serif}
+.savestat{font-size:13.5px;color:var(--muted);font-weight:500}.savestat.warn{color:var(--red);font-weight:700}.savestat.ok{color:var(--green)}
+.livebar .grow{margin-left:auto;font-size:13.5px;color:var(--muted)}
+.live{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.att{display:flex;gap:7px;flex-wrap:wrap}
+.achip{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font:600 14px 'Noto Sans TC';color:#3E5A4C;cursor:pointer}
+.achip.p{background:var(--g-soft);border-color:var(--g-line);color:var(--green)}
+.achip.l{background:#EEEEE8;border-color:#D8D8CE;color:#6F7A72;text-decoration:line-through}
+.achip[disabled]{cursor:default}
+.lcard{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 4px 12px rgba(25,62,37,.04);overflow:hidden}
+.lcard.open{border-color:var(--t-line)}
+.lhead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:13px 16px;cursor:pointer}
+.lno{display:grid;place-items:center;flex:none;width:28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:14px}
+.lti{flex:1;min-width:140px;font:700 16px/1.4 'Noto Sans TC'}
+.lmeta{font-size:13px;color:var(--muted)}
+.chev{width:12px;height:12px;border-right:2.5px solid var(--muted);border-bottom:2.5px solid var(--muted);transform:rotate(45deg);margin:0 4px 4px 2px;transition:transform .15s}
+.lcard.open .chev{transform:rotate(-135deg);margin-bottom:-2px}
+.lbody{display:none;padding:2px 16px 16px;flex-direction:column;gap:10px}
+.lcard.open .lbody{display:flex}
+.lbody label{display:block;font-weight:700;font-size:13.5px;color:#3E5A4C;margin-bottom:4px}
+.lbody textarea{width:100%;min-height:96px;padding:11px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;line-height:1.55;background:#fff;resize:vertical;color:var(--ink)}
+.lbody textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px rgba(39,103,95,.12)}
+.lbody textarea.dec{min-height:70px}
+.ro{padding:9px 12px;border-radius:12px;background:#F6F5EC;font-size:14.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word;min-height:20px}
+.ro.empty-t{color:#98A59B}
+.tdl{display:flex;gap:6px;flex-wrap:wrap}
+.td{display:inline-flex;align-items:center;gap:6px;padding:5px 6px 5px 12px;border-radius:999px;background:var(--t-soft);border:1px solid var(--t-line);font-size:13.5px;color:var(--teal-d)}
+.td b{font-weight:700}.td em{font-style:normal;color:var(--muted)}.td .no{color:#8A4A12;font-weight:700}
+.td button{border:0;background:rgba(255,255,255,.8);width:22px;height:22px;border-radius:50%;cursor:pointer;color:var(--red);font-size:15px;line-height:1}
+.td.ro-td{padding-right:12px}
+.qa{display:flex;flex-direction:column;gap:7px;padding:11px;border-radius:14px;background:#F3F7F5;border:1px dashed var(--t-line)}
+.qrow{display:flex;gap:8px}
+.qrow input{flex:1;min-width:0;padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:#fff}
+.qrow input:focus{outline:none;border-color:var(--teal)}
+.qlab{font-size:12.5px;color:var(--muted);font-weight:700}
+.qchips{display:flex;gap:6px;flex-wrap:wrap;overflow-x:auto}
+.qc{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font:600 13px 'Noto Sans TC';color:#3E5A4C;cursor:pointer;white-space:nowrap}
+.qc.on{border-color:var(--teal);background:var(--t-soft);color:var(--teal-d)}
+.qchips input[type=date]{padding:4px 8px;border:1.5px solid var(--line);border-radius:999px;font-size:14px}
+.lfoot{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.lconf{padding:10px 12px;border-radius:12px;background:#FBECE9;color:#7A2A1F;font-size:13.5px;line-height:1.6}
+.lconf .btn{margin:6px 6px 0 0}
 @media (max-width:1000px){.banner .art{opacity:.3}.banner .txt{max-width:100%}.cols{grid-template-columns:1fr}.side{position:static}}
 @media (max-width:640px){
   main{padding:12px 12px 120px}
@@ -185,6 +229,9 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
   .box{border-radius:22px 22px 0 0;max-width:none;max-height:92vh}
   .two{grid-template-columns:1fr}
   .alert .btn{margin-left:0;width:100%}
+  .livebar{top:56px}
+  .lhead{padding:12px}.lbody{padding:2px 12px 14px}
+  .lfoot .btn{flex:1}
   .mergebar{width:calc(100% - 24px);justify-content:space-between;bottom:92px}
 }
 </style>
@@ -391,10 +438,12 @@ function drawDetail(){
   var pend = (pr.reporterPending||{})[me.name];
   if(prep && pend && pend.length && open) h += '<div class="alert"><span>你被指定報告「<b>'+esc(pend.join("、"))+'</b>」，請填報告內容。</span><button class="btn main sm" data-act="fillFixed" data-id="'+esc(d.topics.filter(function(t){ return t.fixed && t.reporter===me.name && !t.desc; })[0].id)+'">去填寫</button></div>';
   if(prep && !open && !mgr) h += '<div class="alert t">議題徵集已截止，不能再新增或修改議題；如需補充請洽主持人。</div>';
-  if(m.status==="議程已發布") h += '<div class="alert t">議程已發布。會中記錄功能會在下一階段開放。</div>';
-  h += '<div class="msg" id="dmsg"></div><div class="cols"><aside class="side">' + sideCards(d, prep) + '</aside><section>' + boardHtml(d, open) + '</section></div>';
+  if(m.status==="議程已發布") h += '<div class="alert t">議程已發布。開會時由主持人按下方「開始開會」，記錄人（'+(m.recorder?esc(m.recorder):"尚未指定")+'）就能開始記錄。</div>';
+  var live = m.status==="會中" || m.status==="已結束";
+  h += '<div class="msg" id="dmsg"></div>';
+  h += live ? liveHtml(d) : '<div class="cols"><aside class="side">' + sideCards(d, prep) + '</aside><section>' + boardHtml(d, open) + '</section></div>';
   $("vDetail").innerHTML = h + dockHtml(d);
-  tick();
+  if(live) liveInit();
 }
 function sideCards(d, prep){
   var m = d.meeting, pr = d.progress, pct = pr.total ? Math.round(pr.filled*100/pr.total) : 0, h = "";
@@ -458,13 +507,14 @@ function noteHtml(d, t, mem, open){
 }
 function dockHtml(d){
   var m = d.meeting, mgr = isMgr(), prep = m.status==="籌備中";
+  if(m.status==="會中" || m.status==="已結束") return liveDock(d);
   if(!(mgr || prep)) return "";
   var total = 0; d.topics.forEach(function(t){ if(counted(t)) total += t.minutes||0; });
   var len = meetLen(m), pct = len ? Math.min(100, Math.round(total*100/len)) : 0, over = len && total > len;
   var h = '<div class="dock"><div class="budget"><div class="pline"><span>議程總預估 <b class="'+(over?"over-t":"")+'">'+total+'</b> 分鐘'+(len?' ／ 會議長度 '+len+' 分鐘':'（尚未設定會議長度）')+'</span>'+(over?'<span class="over-t">超過 '+(total-len)+' 分鐘，建議刪減或延後</span>':'')+'</div>' +
     '<div class="prog"><i class="'+(over?"over":"")+'" style="width:'+pct+'%"></i></div></div>';
   if(mgr && prep) h += '<button class="btn main" data-act="publish">發布議程</button>';
-  else if(mgr && m.status==="議程已發布") h += '<button class="btn sec" data-act="reopen">重新開放徵集</button>';
+  else if(mgr && m.status==="議程已發布") h += '<button class="btn sec" data-act="reopen">重新開放徵集</button><button class="btn main" data-act="startMeeting">開始開會</button>';
   return h + '</div>';
 }
 var tickTimer = setInterval(function(){ if(S.detail && !$("vDetail").hidden && S.detail.meeting.status==="籌備中"){ var cd = $("vDetail").querySelector(".cd"); if(cd){ var c=countdown(S.detail.meeting.deadline); cd.className="cd"+(c.over?" over":""); cd.lastChild.textContent=c.text+"（"+fmtDL(S.detail.meeting.deadline)+"）"; } } }, 30000);
@@ -503,6 +553,7 @@ function simple(action, args, okText){          // 直接執行並重整詳情
 /* ========== 動作分派 ========== */
 function act(a){
   var k = a.dataset.act, id = a.dataset.id, d = S.detail;
+  if(LIVE_ACTS[k]) return LIVE_ACTS[k](a, id, d);
   if(k==="tools"){ a.closest(".note").classList.toggle("open"); return; }
   if(k==="newTopic") return openTopic(null);
   if(k==="editTopic") return openTopic(findT(id));
@@ -695,6 +746,210 @@ $("mtSave").onclick = function(){
     else setErr("mtErr", errText(j));
   }).catch(function(e){ $("mtSave").disabled=false; if(e.message!=="unauthorized") setErr("mtErr","連線失敗，請檢查網路後再試。"); });
 };
+
+
+/* ========== 會中記錄 ========== */
+var SV = {}, QA = {}, savedAt = null, openSet = {}, lastLiveId = "";
+function canRecMe(m){ return isMgr() || (!!m.recorder && m.recorder === me.name); }
+function recOn(m){ return m.status==="會中" && canRecMe(m); }
+function agendaOf(d){ return d.topics.filter(function(t){ return t.status!=="已合併" && t.status!=="退回補充"; }); }
+function hhmm(dt){ var z=function(n){ return ("0"+n).slice(-2); }; return z(dt.getHours())+":"+z(dt.getMinutes()); }
+function liveHtml(d){
+  var m = d.meeting, rec = recOn(m), ended = m.status==="已結束", ag = agendaOf(d);
+  var h = '<div class="live"><div class="livebar"><b>'+esc(m.title)+'</b><span class="savestat" id="saveStat"></span><span class="grow" id="attStat"></span></div>';
+  h += '<div class="panel"><div class="ttl">出席登記'+(rec?'<small>點一下切換「出席／請假」</small>':'')+'</div><div class="att" id="attBox"></div>'+
+    (rec ? '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn sec sm" data-act="attAll">全部出席</button><button class="btn sec sm" data-act="attClear">清除登記</button></div>' : '')+'</div>';
+  if(d.prevTodos.length) h += '<div class="panel"><div class="ttl">上次未結案待辦<small>共 '+d.prevTodos.length+' 筆，檢討時對照</small></div>'+d.prevTodos.map(function(t){
+    var late = t.due && t.due < today();
+    return '<div class="todo"><b>'+esc(t.content)+'</b><small>'+esc(t.owner||"未指定")+' · <span class="'+(late?"late":"")+'">'+(t.due?"期限 "+esc(fmtDate(t.due)):"無期限")+(late?"（逾期）":"")+'</span></small></div>'; }).join("")+'</div>';
+  if(!openSet[m.id+"_init"]){ openSet[m.id+"_init"] = 1; for(var i=0;i<ag.length;i++){ if(ag[i].status==="已排入"){ openSet[ag[i].id]=1; break; } } }
+  h += ag.map(function(t,i){ return liveCard(d,t,i); }).join("");
+  return h + '</div>';
+}
+function liveCard(d, t, idx){
+  var m = d.meeting, rec = recOn(m), meta = TOPIC_META[t.type] || TOPIC_META["報告事項"];
+  var stag = t.status==="已討論" ? '<span class="tag s-done">已討論</span>' : t.status==="順延" ? '<span class="tag s-pub">順延</span>' : t.status==="會中不討論" ? '<span class="tag s-void">只做紀錄</span>' : '';
+  var h = '<div class="lcard'+(openSet[t.id]?" open":"")+'" id="lc_'+esc(t.id)+'"><div class="lhead" data-act="cardToggle" data-id="'+esc(t.id)+'"><span class="lno">'+(idx+1)+'</span><span class="lti">'+(t.fixed?"":ico(meta.icon))+esc(t.title)+'</span>'+stag+
+    '<span class="lmeta">'+(t.fixed?(t.reporter?"報告人 "+esc(t.reporter):""):esc(t.proposer))+(t.minutes?" · "+t.minutes+" 分鐘":"")+'</span><i class="chev"></i></div><div class="lbody">';
+  if(t.wish) h += '<div class="nwish"><b>希望會議決定：</b>'+esc(t.wish)+'</div>';
+  if(t.desc) h += '<div class="ndesc">'+esc(t.desc)+'</div>';
+  h += '<div class="lconf" id="cf_'+esc(t.id)+'" hidden></div>';
+  if(rec) h += '<div><label>討論重點</label><textarea data-rec="notes" data-id="'+esc(t.id)+'" maxlength="3000" placeholder="記下大家的意見…">'+esc(t.notes)+'</textarea></div><div><label>決議</label><textarea class="dec" data-rec="decision" data-id="'+esc(t.id)+'" maxlength="2000" placeholder="最後決定了什麼？">'+esc(t.decision)+'</textarea></div>';
+  else h += '<div><label>討論重點</label><div class="ro'+(t.notes?"":" empty-t")+'">'+(t.notes?esc(t.notes):"（尚無紀錄）")+'</div></div><div><label>決議</label><div class="ro'+(t.decision?"":" empty-t")+'">'+(t.decision?esc(t.decision):"（尚無決議）")+'</div></div>';
+  h += '<div><label>待辦</label><div class="tdl" id="tdl_'+esc(t.id)+'">'+todoListHtml(d,t.id,rec)+'</div></div>';
+  if(rec){
+    h += qaHtml(d,t.id) + '<div class="lfoot">';
+    if(t.status==="已討論"||t.status==="順延") h += '<button class="btn sec" data-act="topicState" data-v="已排入" data-id="'+esc(t.id)+'">改回討論中</button>';
+    else if(t.status==="已排入") h += '<button class="btn sec" data-act="topicState" data-v="順延" data-id="'+esc(t.id)+'">順延到下次</button><button class="btn main" data-act="topicState" data-v="已討論" data-id="'+esc(t.id)+'">這題討論完了 ✓</button>';
+    h += '</div>';
+  }
+  return h + '</div></div>';
+}
+function todoListHtml(d, tid, rec){
+  var l = d.todos.filter(function(x){ return x.topicId===tid; });
+  if(!l.length) return '<span class="muted" style="font-size:13.5px">還沒有待辦</span>';
+  return l.map(function(x){
+    return '<span class="td'+(rec&&!x.handoverId?"":" ro-td")+'"><b>'+esc(x.content)+'</b><em>'+(x.owner?esc(x.owner):'<span class="no">未指定負責人</span>')+(x.due?" · "+esc(fmtDate(x.due)):"")+'</em>'+(rec&&!x.handoverId?'<button data-act="tdDel" data-id="'+esc(x.id)+'" title="刪除">×</button>':"")+'</span>';
+  }).join("");
+}
+function dueOf(key){
+  var d = new Date(), z = function(n){ return ("0"+n).slice(-2); };
+  if(key==="tomorrow") d.setDate(d.getDate()+1);
+  else if(key==="fri" || key==="nfri"){ d.setDate(d.getDate() + (5-d.getDay()+7)%7 + (key==="nfri"?7:0)); }
+  return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate());
+}
+function qaHtml(d, tid){
+  var q = QA[tid] || (QA[tid] = { owner:"", key:"", due:"" });
+  var dues = [["today","今天"],["tomorrow","明天"],["fri","本週五"],["nfri","下週五"],["custom","自訂"]];
+  return '<div class="qa" id="qa_'+esc(tid)+'"><div class="qrow"><input type="text" maxlength="120" data-qin="'+esc(tid)+'" placeholder="新增待辦：要做什麼？（按 Enter 加入）"><button class="btn main sm" data-act="tdAdd" data-id="'+esc(tid)+'">加入</button></div>'+
+    '<div class="qlab">負責人（點選）</div><div class="qchips">'+d.meeting.attendees.map(function(n){ return '<button type="button" class="qc'+(q.owner===n?" on":"")+'" data-act="tdOwner" data-id="'+esc(tid)+'" data-v="'+esc(n)+'">'+esc(n)+'</button>'; }).join("")+'</div>'+
+    '<div class="qlab">期限</div><div class="qchips">'+dues.map(function(x){ return '<button type="button" class="qc'+(q.key===x[0]?" on":"")+'" data-act="tdDue" data-id="'+esc(tid)+'" data-v="'+x[0]+'">'+x[1]+'</button>'; }).join("")+
+    '<input type="date" data-qdate="'+esc(tid)+'" value="'+esc(q.key==="custom"?q.due:"")+'"'+(q.key==="custom"?"":" hidden")+'></div></div>';
+}
+function liveDock(d){
+  var m = d.meeting;
+  if(m.status==="會中" && canRecMe(m)) return '<div class="dock"><div class="budget"><span class="savestat" id="saveStat2"></span></div><button class="btn main" data-act="finishMeeting">結束會議</button></div>';
+  if(m.status==="已結束" && isMgr()) return '<div class="dock"><div class="budget muted">會議已結束，紀錄已鎖定。</div><button class="btn sec" data-act="unlockMeeting">解鎖重新編輯</button></div>';
+  return "";
+}
+
+/* 自動儲存：每題各自排隊；失敗就留在本機暫存，之後自動補送 */
+function sv(id){ return SV[id] || (SV[id] = { dirty:false, inflight:false, failed:false, conflict:false, latest:null, timer:null }); }
+function draftKey(id){ return "mt_d_" + id; }
+function saveDraft(id){ var t = findT(id); try{ localStorage.setItem(draftKey(id), JSON.stringify({ notes:t.notes, decision:t.decision, ver:t.updatedAt })); }catch(e){} }
+function dropDraft(id){ try{ localStorage.removeItem(draftKey(id)); }catch(e){} }
+function pendingSaves(){ return Object.keys(SV).some(function(k){ var s=SV[k]; return s.dirty||s.inflight||s.failed||s.conflict; }); }
+function paintSave(){
+  var any = Object.keys(SV).map(function(k){ return SV[k]; }), txt, cls = "savestat";
+  if(any.some(function(s){ return s.conflict; })){ txt = "有題目內容衝突，請在該題處理"; cls += " warn"; }
+  else if(any.some(function(s){ return s.failed; })){ txt = "⚠ 尚未儲存（已暫存在這台裝置，連線恢復後會自動補送）"; cls += " warn"; }
+  else if(any.some(function(s){ return s.dirty||s.inflight; })) txt = "儲存中…";
+  else if(savedAt){ txt = "已自動儲存 " + hhmm(savedAt); cls += " ok"; }
+  else txt = recOn(S.detail.meeting) ? "所有內容會自動儲存" : "";
+  ["saveStat","saveStat2"].forEach(function(i){ var e=$(i); if(e){ e.textContent=txt; e.className=cls; } });
+}
+function markDirty(id){ var s = sv(id); s.dirty = true; clearTimeout(s.timer); s.timer = setTimeout(function(){ flush(id); }, 1000); paintSave(); }
+function flush(id){
+  var s = sv(id), t = findT(id); if(!t || s.inflight || s.conflict || !s.dirty) return;
+  clearTimeout(s.timer); s.inflight = true; s.dirty = false; paintSave();
+  api("topic.record", { id:id, ver:t.updatedAt, notes:t.notes, decision:t.decision, status:t.status }).then(function(j){
+    s.inflight = false;
+    if(j && j.ok){ t.updatedAt = j.topic.updatedAt; s.failed = false; savedAt = new Date(); if(!s.dirty) dropDraft(id); }
+    else if(j && j.error==="conflict"){ s.conflict = true; s.latest = j.topic; showConflict(id); }
+    else { s.dirty = true; if(j && (j.error==="locked"||j.error==="forbidden")){ dmsg(errText(j)); s.dirty = false; } else s.failed = true; }
+    paintSave(); if(s.dirty && !s.failed && !s.conflict) flush(id);
+  }).catch(function(e){ s.inflight = false; if(e.message!=="unauthorized"){ s.dirty = true; s.failed = true; } paintSave(); });
+}
+setInterval(function(){ Object.keys(SV).forEach(function(k){ if(SV[k].failed && !SV[k].inflight){ SV[k].failed = false; flush(k); if(!SV[k].inflight) SV[k].failed = true; } }); }, 8000);
+window.addEventListener("online", function(){ Object.keys(SV).forEach(function(k){ if(SV[k].failed){ SV[k].failed = false; flush(k); } }); });
+window.addEventListener("beforeunload", function(e){ if(pendingSaves()){ e.preventDefault(); e.returnValue = ""; } });
+function showConflict(id){
+  var el = $("cf_"+id); if(!el) return;
+  el.hidden = false;
+  el.innerHTML = '這題剛剛被別人改過（最後更新 '+esc((sv(id).latest||{}).updatedAt||"")+'）。你輸入的內容還在上面。<br><button class="btn sec sm" data-act="cfLoad" data-id="'+esc(id)+'">載入最新版（放棄我的）</button><button class="btn main sm" data-act="cfForce" data-id="'+esc(id)+'">用我的覆蓋</button>';
+}
+function applyToCard(t){ var c = $("lc_"+t.id); if(!c) return; c.querySelectorAll("[data-rec]").forEach(function(x){ x.value = t[x.dataset.rec] || ""; }); }
+function liveInit(){
+  var d = S.detail, m = d.meeting;
+  if(lastLiveId !== m.id){ SV = {}; savedAt = null; lastLiveId = m.id; }
+  if(recOn(m)) agendaOf(d).forEach(function(t){                      // 把上次沒送出的暫存內容接回來
+    var raw = ""; try{ raw = localStorage.getItem(draftKey(t.id)) || ""; }catch(e){}
+    if(!raw) return; var dr; try{ dr = JSON.parse(raw); }catch(e){ return; }
+    if(dr.notes===t.notes && dr.decision===t.decision){ dropDraft(t.id); return; }
+    var server = JSON.parse(JSON.stringify(t));
+    t.notes = dr.notes; t.decision = dr.decision; applyToCard(t);
+    if(dr.ver === server.updatedAt) markDirty(t.id);
+    else { var s = sv(t.id); s.conflict = true; s.latest = server; showConflict(t.id); }
+  });
+  paintAtt(); paintSave();
+}
+function paintAtt(){
+  var m = S.detail.meeting, rec = recOn(m), box = $("attBox"); if(!box) return;
+  var att = m.attendance || {}, p = 0, l = 0;
+  box.innerHTML = m.attendees.map(function(n){
+    var st = att[n]; if(st==="出席") p++; if(st==="請假") l++;
+    return '<button type="button" class="achip'+(st==="出席"?" p":st==="請假"?" l":"")+'" '+(rec?'data-act="att" data-v="'+esc(n)+'"':"disabled")+'>'+(st==="出席"?"✓ ":st==="請假"?"假 ":"")+esc(n)+'</button>';
+  }).join("");
+  var as = $("attStat"); if(as) as.textContent = "出席 "+p+"／請假 "+l+"／共 "+m.attendees.length+" 人";
+}
+function setAtt(map){
+  var m = S.detail.meeting, old = {}, att = m.attendance = m.attendance || {};
+  for(var n in map){ old[n] = att[n]; if(map[n]) att[n] = map[n]; else delete att[n]; }
+  paintAtt();
+  api("meeting.attend", { id:m.id, attendance:map }).then(function(j){
+    if(j && j.ok){ m.attendance = j.attendance; paintAtt(); }
+    else { for(var n in old){ if(old[n]) att[n] = old[n]; else delete att[n]; } paintAtt(); dmsg(errText(j)); }
+  }).catch(function(e){ for(var n in old){ if(old[n]) att[n] = old[n]; else delete att[n]; } paintAtt(); if(e.message!=="unauthorized") dmsg("連線失敗，出席登記沒有儲存。"); });
+}
+function paintQa(tid){
+  var q = QA[tid], box = $("qa_"+tid); if(!box) return;
+  box.querySelectorAll('[data-act=tdOwner]').forEach(function(b){ b.classList.toggle("on", b.dataset.v===q.owner); });
+  box.querySelectorAll('[data-act=tdDue]').forEach(function(b){ b.classList.toggle("on", b.dataset.v===q.key); });
+  var di = box.querySelector("[data-qdate]"); di.hidden = q.key!=="custom"; if(q.key!=="custom") di.value = "";
+}
+function repaintTodos(tid){ var e = $("tdl_"+tid); if(e) e.innerHTML = todoListHtml(S.detail, tid, recOn(S.detail.meeting)); }
+function addTodo(tid){
+  var card = $("qa_"+tid), inp = card.querySelector("[data-qin]"), q = QA[tid], content = inp.value.trim();
+  if(!content){ inp.focus(); return; }
+  if(q.key==="custom" && !q.due){ dmsg("請選擇自訂的期限日期。"); return; }
+  var btn = card.querySelector('[data-act=tdAdd]'); btn.disabled = true;
+  api("todo.add", { topicId:tid, content:content, owner:q.owner, due:q.key?q.due:"" }).then(function(j){
+    btn.disabled = false;
+    if(j && j.ok){ S.detail.todos.push(j.todo); inp.value = ""; repaintTodos(tid); inp.focus(); dmsg(""); }
+    else dmsg(errText(j));
+  }).catch(function(e){ btn.disabled = false; if(e.message!=="unauthorized") dmsg("連線失敗，這筆待辦沒有加入（內容還在輸入框，請再按一次加入）。"); });
+}
+document.addEventListener("input", function(e){
+  var el = e.target;
+  if(el.dataset && el.dataset.rec){ var t = findT(el.dataset.id); t[el.dataset.rec] = el.value; saveDraft(t.id); markDirty(t.id); }
+  else if(el.dataset && el.dataset.qdate){ var q = QA[el.dataset.qdate]; q.due = el.value; }
+});
+document.addEventListener("focusout", function(e){ if(e.target.dataset && e.target.dataset.rec) flush(e.target.dataset.id); });
+document.addEventListener("keydown", function(e){ if(e.key==="Enter" && e.target.dataset && e.target.dataset.qin && !e.isComposing){ e.preventDefault(); addTodo(e.target.dataset.qin); } });
+
+function replaceCard(id){
+  var d = S.detail, ag = agendaOf(d), i = ag.map(function(x){ return x.id; }).indexOf(id), n = $("lc_"+id);
+  if(i<0 || !n) return;
+  var w = document.createElement("div"); w.innerHTML = liveCard(d, ag[i], i); n.replaceWith(w.firstChild);
+  if(sv(id).conflict) showConflict(id);
+}
+function setTopicState(id, st){
+  var t = findT(id); t.status = st; markDirty(id); flush(id);
+  var ag = agendaOf(S.detail), idx = ag.map(function(x){ return x.id; }).indexOf(id), nextId = "";
+  if(st!=="已排入"){ delete openSet[id]; for(var i=idx+1;i<ag.length;i++){ if(ag[i].status==="已排入"){ openSet[ag[i].id]=1; nextId = ag[i].id; break; } } } else openSet[id] = 1;
+  replaceCard(id); if(nextId){ replaceCard(nextId); var nx = $("lc_"+nextId); if(nx) nx.scrollIntoView({ behavior:"smooth", block:"start" }); }
+}
+function finishMeeting(){
+  var d = S.detail; if(pendingSaves()){ dmsg("還有內容正在儲存或尚未儲存成功，請等「已自動儲存」出現，或先檢查網路。"); return; }
+  var left = agendaOf(d).filter(function(t){ return t.status==="已排入"; }).length;
+  confirmBox("結束會議", "確定結束會議嗎？結束後紀錄會鎖定（主持人可以解鎖）。" + (left ? "<br>還有 <b>"+left+"</b> 題沒有標「討論完了」或「順延」。" : ""), "結束會議", function(){
+    return api("meeting.finish",{id:d.meeting.id}).then(function(j){ if(j&&j.ok){ SV = {}; refreshDetail(); } return j; }); });
+}
+var LIVE_ACTS = {
+  cardToggle: function(a,id){ var c = $("lc_"+id); c.classList.toggle("open"); if(c.classList.contains("open")) openSet[id]=1; else delete openSet[id]; },
+  att: function(a){ var n = a.dataset.v, st = (S.detail.meeting.attendance||{})[n]; var o = {}; o[n] = st==="出席" ? "請假" : "出席"; setAtt(o); },
+  attAll: function(){ var o = {}, att = S.detail.meeting.attendance || {}; S.detail.meeting.attendees.forEach(function(n){ if(!att[n]) o[n] = "出席"; }); if(Object.keys(o).length) setAtt(o); },
+  attClear: function(){ confirmBox("清除出席登記","要把所有人的出席／請假登記清掉嗎？","清除",function(){ var o = {}; S.detail.meeting.attendees.forEach(function(n){ o[n] = ""; }); setAtt(o); return Promise.resolve({ ok:true }); }); },
+  topicState: function(a,id){ setTopicState(id, a.dataset.v); },
+  tdOwner: function(a,id){ var q = QA[id]; q.owner = q.owner===a.dataset.v ? "" : a.dataset.v; paintQa(id); },
+  tdDue: function(a,id){ var q = QA[id], k = a.dataset.v; if(q.key===k){ q.key = ""; q.due = ""; } else { q.key = k; q.due = k==="custom" ? "" : dueOf(k); } paintQa(id); },
+  tdAdd: function(a,id){ addTodo(id); },
+  tdDel: function(a,id){
+    var x = S.detail.todos.filter(function(y){ return y.id===id; })[0]; if(!x) return;
+    api("todo.delete",{id:id}).then(function(j){ if(j&&j.ok){ S.detail.todos = S.detail.todos.filter(function(y){ return y.id!==id; }); repaintTodos(x.topicId); } else dmsg(errText(j)); })
+      .catch(function(e){ if(e.message!=="unauthorized") dmsg("連線失敗，沒有刪除。"); });
+  },
+  cfLoad: function(a,id){ var s = sv(id), t = findT(id); for(var k in s.latest) t[k] = s.latest[k]; s.conflict = false; s.latest = null; s.dirty = false; dropDraft(id); applyToCard(t); $("cf_"+id).hidden = true; paintSave(); },
+  cfForce: function(a,id){ var s = sv(id), t = findT(id); t.updatedAt = s.latest.updatedAt; s.conflict = false; s.latest = null; $("cf_"+id).hidden = true; markDirty(id); flush(id); },
+  startMeeting: function(a,id,d){ confirmBox("開始開會","按下後，記錄人（"+esc(d.meeting.recorder||"尚未指定")+"）就能逐題記錄。議程仍可由你調整。","開始開會",function(){ return api("meeting.start",{id:d.meeting.id}).then(function(j){ if(j&&j.ok) refreshDetail(); return j; }); }); },
+  finishMeeting: function(){ finishMeeting(); },
+  unlockMeeting: function(a,id,d){ confirmBox("解鎖重新編輯","會議會回到「會中」，記錄人可以再修改紀錄。","解鎖",function(){ return api("meeting.unlock",{id:d.meeting.id}).then(function(j){ if(j&&j.ok) refreshDetail(); return j; }); }); }
+};
+/* 沒有編輯權的人看「會中」：每 20 秒自動更新紀錄 */
+setInterval(function(){
+  if(!S.detail || $("vDetail").hidden || S.detail.meeting.status!=="會中" || recOn(S.detail.meeting) || document.querySelector(".modal.show")) return;
+  api("meeting.get",{id:S.detail.meeting.id}).then(function(j){ if(j && j.ok && !$("vDetail").hidden){ S.detail = j; drawDetail(); } }).catch(function(){});
+}, 20000);
 
 $("btnNew").onclick = function(){ openMeeting(null); };
 $("btnReload").onclick = function(){ loadList(); };
