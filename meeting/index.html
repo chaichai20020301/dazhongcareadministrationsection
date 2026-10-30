@@ -190,6 +190,12 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 .todo .trow-act{display:flex;gap:6px;margin-top:4px}
 .badge-carry{display:inline-block;margin-left:6px;padding:1px 9px;border-radius:999px;background:var(--t-soft);color:var(--teal-d);font-size:12px;font-weight:700;vertical-align:middle}
 .carrybox{padding:10px 14px;border-radius:14px;background:var(--t-soft);border:1px dashed var(--t-line);font-size:14px;line-height:1.7}
+.hrow{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.hrow:last-child{border-bottom:0}
+.hrow input{width:18px;height:18px;margin-top:3px;accent-color:var(--teal);flex:none}
+.hrow .hc{flex:1;min-width:0}.hrow .hc b{word-break:break-word}.hrow .hc small{display:block;color:var(--muted);margin-top:2px}
+.hrow .no{color:#8A4A12;font-weight:700}
+.tag.ho{background:var(--g-soft);color:var(--green)}
 /* 會中記錄 */
 .livebar{position:sticky;top:64px;z-index:50;display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;margin:0 0 12px;padding:9px 16px;background:rgba(255,253,248,.97);border:1px solid var(--t-line);border-radius:16px;box-shadow:0 4px 12px rgba(25,62,37,.06)}
 .livebar b{font:900 16px 'Noto Serif TC',serif}
@@ -344,7 +350,7 @@ var TOPIC_META = {
   "提案討論": { cls:"t-prop", pill:"p-prop", icon:"common/icon-info", hint:"我有一個想法想大家討論" }
 };
 var ERR = { forbidden:"這個動作只有主持人（主管）可以做。", locked:"這場會議目前不能這樣操作（可能已截止或已發布）。", invalid:"資料不完整或格式不對，請檢查後再試。",
-  wish_required:"痛點與提案請寫「希望會議幫我決定什麼」。", not_found:"找不到這筆資料，可能已被刪除，請重新整理。", conflict:"這筆資料剛剛被別人改過，請重新整理後再改。",
+  nothing:"沒有可以送的待辦（要有負責人、還沒完成、而且還沒送過）。", handover_fail:"連不上行政交班，請稍後再試。", wish_required:"痛點與提案請寫「希望會議幫我決定什麼」。", not_found:"找不到這筆資料，可能已被刪除，請重新整理。", conflict:"這筆資料剛剛被別人改過，請重新整理後再改。",
   busy:"系統忙碌中，請稍後再試。", too_many:"同一場會議最多提出 20 張議題卡。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
 
 var S = { tab:"up", boot:null, detail:null, people:null, merge:null, opening:"" };
@@ -449,6 +455,8 @@ function openDetail(id){
   return api("meeting.get",{id:id}).then(function(j){
     if(!j || !j.ok){ $("vDetail").innerHTML = '<p><a href="#" data-back>&larr; 回會議首頁</a></p>'+pstate("common/state-error",esc(errText(j))); return; }
     S.detail = j; S.merge = null; drawDetail();
+    if(j.meeting.status==="已結束" && j.todos.some(function(t){ return t.handoverId && isOpenTodo(t); }))      // 交班那邊已完成的，同步回來
+      api("todo.sync").then(function(r){ if(r && r.ok && r.synced && S.detail && S.detail.meeting.id===j.meeting.id && !pendingSaves()) refreshDetail(); }).catch(function(){});
   }).catch(function(e){ if(e.message!=="unauthorized") $("vDetail").innerHTML = '<p><a href="#" data-back>&larr; 回會議首頁</a></p>'+pstate("common/state-offline","連線失敗，請檢查網路後再試。"); });
 }
 function refreshDetail(){ return openDetail(S.detail.meeting.id); }
@@ -798,6 +806,7 @@ function liveHtml(d){
   var h = '<div class="live"><div class="livebar"><b>'+esc(m.title)+'</b><span class="savestat" id="saveStat"></span><span class="grow" id="attStat"></span></div>';
   h += '<div class="panel"><div class="ttl">出席登記'+(rec?'<small>點一下切換「出席／請假」</small>':'')+'</div><div class="att" id="attBox"></div>'+
     (rec ? '<div style="margin-top:10px;display:flex;gap:8px"><button class="btn sec sm" data-act="attAll">全部出席</button><button class="btn sec sm" data-act="attClear">清除登記</button></div>' : '')+'</div>';
+  if(ended) h += handoverPanelHtml(d);
   if(d.prevTodos.length) h += prevPanelHtml(d, true);
   if(!openSet[m.id+"_init"]){ openSet[m.id+"_init"] = 1; for(var i=0;i<ag.length;i++){ if(ag[i].status==="已排入"){ openSet[ag[i].id]=1; break; } } }
   h += ag.map(function(t,i){ return liveCard(d,t,i); }).join("");
@@ -1021,9 +1030,9 @@ $("dueSave").onclick = function(){
 
 /* ========== 待辦看板 ========== */
 S.todos = null; S.todoView = "mine"; S.showDone = false;
-function loadTodos(){
+function loadTodos(force){
   $("listBody").innerHTML = pstate("common/state-loading","載入中…");
-  api("todo.list").then(function(j){
+  api("todo.sync",{force:!!force}).catch(function(){ return null; }).then(function(){ return api("todo.list"); }).then(function(j){
     if(!j || !j.ok){ $("listBody").innerHTML = pstate("common/state-error", esc(errText(j))); return; }
     S.todos = j.todos; if(S.tab==="todo") drawBoard();
   }).catch(function(e){ if(e.message!=="unauthorized") $("listBody").innerHTML = pstate("common/state-offline","連線失敗，請檢查網路後重新整理。"); });
@@ -1056,7 +1065,7 @@ function todoRow(t){
   var cls = open && t.due && t.due < td ? "late" : open && t.due===td ? "today" : "";
   var sc = {"待處理":"s-p","進行中":"s-d","已完成":"s-c","已取消":"s-x"}[t.status];
   var sel = can ? '<select class="tsel '+sc+'" data-tid="'+esc(t.id)+'">'+["待處理","進行中","已完成","已取消"].map(function(x){ return '<option'+(x===t.status?" selected":"")+'>'+x+'</option>'; }).join("")+'</select>' : '<span class="tag '+({"待處理":"s-prep","進行中":"s-pub","已完成":"s-done","已取消":"s-void"}[t.status])+'">'+esc(t.status)+'</span>';
-  return '<div class="trow'+(open?"":" done")+'"><div class="tc">'+esc(t.content)+'</div><div class="tm"><span>'+esc(t.meetingTitle)+(t.topicTitle?' · '+esc(t.topicTitle.replace(/（.*）/,"")):"")+'</span>'+
+  return '<div class="trow'+(open?"":" done")+'"><div class="tc">'+esc(t.content)+'</div><div class="tm"><span>'+esc(t.meetingTitle)+(t.topicTitle?' · '+esc(t.topicTitle.replace(/（.*）/,"")):"")+'</span>'+(t.handoverId?'<span class="tag ho">交班</span>':'')+
     '<span class="due '+cls+'">'+(cls==="late"?ico("common/icon-warning"):ico("common/icon-calendar-small"))+(t.due?esc(fmtDate(t.due))+(cls==="late"?" 逾期":cls==="today"?" 今天":""):"無期限")+'</span>'+sel+
     (can && open ? '<button class="lk" data-act="dueOpen" data-id="'+esc(t.id)+'" data-from="board">延後</button>' : '')+'</div></div>';
 }
@@ -1064,13 +1073,41 @@ function bindBoard(){
   var c = $("chkDone"); if(c) c.onchange = function(){ S.showDone = c.checked; drawBoard(); };
   document.querySelectorAll(".tsel").forEach(function(sl){ sl.onchange = function(){
     var t = S.todos.filter(function(x){ return x.id===sl.dataset.tid; })[0], old = t.status; t.status = sl.value; if(sl.value==="已完成") t.doneAt = nowLocal(); else t.doneAt = ""; drawBoard();
-    api("todo.update",{id:t.id,status:sl.value}).then(function(j){ if(!(j&&j.ok)){ t.status = old; drawBoard(); say(errText(j)); } })
+    api("todo.update",{id:t.id,status:sl.value}).then(function(j){ if(!(j&&j.ok)){ t.status = old; drawBoard(); say(errText(j)); } else if(j.warn) say(j.warn); })
       .catch(function(e){ t.status = old; drawBoard(); if(e.message!=="unauthorized") say("連線失敗，狀態沒有更新。"); });
   }; });
 }
 function nowLocal(){ var d = new Date(), z = function(n){ return ("0"+n).slice(-2); }; return d.getFullYear()+"-"+z(d.getMonth()+1)+"-"+z(d.getDate())+" "+z(d.getHours())+":"+z(d.getMinutes())+":"+z(d.getSeconds()); }
+
+/* ========== 結束後：待辦送行政交班 ========== */
+function hoEligible(m, t){ return canRecMe(m) && !!t.owner && isOpenTodo(t) && !t.handoverId; }
+function handoverPanelHtml(d){
+  var m = d.meeting, td = d.todos, n = td.filter(function(t){ return hoEligible(m,t); }).length;
+  var h = '<div class="panel" id="hoPanel"><div class="ttl">這場會議的待辦<small>'+td.length+' 筆；有負責人的可以送到行政交班，之後在交班按完成，這裡也會跟著完成</small></div>';
+  if(!td.length) return h + '<div class="muted" style="font-size:14px">這場會議沒有待辦。</div></div>';
+  h += td.map(function(t){
+    var el = hoEligible(m,t);
+    return '<label class="hrow">'+(el?'<input type="checkbox" data-ho="'+esc(t.id)+'" checked>':'<span style="width:18px;flex:none"></span>')+'<span class="hc"><b>'+esc(t.content)+'</b><small>'+(t.owner?esc(t.owner):'<span class="no">未指定負責人（無法送交班）</span>')+(t.due?' · 期限 '+esc(fmtDate(t.due)):'')+' · '+esc(t.status)+
+      (t.handoverId?' <span class="tag ho">已送交班</span>':'')+'</small></span></label>';
+  }).join("");
+  if(canRecMe(m)) h += '<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn main" data-act="hoSend"'+(n?"":" disabled")+'>'+ico("common/icon-share")+'送到行政交班'+(n?'（'+n+' 筆）':'')+'</button>'+(n?'':'<span class="muted" style="font-size:13.5px">沒有需要送的待辦</span>')+'</div>';
+  return h + '</div>';
+}
+function repaintHo(){ var e = $("hoPanel"); if(e){ var w = document.createElement("div"); w.innerHTML = handoverPanelHtml(S.detail); e.replaceWith(w.firstChild); } }
+LIVE_ACTS.hoSend = function(a, id, d){
+  var ids = Array.prototype.map.call(document.querySelectorAll("[data-ho]:checked"), function(x){ return x.dataset.ho; });
+  if(!ids.length){ dmsg("請先勾選要送的待辦。"); return; }
+  a.disabled = true; a.textContent = "送出中…（請稍等，不要關閉頁面）"; dmsg("");
+  api("todo.handover",{ meetingId:d.meeting.id, ids:ids }).then(function(j){
+    if(j && j.ok){
+      (j.todos||[]).forEach(function(nt){ d.todos = d.todos.map(function(x){ return x.id===nt.id ? nt : x; }); });
+      repaintHo();
+      dmsg("已送 "+j.sent+" 筆到行政交班（分類「會議」）。"+(j.failed.length?" 有 "+j.failed.length+" 筆沒送成功：\n"+j.failed.join("；"):""), !j.failed.length);
+    } else { repaintHo(); dmsg(errText(j) + (j && j.detail ? "（"+j.detail+"）" : "")); }
+  }).catch(function(e){ repaintHo(); if(e.message!=="unauthorized") dmsg("連線失敗，不確定有沒有送成功。請重新整理頁面確認「已送交班」標籤，沒有標籤的再送一次（不會重複送）。"); });
+};
 LIVE_ACTS.tview = function(a){ S.todoView = a.dataset.v; drawBoard(); };
-LIVE_ACTS.tload = function(){ loadTodos(); };
+LIVE_ACTS.tload = function(){ loadTodos(true); };
 
 $("btnNew").onclick = function(){ openMeeting(null); };
 $("btnReload").onclick = function(){ loadList(); };
