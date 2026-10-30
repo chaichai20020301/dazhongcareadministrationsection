@@ -86,11 +86,15 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 .pline{display:flex;justify-content:space-between;font-size:13.5px;color:var(--muted);margin-bottom:5px}
 .me-ok{color:var(--green);font-weight:700}.me-no{color:#8A4A12;font-weight:700}
 .empty{padding:34px 20px;text-align:center;color:var(--muted)}
-.empty img{display:block;width:120px;height:auto;margin:0 auto 10px}
+.empty img{display:block;width:150px;max-width:70%;height:auto;margin:0 auto 10px}
 
 /* 詳情 */
 .dhead{position:relative;overflow:hidden;isolation:isolate;margin-bottom:14px;padding:18px 22px 18px 90px;background:#E9F4F1;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
 .dhead .leaf{position:absolute;left:0;top:0;height:100%;width:auto;opacity:.75;z-index:-1;pointer-events:none}
+.dhead .art{position:absolute;right:14px;bottom:0;height:88%;width:auto;max-width:34%;object-fit:contain;object-position:right bottom;z-index:-1;pointer-events:none}
+.dhead .dtxt{max-width:64%}
+.tag .ico,.minfo .ico{margin-right:3px}
+.stateimg{display:block;width:96px;height:auto}
 .dhead h1{font-size:25px;margin-bottom:8px}
 .dinfo{display:flex;gap:6px 18px;flex-wrap:wrap;font-size:14.5px;color:var(--ink);margin:8px 0}
 .dinfo span{display:inline-flex;align-items:center}
@@ -105,17 +109,17 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 .todo:last-child{border-bottom:0}.todo small{color:var(--muted)}.todo .late{color:var(--red);font-weight:700}
 
 /* 佈告板 */
-.board{background:#F4F1E4 url(../assets/common/sprig-leaf.webp) right 12px top 10px/70px no-repeat;border:1px solid #E3DFCB;border-radius:22px;padding:16px}
+.board{background:#F4F1E4 url(../assets/meeting/bg-board.webp) center/cover no-repeat;border:1px solid #E3DFCB;border-radius:22px;padding:16px}
 .boardbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.sect{margin:14px 2px 8px;font:700 13.5px 'Noto Sans TC';color:var(--muted)}
+.sect{margin:16px 2px 16px;font:700 13.5px 'Noto Sans TC';color:var(--muted)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px 14px}
 .note{position:relative;display:flex;flex-direction:column;gap:7px;background:#fff;border-radius:6px 6px 14px 14px;padding:20px 14px 12px;box-shadow:0 3px 9px rgba(60,50,20,.13);border-top:0}
-.note::before{content:"";position:absolute;left:50%;top:-8px;width:70px;height:18px;margin-left:-35px;border-radius:3px;opacity:.75;transform:rotate(-2deg)}
-.note.t-report{background:#F6FAEE}.note.t-report::before{background:#B5CDA2}
-.note.t-pain{background:#FFF7E8}.note.t-pain::before{background:#EDC58D}
-.note.t-prop{background:#EEF6F4}.note.t-prop::before{background:#AACAC2}
-.note.fixed{background:#F3F2EA;box-shadow:0 2px 5px rgba(60,50,20,.08);padding-top:14px}
-.note.fixed::before{left:14px;top:-7px;width:16px;height:16px;margin:0;border-radius:50%;background:var(--teal);opacity:1;transform:none;box-shadow:0 2px 3px rgba(0,0,0,.2)}
+.note::before{content:"";position:absolute;left:50%;top:-10px;width:92px;height:16px;margin-left:-46px;background-size:100% 100%;background-repeat:no-repeat;opacity:.95;transform:rotate(-2deg)}
+.note.t-report{background:#F6FAEE}.note.t-report::before{background-image:url(../assets/meeting/decor-tape-green.webp)}
+.note.t-pain{background:#FFF7E8}.note.t-pain::before{background-image:url(../assets/meeting/decor-tape-orange.webp)}
+.note.t-prop{background:#EEF6F4}.note.t-prop::before{background-image:url(../assets/meeting/decor-tape-teal.webp)}
+.note.fixed{background:#F3F2EA;box-shadow:0 2px 5px rgba(60,50,20,.08);padding-top:26px}
+.note.fixed::before{left:12px;top:-13px;width:24px;height:31px;margin:0;background:url(../assets/meeting/decor-pin.webp) center/contain no-repeat;opacity:1;transform:none}
 .note.sel{outline:3px solid var(--teal)}
 .note.dim{opacity:.55}
 .nt{display:flex;gap:7px;align-items:flex-start;font:700 15.5px/1.4 'Noto Sans TC'}
@@ -262,7 +266,7 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 .lfoot{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .lconf{padding:10px 12px;border-radius:12px;background:#FBECE9;color:#7A2A1F;font-size:13.5px;line-height:1.6}
 .lconf .btn{margin:6px 6px 0 0}
-@media (max-width:1000px){.banner .art{opacity:.3}.banner .txt{max-width:100%}.cols{grid-template-columns:1fr}.side{position:static}}
+@media (max-width:1000px){.dhead .art{opacity:.25}.dhead .dtxt{max-width:100%}.banner .art{opacity:.3}.banner .txt{max-width:100%}.cols{grid-template-columns:1fr}.side{position:static}}
 @media (max-width:640px){
   main{padding:12px 12px 120px}
   .v-topbar{height:56px;padding:0 12px;gap:10px}body{padding-top:56px}
@@ -291,7 +295,7 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
 <div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">會議系統</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
 <main>
   <section id="vList">
-    <div class="banner"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><img class="art" src="../kiosk/img/n-cal.webp" alt="">
+    <div class="banner"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><img class="art" src="../assets/meeting/banner.webp" alt="">
       <div class="txt"><h1>會議系統</h1><p class="sub">會前先填議題，會中好記錄，會後有人追。</p>
         <div class="bar"><button class="btn main" id="btnNew" hidden><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>建立會議</button><button class="btn sec" id="btnReload"><i class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button></div></div></div>
     <div class="tabs" id="tabs"><button class="tab on" data-tab="up">即將開會</button><button class="tab" data-tab="todo">待辦看板</button><button class="tab" data-tab="hist">歷史</button></div>
@@ -355,6 +359,12 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;color:var(--ink);lett
   <div class="btns"><button class="btn sec" data-close>取消</button><button class="btn main" id="dueSave">儲存</button></div>
 </div></div>
 
+<div class="modal" id="mDone"><div class="box" style="text-align:center;max-width:380px">
+  <img src="../assets/meeting/state-submitted.webp" alt="" style="width:200px;max-width:70%;height:auto;margin:0 auto 6px;display:block">
+  <h2 style="margin-bottom:6px">議題已送出</h2><p class="muted" style="margin:0 0 14px;line-height:1.6">截止前都可以修改。</p>
+  <button class="btn main" data-close>好</button>
+</div></div>
+
 <div class="modal" id="mConfirm"><div class="box">
   <h2 id="cfTitle"></h2><p id="cfText" style="margin:0;line-height:1.7"></p>
   <div class="ferr" id="cfErr"></div>
@@ -367,14 +377,16 @@ var AUTH_API = "https://script.google.com/macros/s/AKfycbwadUVv4zkMZrE13JohVslg1
 var USE_ROLES = ["manager", "admin"];   // 可挑選為與會者的身份（之後開放護理等單位：在這裡加）
 var $ = function(id){ return document.getElementById(id); };
 var TOPIC_META = {
-  "報告事項": { cls:"t-report", pill:"p-report", icon:"common/icon-note", hint:"我要報告進度或分享做法" },
-  "痛點": { cls:"t-pain", pill:"p-pain", icon:"common/icon-warning", hint:"我卡住了，需要大家協助" },
-  "提案討論": { cls:"t-prop", pill:"p-prop", icon:"common/icon-info", hint:"我有一個想法想大家討論" }
+  "報告事項": { cls:"t-report", pill:"p-report", icon:"meeting/icon-topic-report", hint:"我要報告進度或分享做法" },
+  "痛點": { cls:"t-pain", pill:"p-pain", icon:"meeting/icon-topic-pain", hint:"我卡住了，需要大家協助" },
+  "提案討論": { cls:"t-prop", pill:"p-prop", icon:"meeting/icon-topic-proposal", hint:"我有一個想法想大家討論" }
 };
 var ERR = { forbidden:"這個動作只有主持人（主管）可以做。", locked:"這場會議目前不能這樣操作（可能已截止或已發布）。", invalid:"資料不完整或格式不對，請檢查後再試。",
   nothing:"沒有可以送的待辦（要有負責人、還沒完成、而且還沒送過）。", handover_fail:"連不上行政交班，請稍後再試。", wish_required:"痛點與提案請寫「希望會議幫我決定什麼」。", not_found:"找不到這筆資料，可能已被刪除，請重新整理。", conflict:"這筆資料剛剛被別人改過，請重新整理後再改。",
   busy:"系統忙碌中，請稍後再試。", too_many:"同一場會議最多提出 20 張議題卡。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
 
+var TYPE_ICON = { "業務經驗交流會":"meeting/icon-type-experience", "痛點解決會議":"meeting/icon-type-pain" };
+function typeTag(t){ return '<span class="tag type">'+(TYPE_ICON[t]?ico(TYPE_ICON[t]):"")+esc(t)+'</span>'; }
 var S = { tab:"up", boot:null, detail:null, people:null, merge:null, opening:"" };
 var me = { name:"", role:"" };
 
@@ -449,12 +461,12 @@ function drawList(){
     var up = ms.filter(function(m){ return m.status==="籌備中"||m.status==="議程已發布"||m.status==="會中"; }).sort(function(a,b){ return (a.date+a.start) < (b.date+b.start) ? -1 : 1; });
     ms.forEach(function(m){ if(m.status==="已作廢" && isMgr()) up.push(m); });
     var alerts = up.filter(function(m){ return m.status==="籌備中" && collecting(m) && !m.iFilled; }).map(function(m){
-      return '<div class="alert">'+ico("common/icon-clock")+'<span>「<b>'+esc(m.title)+'</b>」要你填議題，截止 '+esc(fmtDL(m.deadline))+'</span><button class="btn main sm" data-open="'+esc(m.id)+'">去填寫</button></div>';
+      return '<div class="alert">'+ico("meeting/icon-reminder")+'<span>「<b>'+esc(m.title)+'</b>」要你填議題，截止 '+esc(fmtDL(m.deadline))+'</span><button class="btn main sm" data-open="'+esc(m.id)+'">去填寫</button></div>';
     }).join("");
-    html = alerts + (up.length ? '<div class="mlist">'+up.map(mcard).join("")+'</div>' : pstate("common/state-empty","目前沒有即將召開的會議。"+(isMgr()?"按右上「建立會議」開始。":"")));
+    html = alerts + (up.length ? '<div class="mlist">'+up.map(mcard).join("")+'</div>' : pstate("meeting/state-no-upcoming","目前沒有即將召開的會議。"+(isMgr()?"按右上「建立會議」開始。":"")));
   } else if(S.tab==="hist"){
     var h = ms.filter(function(m){ return m.status==="已結束"; }).sort(function(a,b){ return a.date < b.date ? 1 : -1; });
-    html = h.length ? '<div class="mlist">'+h.map(mcard).join("")+'</div>' : pstate("common/state-empty","還沒有已結束的會議。");
+    html = h.length ? '<div class="mlist">'+h.map(mcard).join("")+'</div>' : pstate("meeting/state-no-upcoming","還沒有已結束的會議。");
   } else {
     loadTodos(); return;
   }
@@ -465,7 +477,7 @@ function mcard(m){
   if(m.status==="籌備中"){
     t = '<div><div class="pline"><span>議題徵集　已填 <b>'+pr.filled+'</b>／'+pr.total+'</span><span class="'+(m.iFilled?"me-ok":"me-no")+'">'+(m.iFilled?(m.myCount?"你已提交 "+m.myCount+" 項":"你已完成"):"你還沒填")+'</span></div><div class="prog"><i style="width:'+pct+'%"></i></div></div>';
   }
-  return '<div class="mcard" data-open="'+esc(m.id)+'"><div class="mrow">'+statusTag(m.status)+'<span class="tag type">'+esc(m.type)+'</span></div><h3>'+esc(m.title)+'</h3>' +
+  return '<div class="mcard" data-open="'+esc(m.id)+'"><div class="mrow">'+statusTag(m.status)+typeTag(m.type)+'</div><h3>'+esc(m.title)+'</h3>' +
     '<div class="minfo"><span>'+ico("common/icon-calendar-small")+esc(fmtDate(m.date))+(m.start?" "+esc(m.start):"")+'</span>'+(m.place?'<span>'+ico("common/icon-location")+esc(m.place)+'</span>':"")+'</div>' + t +
     '<div class="mrow" style="justify-content:flex-end"><button class="btn sec sm" data-open="'+esc(m.id)+'">進入會議</button></div></div>';
 }
@@ -489,15 +501,15 @@ function drawDetail(){
   var d = S.detail, m = d.meeting, pr = d.progress, mgr = isMgr(), open = collecting(m), prep = m.status==="籌備中";
   var cd = prep ? countdown(m.deadline) : null;
   var h = '<p style="margin:0 0 10px"><a href="#" data-back class="muted" style="font-weight:700;text-decoration:none">&larr; 回會議首頁</a></p>';
-  h += '<div class="dhead"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><div class="mrow">'+statusTag(m.status)+'<span class="tag type">'+esc(m.type)+'</span></div><h1>'+esc(m.title)+'</h1>' +
+  h += '<div class="dhead"><img class="leaf" src="../portal-img/leaf-teal-l.webp" alt=""><img class="art" src="../assets/meeting/banner-detail.webp" alt=""><div class="dtxt"><div class="mrow">'+statusTag(m.status)+typeTag(m.type)+'</div><h1>'+esc(m.title)+'</h1>' +
     '<div class="dinfo"><span>'+ico("common/icon-calendar-small")+esc(fmtDate(m.date))+(m.start?" "+esc(m.start)+(m.end?"–"+esc(m.end):""):"")+'</span>'+(m.place?'<span>'+ico("common/icon-location")+esc(m.place)+'</span>':"")+
-    '<span>'+ico("common/icon-user")+'主持人：'+esc(m.host)+'</span><span>'+ico("common/icon-note")+'記錄人：'+(m.recorder?esc(m.recorder):"尚未指定")+'</span></div>' +
-    (prep ? '<div class="mrow"><span class="cd'+(cd.over?" over":"")+'">'+ico("common/icon-clock")+esc(cd.text)+'（'+esc(fmtDL(m.deadline))+'）</span></div>' : '') +
+    '<span>'+ico("meeting/icon-host")+'主持人：'+esc(m.host)+'</span><span>'+ico("meeting/icon-recorder")+'記錄人：'+(m.recorder?esc(m.recorder):"尚未指定")+'</span></div>' +
+    (prep ? '<div class="mrow"><span class="cd'+(cd.over?" over":"")+'">'+ico("meeting/icon-deadline")+esc(cd.text)+'（'+esc(fmtDL(m.deadline))+'）</span></div>' : '') +
     (mgr && m.status!=="已結束" && m.status!=="已作廢" ? '<div class="bar" style="margin-top:10px"><button class="btn sec sm" data-act="editMeeting">'+ico("common/icon-edit")+'編輯會議</button><button class="btn warn sm" data-act="cancelMeeting">作廢會議</button></div>' : '') +
-    '</div>';
+    '</div></div>';
   var pend = (pr.reporterPending||{})[me.name];
   if(prep && pend && pend.length && open) h += '<div class="alert"><span>你被指定報告「<b>'+esc(pend.join("、"))+'</b>」，請填報告內容。</span><button class="btn main sm" data-act="fillFixed" data-id="'+esc(d.topics.filter(function(t){ return t.fixed && t.reporter===me.name && !t.desc; })[0].id)+'">去填寫</button></div>';
-  if(prep && !open && !mgr) h += '<div class="alert t">議題徵集已截止，不能再新增或修改議題；如需補充請洽主持人。</div>';
+  if(prep && !open && !mgr) h += '<div class="alert t"><img class="stateimg" style="width:64px" src="../assets/meeting/state-closed.webp" alt=""><span>議題徵集已截止，不能再新增或修改議題；如需補充請洽主持人。</span></div>';
   if(m.status==="議程已發布") h += '<div class="alert t">議程已發布。開會時由主持人按下方「開始開會」，記錄人（'+(m.recorder?esc(m.recorder):"尚未指定")+'）就能開始記錄。</div>';
   var live = m.status==="會中" || m.status==="已結束";
   h += '<div class="msg" id="dmsg"></div>';
@@ -538,7 +550,7 @@ function boardHtml(d, open){
     '<span class="muted" style="font-size:13.5px">'+(m.status==="籌備中"?"大家提出的議題彼此都看得到。":"議程")+'</span></div>';
   h += '<div class="sect">固定議題</div><div class="grid">' + fixed.map(function(t){ return noteHtml(d, t, mem, open); }).join("") + '</div>';
   h += '<div class="sect">同仁提出的議題（'+mem.length+'）</div>';
-  h += mem.length ? '<div class="grid">' + mem.map(function(t){ return noteHtml(d, t, mem, open); }).join("") + '</div>' : pstate("common/state-empty","還沒有人提出議題。");
+  h += mem.length ? '<div class="grid">' + mem.map(function(t){ return noteHtml(d, t, mem, open); }).join("") + '</div>' : pstate("meeting/state-no-topics","還沒有人提出議題。");
   return h + '</div>';
 }
 function noteHtml(d, t, mem, open){
@@ -565,8 +577,8 @@ function noteHtml(d, t, mem, open){
       h += '<button class="lk tools-toggle" data-act="tools">⋯ 整理</button><span class="tools">';
       if(t.fixed) h += '<button class="lk" data-act="editFixed" data-id="'+esc(t.id)+'">編輯／指定報告人</button>';
       else {
-        if(prep) h += '<button class="lk" data-act="returnTopic" data-id="'+esc(t.id)+'">退回補充</button>';
-        h += '<button class="lk" data-act="startMerge" data-id="'+esc(t.id)+'">合併</button><button class="lk" data-act="mv" data-d="-1" data-id="'+esc(t.id)+'">↑ 上移</button><button class="lk" data-act="mv" data-d="1" data-id="'+esc(t.id)+'">↓ 下移</button>';
+        if(prep) h += '<button class="lk" data-act="returnTopic" data-id="'+esc(t.id)+'">'+ico("meeting/icon-return")+'退回補充</button>';
+        h += '<button class="lk" data-act="startMerge" data-id="'+esc(t.id)+'">'+ico("meeting/icon-merge")+'合併</button><button class="lk" data-act="mv" data-d="-1" data-id="'+esc(t.id)+'">↑ 上移</button><button class="lk" data-act="mv" data-d="1" data-id="'+esc(t.id)+'">↓ 下移</button>';
         h += '<button class="lk" data-act="skip" data-id="'+esc(t.id)+'" data-v="'+(t.status==="會中不討論"?"0":"1")+'">'+(t.status==="會中不討論"?"改回要討論":"會中不討論")+'</button>';
       }
       h += '</span>';
@@ -580,7 +592,7 @@ function dockHtml(d){
   if(!(mgr || prep)) return "";
   var total = 0; d.topics.forEach(function(t){ if(counted(t)) total += t.minutes||0; });
   var len = meetLen(m), pct = len ? Math.min(100, Math.round(total*100/len)) : 0, over = len && total > len;
-  var h = '<div class="dock"><div class="budget"><div class="pline"><span>議程總預估 <b class="'+(over?"over-t":"")+'">'+total+'</b> 分鐘'+(len?' ／ 會議長度 '+len+' 分鐘':'（尚未設定會議長度）')+'</span>'+(over?'<span class="over-t">超過 '+(total-len)+' 分鐘，建議刪減或延後</span>':'')+'</div>' +
+  var h = '<div class="dock"><div class="budget"><div class="pline"><span>'+ico("meeting/icon-time-budget")+'議程總預估 <b class="'+(over?"over-t":"")+'">'+total+'</b> 分鐘'+(len?' ／ 會議長度 '+len+' 分鐘':'（尚未設定會議長度）')+'</span>'+(over?'<span class="over-t">超過 '+(total-len)+' 分鐘，建議刪減或延後</span>':'')+'</div>' +
     '<div class="prog"><i class="'+(over?"over":"")+'" style="width:'+pct+'%"></i></div></div>';
   if(mgr && prep) h += '<button class="btn main" data-act="publish">發布議程</button>';
   else if(mgr && m.status==="議程已發布") h += '<button class="btn sec" data-act="reopen">重新開放徵集</button><button class="btn main" data-act="startMeeting">開始開會</button>';
@@ -690,7 +702,7 @@ $("tpSave").onclick = function(){
   $("tpSave").disabled = true; setErr("tpErr","");
   api("topic.save", args).then(function(j){
     $("tpSave").disabled = false;
-    if(j && j.ok){ hideModals(); refreshDetail().then(function(){ dmsg(tp.id?"議題已更新。":"議題已送出，截止前都可以修改。",true); }); }
+    if(j && j.ok){ var wasNew = !tp.id; hideModals(); refreshDetail().then(function(){ if(wasNew) showModal("mDone"); else dmsg("議題已更新。",true); }); }
     else setErr("tpErr", errText(j));
   }).catch(function(e){ $("tpSave").disabled=false; if(e.message!=="unauthorized") setErr("tpErr","連線失敗，請檢查網路後再試。"); });
 };
@@ -838,7 +850,7 @@ function liveHtml(d){
   h += ag.map(function(t,i){ return liveCard(d,t,i); }).join("");
   if(m.status==="已結束"){
     var left = ag.filter(function(t){ return !t.fixed && (t.status==="已排入" || t.status==="順延"); });
-    if(left.length) h += '<div class="carrybox"><b>會順延到下次會議的議題（'+left.length+'）</b><br>'+left.map(function(t){ return '・'+esc(t.title)+'（'+esc(t.proposer)+'）'; }).join("<br>")+'<br><span class="muted">下次建立同類型會議時，會自動出現在議題徵集區。</span></div>';
+    if(left.length) h += '<div class="carrybox">'+ico("meeting/icon-carryover")+'<b>會順延到下次會議的議題（'+left.length+'）</b><br>'+left.map(function(t){ return '・'+esc(t.title)+'（'+esc(t.proposer)+'）'; }).join("<br>")+'<br><span class="muted">下次建立同類型會議時，會自動出現在議題徵集區。</span></div>';
   }
   return h + '</div>';
 }
@@ -856,7 +868,7 @@ function liveCard(d, t, idx){
   if(rec){
     h += qaHtml(d,t.id) + '<div class="lfoot">';
     if(t.status==="已討論"||t.status==="順延") h += '<button class="btn sec" data-act="topicState" data-v="已排入" data-id="'+esc(t.id)+'">改回討論中</button>';
-    else if(t.status==="已排入") h += '<button class="btn sec" data-act="topicState" data-v="順延" data-id="'+esc(t.id)+'">順延到下次</button><button class="btn main" data-act="topicState" data-v="已討論" data-id="'+esc(t.id)+'">這題討論完了 ✓</button>';
+    else if(t.status==="已排入") h += '<button class="btn sec" data-act="topicState" data-v="順延" data-id="'+esc(t.id)+'">'+ico("meeting/icon-carryover")+'順延到下次</button><button class="btn main" data-act="topicState" data-v="已討論" data-id="'+esc(t.id)+'">這題討論完了 ✓</button>';
     h += '</div>';
   }
   return h + '</div></div>';
@@ -885,7 +897,7 @@ function qaHtml(d, tid){
 function liveDock(d){
   var m = d.meeting;
   if(m.status==="會中" && canRecMe(m)) return '<div class="dock"><div class="budget"><span class="savestat" id="saveStat2"></span></div><button class="btn main" data-act="finishMeeting">結束會議</button></div>';
-  if(m.status==="已結束" && isMgr()) return '<div class="dock"><div class="budget muted">會議已結束，紀錄已鎖定。</div><button class="btn sec" data-act="unlockMeeting">解鎖重新編輯</button><button class="btn main" data-act="copyNext">'+ico("common/icon-copy")+'複製為下次會議</button></div>';
+  if(m.status==="已結束" && isMgr()) return '<div class="dock"><div class="budget muted">會議已結束，紀錄已鎖定。</div><button class="btn sec" data-act="unlockMeeting">解鎖重新編輯</button><button class="btn main" data-act="copyNext">'+ico("meeting/icon-duplicate")+'複製為下次會議</button></div>';
   return "";
 }
 
@@ -944,7 +956,7 @@ function paintAtt(){
   var att = m.attendance || {}, p = 0, l = 0;
   box.innerHTML = m.attendees.map(function(n){
     var st = att[n]; if(st==="出席") p++; if(st==="請假") l++;
-    return '<button type="button" class="achip'+(st==="出席"?" p":st==="請假"?" l":"")+'" '+(rec?'data-act="att" data-v="'+esc(n)+'"':"disabled")+'>'+(st==="出席"?"✓ ":st==="請假"?"假 ":"")+esc(n)+'</button>';
+    return '<button type="button" class="achip'+(st==="出席"?" p":st==="請假"?" l":"")+'" '+(rec?'data-act="att" data-v="'+esc(n)+'"':"disabled")+'>'+(st==="出席"?ico("meeting/icon-present"):st==="請假"?ico("meeting/icon-leave"):"")+esc(n)+'</button>';
   }).join("");
   var as = $("attStat"); if(as) as.textContent = "出席 "+p+"／請假 "+l+"／共 "+m.attendees.length+" 人";
 }
@@ -1076,7 +1088,7 @@ function drawBoard(){
   var h = '<div class="stats"><div class="stat bad"><b>'+st.late+'</b><span>逾期</span></div><div class="stat warn"><b>'+st.today+'</b><span>今天到期</span></div><div class="stat"><b>'+st.doing+'</b><span>進行中</span></div><div class="stat good"><b>'+st.week+'</b><span>本週完成</span></div></div>';
   h += '<div class="tbar"><div class="pills"><button class="pill'+(S.todoView==="mine"?" on":"")+'" data-act="tview" data-v="mine">我的</button><button class="pill'+(S.todoView==="all"?" on":"")+'" data-act="tview" data-v="all">全部</button></div>'+
     '<label><input type="checkbox" id="chkDone"'+(S.showDone?" checked":"")+'> 顯示已完成／已取消</label><button class="btn sec sm" data-act="tload" style="margin-left:auto">'+ico("common/icon-refresh")+'重新整理</button></div>';
-  if(!show.length){ $("listBody").innerHTML = h + pstate("common/state-done", S.todos.length ? "太棒了，目前沒有待辦" : "還沒有任何待辦。"); bindBoard(); return; }
+  if(!show.length){ $("listBody").innerHTML = h + pstate("meeting/state-all-done", S.todos.length ? "太棒了，目前沒有待辦" : "還沒有任何待辦。"); bindBoard(); return; }
   var groups = {}, order = [];
   show.forEach(function(t){ var k = t.owner || ""; if(!groups[k]){ groups[k] = []; order.push(k); } groups[k].push(t); });
   order.sort(function(a,b){ return a==="" ? 1 : b==="" ? -1 : (a===me.name ? -1 : b===me.name ? 1 : a.localeCompare(b)); });
@@ -1092,7 +1104,7 @@ function todoRow(t){
   var sc = {"待處理":"s-p","進行中":"s-d","已完成":"s-c","已取消":"s-x"}[t.status];
   var sel = can ? '<select class="tsel '+sc+'" data-tid="'+esc(t.id)+'">'+["待處理","進行中","已完成","已取消"].map(function(x){ return '<option'+(x===t.status?" selected":"")+'>'+x+'</option>'; }).join("")+'</select>' : '<span class="tag '+({"待處理":"s-prep","進行中":"s-pub","已完成":"s-done","已取消":"s-void"}[t.status])+'">'+esc(t.status)+'</span>';
   return '<div class="trow'+(open?"":" done")+'"><div class="tc">'+esc(t.content)+'</div><div class="tm"><span>'+esc(t.meetingTitle)+(t.topicTitle?' · '+esc(t.topicTitle.replace(/（.*）/,"")):"")+'</span>'+(t.handoverId?'<span class="tag ho">交班</span>':'')+
-    '<span class="due '+cls+'">'+(cls==="late"?ico("common/icon-warning"):ico("common/icon-calendar-small"))+(t.due?esc(fmtDate(t.due))+(cls==="late"?" 逾期":cls==="today"?" 今天":""):"無期限")+'</span>'+sel+
+    '<span class="due '+cls+'">'+(cls==="late"?ico("meeting/icon-overdue"):ico("common/icon-calendar-small"))+(t.due?esc(fmtDate(t.due))+(cls==="late"?" 逾期":cls==="today"?" 今天":""):"無期限")+'</span>'+sel+
     (can && open ? '<button class="lk" data-act="dueOpen" data-id="'+esc(t.id)+'" data-from="board">延後</button>' : '')+'</div></div>';
 }
 function bindBoard(){
@@ -1116,7 +1128,7 @@ function handoverPanelHtml(d){
     return '<label class="hrow">'+(el?'<input type="checkbox" data-ho="'+esc(t.id)+'" checked>':'<span style="width:18px;flex:none"></span>')+'<span class="hc"><b>'+esc(t.content)+'</b><small>'+(t.owner?esc(t.owner):'<span class="no">未指定負責人（無法送交班）</span>')+(t.due?' · 期限 '+esc(fmtDate(t.due)):'')+' · '+esc(t.status)+
       (t.handoverId?' <span class="tag ho">已送交班</span>':'')+'</small></span></label>';
   }).join("");
-  if(canRecMe(m)) h += '<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn main" data-act="hoSend"'+(n?"":" disabled")+'>'+ico("common/icon-share")+'送到行政交班'+(n?'（'+n+' 筆）':'')+'</button>'+(n?'':'<span class="muted" style="font-size:13.5px">沒有需要送的待辦</span>')+'</div>';
+  if(canRecMe(m)) h += '<div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn main" data-act="hoSend"'+(n?"":" disabled")+'>'+ico("meeting/icon-handover")+'送到行政交班'+(n?'（'+n+' 筆）':'')+'</button>'+(n?'':'<span class="muted" style="font-size:13.5px">沒有需要送的待辦</span>')+'</div>';
   return h + '</div>';
 }
 function repaintHo(){ var e = $("hoPanel"); if(e){ var w = document.createElement("div"); w.innerHTML = handoverPanelHtml(S.detail); e.replaceWith(w.firstChild); } }
@@ -1158,7 +1170,7 @@ function lineText(d){
 }
 function linePanelHtml(d){
   return '<div class="panel"><div class="ttl">LINE 公告<small>內容來自上面的決議與待辦，複製後貼到群組</small></div><div class="bubble" id="lineText">'+esc(lineText(d))+'</div>'+
-    '<div style="margin-top:12px"><button class="btn main" data-act="lineCopy">'+ico("common/icon-copy")+'複製公告文字</button></div></div>';
+    '<div style="margin-top:12px"><button class="btn main" data-act="lineCopy">'+ico("meeting/icon-announce")+'複製公告文字</button></div></div>';
 }
 
 /* ========== 會議紀錄輸出（列印／存成 PDF、複製文字） ========== */
@@ -1208,7 +1220,7 @@ function minutesHtml(d){
   return h;
 }
 function minutesPanelHtml(d){
-  return '<div class="panel"><div class="ttl">會議紀錄<small>完整的討論重點、決議與待辦，可列印或存成 PDF</small></div><div class="bar">'+
+  return '<div class="panel"><div class="ttl">'+ico("meeting/icon-minutes")+'會議紀錄<small>完整的討論重點、決議與待辦，可列印或存成 PDF</small></div><div class="bar">'+
     '<button class="btn main" data-act="minPrint">'+ico("common/icon-print")+'列印／存成 PDF</button><button class="btn sec" data-act="minCopy">'+ico("common/icon-copy")+'複製成文字</button></div></div>';
 }
 LIVE_ACTS.minPrint = function(a, id, d){
