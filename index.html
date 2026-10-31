@@ -446,31 +446,35 @@
     function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
 
 
-    /* 會議系統卡片的「N 項待處理」紅點：登入後在背景向會議後端問一次；太慢（6 秒）或失敗就不顯示，完全不影響登入與使用 */
-    var MEETING_API = "https://script.google.com/macros/s/AKfycbydjtF6BREEVXLy9CGpRm9JZwhOWYL500sM_R8awjTalSKFdkCaj1NNKDKzbCg0aacg/exec";
-    var BADGE_KEY = "";
+    /* 卡片的「N 項待處理」紅點：登入後在背景向各系統後端問一次「跟我有關的有幾件」；太慢（6 秒）或失敗就不顯示，完全不影響登入與使用 */
+    var BADGES = [
+      { key:"meeting", api:"https://script.google.com/macros/s/AKfycbydjtF6BREEVXLy9CGpRm9JZwhOWYL500sM_R8awjTalSKFdkCaj1NNKDKzbCg0aacg/exec", action:"badge", count:function(j){ return j && j.ok ? j.count : 0; } },
+      { key:"handover", api:"https://script.google.com/macros/s/AKfycby_XulC71Nz1aPSSzlPxuSNfd0DOmAaJF2FJbphmRGyfFTkuhcUFvhyVgfG215SYIaZ/exec", action:"getBadge", count:function(j){ return j && j.ok && j.data ? j.data.count : 0; } }
+    ];
+    var BADGE_KEYS = {};
     function setBadge(card, n){
       var b = card.querySelector(".badge");
       if(!b){ b = document.createElement("span"); b.className = "badge"; card.appendChild(b); }
       b.setAttribute("data-n", n); b.textContent = T("badgeN").replace("{n}", n);
     }
-    function loadMeetingBadge(){
+    function loadBadge(cfg){
       try{
-        var card = document.querySelector('#app .card[data-key="meeting"]');
+        var card = document.querySelector('#app .card[data-key="' + cfg.key + '"]');
         if(!card || card.style.display==="none" || !tokenValid()) return;
         var key = CUR_NAME + "|" + CUR_ROLE, old = card.querySelector(".badge");
-        if(BADGE_KEY === key) return;
+        if(BADGE_KEYS[cfg.key] === key) return;
         if(old) old.parentNode.removeChild(old);                       /* 換人登入：先清掉上一位的紅點 */
-        BADGE_KEY = key;
+        BADGE_KEYS[cfg.key] = key;
         var ctl = ("AbortController" in window) ? new AbortController() : null;
         var to = setTimeout(function(){ if(ctl) ctl.abort(); }, 6000);
-        fetch(MEETING_API, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
-          body: JSON.stringify({ action:"badge", token: lsGet(TOKEN_KEY) }), signal: ctl ? ctl.signal : undefined })
+        fetch(cfg.api, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
+          body: JSON.stringify({ action:cfg.action, token: lsGet(TOKEN_KEY) }), signal: ctl ? ctl.signal : undefined })
           .then(function(r){ return r.json(); })
-          .then(function(j){ clearTimeout(to); if(j && j.ok && j.count > 0) setBadge(card, j.count); })
-          .catch(function(){ clearTimeout(to); BADGE_KEY = ""; });
+          .then(function(j){ clearTimeout(to); var n = cfg.count(j); if(n > 0) setBadge(card, n); })
+          .catch(function(){ clearTimeout(to); BADGE_KEYS[cfg.key] = ""; });
       }catch(e){}
     }
+    function loadBadges(){ for(var i=0;i<BADGES.length;i++) loadBadge(BADGES[i]); }
     function showApp(name, role){
       role = role || lsGet(ROLE_KEY) || "care";
       applyRole(role);
@@ -483,7 +487,7 @@
       document.getElementById("whobar").classList.remove("hidden");
       document.getElementById("app").classList.remove("hidden");
       document.getElementById("foot").classList.remove("hidden");
-      loadMeetingBadge();
+      loadBadges();
     }
     function showGate(){
       document.getElementById("app").classList.add("hidden");
