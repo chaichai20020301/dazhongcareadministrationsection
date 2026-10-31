@@ -449,7 +449,8 @@
     /* 卡片的「N 項待處理」紅點：登入後在背景向各系統後端問一次「跟我有關的有幾件」；太慢（6 秒）或失敗就不顯示，完全不影響登入與使用 */
     var BADGES = [
       { key:"meeting", api:"https://script.google.com/macros/s/AKfycbydjtF6BREEVXLy9CGpRm9JZwhOWYL500sM_R8awjTalSKFdkCaj1NNKDKzbCg0aacg/exec", action:"badge", count:function(j){ return j && j.ok ? j.count : 0; } },
-      { key:"handover", api:"https://script.google.com/macros/s/AKfycby_XulC71Nz1aPSSzlPxuSNfd0DOmAaJF2FJbphmRGyfFTkuhcUFvhyVgfG215SYIaZ/exec", action:"getBadge", count:function(j){ return j && j.ok && j.data ? j.data.count : 0; } }
+      { key:"handover", api:"https://script.google.com/macros/s/AKfycby_XulC71Nz1aPSSzlPxuSNfd0DOmAaJF2FJbphmRGyfFTkuhcUFvhyVgfG215SYIaZ/exec", action:"getBadge", count:function(j){ return j && j.ok && j.data ? j.data.count : 0; } },
+      { key:"repair", api:"https://script.google.com/macros/s/AKfycbwKWNcegoY9JxOjjp8kuNvTw9mhbtHnDkhXyR3glfYRK8Al19nW1ta0zrdie4R8FW-n3w/exec", action:"badge", extra:{ rootFolderId:"1zVC4RGZOrBvfG0ohcX1LZQdJoQfupXx3" }, count:function(j){ return j && j.ok ? j.count : 0; } }
     ];
     var BADGE_KEYS = {};
     function setBadge(card, n){
@@ -468,7 +469,7 @@
         var ctl = ("AbortController" in window) ? new AbortController() : null;
         var to = setTimeout(function(){ if(ctl) ctl.abort(); }, 6000);
         fetch(cfg.api, { method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
-          body: JSON.stringify({ action:cfg.action, token: lsGet(TOKEN_KEY) }), signal: ctl ? ctl.signal : undefined })
+          body: JSON.stringify(Object.assign({ action:cfg.action, token: lsGet(TOKEN_KEY) }, cfg.extra || {})), signal: ctl ? ctl.signal : undefined })
           .then(function(r){ return r.json(); })
           .then(function(j){ clearTimeout(to); var n = cfg.count(j); if(n > 0) setBadge(card, n); })
           .catch(function(){ clearTimeout(to); BADGE_KEYS[cfg.key] = ""; });
