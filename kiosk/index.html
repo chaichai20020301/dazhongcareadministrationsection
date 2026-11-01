@@ -41,7 +41,7 @@
   .welcome h1{margin:0;font:900 clamp(30px,calc(var(--u)*5.4),72px)/1.25 var(--serif);letter-spacing:.04em;color:#092f25}
   .welcome h1 br{display:none}
   .welcome p{margin:calc(var(--u)*1) 0 0;font:500 clamp(18px,calc(var(--u)*3),38px) var(--sans);color:#4d695a}
-  .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);gap:calc(var(--u)*2.6)}
+  .grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,1fr);gap:calc(var(--u)*2.6)}
   .card{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(var(--u)*1.4);text-align:center;
     border:2px solid #b5cda2;border-radius:calc(var(--u)*3);padding:calc(var(--u)*2.4) calc(var(--u)*2);color:#092f25;overflow:hidden;
     background:#eaf3dc;box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2.2) rgba(60,90,60,.14);transition:transform .12s ease}
@@ -80,6 +80,47 @@
     .card h2{font-size:calc(var(--u)*7.2)}.card p{font-size:calc(var(--u)*3)}
     .foot{flex-wrap:wrap}.foot .info{margin-left:0;flex-basis:100%;margin-top:calc(var(--u)*-1);justify-content:flex-start;font-size:calc(var(--u)*2.6);gap:calc(var(--u)*3);text-align:left}
     .foot .info .sep{display:none}.foot .help{flex:1;font-size:calc(var(--u)*4.4)}
+  }
+
+  /* ===== 閒置輪播（沒人操作時自動播放機構介紹／營養保健品；點一下螢幕回首頁）===== */
+  #attract{--u:1vmin;position:fixed;inset:0;z-index:9;display:none;flex-direction:column;background:#faf8ef;overflow:hidden;cursor:pointer}
+  #attract.show{display:flex;animation:atIn .6s ease}
+  @keyframes atIn{from{opacity:0}to{opacity:1}}
+  #attract .top{padding:calc(var(--u)*2.6) calc(var(--u)*3.6) 0;position:relative;z-index:2}
+  #attract .stage{position:relative;flex:1;min-height:0}
+  .slide{position:absolute;inset:0;display:flex;align-items:center;gap:calc(var(--u)*3);padding:0 calc(var(--u)*6);opacity:0;transition:opacity 1.1s ease;pointer-events:none}
+  .slide.on{opacity:1}
+  .slide .art{flex:1.15;min-width:0;height:88%;display:flex;align-items:center;justify-content:center}
+  .slide .art img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .slide.on .art img{animation:drift 9s ease-in-out both}
+  @keyframes drift{from{transform:scale(1)}to{transform:scale(1.05)}}
+  .slide .words{flex:1;min-width:0}
+  .slide .tag{display:inline-block;padding:calc(var(--u)*.7) calc(var(--u)*2.4);border-radius:999px;background:#14563f;color:#fff;font:800 clamp(16px,calc(var(--u)*2.6),32px) var(--sans);letter-spacing:.08em}
+  .slide.promo .tag{background:#b65b16}
+  .slide h2{margin:calc(var(--u)*1.8) 0 calc(var(--u)*1.6);font:900 clamp(34px,calc(var(--u)*6.6),84px)/1.25 var(--serif);letter-spacing:.04em;color:#092f25}
+  .slide p{margin:0;font:500 clamp(20px,calc(var(--u)*3.3),42px)/1.65 var(--sans);color:#3d5a4a}
+  .slide ul{margin:0;padding:0;list-style:none;font:700 clamp(22px,calc(var(--u)*3.6),46px)/1.5 var(--sans);color:#17261d}
+  .slide li{position:relative;padding-left:calc(var(--u)*4)}
+  .slide li+li{margin-top:calc(var(--u)*1)}
+  .slide li::before{content:"";position:absolute;left:0;top:.5em;width:calc(var(--u)*2.2);height:calc(var(--u)*2.2);border-radius:50% 0 50% 0;background:#6aae3c}
+  .slide.promo li::before{background:#e08a3a}
+  .slide .art.photo img{border-radius:calc(var(--u)*3);box-shadow:0 calc(var(--u)*.8) calc(var(--u)*2.4) rgba(60,80,50,.2);background:#fff}
+  #attract .bottom{flex:none;display:flex;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);padding:0 0 calc(var(--u)*3.4);position:relative;z-index:2}
+  .touchme{display:inline-flex;align-items:center;padding:calc(var(--u)*1.8) calc(var(--u)*6);border-radius:999px;background:#14563f;color:#fff;
+    font:900 clamp(22px,calc(var(--u)*4),52px) var(--sans);letter-spacing:.06em;box-shadow:0 calc(var(--u)*.6) calc(var(--u)*1.6) rgba(20,86,63,.35);animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+  .dots{display:flex;gap:calc(var(--u)*1.2)}
+  .dots i{width:calc(var(--u)*1.4);height:calc(var(--u)*1.4);border-radius:999px;background:#c9d4bd;transition:all .4s}
+  .dots i.on{width:calc(var(--u)*4.4);background:#14563f}
+  @media (max-aspect-ratio:1/1){
+    #attract{--u:min(1vmin,.563vh)}
+    .slide{flex-direction:column;justify-content:center;gap:calc(var(--u)*2);padding:0 calc(var(--u)*5)}
+    .slide .art{flex:none;height:44%;width:100%}
+    .slide .words{flex:none;text-align:center}
+    .slide ul{display:inline-block;text-align:left}
+    .slide h2{font-size:calc(var(--u)*8)}.slide p{font-size:calc(var(--u)*3.8)}.slide ul{font-size:calc(var(--u)*4.2)}
+    .slide .tag{font-size:calc(var(--u)*3)}
+    .touchme{font-size:calc(var(--u)*4.6)}
   }
 
   /* ===== 內嵌系統畫面 ===== */
@@ -132,11 +173,6 @@
       <div class="txt"><h2>探視預約</h2><p>預約探視家人的日期與時段</p></div>
       <span class="go">開始預約 →</span>
     </button>
-    <button class="card" onclick="openApp('tour')">
-      <i class="im lv l"></i><i class="im lv r"></i><img class="ico" src="img/n-house.webp" alt="">
-      <div class="txt"><h2>參訪預約</h2><p>想了解入住？預約參觀機構環境</p></div>
-      <span class="go">開始預約 →</span>
-    </button>
     <button class="card items" id="cardItems" onclick="openApp('items')">
       <i class="im lv l"></i><i class="im lv r"></i><img class="ico" src="img/n-box.webp" alt="">
       <div class="txt"><h2>物品登記</h2><p>登記今天帶來給長輩的衣物與用品</p></div>
@@ -159,6 +195,16 @@
   <iframe id="frame" title="家屬自助服務"></iframe>
 </section>
 
+<!-- 閒置輪播 -->
+<div id="attract" onclick="endAttract()">
+  <div class="top">
+    <img src="logo.png" alt="線東大眾護理之家" style="height:clamp(46px,calc(var(--u)*8.4),100px);width:auto">
+    <div class="clock"><div class="t" data-clk="t">--:--</div><div class="d" data-clk="d"></div></div>
+  </div>
+  <div class="stage" id="stage"></div>
+  <div class="bottom"><div class="dots" id="dots"></div><span class="touchme">請點一下螢幕開始使用</span></div>
+</div>
+
 <!-- 閒置提醒 -->
 <div id="idle">
   <div class="box">
@@ -176,9 +222,21 @@
 /* ===== 設定 ===== */
 var IDLE_MS = 90 * 1000;        // 沒有操作多久後跳出提醒
 var WARN_SEC = 15;              // 提醒後幾秒自動回首頁
+var ATTRACT_MS = 60 * 1000;     // 首頁沒人操作多久後開始自動輪播
+var SLIDE_MS = 9 * 1000;        // 每一張輪播停留幾秒
+/* 輪播內容平常由主管在入口網站的「機台輪播管理」維護，機台開著時會自己去讀（每 3 分鐘更新一次）。
+   下面這份是「備援」：後端連不上、而且機台也沒讀過內容時才會播。結構：type "intro"＝機構介紹（綠色標籤）、"promo"＝營養保健品（橘色標籤）；
+   words 文字段落、list 條列（二選一）；title／words 裡的 \n 是換行；photo:true 表示是照片（加圓角陰影）。 */
+var SLIDES_API = "https://script.google.com/macros/s/AKfycby79wULdv1ZN5kzcHNXyWuHv_EsF0dGDTpzuS5ry638Qy9L_CHG6iLO5Povy9a4IQx_nQ/exec";            // 機台輪播後端（Apps Script /exec 網址）；部署後填入。空白＝只用下面的備援內容
+var SLIDES = [
+  { type:"intro", tag:"線東大眾護理之家", title:"讓我們一起開心、\n健康的慢慢變老", words:"把熱忱、關愛、專業和耐心，當作撐起每個家庭裡長輩生活的支點。", art:"../assets/tour/hero.webp" },
+  { type:"intro", tag:"專業照護", title:"專業照護，細心陪伴", list:["日常生活看顧　專人協助洗澡","護理師每天量測生命徵象","社工服務與長照諮詢","醫師、藥師、營養師定期巡視","文康活動，延緩身心老化"], art:"../assets/tour/sec-services.webp" },
+  { type:"intro", tag:"適合對象", title:"適合哪些長輩", list:["日常生活需他人協助者","慢性病需護理照顧者","急性醫療出院後仍需照護者","中風、失智、行動不便者","需洗腎、化療、傷口照護者","安寧照護"], art:"../assets/tour/sec-who.webp" },
+  { type:"intro", tag:"生活日常", title:"像家一樣的每一天", words:"獨立私人衣櫃、電動升降床、全熱交換器新鮮空氣，並定期舉辦多元活動與社區互動。", art:"../assets/tour/sec-daily.webp" },
+  { type:"intro", tag:"歡迎參觀", title:"想了解入住？\n歡迎來電或洽櫃檯", words:"服務電話　(04)763-0685\n彰化縣彰化市線東路一段一號", art:"../assets/tour/sec-cta.webp" },
+];
 var APPS = {
   visit: { title:"探視預約", src:"visit/index.html",          zoom:1,      open:true, bar:false },
-  tour:  { title:"參訪預約", src:"../tour-family/index.html", zoom:1.5,    open:true, fitHero:true },
   items: { title:"物品登記", src:"items/index.html",          zoom:1,      open:true, bar:false }   // 後端部署完成後改 true
 };
 
@@ -209,7 +267,7 @@ function toast(msg){
 function openApp(key){
   var a = APPS[key]; if(!a) return;
   if(!a.open){ toast("此服務即將開放，請洽櫃檯人員協助"); return; }
-  cur = key;
+  cur = key; clearTimeout(atTimer);
   $("ttl").textContent = a.title;
   $("home").classList.add("hide");
   $("frameView").classList.add("show");
@@ -224,6 +282,7 @@ function goHome(){
   $("frame").src = "about:blank";             // 清掉已填寫的資料
   $("frameView").classList.remove("show");
   $("home").classList.remove("hide");
+  armAttract();
 }
 
 /* ===== 閒置偵測 ===== */
@@ -250,6 +309,74 @@ function keepUsing(){
 ["touchstart","mousedown","keydown","wheel"].forEach(function(ev){
   document.addEventListener(ev, armIdle, {capture:true, passive:true});
 });
+
+/* ===== 閒置輪播 ===== */
+var atTimer = null, slideTimer = null, slideIdx = 0, slidesBuilt = false;
+function escH(t){ return String(t==null?"":t).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }).replace(/\n/g,"<br>"); }
+var slideData = SLIDES;           // 目前要播的內容（先用備援，讀到後端的就換掉）
+function applySlides(d){
+  if(!d || !d.slides || !d.slides.length) return;
+  slideData = d.slides;
+  if(d.settings){
+    if(d.settings.attractSec >= 15) ATTRACT_MS = d.settings.attractSec * 1000;
+    if(d.settings.slideSec >= 4) SLIDE_MS = d.settings.slideSec * 1000;
+  }
+  if(!$("attract").classList.contains("show")){ slidesBuilt = false; armAttract(); }   // 正在播的話，等下次開始播再換
+}
+function loadSlides(){
+  if(!SLIDES_API) return;
+  var done = false, ctl = window.AbortController ? new AbortController() : null;
+  var to = setTimeout(function(){ if(ctl) ctl.abort(); }, 8000);
+  fetch(SLIDES_API, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({action:"get"}), signal: ctl ? ctl.signal : undefined })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      clearTimeout(to);
+      if(j && j.ok){ applySlides(j); try{ localStorage.setItem("kiosk_slides", JSON.stringify(j)); }catch(e){} }
+    }).catch(function(){ clearTimeout(to); });
+}
+try{ applySlides(JSON.parse(localStorage.getItem("kiosk_slides")||"null")); }catch(e){}   // 先用上次讀到的（斷網也能播）
+loadSlides(); setInterval(loadSlides, 3 * 60 * 1000);
+function buildSlides(){
+  if(slidesBuilt) return; slidesBuilt = true;
+  var list = slideData.filter(function(x){ return x.enabled !== false; });
+  $("stage").innerHTML = list.map(function(x){
+    var body = x.list && x.list.length ? "<ul>"+x.list.map(function(t){ return "<li>"+escH(t)+"</li>"; }).join("")+"</ul>" : "<p>"+escH(x.words)+"</p>";
+    var art = /^https?:|^\.\.\//.test(x.art) ? x.art : "../" + x.art;
+    return '<div class="slide '+(x.type==="promo"?"promo":"intro")+'"><div class="art'+(x.photo?" photo":"")+'"><img src="'+escH(art)+'" alt=""></div>'+
+           '<div class="words">'+(x.tag?'<span class="tag">'+escH(x.tag)+'</span>':"")+'<h2>'+escH(x.title)+'</h2>'+body+'</div></div>';
+  }).join("");
+  $("dots").innerHTML = list.map(function(){ return "<i></i>"; }).join("");
+}
+function showSlide(i){
+  var sl = document.querySelectorAll("#stage .slide"), ds = document.querySelectorAll("#dots i");
+  if(!sl.length) return;
+  slideIdx = (i + sl.length) % sl.length;
+  sl.forEach(function(e,k){ e.classList.remove("on"); if(k === slideIdx){ void e.offsetWidth; e.classList.add("on"); } });
+  ds.forEach(function(e,k){ e.classList.toggle("on", k === slideIdx); });
+}
+function startAttract(){
+  if(cur || warning) return;                // 有人正在用就不播
+  buildSlides();
+  if(!document.querySelector("#stage .slide")) return;
+  $("attract").classList.add("show");
+  showSlide(0);
+  clearInterval(slideTimer);
+  slideTimer = setInterval(function(){ showSlide(slideIdx + 1); }, SLIDE_MS);
+}
+function endAttract(){
+  clearInterval(slideTimer);
+  $("attract").classList.remove("show");
+  armAttract();
+}
+function armAttract(){
+  clearTimeout(atTimer);
+  if(cur || $("attract").classList.contains("show")) return;
+  atTimer = setTimeout(startAttract, ATTRACT_MS);
+}
+["touchstart","mousedown","keydown","wheel"].forEach(function(ev){
+  document.addEventListener(ev, armAttract, {capture:true, passive:true});
+});
+armAttract();
 
 /* ===== 調整被嵌入的家屬頁（同網域，可直接改 DOM）===== */
 function zoomFor(a){

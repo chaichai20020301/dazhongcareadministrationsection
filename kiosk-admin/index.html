@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>機台輪播管理 · 線東大眾護理之家</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--green:#14563F;--green-d:#0E4231;--ink:#092F25;--muted:#4D695A;--paper:#FAF8EF;--card:#FFFDF8;--line:#E3E5D8;--red:#A63124;--orange:#B65B16;
+  --g-soft:#EAF3DC;--g-line:#B5CDA2;--o-soft:#FFF0D7;--o-line:#EDC58D}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+body{padding-top:64px}
+body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:16px 24px 100px}
+[hidden]{display:none!important}
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;gap:14px;padding:0 20px;background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--green);color:#fff!important;border-radius:999px;font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:var(--green);border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-user{display:none;margin-left:auto;align-items:center;gap:8px;padding:4px 14px 4px 5px;background:rgba(255,255,255,.75);border:1px solid #DEDFD1;border-radius:999px;font:500 13.5px 'Noto Sans TC';white-space:nowrap}
+.v-user b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;font-size:14px}
+.ico{display:inline-block;flex:none;width:1.15em;height:1.15em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:-.2em;margin-right:5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14.5px;cursor:pointer;white-space:nowrap}
+.btn.main{background:var(--green);color:#fff;box-shadow:0 3px 8px rgba(20,86,63,.22)}.btn.main:hover{background:var(--green-d)}
+.btn.orange{background:var(--orange);color:#fff;box-shadow:0 3px 8px rgba(182,91,22,.25)}
+.btn.sec{background:var(--card);color:var(--green-d);border:1.5px solid var(--g-line)}.btn.sec:hover{background:var(--g-soft)}
+.btn.warn{background:var(--card);color:var(--red);border:1.5px solid #E6C9C4}
+.btn.sm{padding:6px 13px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.banner{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:140px;margin-bottom:14px;padding:18px 24px 18px 100px;background:#F5F6E6;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.banner img{position:absolute;pointer-events:none;z-index:-1}
+.banner .l{left:0;top:0;height:100%;opacity:.85}.banner .r{right:12px;bottom:0;height:92%;max-width:42%;object-fit:contain;object-position:right bottom}
+.banner .txt{max-width:62%}
+h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
+.sub{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;box-shadow:0 4px 12px rgba(25,62,37,.04);margin-bottom:14px}
+.ttl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 0 10px;font:700 15.5px 'Noto Sans TC'}
+.ttl small{flex-basis:100%;font:400 12.5px 'Noto Sans TC';color:#7A8C80}
+.set{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+.set label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--muted)}
+.set select{padding:9px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:15px;background:#fff;min-width:150px}
+.msg{min-height:20px;margin:6px 2px;font-size:13.5px;font-weight:700}.msg.ok{color:var(--green)}.msg.err{color:var(--red)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{display:grid;grid-template-columns:150px 1fr auto;gap:14px;align-items:center;padding:10px 14px 10px 10px;background:var(--card);border:1.5px solid var(--g-line);border-radius:18px}
+.item.promo{border-color:var(--o-line);background:#FFFAF0}
+.item.off{opacity:.55}
+.item .th{height:96px;border-radius:12px;background:#F3F1E6;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.item .th img{max-width:100%;max-height:100%;object-fit:contain}
+.tag{display:inline-block;padding:2px 11px;border-radius:999px;font-size:12px;font-weight:700;background:var(--green);color:#fff;margin-right:6px}
+.tag.promo{background:var(--orange)}.tag.off{background:#9AA79F}
+.item h3{margin:6px 0 3px;font:900 18px/1.35 'Noto Serif TC',serif}
+.item p{margin:0;font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.mv{border:1.5px solid var(--g-line);background:#fff;border-radius:50%;width:34px;height:34px;cursor:pointer;color:var(--green-d);font-size:15px;line-height:1}
+.mv:disabled{opacity:.3;cursor:default}
+.sw{position:relative;width:46px;height:26px;border-radius:999px;background:#C9D1C6;border:0;cursor:pointer;flex:none;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--green)}.sw.on::after{left:23px}
+.empty{text-align:center;padding:30px 10px;color:var(--muted);font-size:14.5px;line-height:1.8}
+.empty img{display:block;margin:0 auto 6px;height:120px;width:auto}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(9,47,37,.45)}
+.box{background:var(--card);border-radius:22px;width:100%;max-width:880px;max-height:92vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.box h2{margin:0 0 12px;font:900 21px 'Noto Serif TC',serif}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld>span{font-size:13px;font-weight:700;color:var(--muted)}.fld small{font-weight:400;color:#7A8C80}
+.fld input[type=text],.fld textarea{padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:#fff;width:100%;resize:vertical}
+.fld input:focus,.fld textarea:focus{outline:none;border-color:var(--green)}
+.seg{display:flex;gap:8px}
+.seg label{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
+.seg input{display:none}.seg label.on{border-color:var(--green);background:var(--g-soft);color:var(--green-d)}.seg label.on.promo{border-color:var(--orange);background:var(--o-soft);color:#8A4A12}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px;margin-bottom:8px}
+.gal button{height:64px;border:2px solid var(--line);background:#F3F1E6;border-radius:12px;padding:3px;cursor:pointer}
+.gal button.on{border-color:var(--green);box-shadow:0 0 0 2px var(--g-line)}
+.gal img{width:100%;height:100%;object-fit:contain;display:block}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;margin:4px 0 10px}
+.pv{container-type:inline-size;position:relative;width:100%;aspect-ratio:16/10;background:#faf8ef;border:1.5px solid var(--line);border-radius:14px;overflow:hidden}
+.pv .in{position:absolute;inset:0;display:flex;align-items:center;gap:3cqw;padding:0 4cqw}
+.pv .a{flex:1.15;min-width:0;height:80%;display:flex;align-items:center;justify-content:center}
+.pv .a img{max-width:100%;max-height:100%;object-fit:contain}.pv .a.photo img{border-radius:3cqw;box-shadow:0 1cqw 3cqw rgba(60,80,50,.2);background:#fff}
+.pv .w{flex:1;min-width:0}
+.pv .tg{display:inline-block;padding:.6cqw 2.2cqw;border-radius:999px;background:var(--green);color:#fff;font:800 2.6cqw 'Noto Sans TC';letter-spacing:.08em}
+.pv.promo .tg{background:var(--orange)}
+.pv h4{margin:1.6cqw 0 1.4cqw;font:900 5.6cqw/1.25 'Noto Serif TC',serif;color:#092f25;letter-spacing:.04em}
+.pv p{margin:0;font:500 3cqw/1.6 'Noto Sans TC';color:#3d5a4a}
+.pv ul{margin:0;padding:0;list-style:none;font:700 3.1cqw/1.5 'Noto Sans TC'}.pv li{padding-left:3.4cqw;position:relative}
+.pv li::before{content:"";position:absolute;left:0;top:.5em;width:1.8cqw;height:1.8cqw;border-radius:50% 0 50% 0;background:#6aae3c}.pv.promo li::before{background:#e08a3a}
+.pvl{font-size:12px;color:#7A8C80;margin:4px 0 0}
+.err{color:var(--red);font-size:13.5px;font-weight:700;min-height:18px;margin:4px 0}
+.foot{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+@media (max-width:760px){
+  main{padding:12px 12px 100px}body{padding-top:56px}.v-topbar{height:56px;padding:0 12px;gap:10px}
+  .v-tb-logo,.v-user span{display:none}.v-user{padding:3px}.v-tb-title{font-size:17px}body::after{display:none}
+  .banner{padding:14px 14px 14px 60px;min-height:0}.banner .r{opacity:.3}.banner .txt{max-width:100%}h1{font-size:22px}
+  .item{grid-template-columns:96px 1fr}.item .th{height:70px}.item .acts{grid-column:1/3;justify-content:flex-start}
+  .modal{align-items:flex-end;padding:0}.box{border-radius:22px 22px 0 0;max-height:94vh}.cols{grid-template-columns:1fr}
+  .foot .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">機台輪播管理</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
+<main>
+  <div class="banner"><img class="l" src="../kiosk/img/n-g-l.webp" alt=""><img class="r" src="../assets/tour/sec-daily.webp" alt="">
+    <div class="txt"><h1>機台輪播管理</h1><p class="sub">家屬自助機台沒人操作時，會自動輪流播放這些畫面。在這裡新增、修改、排順序，按儲存後機台幾分鐘內就會更新。</p></div></div>
+  <div class="msg" id="msg"></div>
+
+  <section class="panel" id="setPanel" hidden>
+    <div class="ttl">播放設定</div>
+    <div class="set">
+      <label>機台沒人操作多久後開始播放<select id="setAttract"></select></label>
+      <label>每一張畫面停留<select id="setSlide"></select></label>
+      <button class="btn sec" id="setSave">儲存設定</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="ttl">輪播畫面<small>由上到下依序播放；關掉右邊的開關就先不播（內容會保留）。</small></div>
+    <div class="bar" style="margin-bottom:12px">
+      <button class="btn orange" id="addPromo"><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增營養保健品</button>
+      <button class="btn main" id="addIntro"><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增機構介紹</button>
+      <button class="btn sec" id="reload"><i class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button>
+    </div>
+    <div class="list" id="list"></div>
+  </section>
+</main>
+
+<div class="modal" id="ed" hidden>
+  <div class="box">
+    <h2 id="edTitle">新增畫面</h2>
+    <div class="cols">
+      <div>
+        <div class="fld"><span>類型</span>
+          <div class="seg" id="fType"><label data-v="intro"><input type="radio" name="ty">機構介紹</label><label data-v="promo" class="promo"><input type="radio" name="ty">營養保健品</label></div></div>
+        <div class="fld"><span>小標籤 <small>（顯示在標題上方的小膠囊，例：營養保健品、專業照護）</small></span><input type="text" id="fTag" maxlength="20"></div>
+        <div class="fld"><span>標題 <small>（要換行就按 Enter）</small></span><textarea id="fTitle" rows="2" maxlength="60"></textarea></div>
+        <div class="fld"><span>說明文字 <small>（一兩句話；也可以只用下面的條列）</small></span><textarea id="fWords" rows="3" maxlength="300"></textarea></div>
+        <div class="fld"><span>條列 <small>（一行一條，最多 8 條；有填的話會取代說明文字）</small></span><textarea id="fList" rows="4"></textarea></div>
+      </div>
+      <div>
+        <div class="fld"><span>圖片</span>
+          <div class="gal" id="gal"></div>
+          <div class="bar"><button class="btn sec sm" id="upBtn" type="button"><i class="ico" style="--ico:url(../assets/common/icon-upload.webp)"></i>上傳照片（商品、現場）</button><input type="file" id="upFile" accept="image/*" hidden><span id="upNote" class="pvl"></span></div>
+          <label class="chk"><input type="checkbox" id="fPhoto"> 這是照片（加圓角與陰影；水彩插圖不要勾）</label>
+        </div>
+        <div class="fld"><span>機台上的樣子（大約）</span><div class="pv" id="pv"></div><p class="pvl">請勿上傳住民或家屬的照片、任何個資。</p></div>
+      </div>
+    </div>
+    <div class="err" id="edErr"></div>
+    <div class="foot"><button class="btn sec" id="edCancel">取消</button><button class="btn main" id="edSave">儲存</button></div>
+  </div>
+</div>
+
+<div class="modal" id="cf" hidden><div class="box" style="max-width:420px"><h2>確定要刪除嗎？</h2><p id="cfText" style="line-height:1.7"></p>
+  <div class="foot"><button class="btn sec" id="cfNo">先不要</button><button class="btn warn" id="cfYes">刪除</button></div></div></div>
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycby79wULdv1ZN5kzcHNXyWuHv_EsF0dGDTpzuS5ry638Qy9L_CHG6iLO5Povy9a4IQx_nQ/exec";   // 機台輪播後端（Apps Script /exec 網址）；部署後填入
+var $ = function(id){ return document.getElementById(id); };
+var BUILTIN = [
+  ["assets/tour/hero.webp","機構外觀"],["assets/tour/sec-services.webp","護理師陪伴"],["assets/tour/sec-who.webp","庭院散步"],
+  ["assets/tour/sec-daily.webp","用餐"],["assets/tour/sec-cta.webp","大門"],["assets/tour/banner.webp","橫幅"],["assets/visit/banner-family.webp","家人陪伴"],["assets/items/icon-supplement.webp","保健品圖示"]
+];
+var ERR = { forbidden:"這個功能只有主管可以使用。", invalid:"資料不完整或格式不對，請檢查後再試。", not_found:"找不到這一張，請重新整理。", too_big:"照片太大，請換一張小一點的。",
+  busy:"系統忙碌中，請稍後再試。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
+var S = { slides:[], settings:null, edit:null, del:null };
+
+function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function kick(){ try{ localStorage.removeItem("portal_token"); localStorage.removeItem("portal_exp"); }catch(e){} location.replace("../index.html"); }
+function say(t, ok){ var e=$("msg"); e.textContent=t||""; e.className="msg "+(ok?"ok":"err"); if(ok) setTimeout(function(){ if(e.textContent===t) e.textContent=""; }, 4000); }
+function errText(j){ return ERR[j && j.error] || "操作失敗，請稍後再試。"; }
+function api(action, args){
+  var t = token(); if(!t){ kick(); return Promise.reject(new Error("unauthorized")); }
+  if(!SCRIPT_URL){ return Promise.reject(new Error("nourl")); }
+  var p = { action:action, token:t }; for(var k in (args||{})) p[k] = args[k];
+  return fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p)}).then(function(r){ return r.json(); })
+    .then(function(j){ if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; });
+}
+function netFail(e, what){ if(e.message==="unauthorized") return; say(e.message==="nourl" ? "機台輪播後端還沒設定網址，請通知管理員。" : (what||"連線失敗，請檢查網路後再試。")); }
+/* 站內圖是相對於網站根目錄的路徑（assets/…），本頁在子資料夾所以要加 ../；上傳的照片本來就是完整網址 */
+function src(a){ return /^https?:/.test(a) ? a : "../" + a; }
+
+/* ===== 開機 ===== */
+(function boot(){
+  if(!token()){ kick(); return; }
+  var n=ls("handover_name"), r=ls("portal_role"), e=$("v-user");
+  if(n){ e.children[0].textContent=n.trim().charAt(0); e.children[1].textContent=n+(r==="manager"?" · 主管":""); e.style.display="flex"; }
+  if(r !== "manager"){ $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-locked.webp" alt="">這個功能只有主管可以使用。</div>'; document.querySelectorAll(".bar button").forEach(function(b){ b.hidden=true; }); return; }
+  load();
+})();
+function load(){
+  say("");
+  $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-loading.webp" alt="">載入中…</div>';
+  return api("list").then(function(j){
+    if(!j || !j.ok){ $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-error.webp" alt="">'+esc(errText(j))+'</div>'; return; }
+    S.slides = j.slides; S.settings = j.settings; paintSettings(); paintList();
+  }).catch(function(e){ $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-offline.webp" alt="">'+(e.message==="nourl"?"機台輪播後端還沒設定網址，請通知管理員。":"連線失敗，請檢查網路後按「重新整理」。")+'</div>'; });
+}
+
+/* ===== 播放設定 ===== */
+function fillSel(id, opts, cur){
+  var has = opts.some(function(o){ return o[0]===cur; });
+  if(!has) opts = opts.concat([[cur, cur+" 秒（目前）"]]);
+  $(id).innerHTML = opts.map(function(o){ return '<option value="'+o[0]+'"'+(o[0]===cur?" selected":"")+'>'+o[1]+'</option>'; }).join("");
+}
+function paintSettings(){
+  $("setPanel").hidden = false;
+  fillSel("setAttract", [[30,"30 秒"],[60,"1 分鐘"],[120,"2 分鐘"],[180,"3 分鐘"],[300,"5 分鐘"],[600,"10 分鐘"]], S.settings.attractSec);
+  fillSel("setSlide", [[6,"6 秒"],[9,"9 秒"],[12,"12 秒"],[15,"15 秒"],[20,"20 秒"]], S.settings.slideSec);
+}
+$("setSave").onclick = function(){
+  var b=$("setSave"); b.disabled=true;
+  api("settings.save",{attractSec:+$("setAttract").value, slideSec:+$("setSlide").value}).then(function(j){
+    b.disabled=false; if(j&&j.ok){ S.settings=j.settings; say("已儲存播放設定。",true); } else say(errText(j));
+  }).catch(function(e){ b.disabled=false; netFail(e); });
+};
+
+/* ===== 清單 ===== */
+function summary(s){ return s.list ? s.list.split("\n").filter(Boolean).join("、") : s.words.replace(/\n/g," "); }
+function paintList(){
+  var L = S.slides;
+  if(!L.length){ $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-empty.webp" alt="">還沒有輪播畫面。<br>機台會改播內建的機構介紹。要新增請按上方按鈕。</div>'; return; }
+  $("list").innerHTML = L.map(function(s,i){
+    return '<div class="item '+s.type+(s.enabled?"":" off")+'" data-id="'+esc(s.id)+'">'+
+      '<div class="th"><img src="'+esc(src(s.art))+'" alt=""></div>'+
+      '<div><span class="tag '+s.type+'">'+(s.type==="promo"?"營養保健品":"機構介紹")+'</span>'+(s.enabled?"":'<span class="tag off">暫停播放</span>')+
+      '<h3>'+esc(s.title).replace(/\n/g," ")+'</h3><p>'+esc(summary(s))+'</p></div>'+
+      '<div class="acts"><button class="mv" data-a="up" title="往前"'+(i===0?" disabled":"")+'>↑</button><button class="mv" data-a="down" title="往後"'+(i===L.length-1?" disabled":"")+'>↓</button>'+
+      '<button class="sw'+(s.enabled?" on":"")+'" data-a="tog" title="'+(s.enabled?"播放中，按一下暫停":"已暫停，按一下開始播放")+'" aria-label="開關"></button>'+
+      '<button class="btn sec sm" data-a="edit">編輯</button><button class="btn warn sm" data-a="del">刪除</button></div></div>';
+  }).join("");
+}
+function findSlide(id){ for(var i=0;i<S.slides.length;i++) if(S.slides[i].id===id) return i; return -1; }
+$("list").onclick = function(e){
+  var b = e.target.closest("[data-a]"); if(!b) return;
+  var id = b.closest(".item").getAttribute("data-id"), i = findSlide(id), a = b.getAttribute("data-a");
+  if(i<0) return;
+  if(a==="edit") openEditor(S.slides[i]);
+  else if(a==="del"){ S.del = id; $("cfText").textContent = "「"+S.slides[i].title.replace(/\n/g," ")+"」會從輪播中刪除。如果只是想暫時不播，可以改用右邊的開關。"; $("cf").hidden=false; }
+  else if(a==="tog") toggle(i);
+  else if(a==="up"||a==="down") move(i, a==="up"?-1:1);
+};
+function toggle(i){
+  var s = S.slides[i], want = !s.enabled; s.enabled = want; paintList();
+  api("save",{slide:{id:s.id,type:s.type,tag:s.tag,title:s.title,words:s.words,list:s.list,image:s.image,photo:s.photo,enabled:want}}).then(function(j){
+    if(!(j&&j.ok)){ s.enabled=!want; paintList(); say(errText(j)); } else say(want?"已開始播放。":"已暫停播放。",true);
+  }).catch(function(e){ s.enabled=!want; paintList(); netFail(e); });
+}
+function move(i, d){
+  var old = S.slides.slice(), j = i+d; if(j<0||j>=old.length) return;
+  var t = S.slides[i]; S.slides[i] = S.slides[j]; S.slides[j] = t; paintList();
+  api("reorder",{ids:S.slides.map(function(s){ return s.id; })}).then(function(r){
+    if(!(r&&r.ok)){ S.slides=old; paintList(); say(errText(r)); } else say("順序已更新。",true);
+  }).catch(function(e){ S.slides=old; paintList(); netFail(e); });
+}
+$("cfNo").onclick = function(){ $("cf").hidden=true; };
+$("cfYes").onclick = function(){
+  var id=S.del, b=$("cfYes"); b.disabled=true;
+  api("delete",{id:id}).then(function(j){ b.disabled=false; $("cf").hidden=true;
+    if(j&&j.ok){ S.slides=S.slides.filter(function(s){ return s.id!==id; }); paintList(); say("已刪除。",true); } else say(errText(j));
+  }).catch(function(e){ b.disabled=false; $("cf").hidden=true; netFail(e); });
+};
+$("reload").onclick = load;
+$("addIntro").onclick = function(){ openEditor(null,"intro"); };
+$("addPromo").onclick = function(){ openEditor(null,"promo"); };
+
+/* ===== 編輯視窗 ===== */
+function openEditor(s, type){
+  var isNew = !s;
+  S.edit = s ? { id:s.id, type:s.type, tag:s.tag, title:s.title, words:s.words, list:s.list, image:s.image, art:s.art, photo:s.photo, enabled:s.enabled }
+             : { id:"", type:type, tag:type==="promo"?"營養保健品":"", title:"", words:"", list:"", image:BUILTIN[type==="promo"?7:1][0], art:BUILTIN[type==="promo"?7:1][0], photo:false, enabled:true };
+  $("edTitle").textContent = isNew ? (type==="promo"?"新增營養保健品":"新增機構介紹") : "編輯畫面";
+  $("fTag").value=S.edit.tag; $("fTitle").value=S.edit.title; $("fWords").value=S.edit.words; $("fList").value=S.edit.list; $("fPhoto").checked=S.edit.photo;
+  $("edErr").textContent=""; $("upNote").textContent=""; $("edSave").disabled=false;
+  paintType(); paintGal(); paintPv(); $("ed").hidden=false; $("ed").querySelector(".box").scrollTop=0;
+}
+function paintType(){ document.querySelectorAll("#fType label").forEach(function(l){ l.classList.toggle("on", l.getAttribute("data-v")===S.edit.type); }); }
+function paintGal(){
+  var cur = S.edit.image;
+  $("gal").innerHTML = BUILTIN.map(function(b){ return '<button type="button" data-i="'+b[0]+'" title="'+b[1]+'" class="'+(b[0]===cur?"on":"")+'"><img src="../'+b[0]+'" alt="'+b[1]+'"></button>'; }).join("");
+}
+function paintPv(){
+  var e = S.edit, t = ($("fTitle").value||"標題").split("\n").map(esc).join("<br>"), tag = $("fTag").value || "小標籤";
+  var items = $("fList").value.split("\n").map(function(x){ return x.trim(); }).filter(Boolean).slice(0,8);
+  var body = items.length ? "<ul>"+items.map(function(x){ return "<li>"+esc(x)+"</li>"; }).join("")+"</ul>" : "<p>"+esc($("fWords").value).replace(/\n/g,"<br>")+"</p>";
+  $("pv").className = "pv "+e.type;
+  $("pv").innerHTML = '<div class="in"><div class="a'+($("fPhoto").checked?" photo":"")+'"><img src="'+esc(src(e.art))+'" alt=""></div><div class="w"><span class="tg">'+esc(tag)+'</span><h4>'+t+'</h4>'+body+'</div></div>';
+}
+["fTag","fTitle","fWords","fList","fPhoto"].forEach(function(id){ $(id).addEventListener("input", paintPv); $(id).addEventListener("change", paintPv); });
+$("fType").onclick = function(e){ var l=e.target.closest("label"); if(!l) return; e.preventDefault(); S.edit.type=l.getAttribute("data-v"); paintType(); paintPv(); };
+$("gal").onclick = function(e){ var b=e.target.closest("button"); if(!b) return; S.edit.image=b.getAttribute("data-i"); S.edit.art=S.edit.image; $("fPhoto").checked=false; paintGal(); paintPv(); };
+$("edCancel").onclick = function(){ $("ed").hidden=true; };
+
+/* 上傳照片：先在瀏覽器縮小（最長邊 1400px、JPEG），再傳到後端存進雲端硬碟 */
+$("upBtn").onclick = function(){ $("upFile").value=""; $("upFile").click(); };
+$("upFile").onchange = function(){
+  var f = this.files && this.files[0]; if(!f) return;
+  if(!/^image\//.test(f.type)){ $("edErr").textContent="請選擇照片檔。"; return; }
+  $("edErr").textContent=""; $("upNote").textContent="上傳中…"; $("upBtn").disabled=true;
+  var img = new Image(), url = URL.createObjectURL(f);
+  img.onerror = function(){ URL.revokeObjectURL(url); $("upBtn").disabled=false; $("upNote").textContent=""; $("edErr").textContent="這張照片讀不出來，請換一張（建議 JPG 或 PNG）。"; };
+  img.onload = function(){
+    URL.revokeObjectURL(url);
+    var k = Math.min(1, 1400/Math.max(img.width,img.height)), w = Math.round(img.width*k), h = Math.round(img.height*k);
+    var c = document.createElement("canvas"); c.width=w; c.height=h;
+    var x = c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+    var data = c.toDataURL("image/jpeg",0.86).split(",")[1];
+    api("image.upload",{mime:"image/jpeg",data:data}).then(function(j){
+      $("upBtn").disabled=false;
+      if(!(j&&j.ok)){ $("upNote").textContent=""; $("edErr").textContent=errText(j); return; }
+      S.edit.image=j.ref; S.edit.art="data:image/jpeg;base64,"+data; $("fPhoto").checked=true;   // 預覽直接用剛縮好的圖
+      $("upNote").textContent="已上傳"; paintGal(); paintPv();
+    }).catch(function(e){ $("upBtn").disabled=false; $("upNote").textContent=""; if(e.message!=="unauthorized") $("edErr").textContent="上傳失敗，請檢查網路後再試。"; });
+  };
+  img.src = url;
+};
+$("edSave").onclick = function(){
+  var e = S.edit, title = $("fTitle").value.trim();
+  if(!title){ $("edErr").textContent="請填標題。"; return; }
+  var b=$("edSave"); b.disabled=true; $("edErr").textContent="";
+  var slide = { id:e.id, type:e.type, tag:$("fTag").value.trim(), title:title, words:$("fWords").value.trim(), list:$("fList").value, image:e.image, photo:$("fPhoto").checked, enabled:e.enabled };
+  api("save",{slide:slide}).then(function(j){
+    b.disabled=false;
+    if(!(j&&j.ok)){ $("edErr").textContent=errText(j); return; }
+    var i = findSlide(j.slide.id); if(i>=0) S.slides[i]=j.slide; else S.slides.push(j.slide);
+    $("ed").hidden=true; paintList(); say("已儲存，機台幾分鐘內會更新。",true);
+  }).catch(function(er){ b.disabled=false; if(er.message!=="unauthorized") $("edErr").textContent = er.message==="nourl" ? "後端還沒設定網址。" : "連線失敗，內容還在，請再按一次儲存。"; });
+};
+</script>
+</body>
+</html>
