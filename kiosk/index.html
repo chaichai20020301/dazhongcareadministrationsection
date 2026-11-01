@@ -378,6 +378,19 @@ function armAttract(){
 });
 armAttract();
 
+/* ===== 螢幕不熄滅：向瀏覽器要求「保持喚醒」（支援的瀏覽器才有效；裝置本身的休眠設定仍要關掉）===== */
+var wakeLock = null;
+function keepAwake(){
+  if(!navigator.wakeLock || wakeLock || document.visibilityState !== "visible") return;
+  navigator.wakeLock.request("screen").then(function(l){
+    wakeLock = l; l.addEventListener("release", function(){ wakeLock = null; });
+  }).catch(function(){});
+}
+keepAwake();
+document.addEventListener("visibilitychange", keepAwake);
+["touchstart","mousedown"].forEach(function(ev){ document.addEventListener(ev, keepAwake, {capture:true, passive:true}); });
+setInterval(keepAwake, 60 * 1000);
+
 /* ===== 調整被嵌入的家屬頁（同網域，可直接改 DOM）===== */
 function zoomFor(a){
   if(a.zoom !== "auto") return a.zoom;
