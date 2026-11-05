@@ -28,6 +28,7 @@ main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:16px 24p
 .btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14.5px;cursor:pointer;white-space:nowrap}
 .btn.main{background:var(--green);color:#fff;box-shadow:0 3px 8px rgba(20,86,63,.22)}.btn.main:hover{background:var(--green-d)}
 .btn.orange{background:var(--orange);color:#fff;box-shadow:0 3px 8px rgba(182,91,22,.25)}
+.btn.teal{background:#27675F;color:#fff;box-shadow:0 3px 8px rgba(39,103,95,.25)}
 .btn.sec{background:var(--card);color:var(--green-d);border:1.5px solid var(--g-line)}.btn.sec:hover{background:var(--g-soft)}
 .btn.warn{background:var(--card);color:var(--red);border:1.5px solid #E6C9C4}
 .btn.sm{padding:6px 13px;font-size:13px}
@@ -53,7 +54,8 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
 .item .th{height:96px;border-radius:12px;background:#F3F1E6;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .item .th img{max-width:100%;max-height:100%;object-fit:contain}
 .tag{display:inline-block;padding:2px 11px;border-radius:999px;font-size:12px;font-weight:700;background:var(--green);color:#fff;margin-right:6px}
-.tag.promo{background:var(--orange)}.tag.off{background:#9AA79F}
+.tag.promo{background:var(--orange)}.tag.full{background:#27675F}.tag.off{background:#9AA79F}
+.item.full{border-color:#AACAC2;background:#F6FAF9}
 .item h3{margin:6px 0 3px;font:900 18px/1.35 'Noto Serif TC',serif}
 .item p{margin:0;font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
@@ -74,7 +76,8 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
 .fld input:focus,.fld textarea:focus{outline:none;border-color:var(--green)}
 .seg{display:flex;gap:8px}
 .seg label{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:9px 10px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-weight:700;font-size:14px;cursor:pointer;color:var(--muted)}
-.seg input{display:none}.seg label.on{border-color:var(--green);background:var(--g-soft);color:var(--green-d)}.seg label.on.promo{border-color:var(--orange);background:var(--o-soft);color:#8A4A12}
+.seg input{display:none}.seg label.on{border-color:var(--green);background:var(--g-soft);color:var(--green-d)}.seg label.on.full{border-color:#27675F;background:#E6F1EE;color:#1D5049}
+.seg label.on.promo{border-color:var(--orange);background:var(--o-soft);color:#8A4A12}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(86px,1fr));gap:8px;margin-bottom:8px}
 .gal button{height:64px;border:2px solid var(--line);background:#F3F1E6;border-radius:12px;padding:3px;cursor:pointer}
 .gal button.on{border-color:var(--green);box-shadow:0 0 0 2px var(--g-line)}
@@ -91,6 +94,16 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
 .pv p{margin:0;font:500 3cqw/1.6 'Noto Sans TC';color:#3d5a4a}
 .pv ul{margin:0;padding:0;list-style:none;font:700 3.1cqw/1.5 'Noto Sans TC'}.pv li{padding-left:3.4cqw;position:relative}
 .pv li::before{content:"";position:absolute;left:0;top:.5em;width:1.8cqw;height:1.8cqw;border-radius:50% 0 50% 0;background:#6aae3c}.pv.promo li::before{background:#e08a3a}
+.pv.full{aspect-ratio:9/13;max-width:300px;margin:0 auto}
+.pv.full .fs{position:absolute;inset:0;background:#faf8ef;display:flex;align-items:center;justify-content:center;text-align:center;color:#7A8C80;font:500 3.4cqw 'Noto Sans TC'}
+.pv.full.fr .fs{inset:3.4cqw}
+.pv.full .fs img{width:100%;height:100%;object-fit:contain;display:block}.pv.full.cover .fs img{object-fit:cover}
+.pv.full .fm{position:absolute;inset:0;pointer-events:none;--fc:#6aae3c;--hue:0deg}
+.pv.full.fr-orange .fm{--fc:#e0a35a;--hue:-70deg}.pv.full.fr-teal .fm{--fc:#5ba39a;--hue:62deg}
+.pv.full .fm::before{content:"";position:absolute;inset:1.2cqw;border:.5cqw solid var(--fc);border-radius:3cqw;box-shadow:inset 0 0 0 .4cqw rgba(255,255,255,.9)}
+.pv.full .fm i{position:absolute;width:17cqw;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;filter:hue-rotate(var(--hue))}
+.pv.full .fm .tl{left:0;top:0;background-image:url(../kiosk/img/n-c-tl.webp);background-position:left top}.pv.full .fm .tr{right:0;top:0;background-image:url(../kiosk/img/n-c-tr.webp);background-position:right top}
+.pv.full .fm .bl{left:0;bottom:0;background-image:url(../kiosk/img/n-c-bl.webp);background-position:left bottom}.pv.full .fm .br{right:0;bottom:0;background-image:url(../kiosk/img/n-c-br.webp);background-position:right bottom}
 .pvl{font-size:12px;color:#7A8C80;margin:4px 0 0}
 .err{color:var(--red);font-size:13.5px;font-weight:700;min-height:18px;margin:4px 0}
 .foot{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
@@ -123,9 +136,16 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
   <section class="panel">
     <div class="ttl">輪播畫面<small>由上到下依序播放；關掉右邊的開關就先不播（內容會保留）。</small></div>
     <div class="bar" style="margin-bottom:12px">
+      <button class="btn teal" id="addFull"><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增整張圖片</button>
       <button class="btn orange" id="addPromo"><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增營養保健品</button>
       <button class="btn main" id="addIntro"><i class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></i>新增機構介紹</button>
       <button class="btn sec" id="reload"><i class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></i>重新整理</button>
+    </div>
+    <div class="bar" id="bulkBar" style="margin:-4px 0 12px;padding:10px 12px;border:1.5px dashed #AACAC2;border-radius:14px;background:#F6FAF9">
+      <button class="btn sec sm" id="bulkBtn"><i class="ico" style="--ico:url(../assets/common/icon-upload.webp)"></i>一次上傳多張整張圖片</button>
+      <label class="pvl" style="margin:0">花邊 <select id="bulkFrame" style="padding:6px 10px;border:1.5px solid #D3D8C8;border-radius:10px;font-size:14px"><option value="none">無</option><option value="green">綠</option><option value="orange">橘</option><option value="teal">淡藍綠</option></select></label>
+      <span class="pvl" id="bulkNote" style="margin:0">一次選好幾張，會依檔名順序加到最後面（每張一個畫面，檔名當名稱）。</span>
+      <input type="file" id="bulkFile" accept="image/*" multiple hidden>
     </div>
     <div class="list" id="list"></div>
   </section>
@@ -137,17 +157,21 @@ h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
     <div class="cols">
       <div>
         <div class="fld"><span>類型</span>
-          <div class="seg" id="fType"><label data-v="intro"><input type="radio" name="ty">機構介紹</label><label data-v="promo" class="promo"><input type="radio" name="ty">營養保健品</label></div></div>
-        <div class="fld"><span>小標籤 <small>（顯示在標題上方的小膠囊，例：營養保健品、專業照護）</small></span><input type="text" id="fTag" maxlength="20"></div>
-        <div class="fld"><span>標題 <small>（要換行就按 Enter）</small></span><textarea id="fTitle" rows="2" maxlength="60"></textarea></div>
-        <div class="fld"><span>說明文字 <small>（一兩句話；也可以只用下面的條列）</small></span><textarea id="fWords" rows="3" maxlength="300"></textarea></div>
-        <div class="fld"><span>條列 <small>（一行一條，最多 8 條；有填的話會取代說明文字）</small></span><textarea id="fList" rows="4"></textarea></div>
+          <div class="seg" id="fType"><label data-v="intro"><input type="radio" name="ty">機構介紹</label><label data-v="promo" class="promo"><input type="radio" name="ty">營養保健品</label><label data-v="full" class="full"><input type="radio" name="ty">整張圖片</label></div></div>
+        <div id="txtFlds1" class="fld"><span>小標籤 <small>（顯示在標題上方的小膠囊，例：營養保健品、專業照護）</small></span><input type="text" id="fTag" maxlength="20"></div>
+        <div class="fld"><span id="fTitleLab">標題 <small>（要換行就按 Enter）</small></span><textarea id="fTitle" rows="2" maxlength="60"></textarea></div>
+        <div id="txtFlds2"><div class="fld"><span>說明文字 <small>（一兩句話；也可以只用下面的條列）</small></span><textarea id="fWords" rows="3" maxlength="300"></textarea></div>
+        <div class="fld"><span>條列 <small>（一行一條，最多 8 條；有填的話會取代說明文字）</small></span><textarea id="fList" rows="4"></textarea></div></div>
+        <div id="fullFlds" hidden>
+          <div class="fld"><span>圖片怎麼放 <small>（做好的整張畫面選「完整顯示」才不會被切到）</small></span><div class="seg" id="fFit"><label data-v="contain"><input type="radio" name="ft">完整顯示</label><label data-v="cover"><input type="radio" name="ft">填滿畫面（可能裁切）</label></div></div>
+          <div class="fld"><span>花邊 <small>（圖片外圍的水彩葉片邊框）</small></span><div class="seg" id="fFrame"><label data-v="none"><input type="radio" name="fr">無</label><label data-v="green"><input type="radio" name="fr">綠</label><label data-v="orange"><input type="radio" name="fr">橘</label><label data-v="teal"><input type="radio" name="fr">淡藍綠</label></div></div>
+        </div>
       </div>
       <div>
         <div class="fld"><span>圖片</span>
           <div class="gal" id="gal"></div>
           <div class="bar"><button class="btn sec sm" id="upBtn" type="button"><i class="ico" style="--ico:url(../assets/common/icon-upload.webp)"></i>上傳照片（商品、現場）</button><input type="file" id="upFile" accept="image/*" hidden><span id="upNote" class="pvl"></span></div>
-          <label class="chk"><input type="checkbox" id="fPhoto"> 這是照片（加圓角與陰影；水彩插圖不要勾）</label>
+          <label class="chk" id="photoRow"><input type="checkbox" id="fPhoto"> 這是照片（加圓角與陰影；水彩插圖不要勾）</label>
         </div>
         <div class="fld"><span>機台上的樣子（大約）</span><div class="pv" id="pv"></div><p class="pvl">請勿上傳住民或家屬的照片、任何個資。</p></div>
       </div>
@@ -224,14 +248,15 @@ $("setSave").onclick = function(){
 };
 
 /* ===== 清單 ===== */
-function summary(s){ return s.list ? s.list.split("\n").filter(Boolean).join("、") : s.words.replace(/\n/g," "); }
+var FRAME_NAME = { green:"綠", orange:"橘", teal:"淡藍綠" };
+function summary(s){ if(s.type==="full") return (s.frame!=="none" ? "花邊："+FRAME_NAME[s.frame] : "無花邊")+"；"+(s.fit==="cover" ? "填滿畫面" : "完整顯示"); return s.list ? s.list.split("\n").filter(Boolean).join("、") : s.words.replace(/\n/g," "); }
 function paintList(){
   var L = S.slides;
   if(!L.length){ $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-empty.webp" alt="">還沒有輪播畫面。<br>機台會改播內建的機構介紹。要新增請按上方按鈕。</div>'; return; }
   $("list").innerHTML = L.map(function(s,i){
     return '<div class="item '+s.type+(s.enabled?"":" off")+'" data-id="'+esc(s.id)+'">'+
       '<div class="th"><img src="'+esc(src(s.art))+'" alt=""></div>'+
-      '<div><span class="tag '+s.type+'">'+(s.type==="promo"?"營養保健品":"機構介紹")+'</span>'+(s.enabled?"":'<span class="tag off">暫停播放</span>')+
+      '<div><span class="tag '+s.type+'">'+({promo:"營養保健品",full:"整張圖片"}[s.type]||"機構介紹")+'</span>'+(s.enabled?"":'<span class="tag off">暫停播放</span>')+
       '<h3>'+esc(s.title).replace(/\n/g," ")+'</h3><p>'+esc(summary(s))+'</p></div>'+
       '<div class="acts"><button class="mv" data-a="up" title="往前"'+(i===0?" disabled":"")+'>↑</button><button class="mv" data-a="down" title="往後"'+(i===L.length-1?" disabled":"")+'>↓</button>'+
       '<button class="sw'+(s.enabled?" on":"")+'" data-a="tog" title="'+(s.enabled?"播放中，按一下暫停":"已暫停，按一下開始播放")+'" aria-label="開關"></button>'+
@@ -250,7 +275,7 @@ $("list").onclick = function(e){
 };
 function toggle(i){
   var s = S.slides[i], want = !s.enabled; s.enabled = want; paintList();
-  api("save",{slide:{id:s.id,type:s.type,tag:s.tag,title:s.title,words:s.words,list:s.list,image:s.image,photo:s.photo,enabled:want}}).then(function(j){
+  api("save",{slide:{id:s.id,type:s.type,tag:s.tag,title:s.title,words:s.words,list:s.list,image:s.image,photo:s.photo,enabled:want,fit:s.fit,frame:s.frame}}).then(function(j){
     if(!(j&&j.ok)){ s.enabled=!want; paintList(); say(errText(j)); } else say(want?"已開始播放。":"已暫停播放。",true);
   }).catch(function(e){ s.enabled=!want; paintList(); netFail(e); });
 }
@@ -270,24 +295,65 @@ $("cfYes").onclick = function(){
 };
 $("reload").onclick = load;
 $("addIntro").onclick = function(){ openEditor(null,"intro"); };
+$("addFull").onclick = function(){ openEditor(null,"full"); };
 $("addPromo").onclick = function(){ openEditor(null,"promo"); };
+
+
+/* 一次上傳多張整張圖片：依檔名順序，一張一張縮圖、上傳、新增成畫面 */
+$("bulkBtn").onclick = function(){ $("bulkFile").value=""; $("bulkFile").click(); };
+$("bulkFile").onchange = function(){
+  var files = Array.prototype.slice.call(this.files||[]).filter(function(f){ return /^image\//.test(f.type); });
+  if(!files.length) return;
+  files.sort(function(a,b){ return a.name.localeCompare(b.name, "zh-Hant", {numeric:true}); });
+  var frame = $("bulkFrame").value, n = files.length, i = 0, note = $("bulkNote");
+  $("bulkBtn").disabled = true;
+  function done(msg, ok){ $("bulkBtn").disabled=false; note.textContent = ""; say(msg, ok); }
+  (function next(){
+    if(i >= n){ done("已加入 "+n+" 張整張圖片。", true); return; }
+    var f = files[i]; note.textContent = "處理中 "+(i+1)+" / "+n+"：" + f.name;
+    shrink(f, 2560, function(data){
+      api("image.upload",{mime:"image/jpeg",data:data}).then(function(j){
+        if(!(j&&j.ok)) throw new Error("fail:"+errText(j));
+        return api("save",{slide:{type:"full",title:f.name.replace(/\.[^.]+$/,"").slice(0,60),image:j.ref,photo:false,enabled:true,fit:"contain",frame:frame}});
+      }).then(function(r){
+        if(!(r&&r.ok)) throw new Error("fail:"+errText(r));
+        S.slides.push(r.slide); paintList(); i++; next();
+      }).catch(function(e){ if(e.message==="unauthorized") return; paintList(); done("第 "+(i+1)+" 張（"+f.name+"）失敗，前面 "+i+" 張已加入。"+(e.message.indexOf("fail:")===0 ? e.message.slice(5) : "請檢查網路後再試。")); });
+    }, function(){ paintList(); done("第 "+(i+1)+" 張（"+f.name+"）讀不出來，前面 "+i+" 張已加入。請換成 JPG 或 PNG。"); });
+  })();
+};
 
 /* ===== 編輯視窗 ===== */
 function openEditor(s, type){
   var isNew = !s;
-  S.edit = s ? { id:s.id, type:s.type, tag:s.tag, title:s.title, words:s.words, list:s.list, image:s.image, art:s.art, photo:s.photo, enabled:s.enabled }
-             : { id:"", type:type, tag:type==="promo"?"營養保健品":"", title:"", words:"", list:"", image:BUILTIN[type==="promo"?7:1][0], art:BUILTIN[type==="promo"?7:1][0], photo:false, enabled:true };
-  $("edTitle").textContent = isNew ? (type==="promo"?"新增營養保健品":"新增機構介紹") : "編輯畫面";
+  var none = type==="full";
+  S.edit = s ? { id:s.id, type:s.type, tag:s.tag, title:s.title, words:s.words, list:s.list, image:s.image, art:s.art, photo:s.photo, enabled:s.enabled, fit:s.fit||"contain", frame:s.frame||"none" }
+             : { id:"", type:type, tag:type==="promo"?"營養保健品":"", title:"", words:"", list:"", image:none?"":BUILTIN[type==="promo"?7:1][0], art:none?"":BUILTIN[type==="promo"?7:1][0], photo:false, enabled:true, fit:"contain", frame:"none" };
+  $("edTitle").textContent = isNew ? ({promo:"新增營養保健品",full:"新增整張圖片"}[type]||"新增機構介紹") : "編輯畫面";
   $("fTag").value=S.edit.tag; $("fTitle").value=S.edit.title; $("fWords").value=S.edit.words; $("fList").value=S.edit.list; $("fPhoto").checked=S.edit.photo;
   $("edErr").textContent=""; $("upNote").textContent=""; $("edSave").disabled=false;
   paintType(); paintGal(); paintPv(); $("ed").hidden=false; $("ed").querySelector(".box").scrollTop=0;
 }
-function paintType(){ document.querySelectorAll("#fType label").forEach(function(l){ l.classList.toggle("on", l.getAttribute("data-v")===S.edit.type); }); }
+function paintType(){
+  document.querySelectorAll("#fType label").forEach(function(l){ l.classList.toggle("on", l.getAttribute("data-v")===S.edit.type); });
+  document.querySelectorAll("#fFit label").forEach(function(l){ l.classList.toggle("on", l.getAttribute("data-v")===S.edit.fit); });
+  document.querySelectorAll("#fFrame label").forEach(function(l){ l.classList.toggle("on", l.getAttribute("data-v")===S.edit.frame); });
+  var f = S.edit.type==="full";
+  $("txtFlds1").hidden = f; $("txtFlds2").hidden = f; $("fullFlds").hidden = !f; $("gal").hidden = f; $("photoRow").hidden = f;
+  $("fTitleLab").innerHTML = f ? '名稱 <small>（只給管理頁辨識，機台上不會顯示）</small>' : '標題 <small>（要換行就按 Enter）</small>';
+  $("upBtn").lastChild.textContent = f ? "上傳整張圖片（建議直式 9:16，例如 1080×1920）" : "上傳照片（商品、現場）";
+}
 function paintGal(){
   var cur = S.edit.image;
   $("gal").innerHTML = BUILTIN.map(function(b){ return '<button type="button" data-i="'+b[0]+'" title="'+b[1]+'" class="'+(b[0]===cur?"on":"")+'"><img src="../'+b[0]+'" alt="'+b[1]+'"></button>'; }).join("");
 }
 function paintPv(){
+  if(S.edit.type==="full"){
+    var e2=S.edit, fr=e2.frame!=="none";
+    $("pv").className = "pv full"+(fr?" fr fr-"+e2.frame:"")+(e2.fit==="cover"?" cover":"");
+    $("pv").innerHTML = '<div class="fs">'+(e2.art?'<img src="'+esc(src(e2.art))+'" alt="">':"請先上傳圖片")+'</div>'+(fr?'<div class="fm"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>':"");
+    return;
+  }
   var e = S.edit, t = ($("fTitle").value||"標題").split("\n").map(esc).join("<br>"), tag = $("fTag").value || "小標籤";
   var items = $("fList").value.split("\n").map(function(x){ return x.trim(); }).filter(Boolean).slice(0,8);
   var body = items.length ? "<ul>"+items.map(function(x){ return "<li>"+esc(x)+"</li>"; }).join("")+"</ul>" : "<p>"+esc($("fWords").value).replace(/\n/g,"<br>")+"</p>";
@@ -296,37 +362,46 @@ function paintPv(){
 }
 ["fTag","fTitle","fWords","fList","fPhoto"].forEach(function(id){ $(id).addEventListener("input", paintPv); $(id).addEventListener("change", paintPv); });
 $("fType").onclick = function(e){ var l=e.target.closest("label"); if(!l) return; e.preventDefault(); S.edit.type=l.getAttribute("data-v"); paintType(); paintPv(); };
+$("fFit").onclick = function(e){ var l=e.target.closest("label"); if(!l) return; e.preventDefault(); S.edit.fit=l.getAttribute("data-v"); paintType(); paintPv(); };
+$("fFrame").onclick = function(e){ var l=e.target.closest("label"); if(!l) return; e.preventDefault(); S.edit.frame=l.getAttribute("data-v"); paintType(); paintPv(); };
 $("gal").onclick = function(e){ var b=e.target.closest("button"); if(!b) return; S.edit.image=b.getAttribute("data-i"); S.edit.art=S.edit.image; $("fPhoto").checked=false; paintGal(); paintPv(); };
 $("edCancel").onclick = function(){ $("ed").hidden=true; };
 
 /* 上傳照片：先在瀏覽器縮小（最長邊 1400px、JPEG），再傳到後端存進雲端硬碟 */
+function shrink(f, maxSide, cb, fail){
+  var img = new Image(), url = URL.createObjectURL(f);
+  img.onerror = function(){ URL.revokeObjectURL(url); fail(); };
+  img.onload = function(){
+    URL.revokeObjectURL(url);
+    var k = Math.min(1, maxSide/Math.max(img.width,img.height)), w = Math.round(img.width*k), h = Math.round(img.height*k);
+    var c = document.createElement("canvas"); c.width=w; c.height=h;
+    var x = c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
+    cb(c.toDataURL("image/jpeg",0.9).split(",")[1]);
+  };
+  img.src = url;
+}
 $("upBtn").onclick = function(){ $("upFile").value=""; $("upFile").click(); };
 $("upFile").onchange = function(){
   var f = this.files && this.files[0]; if(!f) return;
   if(!/^image\//.test(f.type)){ $("edErr").textContent="請選擇照片檔。"; return; }
   $("edErr").textContent=""; $("upNote").textContent="上傳中…"; $("upBtn").disabled=true;
-  var img = new Image(), url = URL.createObjectURL(f);
-  img.onerror = function(){ URL.revokeObjectURL(url); $("upBtn").disabled=false; $("upNote").textContent=""; $("edErr").textContent="這張照片讀不出來，請換一張（建議 JPG 或 PNG）。"; };
-  img.onload = function(){
-    URL.revokeObjectURL(url);
-    var k = Math.min(1, 1400/Math.max(img.width,img.height)), w = Math.round(img.width*k), h = Math.round(img.height*k);
-    var c = document.createElement("canvas"); c.width=w; c.height=h;
-    var x = c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,w,h); x.drawImage(img,0,0,w,h);
-    var data = c.toDataURL("image/jpeg",0.86).split(",")[1];
+  var full = S.edit.type==="full";
+  shrink(f, full ? 2560 : 1400, function(data){
     api("image.upload",{mime:"image/jpeg",data:data}).then(function(j){
       $("upBtn").disabled=false;
       if(!(j&&j.ok)){ $("upNote").textContent=""; $("edErr").textContent=errText(j); return; }
-      S.edit.image=j.ref; S.edit.art="data:image/jpeg;base64,"+data; $("fPhoto").checked=true;   // 預覽直接用剛縮好的圖
+      S.edit.image=j.ref; S.edit.art="data:image/jpeg;base64,"+data; if(!full) $("fPhoto").checked=true;   // 預覽直接用剛縮好的圖
+      if(full && !$("fTitle").value.trim()) $("fTitle").value = f.name.replace(/\.[^.]+$/,"").slice(0,60);
       $("upNote").textContent="已上傳"; paintGal(); paintPv();
     }).catch(function(e){ $("upBtn").disabled=false; $("upNote").textContent=""; if(e.message!=="unauthorized") $("edErr").textContent="上傳失敗，請檢查網路後再試。"; });
-  };
-  img.src = url;
+  }, function(){ $("upBtn").disabled=false; $("upNote").textContent=""; $("edErr").textContent="這張照片讀不出來，請換一張（建議 JPG 或 PNG）。"; });
 };
 $("edSave").onclick = function(){
   var e = S.edit, title = $("fTitle").value.trim();
   if(!title){ $("edErr").textContent="請填標題。"; return; }
+  if(e.type==="full" && e.image.indexOf("drive:")!==0){ $("edErr").textContent="整張圖片要先按「上傳整張圖片」選好圖。"; return; }
   var b=$("edSave"); b.disabled=true; $("edErr").textContent="";
-  var slide = { id:e.id, type:e.type, tag:$("fTag").value.trim(), title:title, words:$("fWords").value.trim(), list:$("fList").value, image:e.image, photo:$("fPhoto").checked, enabled:e.enabled };
+  var slide = { id:e.id, type:e.type, tag:$("fTag").value.trim(), title:title, words:$("fWords").value.trim(), list:$("fList").value, image:e.image, photo:$("fPhoto").checked, enabled:e.enabled, fit:e.fit, frame:e.frame };
   api("save",{slide:slide}).then(function(j){
     b.disabled=false;
     if(!(j&&j.ok)){ $("edErr").textContent=errText(j); return; }

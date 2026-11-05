@@ -123,6 +123,29 @@
     .touchme{font-size:calc(var(--u)*4.6)}
   }
 
+  /* 整張圖片（滿版，例如評鑑證明文件）＋花邊 */
+  #attract.isfull .top{opacity:0;pointer-events:none}
+  #attract .top{transition:opacity .6s}
+  .slide.full{display:block;padding:0}
+  .slide.full .shot{position:fixed;inset:0;z-index:1;background:#faf8ef;display:flex;align-items:center;justify-content:center}
+  .slide.full .shot img{width:100%;height:100%;object-fit:contain;display:block}
+  .slide.full.fit-cover .shot img{object-fit:cover}
+  .slide.full.fr .shot{inset:calc(var(--u)*3.4)}
+  .slide.full .frm{position:fixed;inset:0;z-index:1;pointer-events:none;--fc:#6aae3c;--hue:0deg}
+  .slide.full.fr-orange .frm{--fc:#e0a35a;--hue:-70deg}
+  .slide.full.fr-teal .frm{--fc:#5ba39a;--hue:62deg}
+  .slide.full .frm::before{content:"";position:absolute;inset:calc(var(--u)*1.2);border:calc(var(--u)*.5) solid var(--fc);border-radius:calc(var(--u)*3);box-shadow:inset 0 0 0 calc(var(--u)*.4) rgba(255,255,255,.9),0 0 calc(var(--u)*1.2) rgba(60,80,50,.18)}
+  .slide.full .frm .c{position:absolute;width:calc(var(--u)*17);aspect-ratio:1;background-size:contain;background-repeat:no-repeat;filter:hue-rotate(var(--hue))}
+  .frm .tl{left:0;top:0;background-image:url(img/n-c-tl.webp);background-position:left top}
+  .frm .tr{right:0;top:0;background-image:url(img/n-c-tr.webp);background-position:right top}
+  .frm .bl{left:0;bottom:0;background-image:url(img/n-c-bl.webp);background-position:left bottom}
+  .frm .br{right:0;bottom:0;background-image:url(img/n-c-br.webp);background-position:right bottom}
+  #attract.isfull .bottom{position:absolute;left:0;right:0;bottom:0;padding-bottom:calc(var(--u)*5);pointer-events:none;z-index:3}
+  #attract.isfull .dots{display:none}
+  #attract.isfull .touchme{font-size:calc(var(--u)*3);padding:calc(var(--u)*1.2) calc(var(--u)*4);animation:none;opacity:.92}
+  #attract.isfull.hint .touchme{animation:hintOut 4s ease forwards}
+  @keyframes hintOut{0%,70%{opacity:.92}100%{opacity:0}}
+
   /* ===== 內嵌系統畫面 ===== */
   #frameView{position:fixed;inset:0;display:none;flex-direction:column;background:var(--paper)}
   #frameView.show{display:flex}
@@ -340,8 +363,13 @@ function buildSlides(){
   if(slidesBuilt) return; slidesBuilt = true;
   var list = slideData.filter(function(x){ return x.enabled !== false; });
   $("stage").innerHTML = list.map(function(x){
-    var body = x.list && x.list.length ? "<ul>"+x.list.map(function(t){ return "<li>"+escH(t)+"</li>"; }).join("")+"</ul>" : "<p>"+escH(x.words)+"</p>";
     var art = /^https?:|^\.\.\//.test(x.art) ? x.art : "../" + x.art;
+    if(x.type === "full"){
+      var fr = ["green","orange","teal"].indexOf(x.frame) >= 0 ? x.frame : "";
+      return '<div class="slide full fit-'+(x.fit==="cover"?"cover":"contain")+(fr?" fr fr-"+fr:"")+'"><div class="shot"><img src="'+escH(art)+'" alt=""></div>'+
+             (fr?'<div class="frm"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i></div>':"")+'</div>';
+    }
+    var body = x.list && x.list.length ? "<ul>"+x.list.map(function(t){ return "<li>"+escH(t)+"</li>"; }).join("")+"</ul>" : "<p>"+escH(x.words)+"</p>";
     return '<div class="slide '+(x.type==="promo"?"promo":"intro")+'"><div class="art'+(x.photo?" photo":"")+'"><img src="'+escH(art)+'" alt=""></div>'+
            '<div class="words">'+(x.tag?'<span class="tag">'+escH(x.tag)+'</span>':"")+'<h2>'+escH(x.title)+'</h2>'+body+'</div></div>';
   }).join("");
@@ -352,6 +380,9 @@ function showSlide(i){
   if(!sl.length) return;
   slideIdx = (i + sl.length) % sl.length;
   sl.forEach(function(e,k){ e.classList.remove("on"); if(k === slideIdx){ void e.offsetWidth; e.classList.add("on"); } });
+  var at = $("attract"), full = sl[slideIdx].classList.contains("full");
+  at.classList.toggle("isfull", full);
+  at.classList.remove("hint"); if(full){ void at.offsetWidth; at.classList.add("hint"); }   // 滿版時「請點一下螢幕」只在剛換頁時顯示幾秒，避免擋到圖片
   ds.forEach(function(e,k){ e.classList.toggle("on", k === slideIdx); });
 }
 function startAttract(){
