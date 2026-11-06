@@ -532,7 +532,7 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
       const show = (id, d = "flex") => { const e = $(id); if (e) e.style.display = d; };
       const hide = (id) => { const e = $(id); if (e) e.style.display = "none"; };
 
-      let sheetRecords = [], suspensions = [], selectedDate = "", selectedTime = "", isFetching = false, isStaffOverride = false;
+      let sheetRecords = [], suspensions = [], selectedDate = "", selectedTime = "", isFetching = false, isStaffOverride = false, lastFetchAt = 0;
       let blockedNames = [];
       let todayMasked = []; // 今日探視（遮罩版，家屬端側欄用）
       let isoMode = "room"; // room | resident：隔離設定的對象類型
@@ -620,6 +620,7 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
             adminRecords.rooms = data.rooms || [];
             populateAdminDropdowns();
           }
+          lastFetchAt = Date.now();
           $("sync-status").innerText = `已同步 ${new Date().toLocaleTimeString("zh-TW", { hour: "2-digit", minute: "2-digit" })}`;
         } catch (e) {
           $("sync-status").innerText = "離線模式";
@@ -1065,7 +1066,10 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
       $("input-date").min = new Date().toISOString().split("T")[0];
       $("iso-start").min = $("iso-end").min = new Date().toISOString().split("T")[0];
       $("input-date").onchange = async (e) => {
-        selectedDate = e.target.value; selectedTime = ""; setNextEnabled(false); slotsLoading(); await fetchData();
+        selectedDate = e.target.value; selectedTime = ""; setNextEnabled(false);
+        // 1 分鐘內才讀過資料就直接用（送出預約時後端仍會用最新資料再檢查一次名額）；否則才重新讀取
+        if (!isFetching && lastFetchAt && Date.now() - lastFetchAt < 60000) { renderTimeSlots(); return; }
+        slotsLoading(); await fetchData();
       };
 
       $("btn-goto-step-2").onclick = () => {
