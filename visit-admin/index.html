@@ -82,8 +82,10 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
 #step-tabs-container>div{display:flex;align-items:center;justify-content:center;gap:7px}
 .v-ico{display:inline-block;flex:none;width:22px;height:22px;background:currentColor;
   -webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:middle}
-#tab-admin-list,#tab-admin-notes,#tab-admin-isolation{display:flex;align-items:center;gap:6px}
-#tab-admin-list .v-ico,#tab-admin-notes .v-ico,#tab-admin-isolation .v-ico{width:19px;height:19px}
+#tab-admin-list,#tab-admin-notes,#tab-admin-isolation,#tab-admin-open{display:flex;align-items:center;gap:6px}
+#tab-admin-list .v-ico,#tab-admin-notes .v-ico,#tab-admin-isolation .v-ico,#tab-admin-open .v-ico{width:19px;height:19px}
+.open-chip{padding:9px 14px;border:1px solid #B5CDA2;background:#fff;color:#14563F;border-radius:999px;font:700 13.5px 'Noto Sans TC';cursor:pointer}
+.open-chip.on{background:#14563F;color:#fff;border-color:#14563F}
 .v-state{width:190px;height:auto;display:block}
 .v-empty-img{display:block;width:104px;height:auto;margin:0 auto 6px;opacity:.95}
 .v-dot{width:16px;height:16px;vertical-align:-3px;margin-right:5px}
@@ -420,6 +422,7 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
 <div id="tab-admin-list" style="padding-bottom:11px;font:700 15px 'Noto Sans TC';color:#14563F;border-bottom:2px solid #14563F;cursor:pointer"><i class="v-ico" style="--ico:url(../assets/visit/icon-list.webp)"></i>預約清單</div>
 <div id="tab-admin-notes" style="padding-bottom:11px;font:400 15px 'Noto Sans TC';color:#7A8C80;border-bottom:2px solid transparent;cursor:pointer"><i class="v-ico" style="--ico:url(../assets/visit/icon-note.webp)"></i>住民註記</div>
 <div id="tab-admin-isolation" style="padding-bottom:11px;font:400 15px 'Noto Sans TC';color:#7A8C80;border-bottom:2px solid transparent;cursor:pointer"><i class="v-ico" style="--ico:url(../assets/visit/icon-isolation.webp)"></i>隔離設定</div>
+<div id="tab-admin-open" style="padding-bottom:11px;font:400 15px 'Noto Sans TC';color:#7A8C80;border-bottom:2px solid transparent;cursor:pointer"><i class="v-ico" style="--ico:url(../assets/visit/icon-today.webp)"></i>開放設定</div>
 </div>
 <div id="view-admin-list" style="display:flex;flex-direction:column;gap:14px">
 <input type="date" id="admin-date-picker" style="width:100%;padding:13px 15px;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:700 16px 'Noto Sans TC';color:#14563F">
@@ -428,6 +431,36 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
 <div id="view-admin-notes" style="display:none;flex-direction:column;gap:14px">
 <input type="text" id="note-search" placeholder="搜尋住民姓名或床號" style="width:100%;padding:13px 15px;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 15px 'Noto Sans TC';color:#092F25">
 <div id="notes-container" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:2px"></div>
+</div>
+<div id="view-admin-open" style="display:none;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:column;gap:13px;padding:18px;background:#EAF3DC;border:1px solid #B5CDA2;border-radius:12px">
+<div style="font:700 15px 'Noto Serif TC';color:#14563F">設定停止或部分開放</div>
+<div style="font:400 12.5px/1.7 'Noto Sans TC';color:#4D695A">選好日期與時段後，可以「完全不開放」，或「限制名額」（只開放幾組）。設定馬上生效，家屬與行政的預約畫面都會跟著變；週日本來就不開放，會自動略過。</div>
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px">
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font:700 12.5px 'Noto Sans TC';color:#14563F">起始日</div><input type="date" id="open-start" style="width:100%;padding:12px;background:#fff;border:1px solid #B5CDA2;border-radius:12px;font:700 14px 'Noto Sans TC';color:#092F25"></div>
+<div style="display:flex;flex-direction:column;gap:6px"><div style="font:700 12.5px 'Noto Sans TC';color:#14563F">結束日<span style="font-weight:400;color:#7A8C80">　只一天可不填</span></div><input type="date" id="open-end" style="width:100%;padding:12px;background:#fff;border:1px solid #B5CDA2;border-radius:12px;font:700 14px 'Noto Sans TC';color:#092F25"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font:700 12.5px 'Noto Sans TC';color:#14563F">哪些時段<span style="font-weight:400;color:#7A8C80">　可多選</span></div>
+<div id="open-chips" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<div style="font:700 12.5px 'Noto Sans TC';color:#14563F">這些時段要</div>
+<div style="display:flex;gap:8px">
+<button id="open-mode-stop" class="tapbtn" style="flex:1;padding:11px;border:1px solid #A63124;background:#A63124;color:#fff;border-radius:12px;font:700 14px 'Noto Sans TC';cursor:pointer">完全不開放</button>
+<button id="open-mode-limit" class="tapbtn" style="flex:1;padding:11px;border:1px solid #B5CDA2;background:#fff;color:#14563F;border-radius:12px;font:700 14px 'Noto Sans TC';cursor:pointer">限制名額</button>
+</div>
+<div id="open-limit-row" style="display:none;align-items:center;gap:9px;font:400 14px 'Noto Sans TC';color:#092F25">每個時段最多開放 <input type="number" id="open-limit" min="1" max="30" value="3" style="width:76px;padding:10px;background:#fff;border:1px solid #B5CDA2;border-radius:12px;font:700 15px 'Noto Sans TC';color:#092F25;text-align:center"> 組<span style="font:400 12px 'Noto Sans TC';color:#7A8C80">（平常平日 6 組、週六 8 組）</span></div>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px">
+<div style="font:700 12.5px 'Noto Sans TC';color:#14563F">原因<span style="font-weight:400;color:#7A8C80">　選填，家屬看得到</span></div>
+<input id="open-reason" list="dl-open-reasons" placeholder="例如：機構活動、消防演練、流感期間" style="width:100%;padding:12px 14px;background:#fff;border:1px solid #B5CDA2;border-radius:12px;font:400 14px 'Noto Sans TC';color:#092F25">
+<datalist id="dl-open-reasons"><option value="機構活動"></option><option value="消防演練"></option><option value="流感期間"></option><option value="院內感染管制"></option><option value="國定假日"></option></datalist>
+</div>
+<button id="btn-set-open" class="tapbtn" style="width:100%;padding:15px;border:none;background:#14563F;color:#fff;border-radius:12px;font:700 15px 'Noto Serif TC';letter-spacing:.06em;cursor:pointer">確認設定</button>
+</div>
+<div style="display:flex;align-items:center;gap:9px;margin-top:2px"><div style="width:18px;height:1px;background:#B9C4B8"></div><div style="font:700 12px 'Noto Sans TC';color:#4D695A;letter-spacing:.14em">目前的設定（今天起）</div></div>
+<div id="open-list-container" style="display:flex;flex-direction:column;gap:10px"></div>
 </div>
 <div id="view-admin-isolation" style="display:none;flex-direction:column;gap:16px">
 <div style="display:flex;flex-direction:column;gap:13px;padding:18px;background:#FBECE9;border:1px solid #E7C3BD;border-radius:12px">
@@ -1247,18 +1280,126 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
       };
       $("btn-back-to-booking").onclick = () => { hide("view-admin"); show("step-tabs-container", "flex"); show("view-step-1", "flex"); setStep(1); window.scrollTo(0, 0); };
 
+
+      // ---- 開放設定（停止或部分開放）----
+      const OPEN_SLOTS = ["08:30", "09:30", "10:30", "14:00", "15:00", "16:00"];
+      let openPick = ["全天"], openMode = "stop";
+      function renderOpenChips() {
+        $("open-chips").innerHTML = ["全天"].concat(OPEN_SLOTS).map(t => `<button type="button" class="open-chip${openPick.indexOf(t) >= 0 ? " on" : ""}" data-t="${t}">${t === "全天" ? "整天" : t}</button>`).join("");
+        $("open-chips").querySelectorAll("[data-t]").forEach(b => b.onclick = () => {
+          const t = b.getAttribute("data-t");
+          if (t === "全天") openPick = ["全天"];
+          else {
+            openPick = openPick.filter(x => x !== "全天");
+            const i = openPick.indexOf(t); if (i >= 0) openPick.splice(i, 1); else openPick.push(t);
+            if (!openPick.length) openPick = ["全天"];
+          }
+          renderOpenChips();
+        });
+      }
+      function setOpenMode(m) {
+        openMode = m;
+        const on = (el, v, c) => { el.style.background = v ? c : "#fff"; el.style.color = v ? "#fff" : "#14563F"; el.style.borderColor = v ? c : "#B5CDA2"; };
+        on($("open-mode-stop"), m === "stop", "#A63124"); on($("open-mode-limit"), m === "limit", "#14563F");
+        $("open-limit-row").style.display = m === "limit" ? "flex" : "none";
+      }
+      const padTime = (t) => t === "全天" ? t : ("0" + normalizeTimeStr(t)).slice(-5);
+      function renderOpenList() {
+        const c = $("open-list-container"); if (!c) return;
+        const today = ymd(new Date());
+        const rows = (suspensions || []).map(x => ({ d: normalizeDateStr(x.date), t: padTime(x.time), limit: parseInt(x.limit, 10) > 0 ? parseInt(x.limit, 10) : 0, reason: String(x.reason || "") }))
+          .filter(x => /^\d{4}-\d{2}-\d{2}$/.test(x.d) && x.d >= today && new Date(x.d + "T00:00:00").getDay() !== 0);
+        // 先把「同時段、同名額、同原因、日期相連（略過週日）」併成一段
+        const keyOf = (x) => x.t + "|" + x.limit + "|" + x.reason;
+        const byKey = {}; rows.forEach(x => (byKey[keyOf(x)] = byKey[keyOf(x)] || []).push(x));
+        const nextDay = (d) => { const n = new Date(d + "T00:00:00"); n.setDate(n.getDate() + 1); if (n.getDay() === 0) n.setDate(n.getDate() + 1); return ymd(n); };
+        let ranges = [];
+        Object.keys(byKey).forEach(k => {
+          const arr = byKey[k].map(x => x.d).sort(); const f = byKey[k][0];
+          let st = arr[0], prev = arr[0];
+          for (let i = 1; i <= arr.length; i++) {
+            if (i < arr.length && arr[i] === nextDay(prev)) { prev = arr[i]; continue; }
+            ranges.push({ start: st, end: prev, t: f.t, limit: f.limit, reason: f.reason });
+            st = arr[i]; prev = arr[i];
+          }
+        });
+        // 再把「日期、名額、原因都一樣」的不同時段併成一張卡
+        const cards = {};
+        ranges.forEach(r => { const k = r.start + "|" + r.end + "|" + r.limit + "|" + r.reason; (cards[k] = cards[k] || { start: r.start, end: r.end, limit: r.limit, reason: r.reason, times: [] }).times.push(r.t); });
+        const list = Object.values(cards).sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end));
+        if (!list.length) {
+          c.innerHTML = `<div style="padding:28px;text-align:center;background:#fff;border:1px solid #E3E5D8;border-radius:12px;font:400 14px 'Noto Sans TC';color:#7F9186"><img class="v-empty-img" src="../assets/common/state-empty.webp" alt="">目前沒有特別的設定，依平常規則開放</div>`;
+          return;
+        }
+        c.innerHTML = list.map((g, i) => {
+          g.times.sort((a, b) => (a === "全天" ? -1 : b === "全天" ? 1 : a.localeCompare(b)));
+          const badge = g.limit > 0 ? `<span style="padding:2px 8px;background:#FFF0D7;border-radius:999px;font:700 11px 'Noto Sans TC';color:#B65B16">限 ${g.limit} 組</span>` : `<span style="padding:2px 8px;background:#FBECE9;border-radius:999px;font:700 11px 'Noto Sans TC';color:#A63124">不開放</span>`;
+          const when = g.times.indexOf("全天") >= 0 ? "整天" : g.times.join("、");
+          const range = g.start === g.end ? g.start : `${g.start} ～ ${g.end}`;
+          return `<div style="display:flex;gap:13px;padding:15px;background:#fff;border:1px solid #D3D8C8;border-radius:12px">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${badge}<span style="font:700 15px 'Noto Sans TC';color:#092F25">${esc(range)}</span></div>
+              <div style="font:700 13px 'Noto Sans TC';color:#4D695A">${esc(when)}</div>
+              ${g.reason ? `<div style="font:400 13px 'Noto Sans TC';color:#B65B16">原因：${esc(g.reason)}</div>` : ""}
+            </div>
+            <div data-open-cancel="${i}" style="align-self:flex-start;padding:7px 12px;background:#FBECE9;border-radius:12px;font:700 12.5px 'Noto Sans TC';color:#A63124;cursor:pointer">取消設定</div>
+          </div>`;
+        }).join("");
+        c.querySelectorAll("[data-open-cancel]").forEach(el => el.onclick = () => {
+          const g = list[+el.getAttribute("data-open-cancel")];
+          const range = g.start === g.end ? g.start : `${g.start} ～ ${g.end}`;
+          showConfirmPrompt("取消設定", `${range}　${g.times.indexOf("全天") >= 0 ? "整天" : g.times.join("、")}\n\n取消後，這些日子回到平常規則（平日 6 組、週六 8 組）。`, async () => {
+            showStatusMsg("取消中…", false);
+            try {
+              for (const t of g.times) await staffApi({ action: "lift_suspension", start: g.start, end: g.end, time: t });
+              showStatusMsg("已取消設定", false); await fetchData(); renderOpenList();
+            } catch (e) { showStatusMsg("網路錯誤，請稍後確認結果"); await fetchData(); renderOpenList(); }
+          }, "確定取消");
+        });
+      }
+      function setOpenRule() {
+        const start = $("open-start").value, end = $("open-end").value || start;
+        if (!start) { showStatusMsg("請選擇日期"); return; }
+        if (normalizeDateStr(end) < normalizeDateStr(start)) { showStatusMsg("結束日不可早於起始日"); return; }
+        if (start < ymd(new Date())) { showStatusMsg("起始日不可是過去的日子"); return; }
+        let limit = 0;
+        if (openMode === "limit") { limit = parseInt($("open-limit").value, 10); if (!(limit >= 1 && limit <= 30)) { showStatusMsg("名額請填 1～30"); return; } }
+        const reason = $("open-reason").value.trim();
+        const whenTxt = openPick.indexOf("全天") >= 0 ? "整天" : openPick.slice().sort().join("、");
+        const desc = `${start === end ? start : start + " ～ " + end}\n${whenTxt}\n\n${limit > 0 ? "每個時段最多開放 " + limit + " 組" : "完全不開放探視"}${reason ? "\n原因：" + reason : ""}\n\n這些日期、時段原本的設定會被取代。`;
+        showConfirmPrompt("確認設定", desc, async () => {
+          showStatusMsg("設定中…", false);
+          try {
+            const data = await staffApi({ action: "set_suspension", start, end, times: openPick.join(","), limit, reason });
+            if (data.result === "success") {
+              showStatusMsg("已設定完成", false);
+              $("open-start").value = ""; $("open-end").value = ""; $("open-reason").value = "";
+              await fetchData(); renderOpenList();
+            } else showStatusMsg("設定失敗：" + (data.msg || "請重試"));
+          } catch (e) { showStatusMsg("網路錯誤，請稍後確認結果"); }
+        }, "確認設定");
+      }
+      renderOpenChips(); setOpenMode("stop");
+      $("open-mode-stop").onclick = () => setOpenMode("stop");
+      $("open-mode-limit").onclick = () => setOpenMode("limit");
+      $("btn-set-open").onclick = setOpenRule;
+      $("open-start").min = $("open-end").min = ymd(new Date());
+      $("open-start").onchange = () => { if (!$("open-end").value || $("open-end").value < $("open-start").value) $("open-end").value = $("open-start").value; };
+
       const setAdminTab = (which) => {
-        const a = $("tab-admin-list"), b = $("tab-admin-notes"), c = $("tab-admin-isolation");
+        const a = $("tab-admin-list"), b = $("tab-admin-notes"), c = $("tab-admin-isolation"), d = $("tab-admin-open");
         const on = (el, v) => { el.style.color = v ? "#14563F" : "#7A8C80"; el.style.fontWeight = v ? "700" : "400"; el.style.borderBottom = v ? "2px solid #14563F" : "2px solid transparent"; };
-        on(a, which === "list"); on(b, which === "notes"); on(c, which === "isolation");
-        hide("view-admin-list"); hide("view-admin-notes"); hide("view-admin-isolation");
+        on(a, which === "list"); on(b, which === "notes"); on(c, which === "isolation"); on(d, which === "open");
+        hide("view-admin-list"); hide("view-admin-notes"); hide("view-admin-isolation"); hide("view-admin-open");
         if (which === "list") show("view-admin-list", "flex");
         else if (which === "notes") { show("view-admin-notes", "flex"); renderAdminNotes($("note-search").value.trim()); }
+        else if (which === "open") { show("view-admin-open", "flex"); renderOpenList(); }
         else { show("view-admin-isolation", "flex"); renderIsolationList(); }
       };
       $("tab-admin-list").onclick = () => setAdminTab("list");
       $("tab-admin-notes").onclick = () => setAdminTab("notes");
       $("tab-admin-isolation").onclick = () => setAdminTab("isolation");
+      $("tab-admin-open").onclick = () => setAdminTab("open");
       $("admin-date-picker").onchange = renderAdminList;
       $("note-search").addEventListener("input", (e) => renderAdminNotes(e.target.value.trim()));
 
