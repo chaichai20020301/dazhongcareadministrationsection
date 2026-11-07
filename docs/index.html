@@ -116,6 +116,7 @@ table.log{width:100%;border-collapse:collapse;font-size:13px}table.log td,table.
   .foot .btn{flex:1}.catrow{grid-template-columns:1fr}
   .doc.rdoc{grid-template-columns:1fr}.doc.rdoc .acts{grid-column:auto}
 }
+.boxin{margin:8px 0 0;padding-left:20px;font-size:14px;line-height:1.7}.boxin small{color:var(--muted,#4d695a)}
 </style>
 </head>
 <body>
@@ -144,6 +145,7 @@ table.log{width:100%;border-collapse:collapse;font-size:13px}table.log td,table.
       <button class="btn main" id="btnRNew"><span class="dico" style="--ico:url(../assets/docs/docs-rec-tab.webp)"></span>登記病歷</button>
       <button class="btn sec" id="btnRRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
     </div>
+    <div class="chips" id="rview"><button class="chip on" data-v="rec">依病歷看</button><button class="chip" data-v="box">依箱子看（整箱銷毀）</button></div>
     <div class="chips" id="rchips"></div>
     <div class="list" id="rlist"></div>
   </div>
@@ -157,9 +159,9 @@ var ROLE_NAME = { manager:"主管", admin:"行政", nurseadmin:"護理行政", n
 var ROLE_ORDER = ["manager","admin","nurseadmin","nurse","care"];
 var ERR = { forbidden:"這個動作你的身份不能使用。", invalid:"資料不完整或格式不對，請檢查後再試。", not_found:"找不到這份文件，請重新整理。", too_big:"檔案太大了（上限 12MB），請壓縮或拆開再傳。",
   bad_type:"不支援這種檔案。可傳 PDF、圖片、Word、Excel、PowerPoint、txt、csv。", busy:"系統忙碌中，請稍後再試。", exists:"已經有同名的分類了。", not_empty:"這個分類裡還有文件，請先把文件移到別的分類（或封存後仍算在裡面）。",
-  not_available:"這份病歷現在不是「在架」狀態，請重新整理。", not_lent:"這份病歷不是借出狀態，請重新整理。",
+  not_available:"這份病歷現在不是「在架」狀態，請重新整理。", not_lent:"這份病歷不是借出狀態，請重新整理。", box_lent:"這箱還有病歷借出中，請先歸還再整箱銷毀。", box_not_ready:"這箱還沒到可銷毀的時間，或有病歷沒填日期，請重新整理確認。",
   file_missing:"雲端上找不到這個檔案，請通知管理員。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
-var S = { tab:"docs", canRec:false, recs:null, rf:"shelf", rq:"", role:"", canManage:false, cats:[], docs:[], cat:"all", filter:"all", q:"", sort:"upd" };
+var S = { tab:"docs", canRec:false, recs:null, rf:"shelf", rv:"rec", bf:"all", openBox:{}, rq:"", role:"", canManage:false, cats:[], docs:[], cat:"all", filter:"all", q:"", sort:"upd" };
 
 function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
 function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
@@ -213,6 +215,7 @@ function rolesText(r){ return r.length>=ROLE_ORDER.length ? "全部同仁" : r.m
   $("btnCats").onclick = openCats;
   $("btnLog").onclick = openLog;
   Array.prototype.forEach.call(document.querySelectorAll("#tabs .tab"), function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+  Array.prototype.forEach.call(document.querySelectorAll("#rview .chip"), function(c){ c.onclick=function(){ S.rv=c.dataset.v; paintRecs(); }; });
   $("rq").addEventListener("input", function(){ S.rq=this.value.trim(); paintRecs(); });
   $("btnRRef").onclick = function(){ loadRecs(); };
   $("btnRNew").onclick = function(){ openRecEdit(null); };
@@ -570,7 +573,57 @@ function recFlags(r){
   if(r.destroyAfter && !f.destroyed){ var n = daysLeft(r.destroyAfter); f.left=n; if(n<=0) f.canDestroy=true; else if(n<=60) f.soon=true; }
   return f;
 }
+function boxList(){
+  var m = {}, order = [];
+  (S.recs||[]).forEach(function(r){
+    if(r.status==="已銷毀") return;
+    var b = m[r.location]; if(!b){ b = m[r.location] = { loc:r.location, items:[], max:"", unknown:0, lent:0 }; order.push(b); }
+    b.items.push(r);
+    if(r.status==="借出") b.lent++;
+    if(!r.destroyAfter) b.unknown++; else if(r.destroyAfter>b.max) b.max=r.destroyAfter;
+  });
+  order.forEach(function(b){
+    b.left = b.max ? daysLeft(b.max) : null;
+    b.state = b.unknown ? "unknown" : (b.left<=0 ? "ready" : (b.left<=60 ? "soon" : "wait"));
+  });
+  order.sort(function(a,b){ return a.loc.localeCompare(b.loc, "zh-Hant", {numeric:true}); });
+  return order;
+}
+function paintBoxes(){
+  var boxes = boxList(), cnt = { all:boxes.length, ready:0, soon:0, unknown:0 };
+  boxes.forEach(function(b){ if(b.state==="ready") cnt.ready++; else if(b.state==="soon") cnt.soon++; else if(b.state==="unknown") cnt.unknown++; });
+  var defs = [["all","全部箱子",cnt.all,""],["ready","可整箱銷毀",cnt.ready,"warn"],["soon","60 天內到期",cnt.soon,"warn"],["unknown","無法判斷（有沒填日期）",cnt.unknown,""]];
+  $("rchips").innerHTML = defs.map(function(d){ return '<button class="chip '+d[3]+(S.bf===d[0]?' on':'')+'" data-f="'+d[0]+'">'+d[1]+'<b>'+d[2]+'</b></button>'; }).join("");
+  Array.prototype.forEach.call($("rchips").children, function(b){ b.onclick=function(){ S.bf=b.dataset.f; paintRecs(); }; });
+  var q = S.rq.toLowerCase();
+  var rows = boxes.filter(function(b){ return S.bf==="all" || b.state===S.bf; })
+    .filter(function(b){ return !q || (b.loc+" "+b.items.map(function(r){return r.name;}).join(" ")).toLowerCase().indexOf(q)>=0; });
+  if(!rows.length){ $("rlist").innerHTML = '<div class="empty"><img src="../assets/docs/'+(boxes.length||q ? 'docs-state-noresult' : 'docs-state-norecord')+'.webp" alt="">'+(boxes.length||q ? "沒有符合的箱子。" : "還沒有登記任何病歷。")+'</div>'; return; }
+  $("rlist").innerHTML = rows.map(function(b){
+    var tags = '<span class="tag">'+b.items.length+' 份病歷</span>';
+    if(b.state==="ready") tags += '<span class="tag red">整箱都已超過保存年限，可銷毀</span>';
+    else if(b.state==="soon") tags += '<span class="tag org">'+b.left+' 天後可整箱銷毀</span>';
+    else if(b.state==="unknown") tags += '<span class="tag gray">有 '+b.unknown+' 份沒有可銷毀日，無法判斷</span>';
+    if(b.lent) tags += '<span class="tag org">'+b.lent+' 份借出中</span>';
+    var meta = '<span>'+dic("rec-location")+esc(b.loc)+'</span>'
+      + '<span>'+(b.max ? (b.unknown?'已知最晚 ':'整箱可銷毀日 ')+esc(b.max)+(b.unknown?'（還有未填的）':'（以箱內最晚的為準）') : '沒有任何可銷毀日')+'</span>';
+    var open = !!S.openBox[b.loc];
+    var acts = '<button class="btn sec sm" data-b="tog" data-loc="'+esc(b.loc)+'">'+(open?'收起內容':'看箱內病歷')+'</button>';
+    if(S.canDestroy && b.state==="ready" && !b.lent) acts += '<button class="btn warn sm" data-b="del" data-loc="'+esc(b.loc)+'">'+dic("rec-destroy")+'整箱標記已銷毀</button>';
+    var inner = open ? '<ul class="boxin">'+b.items.slice().sort(function(x,y){return (y.destroyAfter||"9999").localeCompare(x.destroyAfter||"9999");}).map(function(r){
+      return '<li>'+esc(r.name)+' <small>'+esc(r.kind)+' · '+(r.destroyAfter?esc(r.destroyAfter)+' 可銷毀':'沒有可銷毀日')+(r.status==="借出"?' · 借出中':'')+'</small></li>'; }).join("")+'</ul>' : '';
+    return '<div class="doc rdoc'+(b.state==="ready"?' exp':'')+'"><div><div>'+tags+'</div><h3>'+esc(b.loc)+'</h3><div class="meta">'+meta+'</div>'+inner+'</div><div class="acts">'+acts+'</div></div>';
+  }).join("");
+  Array.prototype.forEach.call($("rlist").querySelectorAll("[data-b]"), function(btn){ btn.onclick=function(){
+    var loc = btn.dataset.loc;
+    if(btn.dataset.b==="tog"){ S.openBox[loc] = !S.openBox[loc]; paintRecs(); return; }
+    var b = boxList().filter(function(x){return x.loc===loc;})[0]; if(!b) return;
+    if(confirm("把「"+loc+"」整箱 "+b.items.length+" 份病歷標記為已銷毀？\n（只是在系統上標記，不會刪掉紀錄；請確認整箱紙本真的已依規定銷毀。）")) recAct("rec.destroyBox", { location:loc }, "已把整箱標記為已銷毀。");
+  }; });
+}
 function paintRecs(){
+  Array.prototype.forEach.call(document.querySelectorAll("#rview .chip"), function(c){ c.classList.toggle("on", c.dataset.v===S.rv); });
+  if(S.rv==="box") return paintBoxes();
   var all = S.recs || [];
   var cnt = { shelf:0, lent:0, overdue:0, due:0, gone:0 };
   all.forEach(function(r){ var f=recFlags(r); if(f.destroyed) cnt.gone++; else { cnt.shelf++; if(f.lent) cnt.lent++; if(f.overdue) cnt.overdue++; if(f.canDestroy||f.soon) cnt.due++; } });
