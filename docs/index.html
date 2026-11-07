@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文件管理 · 線東大眾護理之家</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--green:#14563F;--green-d:#0E4231;--ink:#092F25;--muted:#4D695A;--paper:#FAF8EF;--card:#FFFDF8;--line:#E3E5D8;--red:#A63124;--orange:#B65B16;--teal:#27675F;
+  --g-soft:#EAF3DC;--g-line:#B5CDA2;--o-soft:#FFF0D7;--o-line:#EDC58D;--r-soft:#FBE9E5;--r-line:#E6C9C4;--t-soft:#E6F1EE;--t-line:#AACAC2}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+body{padding-top:64px}
+body::after{content:"";position:fixed;right:0;bottom:0;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:16px 24px 100px}
+[hidden]{display:none!important}
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;gap:14px;padding:0 20px;background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E3E5D8}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--green);color:#fff!important;border-radius:999px;font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none;box-shadow:0 3px 8px rgba(20,86,63,.22)}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:var(--green);border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-user{display:none;margin-left:auto;align-items:center;gap:8px;padding:4px 14px 4px 5px;background:rgba(255,255,255,.75);border:1px solid #DEDFD1;border-radius:999px;font:500 13.5px 'Noto Sans TC';white-space:nowrap}
+.v-user b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;font-size:14px}
+.ico{display:inline-block;flex:none;width:1.15em;height:1.15em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:-.2em;margin-right:5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14.5px;cursor:pointer;white-space:nowrap}
+.btn.main{background:var(--green);color:#fff;box-shadow:0 3px 8px rgba(20,86,63,.22)}.btn.main:hover{background:var(--green-d)}
+.btn.sec{background:var(--card);color:var(--green-d);border:1.5px solid var(--g-line)}.btn.sec:hover{background:var(--g-soft)}
+.btn.warn{background:var(--card);color:var(--red);border:1.5px solid var(--r-line)}
+.btn.sm{padding:6px 13px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.banner{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:120px;margin-bottom:14px;padding:18px 24px 18px 100px;background:#F5F6E6;border-radius:22px;box-shadow:0 6px 15px rgba(25,62,37,.06)}
+.banner img{position:absolute;left:0;top:0;height:100%;opacity:.85;pointer-events:none;z-index:-1}
+h1{margin:0 0 4px;font:900 27px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
+.sub{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.msg{min-height:20px;margin:6px 2px;font-size:13.5px;font-weight:700}.msg.ok{color:var(--green)}.msg.err{color:var(--red)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;padding:0 14px;background:#fff;border:1.5px solid #D3D8C8;border-radius:999px}
+.search input{flex:1;min-width:0;border:0;outline:0;padding:11px 0;font-size:16px;background:transparent}
+.search:focus-within{border-color:var(--green)}
+.search .ico{color:var(--muted);margin:0}
+select.sel{padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:999px;font-size:14px;background:#fff;color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 14px;font-weight:700;font-size:13.5px;color:var(--muted);cursor:pointer}
+.chip b{margin-left:5px;font-weight:700;color:#8a9a90}
+.chip.on{border-color:var(--green);background:var(--g-soft);color:var(--green-d)}.chip.on b{color:var(--green-d)}
+.chip.warn.on{border-color:var(--orange);background:var(--o-soft);color:#8A4A12}
+.chip.arc.on{border-color:#9AA79F;background:#EEF0EA;color:#4a5a50}
+.list{display:flex;flex-direction:column;gap:10px}
+.doc{display:grid;grid-template-columns:62px 1fr auto;gap:14px;align-items:center;padding:12px 14px;background:var(--card);border:1.5px solid var(--g-line);border-radius:18px}
+.doc.exp{border-color:var(--r-line);background:#FFF9F7}.doc.soon{border-color:var(--o-line);background:#FFFAF0}.doc.arc{opacity:.6;border-style:dashed}
+.ft{width:62px;height:62px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;font:900 15px/1.1 'Noto Sans TC';color:#fff;background:#6b7d72;letter-spacing:.02em}
+.ft small{font:500 10.5px 'Noto Sans TC';margin-top:3px;opacity:.9}
+.ft.pdf{background:#B5483A}.ft.img{background:#2f8a7a}.ft.doc{background:#3f6fb0}.ft.xls{background:#3d8a4e}.ft.ppt{background:#c0702a}
+.doc h3{margin:0 0 3px;font:900 17.5px/1.35 'Noto Serif TC',serif;word-break:break-word}
+.doc .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12.5px;color:var(--muted)}
+.doc p{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tag{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--g-soft);color:var(--green-d);margin-right:6px}
+.tag.red{background:var(--r-soft);color:var(--red)}.tag.org{background:var(--o-soft);color:#8A4A12}.tag.gray{background:#EEF0EA;color:#5a6a60}.tag.teal{background:var(--t-soft);color:#1D5049}
+.acts{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.empty{text-align:center;padding:30px 10px;color:var(--muted);font-size:14.5px;line-height:1.8}
+.empty img{display:block;margin:0 auto 6px;height:120px;width:auto}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(9,47,37,.45)}
+.box{background:var(--card);border-radius:22px;width:100%;max-width:720px;max-height:92vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.box h2{margin:0 0 12px;font:900 21px 'Noto Serif TC',serif}
+.fld{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.fld>span{font-size:13px;font-weight:700;color:var(--muted)}.fld small{font-weight:400;color:#7A8C80}
+.fld input[type=text],.fld input[type=date],.fld textarea,.fld select{padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:#fff;width:100%;resize:vertical}
+.fld input:focus,.fld textarea:focus,.fld select:focus{outline:none;border-color:var(--green)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.roles{display:flex;flex-wrap:wrap;gap:8px}
+.roles label{display:flex;align-items:center;gap:6px;padding:7px 13px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-weight:700;font-size:13.5px;cursor:pointer;color:var(--muted)}
+.roles label.on{border-color:var(--green);background:var(--g-soft);color:var(--green-d)}
+.roles input{display:none}.roles label.lock{opacity:.6;cursor:default}
+.drop{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.fileinfo{font-size:13.5px;color:var(--ink);font-weight:600;word-break:break-all}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.thumbs div{position:relative;width:70px;height:92px;border:2px solid var(--line);border-radius:10px;overflow:hidden;background:#F3F1E6}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs button{position:absolute;top:2px;right:2px;width:22px;height:22px;border:0;border-radius:50%;background:rgba(9,47,37,.75);color:#fff;font-size:14px;line-height:1;cursor:pointer}
+.vers{border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.vers div{display:flex;align-items:center;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:13px}
+.vers div:last-child{border-bottom:0}.vers div span{flex:1;min-width:0;word-break:break-all}.vers small{color:#7A8C80}
+.err{color:var(--red);font-size:13.5px;font-weight:700;min-height:18px;margin:4px 0}
+.foot{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+.catrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.catrow .roles label{padding:4px 10px;font-size:12.5px}
+.catrow input[type=text]{padding:9px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;width:100%}
+table.log{width:100%;border-collapse:collapse;font-size:13px}table.log td,table.log th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}table.log th{color:var(--muted);font-size:12px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{border:0;border-bottom:3px solid transparent;background:none;padding:8px 14px;font:700 16px 'Noto Sans TC';color:var(--muted);cursor:pointer}
+.tab.on{color:var(--green-d);border-bottom-color:var(--green)}
+.doc.lent{border-color:var(--t-line);background:#F6FAF9}
+.rdoc{grid-template-columns:1fr auto}
+/* ===== 文件系統美術素材 ===== */
+.dimg{display:inline-block;width:1.5em;height:1.5em;vertical-align:-.4em;margin-right:5px;object-fit:contain}
+.dico{display:inline-block;flex:none;width:1.2em;height:1.2em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:-.25em;margin-right:5px}
+.banner .bn-art{left:auto;top:auto;right:12px;bottom:-4px;height:100%;max-height:190px;width:auto;opacity:1}
+.banner{padding-right:300px;min-height:150px}
+.ftimg{width:62px;display:flex;flex-direction:column;align-items:center;gap:1px}
+.ftimg img{width:52px;height:52px;object-fit:contain}
+.ftimg small{font:700 10.5px 'Noto Sans TC';color:var(--muted)}
+.tab .dimg{width:1.4em;height:1.4em}
+.chip .dimg{width:1.35em;height:1.35em;vertical-align:-.35em;margin-right:4px}
+@media (max-width:760px){
+  .banner{padding-right:24px}.banner .bn-art{opacity:.2;height:90%}
+  .ftimg{width:52px}.ftimg img{width:44px;height:44px}
+
+  main{padding:12px 12px 100px}body{padding-top:56px}.v-topbar{height:56px;padding:0 12px;gap:10px}
+  .v-tb-logo,.v-user span{display:none}.v-user{padding:3px}.v-tb-title{font-size:17px}body::after{display:none}
+  .banner{padding:14px 14px 14px 60px;min-height:0}h1{font-size:22px}
+  .doc{grid-template-columns:52px 1fr}.ft{width:52px;height:52px;font-size:13px}.doc .acts{grid-column:1/3;justify-content:flex-start}
+  .modal{align-items:flex-end;padding:0}.box{border-radius:22px 22px 0 0;max-height:94vh}.row2{grid-template-columns:1fr}
+  .foot .btn{flex:1}.catrow{grid-template-columns:1fr}
+  .doc.rdoc{grid-template-columns:1fr}.doc.rdoc .acts{grid-column:auto}
+}
+</style>
+</head>
+<body>
+<div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">文件管理</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
+<main>
+  <div class="banner"><img src="../kiosk/img/n-g-l.webp" alt=""><img class="bn-art" src="../assets/docs/docs-banner.webp" alt="">
+    <div><h1>文件管理</h1><p class="sub">證照與評鑑、SOP 規章表單、合約公文、住民相關文件都放在這裡。依身份決定誰看得到，換新版時舊版會保留。</p></div></div>
+  <div class="msg" id="msg"></div>
+
+  <div class="tabs" id="tabs" hidden><button class="tab on" data-t="docs"><img class="dimg" src="../assets/docs/docs-cat-all.webp" alt="">文件</button><button class="tab" data-t="recs"><img class="dimg" src="../assets/docs/docs-rec-tab.webp" alt="">退住／瘦身病歷</button></div>
+  <div id="docView">
+  <div class="tools">
+    <label class="search"><span class="ico" style="--ico:url(../assets/common/icon-search.webp)"></span><input id="q" type="search" placeholder="搜尋文件名稱、說明、檔名" autocomplete="off"></label>
+    <select class="sel" id="sort"><option value="upd">最近更新在前</option><option value="exp">到期日近的在前</option><option value="name">依名稱</option></select>
+    <button class="btn main" id="btnNew" hidden><span class="dico" style="--ico:url(../assets/docs/docs-icon-add.webp)"></span>新增文件</button>
+    <button class="btn sec" id="btnCats" hidden><span class="dico" style="--ico:url(../assets/docs/docs-icon-category.webp)"></span>管理分類</button>
+    <button class="btn sec" id="btnLog" hidden><span class="dico" style="--ico:url(../assets/docs/docs-icon-log.webp)"></span>操作紀錄</button>
+    <button class="btn sec" id="btnRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="list" id="list"></div>
+  </div>
+  <div id="recView" hidden>
+    <div class="tools">
+      <label class="search"><span class="ico" style="--ico:url(../assets/common/icon-search.webp)"></span><input id="rq" type="search" placeholder="搜尋住民姓名、存放位置、備註" autocomplete="off"></label>
+      <button class="btn main" id="btnRNew"><span class="dico" style="--ico:url(../assets/docs/docs-rec-tab.webp)"></span>登記病歷</button>
+      <button class="btn sec" id="btnRRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
+    </div>
+    <div class="chips" id="rchips"></div>
+    <div class="list" id="rlist"></div>
+  </div>
+</main>
+<div id="modalHost"></div>
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx5KYxHos4eMtrrRwZ3hEQg7ECdncwdNX-z0_jWbgH4CxW_1P75gOspqyjVg2QfnZPG/exec";   // 文件管理後端（Apps Script /exec 網址）
+var $ = function(id){ return document.getElementById(id); };
+var ROLE_NAME = { manager:"主管", admin:"行政", nurseadmin:"護理行政", nurse:"護理", care:"照服" };
+var ROLE_ORDER = ["manager","admin","nurseadmin","nurse","care"];
+var ERR = { forbidden:"這個動作你的身份不能使用。", invalid:"資料不完整或格式不對，請檢查後再試。", not_found:"找不到這份文件，請重新整理。", too_big:"檔案太大了（上限 12MB），請壓縮或拆開再傳。",
+  bad_type:"不支援這種檔案。可傳 PDF、圖片、Word、Excel、PowerPoint、txt、csv。", busy:"系統忙碌中，請稍後再試。", exists:"已經有同名的分類了。", not_empty:"這個分類裡還有文件，請先把文件移到別的分類（或封存後仍算在裡面）。",
+  not_available:"這份病歷現在不是「在架」狀態，請重新整理。", not_lent:"這份病歷不是借出狀態，請重新整理。",
+  file_missing:"雲端上找不到這個檔案，請通知管理員。", "unknown action":"後端還沒更新成新版本，請通知管理員。" };
+var S = { tab:"docs", canRec:false, recs:null, rf:"shelf", rq:"", role:"", canManage:false, cats:[], docs:[], cat:"all", filter:"all", q:"", sort:"upd" };
+
+function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function kick(){ try{ localStorage.removeItem("portal_token"); localStorage.removeItem("portal_exp"); }catch(e){} location.replace("../index.html"); }
+function say(t, ok){ var e=$("msg"); e.textContent=t||""; e.className="msg "+(ok?"ok":"err"); if(ok) setTimeout(function(){ if(e.textContent===t) e.textContent=""; }, 4000); }
+function errText(j){ return ERR[j && j.error] || "操作失敗，請稍後再試。"; }
+function api(action, args, ms){
+  var t = token(); if(!t){ kick(); return Promise.reject(new Error("unauthorized")); }
+  if(!SCRIPT_URL){ return Promise.reject(new Error("nourl")); }
+  var p = { action:action, token:t }; for(var k in (args||{})) p[k] = args[k];
+  var ctl = new AbortController(), timer = setTimeout(function(){ ctl.abort(); }, ms||45000);
+  return fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p),signal:ctl.signal}).then(function(r){ return r.json(); })
+    .then(function(j){ clearTimeout(timer); if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; })
+    .catch(function(e){ clearTimeout(timer); throw e; });
+}
+function netFail(e){ if(e.message==="unauthorized") return; say(e.message==="nourl" ? "文件管理後端還沒設定網址，請通知管理員。" : (e.name==="AbortError" ? "等太久了，請檢查網路後再試一次。" : "連線失敗，請檢查網路後再試。")); }
+function di(n){ return '<img class="dimg" src="../assets/docs/docs-'+n+'.webp" alt="">'; }
+function dic(n){ return '<span class="dico" style="--ico:url(../assets/docs/docs-'+n+'.webp)"></span>'; }
+function catIcon(name){ return /證照|評鑑/.test(name)?"cat-cert":/SOP|規章|表單/i.test(name)?"cat-sop":/合約|公文/.test(name)?"cat-contract":/住民/.test(name)?"cat-resident":"cat-all"; }
+function ic(n){ return '<span class="ico" style="--ico:url(../assets/common/icon-'+n+'.webp)"></span>'; }
+
+/* ===== 日期 ===== */
+function pad(n){ return (n<10?"0":"")+n; }
+function todayUTC(){ var d=new Date(); return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()); }
+function daysLeft(ex){ var p=ex.split("/").map(Number); return Math.round((Date.UTC(p[0],p[1]-1,p[2]) - todayUTC())/86400000); }
+function expState(d){
+  if(!d.expiry || d.status!=="active") return { k:"", t:"" };
+  var n = daysLeft(d.expiry);
+  if(n < 0) return { k:"exp", n:n, t:"已過期 "+(-n)+" 天" };
+  if(n <= d.remindDays) return { k:"soon", n:n, t:n===0 ? "今天到期" : n+" 天後到期" };
+  return { k:"", n:n, t:"" };
+}
+function fmtSize(b){ return b>=1048576 ? (b/1048576).toFixed(1)+" MB" : Math.max(1,Math.round(b/1024))+" KB"; }
+function ext(n){ var m=/\.([A-Za-z0-9]{2,5})$/.exec(n||""); return m?m[1].toLowerCase():""; }
+function kind(n){ var e=ext(n);
+  if(e==="pdf") return ["pdf","PDF"]; if(/^(jpg|jpeg|png|webp)$/.test(e)) return ["img","圖片"];
+  if(/^docx?$/.test(e)) return ["doc","Word"]; if(/^xlsx?$/.test(e)) return ["xls","Excel"]; if(/^pptx?$/.test(e)) return ["ppt","簡報"]; return ["",e.toUpperCase()||"檔案"]; }
+function catName(id){ var c=S.cats.filter(function(x){return x.id===id;})[0]; return c?c.name:"未分類"; }
+function rolesText(r){ return r.length>=ROLE_ORDER.length ? "全部同仁" : r.map(function(x){return ROLE_NAME[x]||x;}).join("、"); }
+
+/* ===== 開機與載入 ===== */
+(function boot(){
+  if(!token()){ kick(); return; }
+  var n=ls("handover_name"), r=ls("portal_role"), e=$("v-user");
+  if(n){ e.children[0].textContent=n.trim().charAt(0); e.children[1].textContent=n+(ROLE_NAME[r]?" · "+ROLE_NAME[r]:""); e.style.display="flex"; }
+  $("q").addEventListener("input", function(){ S.q=this.value.trim(); paint(); });
+  $("sort").addEventListener("change", function(){ S.sort=this.value; paint(); });
+  $("btnRef").onclick = function(){ load(); };
+  $("btnNew").onclick = function(){ openEdit(null); };
+  $("btnCats").onclick = openCats;
+  $("btnLog").onclick = openLog;
+  Array.prototype.forEach.call(document.querySelectorAll("#tabs .tab"), function(b){ b.onclick=function(){ setTab(b.dataset.t); }; });
+  $("rq").addEventListener("input", function(){ S.rq=this.value.trim(); paintRecs(); });
+  $("btnRRef").onclick = function(){ loadRecs(); };
+  $("btnRNew").onclick = function(){ openRecEdit(null); };
+  load();
+})();
+function load(){
+  say("");
+  $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-loading.webp" alt="">載入中…</div>';
+  return api("bootstrap").then(function(j){
+    if(!j || !j.ok){ $("chips").innerHTML=""; $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-error.webp" alt="">'+esc(errText(j))+'</div>'; return; }
+    S.role=j.role; S.canManage=j.canManage; S.canRec=!!j.canRec; $("tabs").hidden=!S.canRec; S.cats=j.cats; S.docs=j.docs;
+    $("btnNew").hidden=!S.canManage; $("btnCats").hidden=S.role!=="manager"; $("btnLog").hidden=S.role!=="manager";
+    if(S.cat!=="all" && !S.cats.some(function(c){return c.id===S.cat;})) S.cat="all";
+    paint();
+  }).catch(function(e){ $("chips").innerHTML=""; $("list").innerHTML = '<div class="empty"><img src="../assets/common/state-offline.webp" alt="">'+(e.message==="nourl"?"文件管理後端還沒設定網址，請通知管理員。":"連線失敗，請檢查網路後按「重新整理」。")+'</div>'; });
+}
+
+/* ===== 清單 ===== */
+function paint(){
+  var active = S.docs.filter(function(d){ return d.status==="active"; });
+  var warn = active.filter(function(d){ return expState(d).k; }).length;
+  var arch = S.docs.length - active.length;
+  var h = '<button class="chip'+(S.cat==="all"&&S.filter==="all"?' on':'')+'" data-c="all">'+di("cat-all")+'全部<b>'+active.length+'</b></button>';
+  S.cats.forEach(function(c){ var n=active.filter(function(d){return d.catId===c.id;}).length;
+    h += '<button class="chip'+(S.cat===c.id&&S.filter==="all"?' on':'')+'" data-c="'+esc(c.id)+'">'+di(catIcon(c.name))+esc(c.name)+'<b>'+n+'</b></button>'; });
+  if(warn || S.filter==="warn") h += '<button class="chip warn'+(S.filter==="warn"?' on':'')+'" data-f="warn">'+di("cat-expiring")+'快到期／已過期<b>'+warn+'</b></button>';
+  if(S.role==="manager" && (arch || S.filter==="arc")) h += '<button class="chip arc'+(S.filter==="arc"?' on':'')+'" data-f="arc">'+di("cat-archive")+'已封存<b>'+arch+'</b></button>';
+  $("chips").innerHTML = h;
+  Array.prototype.forEach.call($("chips").children, function(b){ b.onclick=function(){
+    if(b.dataset.f){ S.filter = S.filter===b.dataset.f ? "all" : b.dataset.f; } else { S.cat=b.dataset.c; S.filter="all"; }
+    paint(); }; });
+
+  var q = S.q.toLowerCase();
+  var rows = S.docs.filter(function(d){
+    if(S.filter==="arc") return d.status==="archived";
+    if(d.status!=="active") return false;
+    if(S.filter==="warn") return !!expState(d).k;
+    if(S.cat!=="all" && d.catId!==S.cat) return false;
+    return true;
+  }).filter(function(d){ return !q || (d.title+" "+d.note+" "+d.fileName+" "+catName(d.catId)).toLowerCase().indexOf(q)>=0; });
+  rows.sort(function(a,b){
+    if(S.sort==="name") return a.title.localeCompare(b.title,"zh-Hant");
+    if(S.sort==="exp"){ var x=a.expiry?daysLeft(a.expiry):1e9, y=b.expiry?daysLeft(b.expiry):1e9; return x-y; }
+    return (b.updatedAt||"").localeCompare(a.updatedAt||"");
+  });
+  if(!rows.length){
+    $("list").innerHTML = '<div class="empty"><img src="../assets/docs/'+(S.docs.length||q ? 'docs-state-noresult' : 'docs-state-empty')+'.webp" alt="">'+(S.docs.length||q ? "沒有符合的文件。" : "還沒有文件。"+(S.canManage?"按上面的「新增文件」開始放第一份。":""))+'</div>';
+    return;
+  }
+  $("list").innerHTML = rows.map(docHtml).join("");
+  Array.prototype.forEach.call($("list").querySelectorAll("[data-a]"), function(b){ b.onclick=function(){
+    var id=b.dataset.id, a=b.dataset.a;
+    if(a==="open") getFile(id, 0, false); else if(a==="dl") getFile(id, 0, true); else if(a==="edit") openEdit(id); }; });
+}
+function ftHtml(d,k){
+  var e=ext(d.fileName), m={pdf:"pdf",img:"image",doc:"word",xls:"excel",ppt:"ppt"}[k[0]] || (/^(txt|csv)$/.test(e)?"text":"");
+  if(!m) return '<div class="ft '+k[0]+'">'+esc(k[1])+'<small>.'+esc(e||"?")+'</small></div>';
+  return '<div class="ftimg"><img src="../assets/docs/docs-type-'+m+'.webp" alt="'+esc(k[1])+'"><small>.'+esc(e)+'</small></div>';
+}
+function docHtml(d){
+  var k = kind(d.fileName), st = expState(d), arc = d.status!=="active";
+  var meta = '<span>'+esc(catName(d.catId))+'</span><span>v'+d.ver+'</span><span>'+fmtSize(d.size)+'</span><span>更新 '+esc((d.updatedAt||"").slice(0,10))+'</span>';
+  if(S.canManage) meta += '<span>'+dic("icon-roles")+esc(rolesText(d.viewRoles))+'</span>';
+  var tags = "";
+  if(arc) tags += '<span class="tag gray">已封存</span>';
+  if(st.k==="exp") tags += '<span class="tag red">'+ic("warning")+esc(st.t)+'</span>';
+  else if(st.k==="soon") tags += '<span class="tag org">'+ic("clock")+esc(st.t)+'</span>';
+  if(d.expiry && !st.k && !arc) tags += '<span class="tag teal">到期 '+esc(d.expiry)+'</span>';
+  else if(d.expiry && st.k) tags += '<span class="tag gray">到期日 '+esc(d.expiry)+'</span>';
+  return '<div class="doc'+(arc?' arc':st.k?' '+st.k:'')+'">'+ftHtml(d,k)
+    + '<div><div>'+tags+'</div><h3>'+esc(d.title)+'</h3><div class="meta">'+meta+'</div>'+(d.note?'<p>'+esc(d.note)+'</p>':'')+'</div>'
+    + '<div class="acts"><button class="btn main sm" data-a="open" data-id="'+esc(d.id)+'">'+ic("eye")+'開啟</button><button class="btn sec sm" data-a="dl" data-id="'+esc(d.id)+'">'+ic("download")+'下載</button>'
+    + (S.canManage ? '<button class="btn sec sm" data-a="edit" data-id="'+esc(d.id)+'">'+ic("edit")+'編輯</button>' : '')+'</div></div>';
+}
+
+/* ===== 開啟／下載 ===== */
+function b64ToBlob(b64, mime){
+  var bin = atob(b64), n = bin.length, u = new Uint8Array(n);
+  for(var i=0;i<n;i++) u[i]=bin.charCodeAt(i);
+  return new Blob([u], { type:mime });
+}
+function getFile(id, ver, download){
+  var viewable = false, w = null;
+  var d = S.docs.filter(function(x){return x.id===id;})[0];
+  if(!download && d && /^(pdf|jpg|jpeg|png|webp|txt)$/.test(ext(d.fileName)) && !ver){ viewable = true; w = window.open("", "_blank"); if(w) w.document.write("<p style='font:16px sans-serif;padding:20px'>檔案載入中…</p>"); }
+  say("檔案準備中…", true);
+  return api("doc.file", { id:id, ver:ver||undefined }, 90000).then(function(j){
+    if(!j || !j.ok){ if(w) w.close(); say(errText(j)); return; }
+    say("");
+    var blob = b64ToBlob(j.data, j.mime), url = URL.createObjectURL(blob);
+    if(viewable && w){ w.location.href = url; setTimeout(function(){ URL.revokeObjectURL(url); }, 120000); return; }
+    var a = document.createElement("a"); a.href=url; a.download=j.name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 20000);
+  }).catch(function(e){ if(w) w.close(); netFail(e); });
+}
+
+/* ===== 視窗共用 ===== */
+function openModal(html, onClose){
+  var h = $("modalHost"); h.innerHTML = '<div class="modal"><div class="box">'+html+'</div></div>';
+  var m = h.firstChild;
+  m.addEventListener("mousedown", function(e){ if(e.target===m && !m.dataset.busy) closeModal(); });
+  return m;
+}
+function closeModal(){ $("modalHost").innerHTML=""; }
+function rolesBox(id, sel, lockMgr){
+  return '<div class="roles" id="'+id+'">'+ROLE_ORDER.map(function(r){
+    var on = sel.indexOf(r)>=0 || (lockMgr && r==="manager");
+    return '<label class="'+(on?'on':'')+(lockMgr&&r==="manager"?' lock':'')+'"><input type="checkbox" value="'+r+'"'+(on?' checked':'')+(lockMgr&&r==="manager"?' disabled':'')+'>'+ROLE_NAME[r]+'</label>';
+  }).join("")+'</div>';
+}
+function bindRoles(id){
+  Array.prototype.forEach.call($(id).querySelectorAll("label"), function(l){
+    var i = l.querySelector("input");
+    i.addEventListener("change", function(){ l.classList.toggle("on", i.checked); });
+  });
+}
+function readRoles(id){ return Array.prototype.filter.call($(id).querySelectorAll("input"), function(i){return i.checked;}).map(function(i){return i.value;}); }
+function catRoles(id){ var c=S.cats.filter(function(x){return x.id===id;})[0]; return c?c.viewRoles:ROLE_ORDER.slice(); }
+
+/* ===== 新增／編輯文件 ===== */
+var EP = { photos:[], file:null };
+function openEdit(id){
+  var d = id ? S.docs.filter(function(x){return x.id===id;})[0] : null;
+  if(id && !d) return;
+  if(!S.cats.length){ say("請先請主管在「管理分類」新增分類。"); return; }
+  EP = { photos:[], file:null };
+  var catId = d ? d.catId : (S.cat!=="all" ? S.cat : S.cats[0].id);
+  var remind = d ? d.remindDays : 30;
+  var rm = [0,7,14,30,60,90,180].filter(function(x){return x!==remind;}); rm.push(remind); rm.sort(function(a,b){return a-b;});
+  var html = '<h2>'+(d?'編輯文件':'新增文件')+'</h2>'
+    + '<label class="fld"><span>文件名稱</span><input type="text" id="edTitle" maxlength="80" value="'+esc(d?d.title:"")+'" placeholder="例如：消防安全設備檢修申報書"></label>'
+    + '<div class="row2"><label class="fld"><span>分類</span><select id="edCat">'+S.cats.map(function(c){return '<option value="'+esc(c.id)+'"'+(c.id===catId?' selected':'')+'>'+esc(c.name)+'</option>';}).join("")+'</select></label>'
+    + '<label class="fld"><span>到期日 <small>（沒有就留空）</small></span><input type="date" id="edExp" value="'+esc(d&&d.expiry?d.expiry.replace(/\//g,"-"):"")+'"></label></div>'
+    + '<label class="fld"><span>提前幾天提醒 <small>（有填到期日才有用）</small></span><select id="edRemind">'+rm.map(function(x){return '<option value="'+x+'"'+(x===remind?' selected':'')+'>'+(x===0?'到期當天才提醒':x+' 天前')+'</option>';}).join("")+'</select></label>'
+    + '<label class="fld"><span>說明 <small>（選填，搜尋會找得到）</small></span><textarea id="edNote" rows="2" maxlength="500">'+esc(d?d.note:"")+'</textarea></label>'
+    + '<div class="fld"><span>哪些身份看得到 <small>（主管一定看得到）</small></span>'+rolesBox("edRoles", d?d.viewRoles:catRoles(catId), true)+'</div>'
+    + '<div class="fld"><span>'+(d?'換新版檔案 <small>（不換就不用選；舊版會保留）</small>':'檔案')+'</span><div class="drop">'
+    + '<button class="btn sec sm" type="button" id="btnPick">'+ic("upload")+'選擇檔案</button><button class="btn sec sm" type="button" id="btnShot">'+dic("icon-multiphoto")+'拍照／選照片</button></div>'
+    + '<input type="file" id="fPick" hidden accept=".pdf,.jpg,.jpeg,.png,.webp,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv">'
+    + '<input type="file" id="fShot" hidden accept="image/*" capture="environment" multiple>'
+    + '<div class="fileinfo" id="fInfo">'+(d?'目前：'+esc(d.fileName)+'（v'+d.ver+'，'+fmtSize(d.size)+'）':'')+'</div><div class="thumbs" id="thumbs"></div></div>'
+    + (d ? '<label class="fld" id="vnWrap" hidden><span>這次換版的說明 <small>（選填）</small></span><input type="text" id="edVN" maxlength="100" placeholder="例如：115 年度重新申報"></label>'
+         + '<div class="fld"><span>版本紀錄</span><div class="vers" id="vers">載入中…</div></div>' : '')
+    + '<div class="err" id="edErr"></div>'
+    + '<div class="foot">'
+    + (d ? (d.status==="active" ? '<button class="btn warn" id="btnArc">封存</button>' : '<button class="btn sec" id="btnRes">還原封存</button>') : '')
+    + '<button class="btn sec" id="btnX">取消</button><button class="btn main" id="btnOk">儲存</button></div>';
+  openModal(html);
+  bindRoles("edRoles");
+  $("edCat").onchange = function(){
+    if(d) return;                                           // 新增時，換分類就帶入該分類的預設身份
+    var r = catRoles(this.value);
+    Array.prototype.forEach.call($("edRoles").querySelectorAll("input"), function(i){ i.checked = r.indexOf(i.value)>=0 || i.value==="manager"; i.parentNode.classList.toggle("on", i.checked); });
+  };
+  $("btnPick").onclick = function(){ $("fPick").click(); };
+  $("btnShot").onclick = function(){ $("fShot").click(); };
+  $("fPick").onchange = function(){
+    var f = this.files[0]; this.value = ""; if(!f) return;
+    if(f.size > 12*1024*1024){ $("edErr").textContent="這個檔案超過 12MB，請壓縮或拆開再傳。"; return; }
+    if(!/\.(pdf|jpe?g|png|webp|docx?|xlsx?|pptx?|txt|csv)$/i.test(f.name)){ $("edErr").textContent="不支援這種檔案。可傳 PDF、圖片、Word、Excel、PowerPoint、txt、csv。"; return; }
+    $("edErr").textContent=""; EP.file=f; EP.photos=[]; paintPick(d);
+  };
+  $("fShot").onchange = function(){
+    var fs = Array.prototype.slice.call(this.files); this.value = ""; if(!fs.length) return;
+    EP.file=null; fs.forEach(function(f){ EP.photos.push(f); }); $("edErr").textContent=""; paintPick(d);
+  };
+  $("btnX").onclick = closeModal;
+  $("btnOk").onclick = function(){ saveDoc(d); };
+  if(d){
+    $("btnArc") && ($("btnArc").onclick = function(){ if(confirm("封存「"+d.title+"」？封存後同仁看不到，檔案仍保留，主管可以還原。")) archive(d, "doc.archive", "已封存。"); });
+    $("btnRes") && ($("btnRes").onclick = function(){ archive(d, "doc.restore", "已還原。"); });
+    api("doc.versions", { id:d.id }).then(function(j){
+      var el = $("vers"); if(!el) return;
+      if(!j || !j.ok){ el.textContent = errText(j); return; }
+      el.innerHTML = j.versions.map(function(v){
+        return '<div><span><b>v'+v.ver+'</b>'+(v.ver===j.current?'（目前）':'')+' '+esc(v.fileName)+'<br><small>'+esc(v.at)+' · '+esc(v.by)+' · '+fmtSize(v.size)+(v.note?' · '+esc(v.note):'')+'</small></span>'
+          + '<button class="btn sec sm" data-v="'+v.ver+'">'+ic("download")+'下載</button></div>'; }).join("") || "沒有紀錄";
+      Array.prototype.forEach.call(el.querySelectorAll("[data-v]"), function(b){ b.onclick=function(){ getFile(d.id, Number(b.dataset.v), true); }; });
+    }).catch(function(){ var el=$("vers"); if(el) el.textContent="載入失敗"; });
+  }
+}
+function paintPick(d){
+  var info = $("fInfo"), th = $("thumbs"); th.innerHTML = "";
+  if(EP.file) info.textContent = "已選：" + EP.file.name + "（" + fmtSize(EP.file.size) + "）";
+  else if(EP.photos.length){
+    info.textContent = "已選 " + EP.photos.length + " 張照片，儲存時會合成一份 PDF。可以再按「拍照／選照片」加一張。";
+    EP.photos.forEach(function(f, i){
+      var div = document.createElement("div"), img = document.createElement("img"), x = document.createElement("button");
+      img.src = URL.createObjectURL(f); x.type="button"; x.textContent="×"; x.title="移除這張";
+      x.onclick = function(){ EP.photos.splice(i,1); paintPick(d); };
+      div.appendChild(img); div.appendChild(x); th.appendChild(div);
+    });
+  } else info.textContent = d ? "目前：" + d.fileName + "（v" + d.ver + "，" + fmtSize(d.size) + "）" : "";
+  var w = $("vnWrap"); if(w) w.hidden = !(EP.file || EP.photos.length);
+}
+function archive(d, act, okMsg){
+  var b = $("btnOk"); b.disabled = true;
+  api(act, { id:d.id }).then(function(j){
+    if(!j || !j.ok){ b.disabled=false; $("edErr").textContent = errText(j); return; }
+    closeModal(); say(okMsg, true); load();
+  }).catch(function(e){ b.disabled=false; if(e.message!=="unauthorized") $("edErr").textContent="連線失敗，請再試一次。"; });
+}
+function saveDoc(d){
+  var err = $("edErr"); err.textContent = "";
+  var title = $("edTitle").value.trim();
+  if(!title){ err.textContent="請填文件名稱。"; return; }
+  if(!d && !EP.file && !EP.photos.length){ err.textContent="請選擇檔案，或拍照。"; return; }
+  var roles = readRoles("edRoles"); if(roles.indexOf("manager")<0) roles.push("manager");
+  var exp = $("edExp").value ? $("edExp").value.replace(/-/g,"/") : "";
+  var doc = { id:d?d.id:undefined, title:title, catId:$("edCat").value, note:$("edNote").value.trim(), viewRoles:roles, expiry:exp, remindDays:Number($("edRemind").value) };
+  var btn = $("btnOk"), box = $("modalHost").firstChild;
+  btn.disabled = true; box.dataset.busy = "1"; btn.textContent = "處理中…";
+  var prep;
+  if(EP.file) prep = readB64(EP.file).then(function(b){ return { name:EP.file.name, data:b }; });
+  else if(EP.photos.length) prep = photosToPdf(EP.photos).then(function(bytes){ return { name:title.replace(/[\\\/:*?"<>|]/g,"_").slice(0,60)+".pdf", data:bytesToB64(bytes), size:bytes.length }; });
+  else prep = Promise.resolve(null);
+  prep.then(function(file){
+    if(file && (file.size || file.data.length*0.75) > 12*1024*1024) throw new Error("big");
+    btn.textContent = file ? "上傳中…（檔案大時需要一下）" : "儲存中…";
+    return api("doc.save", { doc:doc, file:file||undefined, verNote:(d && $("edVN") ? $("edVN").value.trim() : undefined) }, 180000);
+  }).then(function(j){
+    btn.disabled = false; delete box.dataset.busy; btn.textContent = "儲存";
+    if(!j || !j.ok){ err.textContent = errText(j); return; }
+    closeModal(); say(d ? "已儲存。" : "已新增「"+title+"」。", true); load();
+  }).catch(function(e){
+    btn.disabled = false; delete box.dataset.busy; btn.textContent = "儲存";
+    if(e.message==="unauthorized") return;
+    err.textContent = e.message==="big" ? ERR.too_big : e.message==="nourl" ? "後端還沒設定網址。" : "上傳沒有成功，內容還在，請檢查網路後再按一次儲存。（如果懷疑已經傳上去，請先重新整理看看有沒有這份文件，避免重複。）";
+  });
+}
+
+/* ===== 檔案處理：讀成 base64、照片縮小、合成 PDF ===== */
+function readB64(file){
+  return new Promise(function(res, rej){ var r = new FileReader(); r.onload=function(){ res(String(r.result).split(",")[1]||""); }; r.onerror=rej; r.readAsDataURL(file); });
+}
+function bytesToB64(u8){ var s="", CH=0x8000; for(var i=0;i<u8.length;i+=CH) s += String.fromCharCode.apply(null, u8.subarray(i,i+CH)); return btoa(s); }
+function jpegOf(file){
+  return new Promise(function(res, rej){
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){
+      var MAX=2000, w=img.naturalWidth, h=img.naturalHeight, k=Math.min(1, MAX/Math.max(w,h));
+      var cw=Math.round(w*k), ch=Math.round(h*k), c=document.createElement("canvas"); c.width=cw; c.height=ch;
+      var x=c.getContext("2d"); x.fillStyle="#fff"; x.fillRect(0,0,cw,ch); x.drawImage(img,0,0,cw,ch);
+      c.toBlob(function(b){ URL.revokeObjectURL(url); if(!b) return rej(new Error("img"));
+        var r=new FileReader(); r.onload=function(){ res({ bytes:new Uint8Array(r.result), w:cw, h:ch }); }; r.onerror=rej; r.readAsArrayBuffer(b); }, "image/jpeg", 0.8);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.src = url;
+  });
+}
+function photosToPdf(files){
+  return files.reduce(function(p, f){ return p.then(function(a){ return jpegOf(f).then(function(j){ a.push(j); return a; }); }); }, Promise.resolve([])).then(buildPdf);
+}
+function buildPdf(imgs){
+  var enc = new TextEncoder(), parts = [], offs = [], len = 0, n = imgs.length;
+  function push(x){ var b = typeof x==="string" ? enc.encode(x) : x; parts.push(b); len += b.length; }
+  function start(no){ offs[no]=len; push(no+" 0 obj\n"); }
+  push("%PDF-1.4\n");
+  start(1); push("<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+  var kids = imgs.map(function(_, i){ return (5+3*i)+" 0 R"; }).join(" ");
+  start(2); push("<< /Type /Pages /Kids ["+kids+"] /Count "+n+" >>\nendobj\n");
+  imgs.forEach(function(im, i){
+    var PW = 595, PH = Math.round(595*im.h/im.w*100)/100, io = 3+3*i, co = 4+3*i, po = 5+3*i;
+    start(io); push("<< /Type /XObject /Subtype /Image /Width "+im.w+" /Height "+im.h+" /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length "+im.bytes.length+" >>\nstream\n"); push(im.bytes); push("\nendstream\nendobj\n");
+    var cs = "q "+PW+" 0 0 "+PH+" 0 0 cm /Im0 Do Q";
+    start(co); push("<< /Length "+cs.length+" >>\nstream\n"+cs+"\nendstream\nendobj\n");
+    start(po); push("<< /Type /Page /Parent 2 0 R /MediaBox [0 0 "+PW+" "+PH+"] /Resources << /XObject << /Im0 "+io+" 0 R >> >> /Contents "+co+" 0 R >>\nendobj\n");
+  });
+  var total = 3+3*n, xr = len;
+  var x = "xref\n0 "+total+"\n0000000000 65535 f \n";
+  for(var k=1;k<total;k++) x += ("0000000000"+offs[k]).slice(-10)+" 00000 n \n";
+  push(x+"trailer\n<< /Size "+total+" /Root 1 0 R >>\nstartxref\n"+xr+"\n%%EOF\n");
+  var out = new Uint8Array(len), o = 0; parts.forEach(function(b){ out.set(b, o); o += b.length; });
+  return out;
+}
+
+/* ===== 管理分類（主管）===== */
+function openCats(){
+  var html = '<h2>管理分類</h2><p class="sub" style="margin-bottom:8px">「哪些身份看得到」是新增文件時的預設值，每份文件之後仍可各別調整。</p><div id="catList"></div>'
+    + '<div class="err" id="catErr"></div><div class="foot"><button class="btn sec" id="catAdd">＋ 新增分類</button><button class="btn main" id="catDone">完成</button></div>';
+  openModal(html);
+  $("catDone").onclick = function(){ closeModal(); load(); };
+  $("catAdd").onclick = function(){ S.cats.push({ id:"", name:"", viewRoles:ROLE_ORDER.slice() }); paintCats(); var t=$("catList").querySelectorAll('input[type=text]'); t[t.length-1].focus(); };
+  paintCats();
+}
+function paintCats(){
+  var el = $("catList");
+  el.innerHTML = S.cats.map(function(c, i){
+    return '<div class="catrow" data-i="'+i+'"><input type="text" maxlength="30" value="'+esc(c.name)+'" placeholder="分類名稱">'
+      + '<div class="acts"><button class="btn sec sm" data-m="up"'+(i===0?' disabled':'')+'>↑</button><button class="btn sec sm" data-m="dn"'+(i===S.cats.length-1?' disabled':'')+'>↓</button>'
+      + '<button class="btn main sm" data-m="save">儲存</button><button class="btn warn sm" data-m="del">刪除</button></div>'
+      + '<div style="grid-column:1/-1"><span class="sub">哪些身份看得到：</span>'+rolesBox("cr"+i, c.viewRoles, true)+'</div></div>';
+  }).join("");
+  S.cats.forEach(function(_, i){ bindRoles("cr"+i); });
+  Array.prototype.forEach.call(el.querySelectorAll(".catrow"), function(row){
+    var i = Number(row.dataset.i), c = S.cats[i], err = $("catErr");
+    Array.prototype.forEach.call(row.querySelectorAll("[data-m]"), function(b){ b.onclick = function(){
+      err.textContent = "";
+      var m = b.dataset.m;
+      if(m==="save"){
+        var name = row.querySelector("input[type=text]").value.trim(), roles = readRoles("cr"+i);
+        if(!name){ err.textContent="請填分類名稱。"; return; }
+        if(roles.indexOf("manager")<0) roles.push("manager");
+        b.disabled = true;
+        api("cat.save", { cat:{ id:c.id||undefined, name:name, viewRoles:roles } }).then(function(j){
+          b.disabled = false;
+          if(!j || !j.ok){ err.textContent = errText(j); return; }
+          S.cats[i] = j.cat; say("分類已儲存。", true); paintCats();
+        }).catch(function(e){ b.disabled=false; if(e.message!=="unauthorized") err.textContent="連線失敗，請再試一次。"; });
+      } else if(m==="del"){
+        if(!c.id){ S.cats.splice(i,1); paintCats(); return; }
+        if(!confirm("刪除分類「"+c.name+"」？（分類裡還有文件的話無法刪除）")) return;
+        api("cat.delete", { id:c.id }).then(function(j){
+          if(!j || !j.ok){ err.textContent = errText(j); return; }
+          S.cats.splice(i,1); paintCats();
+        }).catch(function(e){ if(e.message!=="unauthorized") err.textContent="連線失敗，請再試一次。"; });
+      } else {
+        var j2 = m==="up" ? i-1 : i+1, t = S.cats[i]; S.cats[i] = S.cats[j2]; S.cats[j2] = t;
+        api("cat.reorder", { ids:S.cats.map(function(x){return x.id;}).filter(Boolean) }).then(function(){ paintCats(); }).catch(function(){ err.textContent="排序沒有存成功。"; });
+        paintCats();
+      }
+    }; });
+  });
+}
+
+/* ===== 操作紀錄（主管）===== */
+function openLog(){
+  openModal('<h2>操作紀錄</h2><p class="sub" style="margin-bottom:8px">最近 150 筆：誰在什麼時候上傳、換版、修改、封存、下載了哪份文件。</p><div id="logBody">載入中…</div><div class="foot"><button class="btn main" id="logX">關閉</button></div>');
+  $("logX").onclick = closeModal;
+  api("log.list").then(function(j){
+    var el = $("logBody"); if(!el) return;
+    if(!j || !j.ok){ el.textContent = errText(j); return; }
+    el.innerHTML = j.logs.length ? '<table class="log"><tr><th>時間</th><th>誰</th><th>動作</th><th>文件</th></tr>'+j.logs.map(function(l){
+      return '<tr><td>'+esc(l.at)+'</td><td>'+esc(l.who)+'<br><small>'+esc(ROLE_NAME[l.role]||l.role)+'</small></td><td>'+esc(l.action)+'</td><td>'+esc(l.title)+'</td></tr>'; }).join("")+'</table>' : "還沒有紀錄。";
+  }).catch(function(){ var el=$("logBody"); if(el) el.textContent="載入失敗，請稍後再試。"; });
+}
+
+/* ===== 退住／瘦身病歷（紙本登記）===== */
+function setTab(t){
+  S.tab=t; say("");
+  Array.prototype.forEach.call(document.querySelectorAll("#tabs .tab"), function(b){ b.classList.toggle("on", b.dataset.t===t); });
+  $("docView").hidden = t!=="docs"; $("recView").hidden = t!=="recs";
+  if(t==="recs" && !S.recs) loadRecs();
+}
+function loadRecs(){
+  $("rlist").innerHTML = '<div class="empty"><img src="../assets/common/state-loading.webp" alt="">載入中…</div>';
+  return api("rec.list").then(function(j){
+    if(!j || !j.ok){ $("rchips").innerHTML=""; $("rlist").innerHTML = '<div class="empty"><img src="../assets/common/state-error.webp" alt="">'+esc(errText(j))+'</div>'; return; }
+    S.recs = j.recs; S.canDestroy = j.canDestroy; paintRecs();
+  }).catch(function(e){ $("rchips").innerHTML=""; $("rlist").innerHTML = '<div class="empty"><img src="../assets/common/state-offline.webp" alt="">'+(e.message==="nourl"?"文件管理後端還沒設定網址，請通知管理員。":"連線失敗，請檢查網路後按「重新整理」。")+'</div>'; });
+}
+function recFlags(r){
+  var f = { lent:r.status==="借出", destroyed:r.status==="已銷毀", overdue:false, canDestroy:false, soon:false, left:null };
+  if(f.lent && r.due && daysLeft(r.due)<0) f.overdue = true;
+  if(r.destroyAfter && !f.destroyed){ var n = daysLeft(r.destroyAfter); f.left=n; if(n<=0) f.canDestroy=true; else if(n<=60) f.soon=true; }
+  return f;
+}
+function paintRecs(){
+  var all = S.recs || [];
+  var cnt = { shelf:0, lent:0, overdue:0, due:0, gone:0 };
+  all.forEach(function(r){ var f=recFlags(r); if(f.destroyed) cnt.gone++; else { cnt.shelf++; if(f.lent) cnt.lent++; if(f.overdue) cnt.overdue++; if(f.canDestroy||f.soon) cnt.due++; } });
+  var defs = [["shelf","現存",cnt.shelf,""],["lent","借出中",cnt.lent,""],["overdue","逾期未還",cnt.overdue,"warn"],["due","可銷毀／快到",cnt.due,"warn"]];
+  if(S.canDestroy && cnt.gone) defs.push(["gone","已銷毀",cnt.gone,"arc"]);
+  $("rchips").innerHTML = defs.map(function(d){ return '<button class="chip '+d[3]+(S.rf===d[0]?' on':'')+'" data-f="'+d[0]+'">'+d[1]+'<b>'+d[2]+'</b></button>'; }).join("");
+  Array.prototype.forEach.call($("rchips").children, function(b){ b.onclick=function(){ S.rf=b.dataset.f; paintRecs(); }; });
+  var q = S.rq.toLowerCase();
+  var rows = all.filter(function(r){
+    var f = recFlags(r);
+    if(S.rf==="gone") return f.destroyed;
+    if(f.destroyed) return false;
+    if(S.rf==="lent") return f.lent;
+    if(S.rf==="overdue") return f.overdue;
+    if(S.rf==="due") return f.canDestroy||f.soon;
+    return true;
+  }).filter(function(r){ return !q || (r.name+" "+r.location+" "+r.note+" "+r.period+" "+r.borrower).toLowerCase().indexOf(q)>=0; });
+  rows.sort(function(a,b){ return (b.date||"").localeCompare(a.date||""); });
+  if(!rows.length){ $("rlist").innerHTML = '<div class="empty"><img src="../assets/docs/'+(all.length||q ? 'docs-state-noresult' : 'docs-state-norecord')+'.webp" alt="">'+(all.length||q ? "沒有符合的病歷。" : "還沒有登記任何病歷。按「登記病歷」開始。")+'</div>'; return; }
+  $("rlist").innerHTML = rows.map(function(r){
+    var f = recFlags(r), tags = '<span class="tag '+(r.kind==="退住"?'gray':'teal')+'">'+dic(r.kind==="退住"?"rec-discharge":"rec-slim")+esc(r.kind)+'</span>';
+    if(f.destroyed) tags += '<span class="tag gray">已銷毀</span>';
+    else if(f.lent) tags += '<span class="tag '+(f.overdue?'red':'org')+'">'+dic(f.overdue?"rec-overdue":"rec-lend")+(f.overdue?'逾期未還 · ':'借出中 · ')+esc(r.borrower)+(r.due?'（'+esc(r.due)+' 前還）':'')+'</span>';
+    else tags += '<span class="tag">在架</span>';
+    if(f.canDestroy) tags += '<span class="tag red">已超過保存年限，可銷毀</span>';
+    else if(f.soon) tags += '<span class="tag org">'+f.left+' 天後可銷毀</span>';
+    var meta = '<span>'+dic("rec-location")+esc(r.location)+'</span><span>'+(r.date?esc(r.kind)+'日 '+esc(r.date):'日期未填')+'</span>'+(r.period?'<span>內容 '+esc(r.period)+'</span>':'')
+      + '<span>'+(r.years?'保存 '+r.years+' 年，'+(r.destroyAfter?esc(r.destroyAfter)+' 後可銷毀':''):'永久保存')+'</span>';
+    var acts = '';
+    if(!f.destroyed){
+      acts += f.lent ? '<button class="btn main sm" data-r="ret" data-id="'+esc(r.id)+'">'+dic("rec-return")+'歸還</button>' : '<button class="btn main sm" data-r="lend" data-id="'+esc(r.id)+'">'+dic("rec-lend")+'借出</button>';
+      acts += '<button class="btn sec sm" data-r="edit" data-id="'+esc(r.id)+'">'+ic("edit")+'編輯</button>';
+    }
+    acts += '<button class="btn sec sm" data-r="his" data-id="'+esc(r.id)+'">'+ic("history")+'借還紀錄</button>';
+    if(S.canDestroy && !f.destroyed && !f.lent) acts += '<button class="btn warn sm" data-r="del" data-id="'+esc(r.id)+'">'+dic("rec-destroy")+'標記已銷毀</button>';
+    return '<div class="doc rdoc'+(f.destroyed?' arc':f.overdue||f.canDestroy?' exp':f.lent?' lent':'')+'"><div><div>'+tags+'</div><h3>'+esc(r.name)+'</h3><div class="meta">'+meta+'</div>'+(r.note?'<p>'+esc(r.note)+'</p>':'')+'</div><div class="acts">'+acts+'</div></div>';
+  }).join("");
+  Array.prototype.forEach.call($("rlist").querySelectorAll("[data-r]"), function(b){ b.onclick=function(){
+    var r = S.recs.filter(function(x){return x.id===b.dataset.id;})[0]; if(!r) return;
+    var a = b.dataset.r;
+    if(a==="edit") openRecEdit(r); else if(a==="lend") openLend(r); else if(a==="his") openRecHis(r);
+    else if(a==="ret"){ if(confirm("確認「"+r.name+"」的病歷已經歸還放回架上？")) recAct("rec.return", { id:r.id }, "已歸還。"); }
+    else if(a==="del"){ if(confirm("把「"+r.name+"」的病歷標記為已銷毀？\n（只是在系統上標記，不會刪掉紀錄；請確認紙本真的已依規定銷毀。）")) recAct("rec.destroy", { id:r.id }, "已標記為已銷毀。"); }
+  }; });
+}
+function recAct(action, args, okMsg){
+  say("處理中…", true);
+  return api(action, args).then(function(j){
+    if(!j || !j.ok){ say(errText(j)); loadRecs(); return; }
+    say(okMsg, true); loadRecs();
+  }).catch(netFail);
+}
+function openRecEdit(r){
+  var years = r ? r.years : 7, ys = [5,7,10,15,20,0].filter(function(x){return x!==years;}); ys.push(years); ys.sort(function(a,b){ return (a||999)-(b||999); });
+  var ymd = r ? r.date.replace(/\//g,"-") : "";
+  openModal('<h2>'+(r?'編輯病歷登記':'登記退住／瘦身病歷')+'</h2>'
+    + '<label class="fld"><span>住民姓名</span><input type="text" id="rName" maxlength="30" value="'+esc(r?r.name:"")+'"></label>'
+    + '<div class="row2"><label class="fld"><span>類型</span><select id="rKind"><option value="退住"'+(r&&r.kind==="瘦身"?'':' selected')+'>退住（住民已退住）</option><option value="瘦身"'+(r&&r.kind==="瘦身"?' selected':'')+'>瘦身（資料夾裝不下，收起舊頁）</option></select></label>'
+    + '<label class="fld"><span id="rDateL">退住／瘦身日 <small>（選填，沒有可留空）</small></span><input type="date" id="rDate" value="'+esc(ymd)+'"></label></div>'
+    + '<label class="fld"><span>病歷內容期間 <small>（選填，例如 113/05～114/12）</small></span><input type="text" id="rPeriod" maxlength="40" value="'+esc(r?r.period:"")+'"></label>'
+    + '<label class="fld"><span>存放位置 <small>（例如：倉庫 A 櫃第 3 層 12 號箱）</small></span><input type="text" id="rLoc" maxlength="60" value="'+esc(r?r.location:"")+'"></label>'
+    + '<label class="fld"><span>保存幾年 <small>（從上面的日期算起，到期後系統會提醒可以銷毀；沒填日期就不會提醒；年限請依機構規定）</small></span><select id="rYears">'+ys.map(function(y){return '<option value="'+y+'"'+(y===years?' selected':'')+'>'+(y===0?'永久保存':y+' 年')+'</option>';}).join("")+'</select></label>'
+    + '<label class="fld"><span>備註 <small>（選填）</small></span><textarea id="rNote" rows="2" maxlength="300">'+esc(r?r.note:"")+'</textarea></label>'
+    + '<div class="err" id="rErr"></div><div class="foot"><button class="btn sec" id="rX">取消</button><button class="btn main" id="rOk">儲存</button></div>');
+  $("rX").onclick = closeModal;
+  $("rOk").onclick = function(){
+    var rec = { id:r?r.id:undefined, name:$("rName").value.trim(), kind:$("rKind").value, date:$("rDate").value.replace(/-/g,"/"), period:$("rPeriod").value.trim(), location:$("rLoc").value.trim(), years:Number($("rYears").value), note:$("rNote").value.trim() };
+    if(!rec.name || !rec.location){ $("rErr").textContent="請填住民姓名和存放位置。"; return; }
+    var b=$("rOk"); b.disabled=true;
+    api("rec.save", { rec:rec }).then(function(j){
+      b.disabled=false; if(!j || !j.ok){ $("rErr").textContent=errText(j); return; }
+      closeModal(); say(r?"已儲存。":"已登記「"+rec.name+"」。", true); loadRecs();
+    }).catch(function(e){ b.disabled=false; if(e.message!=="unauthorized") $("rErr").textContent="連線失敗，請再試一次。"; });
+  };
+}
+function openLend(r){
+  openModal('<h2>借出病歷</h2><p class="sub" style="margin-bottom:10px">'+esc(r.name)+' · '+esc(r.kind)+'病歷 · 位置：'+esc(r.location)+'</p>'
+    + '<label class="fld"><span>誰借走的</span><input type="text" id="lWho" maxlength="20" placeholder="姓名"></label>'
+    + '<label class="fld"><span>預計哪天還 <small>（選填，過了還沒還會標紅提醒）</small></span><input type="date" id="lDue"></label>'
+    + '<label class="fld"><span>原因／備註 <small>（選填）</small></span><input type="text" id="lNote" maxlength="100" placeholder="例如：家屬申請影印"></label>'
+    + '<div class="err" id="lErr"></div><div class="foot"><button class="btn sec" id="lX">取消</button><button class="btn main" id="lOk">確認借出</button></div>');
+  $("lX").onclick = closeModal;
+  $("lOk").onclick = function(){
+    var who = $("lWho").value.trim(); if(!who){ $("lErr").textContent="請填誰借走的。"; return; }
+    var b=$("lOk"); b.disabled=true;
+    api("rec.lend", { id:r.id, borrower:who, due:$("lDue").value.replace(/-/g,"/"), note:$("lNote").value.trim() }).then(function(j){
+      b.disabled=false; if(!j || !j.ok){ $("lErr").textContent=errText(j); return; }
+      closeModal(); say("已登記借出。", true); loadRecs();
+    }).catch(function(e){ b.disabled=false; if(e.message!=="unauthorized") $("lErr").textContent="連線失敗，請再試一次。"; });
+  };
+}
+function openRecHis(r){
+  openModal('<h2>借還紀錄</h2><p class="sub" style="margin-bottom:8px">'+esc(r.name)+' · '+esc(r.kind)+'病歷</p><div id="hBody">載入中…</div><div class="foot"><button class="btn main" id="hX">關閉</button></div>');
+  $("hX").onclick = closeModal;
+  api("rec.history", { id:r.id }).then(function(j){
+    var el=$("hBody"); if(!el) return;
+    if(!j || !j.ok){ el.textContent=errText(j); return; }
+    el.innerHTML = j.items.length ? '<table class="log"><tr><th>時間</th><th>動作</th><th>借閱人</th><th>經手</th></tr>'+j.items.map(function(x){
+      return '<tr><td>'+esc(x.at)+'</td><td>'+esc(x.action)+(x.due?'<br><small>預計 '+esc(x.due)+' 還</small>':'')+'</td><td>'+esc(x.who)+(x.note?'<br><small>'+esc(x.note)+'</small>':'')+'</td><td>'+esc(x.by)+'</td></tr>'; }).join("")+'</table>' : "還沒有借出紀錄。";
+  }).catch(function(){ var el=$("hBody"); if(el) el.textContent="載入失敗，請稍後再試。"; });
+}
+</script>
+</body>
+</html>
