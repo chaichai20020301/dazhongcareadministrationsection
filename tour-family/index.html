@@ -351,6 +351,18 @@ section{padding:64px 0}
   section{padding:52px 0}
   .title-ico{width:34px;height:34px}
 }
+
+.vg{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 10px 3px 14px;border:1.5px dashed #cbbf9c;border-radius:99px;background:#fffdf7}
+.vg>b{font-size:13px;color:#7a6f5a;font-weight:700}
+
+.upl{border:1.5px dashed #cbbf9c;border-radius:14px;padding:12px;background:#fffdf7}
+.upl .th{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.upl .th div{position:relative;width:76px;height:76px;border-radius:10px;background:#eee center/cover no-repeat;border:1px solid var(--line)}
+.upl .th button{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;border:0;background:#b5413a;color:#fff;font-size:13px;line-height:22px;padding:0;cursor:pointer}
+.upl .upb{display:inline-block;position:relative;padding:9px 16px;border-radius:99px;background:var(--g3);color:#2f6b27;font-weight:700;font-size:14.5px;cursor:pointer}
+.upl .upb input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.upl small{display:block;color:var(--sub);margin-top:6px;font-size:12.5px}
+.vg select{border:1.5px solid #cbbf9c;border-radius:99px;padding:5px 12px;background:#fff;font-size:14px;max-width:180px}
 </style>
 </head>
 <body>
@@ -502,6 +514,8 @@ section{padding:64px 0}
       <div class="fld"><label>目前看診醫院</label><input class="fi" name="hospital" placeholder="選填，例如：彰化基督教醫院"></div>
       <div class="fld"><label>入住原因與目前狀況</label><textarea class="ta" name="reason" placeholder="選填。例如：出院後需要專業護理、家中無人照顧…"></textarea></div>
       <div class="fld"><label>疾病史</label><textarea class="ta" name="history" style="min-height:76px" placeholder="選填。例如：高血壓、糖尿病、中風、失智症…"></textarea></div>
+      <div class="fld"><label>已檢驗的體檢表／檢驗報告（選填，可拍照上傳）</label><div class="upl" data-cat="體檢表"><div class="th"></div><label class="upb">＋ 拍照或選擇照片<input type="file" accept="image/*" multiple></label><small>最多 4 張。可先略過，參訪時再帶來也可以。</small></div></div>
+      <div class="fld"><label>病歷摘要（選填，可拍照上傳）</label><div class="upl" data-cat="病歷摘要"><div class="th"></div><label class="upb">＋ 拍照或選擇照片<input type="file" accept="image/*" multiple></label><small>最多 4 張。照片僅供機構評估入住使用，不會公開。</small></div></div>
     </div>
 
     <!-- 3 -->
@@ -511,18 +525,21 @@ section{padding:64px 0}
       <div class="fld"><label>目前的身體狀況（可複選）</label><div class="chips" id="condChips"></div></div>
       <div class="fld cond" id="woundBox"><label>傷口說明</label><input class="fi" name="woundNote" placeholder="位置、大小，例如：右臀 2×3 公分"></div>
       <div class="fld cond" id="condOtherBox"><label>其他狀況說明</label><input class="fi" name="condNote" placeholder="請簡述"></div>
-      <div class="fld"><label>想了解的房型</label><div class="roomsel" id="roomSel"></div></div>
+      <div class="fld"><label>可接受的房型（可複選）</label><div class="roomsel" id="roomSel"></div></div>
       <details class="opt"><summary>更多照護細節（可跳過）</summary><div class="inner">
         <div class="g2">
           <div class="fld"><label>入住身份</label><select class="sel" name="identity"><option value="">不確定</option><option>一般</option><option>中低收入戶</option><option>低收入戶</option></select></div>
           <div class="fld"><label>移動能力</label><select class="sel" name="mobility"><option value="">不確定</option><option>可自行行走</option><option>需輔具</option><option>輪椅</option><option>臥床</option></select></div>
           <div class="fld"><label>進食方式</label><select class="sel" name="feeding"><option value="">不確定</option><option>自行口食</option><option>鼻胃管灌食</option><option>其他</option></select></div>
-          <div class="fld"><label>需要用氧氣嗎</label><select class="sel" name="oxygen"><option value="">不確定</option><option>不需要</option><option>需要</option></select></div>
           <div class="fld"><label>DNR 意願</label><select class="sel" name="dnr"><option value="">不確定</option><option>已簽署</option><option>討論中</option><option>未簽署</option></select></div>
           <div class="fld"><label>溝通狀況</label><select class="sel" name="communication"><option value="">不確定</option><option>正常</option><option>聽力不佳</option><option>表達或理解困難</option></select></div>
-          <div class="fld"><label>餐食型態</label><select class="sel" name="diet"><option value="">不確定</option><option>一般</option><option>軟食</option><option>碎食</option><option>流質</option></select></div>
+          <div class="fld dietf"><label>葷食或素食</label><select class="sel" name="dietType"><option value="">不確定</option><option>葷食</option><option>素食</option></select></div>
+          <div class="fld dietf"><label>主食</label><select class="sel" name="dietStaple"><option value="">不確定</option><option>白飯</option><option>稀飯</option></select></div>
+          <div class="fld dietf"><label>菜的處理方式</label><select class="sel" name="dietVeg"><option value="">不確定</option><option>菜盤</option><option>剪碎</option><option>攪碎</option></select></div>
+          <div class="fld dietf"><label>碗的大小</label><select class="sel" name="dietSize"><option value="">不確定</option><option>大碗</option><option>中碗</option><option>小碗</option></select></div>
           <div class="fld"><label>大小便狀況</label><select class="sel" name="excretion"><option value="">不確定</option><option>可自理</option><option>使用尿布</option><option>使用尿管</option><option>尿布＋尿管</option></select></div>
           <div class="fld"><label>吃東西或喝水會嗆到嗎</label><select class="sel" name="choking"><option value="">不確定</option><option>不會</option><option>偶爾會</option><option>容易嗆咳</option></select></div>
+          <div class="fld"><label>有跌倒的風險嗎（最近容易跌倒、頭暈、腳無力等）</label><select class="sel" name="fallRisk"><option value="">不確定</option><option>無</option><option>有</option></select></div>
         </div>
         <div class="fld"><label>需特別注意的安全狀況</label><div class="chips">
           <label class="chip"><input type="checkbox" name="safety" value="曾跌倒"><span>曾跌倒</span></label>
@@ -659,7 +676,7 @@ const CONTENT = {
 // 費用預設值（系統連線後會以試算表「費用設定」分頁的內容為準）
 let PRICE = {
   rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
-  addons:[{key:"尿布",price:3000},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"傷口",price:0},{key:"其他",price:0}],
+  addons:[{key:"尿布（機構提供）",price:3000},{key:"尿布（自備）",price:0},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"氧氣（機構提供）",price:0},{key:"氧氣（自備）",price:0},{key:"氣墊床（機構提供）",price:0},{key:"氣墊床（自備）",price:0},{key:"傷口",price:0},{key:"其他",price:0}],
   daily:1850,
   note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。",
   disclaimer:"此為依您勾選項目的初步試算，並非正式報價，實際費用以機構評估後為準。"
@@ -699,9 +716,9 @@ function render(){
 function renderPrice(){
   $("#rooms").innerHTML=PRICE.rooms.map((r,i)=>`<div class="room reveal d${(i%5)+1}">${i<5?`<img class="room-ico" src="../assets/tour/icon-bed-${i+1}.webp" alt="">`:""}<h3>${r.name}</h3><b>${Number(r.price).toLocaleString()}</b><span>元／月起</span></div>`).join("");
   $("#priceNote").innerHTML=PRICE.note+"<br>"+PRICE.disclaimer;
-  $("#condChips").innerHTML=PRICE.addons.map(a=>`<label class="chip"><input type="checkbox" name="cond" value="${a.key}"><span>${a.key}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`).join("");
-  $("#roomSel").innerHTML=`<label class="chip"><input type="radio" name="roomType" value="" checked><span>尚未決定</span></label>`+PRICE.rooms.map(r=>`<label class="chip"><input type="radio" name="roomType" value="${r.name}"><span>${r.name}<b>${Number(r.price).toLocaleString()}</b></span></label>`).join("");
-  $$("#condChips input,#roomSel input").forEach(i=>i.addEventListener("change",calc)); calc();
+  $("#condChips").innerHTML=addonChips(PRICE.addons,"chip","","cond");
+  $("#roomSel").innerHTML=PRICE.rooms.map(r=>`<label class="chip"><input type="checkbox" name="roomType" value="${r.name}"><span>${r.name}<b>${Number(r.price).toLocaleString()}</b></span></label>`).join("");
+  $$("#condChips input,#condChips select,#roomSel input").forEach(i=>i.addEventListener("change",calc)); calc();
 }
 
 /* ---------- 動畫 ---------- */
@@ -738,7 +755,7 @@ let step=1;
 const LB=["聯絡方式","長輩資料","照護需求","確認送出"];
 const FORM=$("#f");
 const val=n=>{const e=FORM.elements[n];return e?(e.value||"").trim():""};
-const vals=n=>$$(`[name="${n}"]:checked`).map(e=>e.value);
+const vals=n=>$$(`[name="${n}"]:checked, select[name="${n}"]`).map(e=>e.value).filter(Boolean);
 
 function openBook(){
   $("#ov").classList.add("open");document.body.style.overflow="hidden";$("#fab").classList.remove("show");
@@ -784,29 +801,61 @@ function go(d){
 }
 FORM.addEventListener("input",e=>{const f=e.target.closest(".fld");f&&f.classList.remove("err")});
 $("#transport").addEventListener("change",e=>$("#pickBox").classList.toggle("show",e.target.value==="需要機構派車接送"));
+$("#condChips").addEventListener("change",e=>exclGroup(e.target,$("#condChips")),true);
 $("#condChips").addEventListener("change",()=>{$("#condOtherBox").classList.toggle("show",vals("cond").includes("其他"));$("#woundBox").classList.toggle("show",vals("cond").includes("傷口"))});
 
+function addonChips(list,cls,cur,nm){
+  const E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const NA=nm?` name="${nm}"`:"", VR=/^(.+)（(機構提供|自備|自費|機構)）$/, have=(cur||"").split("、").filter(Boolean), seen={}, out=[];
+  const price=a=>a.price?` +${Number(a.price).toLocaleString()}`:"";
+  const chip=a=>`<label class="${cls}"><input type="checkbox"${NA} value="${E(a.key)}"><span>${E(a.key)}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`;
+  list.forEach(a=>{const m=VR.exec(a.key);if(!m){out.push(chip(a));return}
+    const g=m[1];if(seen[g])return;seen[g]=1;
+    const vs=list.filter(x=>{const y=VR.exec(x.key);return y&&y[1]===g});
+    out.push(`<span class="vg"><b>${E(g)}</b><select${NA} data-g="${E(g)}"><option value="">不選</option>${vs.map(x=>`<option value="${E(x.key)}">${E(VR.exec(x.key)[2])}${price(x)}</option>`).join("")}</select></span>`)});
+  have.filter(k=>!list.some(a=>a.key===k)).forEach(k=>out.push(`<label class="${cls}"><input type="checkbox"${NA} value="${E(k)}"><span>${E(k)}</span></label>`));
+  return out.join("");
+}
+function exclGroup(i,root){if(i.checked&&i.dataset&&i.dataset.g)root.querySelectorAll("input[data-g]").forEach(o=>{if(o!==i&&o.dataset.g===i.dataset.g)o.checked=false})}
 function calc(){
-  const room=PRICE.rooms.find(r=>r.name===(($('[name="roomType"]:checked')||{}).value));
+  const picked=$$('[name="roomType"]:checked').map(i=>PRICE.rooms.find(r=>r.name===i.value)).filter(Boolean);
   const add=vals("cond").reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0);
   const n=$("#estNum");
-  if(!room){n.textContent=add?"+ "+money(add):"請選擇房型";$("#estNote").textContent=PRICE.disclaimer;return null}
-  const t=room.price+add;n.textContent=money(t)+" / 月";
-  $("#estNote").textContent=`${room.name} ${money(room.price)}`+(add?` ＋ 照護加價 ${money(add)}`:"")+"　"+PRICE.disclaimer;return t;
+  if(!picked.length){n.textContent=add?"+ "+money(add):"請選擇房型";$("#estNote").textContent=PRICE.disclaimer;return null}
+  const ps=picked.map(r=>r.price),lo=Math.min(...ps)+add,hi=Math.max(...ps)+add;
+  n.textContent=(lo===hi?money(lo):money(lo)+"～"+money(hi))+" / 月";
+  $("#estNote").textContent=(picked.length>1?"依您選的房型（"+picked.map(r=>r.name).join("、")+"）顯示範圍":`${picked[0].name} ${money(picked[0].price)}`)+(add?` ＋ 照護加價 ${money(add)}`:"")+"　"+PRICE.disclaimer;return lo;
 }
 function payload(){
   const o={};
-  ["visitorName","relation","mobile","phone","email","wantDate","wantSlot","elderName","gender","age","hospital","reason","history","diet","excretion","choking","woundNote","condNote","identity","mobility","feeding","oxygen","dnr","communication","medication","expectedStay","transport","pickupAddr","pickupMode","infoSource"].forEach(k=>o[k]=k==="gender"?vals("gender")[0]||"":val(k));
+  ["visitorName","relation","mobile","phone","email","wantDate","wantSlot","elderName","gender","age","hospital","reason","history","diet","dietType","dietStaple","dietVeg","dietSize","excretion","choking","fallRisk","woundNote","condNote","identity","mobility","feeding","dnr","communication","medication","expectedStay","transport","pickupAddr","pickupMode","infoSource"].forEach(k=>o[k]=k==="gender"?vals("gender")[0]||"":val(k));
   o.conditions=vals("cond").join("、");o.safety=vals("safety").join("、");
-  o.roomType=($('[name="roomType"]:checked')||{}).value||"";o.estimate=calc()||"";
+  o.roomType=$$('[name="roomType"]:checked').map(i=>i.value).join("、");o.estimate=calc()||"";
   o.channel="家屬線上";o.website=val("website");o.clientTime=Date.now();
   return o;
 }
 function buildSum(){
-  const p=payload(),rows=[["您的姓名",p.visitorName+"（"+p.relation+"）"],["聯絡電話",p.mobile+(p.email?"\n"+p.email:"")],["希望參訪",p.wantDate+" "+p.wantSlot],["長輩",`${p.elderName}　${p.gender}　${p.age}歲`],["身體狀況",p.conditions||"未填"],["預想房型",p.roomType||"尚未決定"],["費用試算",p.estimate?money(p.estimate)+" / 月（僅供參考）":"—"]];
+  const p=payload(),rows=[["您的姓名",p.visitorName+"（"+p.relation+"）"],["聯絡電話",p.mobile+(p.email?"\n"+p.email:"")],["希望參訪",p.wantDate+" "+p.wantSlot],["長輩",`${p.elderName}　${p.gender}　${p.age}歲`],["身體狀況",p.conditions||"未填"],["可接受房型",p.roomType||"尚未決定"],["費用試算",p.estimate?money(p.estimate)+" / 月（僅供參考）":"—"]];
   $("#sum").innerHTML=rows.map(r=>`<div><span>${r[0]}</span><b>${String(r[1]).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\n/g,"<br>")}</b></div>`).join("");
 }
 function toast(m){const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(t._t);t._t=setTimeout(()=>t.style.display="none",3200)}
+
+/* ---------- 上傳照片（壓縮後送出） ---------- */
+const FILES={"體檢表":[],"病歷摘要":[]},MAXF=4;
+function compressImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();
+  im.onload=()=>{let s=Math.min(1,1600/Math.max(im.width,im.height)),out="";
+    for(const q of [0.72,0.55,0.4,0.3]){const c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*s));c.height=Math.max(1,Math.round(im.height*s));
+      const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);out=c.toDataURL("image/jpeg",q);if(out.length<2000000)break;s*=0.8}
+    URL.revokeObjectURL(u);out.length<2200000?res(out):rej()};
+  im.onerror=()=>{URL.revokeObjectURL(u);rej()};im.src=u})}
+function drawFiles(box){const cat=box.dataset.cat;box.querySelector(".th").innerHTML=FILES[cat].map((f,i)=>`<div style="background-image:url(${f})"><button type="button" data-i="${i}" aria-label="移除">×</button></div>`).join("");
+  box.querySelectorAll(".th button").forEach(b=>b.onclick=()=>{FILES[cat].splice(+b.dataset.i,1);drawFiles(box)})}
+$$(".upl").forEach(box=>{const cat=box.dataset.cat,inp=box.querySelector("input");
+  inp.addEventListener("change",async()=>{const fs=[...inp.files];inp.value="";let bad=0;
+    for(const f of fs){if(FILES[cat].length>=MAXF){toast("每一類最多 "+MAXF+" 張");break}
+      try{FILES[cat].push(await compressImg(f))}catch(e){bad++}}
+    if(bad)toast("有照片無法讀取，請改用相機拍照或其他格式");drawFiles(box)})});
+function filesPayload(){const o=[];Object.keys(FILES).forEach(c=>FILES[c].forEach(d=>o.push({cat:c,data:d.split(",")[1]})));return o}
 
 /* ---------- 送出 ---------- */
 let sending=false;
@@ -814,7 +863,7 @@ async function submit(){
   if(sending)return;
   if(!$("#agree").checked){$("#agreeMsg").style.display="block";return}
   $("#agreeMsg").style.display="none";
-  const p=payload();
+  const p=payload();p.files=filesPayload();
   if(p.website)return show("ok"); // 蜜罐：機器人，假裝成功
   // 短時間內同一手機重複送出提醒
   try{const last=JSON.parse(localStorage.getItem("tour_last")||"null");
@@ -841,7 +890,7 @@ async function callApi(action,data){
     if(action==="submit"){
       const db=mockLoad(),d=new Date(),pad=n=>String(n).padStart(2,"0");
       const id="T"+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+"-"+pad(db.rows.length+1);
-      db.rows.push(Object.assign({},data,{id,status:"待聯絡",createdAt:d.toISOString(),total:data.estimate||"",updatedAt:d.toISOString(),updatedBy:"家屬自填"}));
+      db.rows.push(Object.assign({},data,{files:undefined,id,status:"待聯絡",createdAt:d.toISOString(),total:data.estimate||"",updatedAt:d.toISOString(),updatedBy:"家屬自填"}));
       localStorage.setItem(MOCK_KEY,JSON.stringify(db));return{ok:true,id};
     }
     return{ok:true};

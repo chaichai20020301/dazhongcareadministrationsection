@@ -243,6 +243,29 @@ tr.row:hover{background:#F3F6EC}
   .top h1{font-size:16px}
   .note-in{grid-template-columns:1fr}
 }
+
+/* 參訪觀察（內部） */
+.obs{background:#fffaf2;border-color:#ecd9b8}
+.obs h3 small{font-weight:400;color:#8a6a2c;font-size:12.5px;margin-left:8px}
+.lvs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.lv{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 16px;font-size:14px;cursor:pointer}
+.lv.on{color:#fff;font-weight:700;border-color:transparent}
+.lv[data-v="順利"].on{background:#4f8a3c}.lv[data-v="留意"].on{background:#c99a22}.lv[data-v="高風險"].on{background:#d8742a}.lv[data-v="建議不收"].on{background:#b5413a}
+.ob{display:inline-block;font-size:12px;font-weight:700;border-radius:6px;padding:1px 8px;color:#fff;white-space:nowrap}
+.ob.留意{background:#c99a22}.ob.高風險{background:#d8742a}.ob.建議不收{background:#b5413a}
+
+.vg{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 10px 3px 14px;border:1.5px dashed #cbbf9c;border-radius:99px;background:#fffdf7}
+.vg>b{font-size:13px;color:#7a6f5a;font-weight:700}
+
+.atts{display:flex;flex-wrap:wrap;gap:10px}
+.att{position:relative;width:120px;height:120px;border:1.5px solid var(--line);border-radius:12px;background:#f5f2ea center/cover no-repeat;cursor:pointer;padding:0;overflow:hidden}
+.att b{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:2px 4px;font-weight:600}
+.att .ld{font-size:12px;color:#888}
+#lb{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px}
+#lb img{max-width:100%;max-height:80vh;border-radius:8px;background:#fff}
+#lb .bar{display:flex;gap:10px}
+#lb .bar a,#lb .bar button{color:#fff;border:1.5px solid #fff;background:transparent;border-radius:99px;padding:7px 18px;font-size:14px;text-decoration:none;cursor:pointer}
+.vg select{border:1.5px solid #cbbf9c;border-radius:99px;padding:5px 12px;background:#fff;font-size:14px;max-width:180px}
 </style>
 </head>
 <body>
@@ -310,9 +333,9 @@ const NOTE_TYPES=["電話","實地","LINE","其他"];
 const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
 const OPEN_ST=["待聯絡","控床聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
-const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"預入住房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日",inTime:"入住時間",inNote:"入住說明",outTransport:"退住交通",outAddr:"退住接送地址",outMode:"退住接送方式",outTime:"退住時間",outNote:"退住說明"};
+const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"可接受房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日",inTime:"入住時間",inNote:"入住說明",outTransport:"退住交通",outAddr:"退住接送地址",outMode:"退住接送方式",outTime:"退住時間",outNote:"退住說明",obsLevel:"參訪觀察評級",obsTags:"參訪觀察標籤",obsNote:"參訪觀察備註",rsnCare:"入住原因：照護需求",rsnHosp:"入住原因：前次住院與治療過程",rsnExpect:"入住原因：家屬期望",rsnOther:"入住原因：其他注意事項",hxChronic:"疾病史：慢性病",hxDiag:"疾病史：主要診斷",hxSurg:"疾病史：手術與住院史",hxAllergy:"疾病史：過敏史",hxCog:"疾病史：失智／精神／情緒",hxInfect:"疾病史：感染或隔離",curPlace:"目前所在",curPlaceNote:"目前所在名稱",dietType:"餐食：葷素",dietStaple:"餐食：主食",dietVeg:"餐食：菜的處理",dietSize:"餐食：碗的大小",fallRisk:"跌倒風險",assess1966:"1966長照評估",cmsLevel:"CMS等級"};
 let PRICE={rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
-  addons:[{key:"尿布",price:3000},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"傷口",price:0},{key:"其他",price:0}],
+  addons:[{key:"尿布（機構提供）",price:3000},{key:"尿布（自備）",price:0},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"氧氣（機構提供）",price:0},{key:"氧氣（自備）",price:0},{key:"氣墊床（機構提供）",price:0},{key:"氣墊床（自備）",price:0},{key:"傷口",price:0},{key:"其他",price:0}],
   daily:1850,note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。"};
 
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -435,8 +458,8 @@ function draw(){
   const a=filtered();
   const arrow=c=>sortK===c?(sortD>0?" ▲":" ▼"):"";
   if(!a.length){$("#tbl").innerHTML='<div class="empty">沒有符合條件的紀錄<br><small>可以調整上方篩選，或按「新增紀錄」</small></div>';$("#cards").innerHTML="";return}
-  $("#tbl").innerHTML=`<table><thead><tr><th onclick="sortBy('createdAt')">建立${arrow("createdAt")}</th><th>狀態</th><th>長者</th><th>聯絡人</th><th onclick="sortBy('date')">參訪日${arrow("date")}</th><th>房型</th><th>試算／合計</th><th>來源</th><th>下次追蹤</th><th>承辦</th></tr></thead><tbody>${a.map((r,i)=>`<tr class="row" style="animation-delay:${Math.min(i,12)*25}ms" onclick="openRow('${r.id}')"><td>${esc(fmtT(r.createdAt))}<br><span class="tag">${esc(r.id)}</span></td><td>${pill(r.status)}</td><td><b>${esc(r.elderName)}</b><br><small>${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></td><td>${esc(r.visitorName)}<br><small>${esc(r.mobile||r.phone)}</small></td><td>${esc(vDate(r))}<br><small>${esc(r.wantSlot||"")}</small></td><td>${esc(r.roomType||"—")}</td><td>${r.total?money(r.total):(r.estimate?"<small>試算</small> "+money(r.estimate):"—")}</td><td>${esc(r.channel||"")}</td><td>${FOLLOW[r.id]?`<span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:"—"}</td><td>${esc(r.handler||"")}</td></tr>`).join("")}</tbody></table>`;
-  $("#cards").innerHTML=a.map((r,i)=>`<div class="rc" style="animation-delay:${Math.min(i,10)*25}ms" onclick="openRow('${r.id}')"><div class="h"><b>${esc(r.elderName)} <small style="font-weight:400;color:var(--sub)">${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></b>${pill(r.status)}</div><div class="m">👤 ${esc(r.visitorName)}（${esc(r.relation||"")}）　📞 ${esc(r.mobile||r.phone)}</div><div class="m">📅 ${esc(vDate(r)||"未定")} ${esc(r.wantSlot||"")}　🏠 ${esc(r.roomType||"—")}${FOLLOW[r.id]?`　🔔 <span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:""}</div><div class="m"><span class="tag">${esc(r.channel||"")}</span> <span class="tag">${esc(r.id)}</span></div></div>`).join("");
+  $("#tbl").innerHTML=`<table><thead><tr><th onclick="sortBy('createdAt')">建立${arrow("createdAt")}</th><th>狀態</th><th>長者</th><th>聯絡人</th><th onclick="sortBy('date')">參訪日${arrow("date")}</th><th>房型</th><th>試算／合計</th><th>來源</th><th>下次追蹤</th><th>承辦</th></tr></thead><tbody>${a.map((r,i)=>`<tr class="row" style="animation-delay:${Math.min(i,12)*25}ms" onclick="openRow('${r.id}')"><td>${esc(fmtT(r.createdAt))}<br><span class="tag">${esc(r.id)}</span></td><td>${pill(r.status)}</td><td><b>${esc(r.elderName)}</b> ${obsBadge(r)} ${attBadge(r)}<br><small>${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></td><td>${esc(r.visitorName)}<br><small>${esc(r.mobile||r.phone)}</small></td><td>${esc(vDate(r))}<br><small>${esc(r.wantSlot||"")}</small></td><td>${esc(r.roomType||"—")}</td><td>${r.total?money(r.total):(r.estimate?"<small>試算</small> "+money(r.estimate):"—")}</td><td>${esc(r.channel||"")}</td><td>${FOLLOW[r.id]?`<span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:"—"}</td><td>${esc(r.handler||"")}</td></tr>`).join("")}</tbody></table>`;
+  $("#cards").innerHTML=a.map((r,i)=>`<div class="rc" style="animation-delay:${Math.min(i,10)*25}ms" onclick="openRow('${r.id}')"><div class="h"><b>${esc(r.elderName)} ${obsBadge(r)} ${attBadge(r)} <small style="font-weight:400;color:var(--sub)">${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></b>${pill(r.status)}</div><div class="m">👤 ${esc(r.visitorName)}（${esc(r.relation||"")}）　📞 ${esc(r.mobile||r.phone)}</div><div class="m">📅 ${esc(vDate(r)||"未定")} ${esc(r.wantSlot||"")}　🏠 ${esc(r.roomType||"—")}${FOLLOW[r.id]?`　🔔 <span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:""}</div><div class="m"><span class="tag">${esc(r.channel||"")}</span> <span class="tag">${esc(r.id)}</span></div></div>`).join("");
 }
 function quick(k){fQuick=fQuick===k?"":k;if(fQuick)fStatus="進行中";draw()}
 function setStatusF(s){fStatus=s;fQuick="";draw()}
@@ -458,6 +481,44 @@ const inp=(k,l,o={})=>`<div class="fl${o.w?" w":""}" data-k="${k}"><label>${l}${
 const sel=(k,l,opts,o={})=>`<div class="fl${o.w?" w":""}" data-k="${k}"><label>${l}${o.req?" <em>*</em>":""}</label><select name="${k}"><option value="">—</option>${opts.map(x=>`<option>${x}</option>`).join("")}</select></div>`;
 const ta=(k,l,o={})=>`<div class="fl w" data-k="${k}"><label>${l}</label><textarea name="${k}" ${o.ph?`placeholder="${o.ph}"`:""}></textarea></div>`;
 
+function addonChips(list,cls,cur,nm){
+  const E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const NA=nm?` name="${nm}"`:"", VR=/^(.+)（(機構提供|自備|自費|機構)）$/, have=(cur||"").split("、").filter(Boolean), seen={}, out=[];
+  const price=a=>a.price?` +${Number(a.price).toLocaleString()}`:"";
+  const chip=a=>`<label class="${cls}"><input type="checkbox"${NA} value="${E(a.key)}"><span>${E(a.key)}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`;
+  list.forEach(a=>{const m=VR.exec(a.key);if(!m){out.push(chip(a));return}
+    const g=m[1];if(seen[g])return;seen[g]=1;
+    const vs=list.filter(x=>{const y=VR.exec(x.key);return y&&y[1]===g});
+    out.push(`<span class="vg"><b>${E(g)}</b><select${NA} data-g="${E(g)}"><option value="">不選</option>${vs.map(x=>`<option value="${E(x.key)}">${E(VR.exec(x.key)[2])}${price(x)}</option>`).join("")}</select></span>`)});
+  have.filter(k=>!list.some(a=>a.key===k)).forEach(k=>out.push(`<label class="${cls}"><input type="checkbox"${NA} value="${E(k)}"><span>${E(k)}</span></label>`));
+  return out.join("");
+}
+function exclGroup(i,root){if(i.checked&&i.dataset&&i.dataset.g)root.querySelectorAll("input[data-g]").forEach(o=>{if(o!==i&&o.dataset.g===i.dataset.g)o.checked=false})}
+const ATT_CACHE={};
+function attList(c){try{return JSON.parse((c&&c.attachments)||"[]")||[]}catch(e){return[]}}
+function attBadge(r){const n=attList(r).length;return n?`<span class="tag" title="家屬上傳了檢驗資料">📎${n}</span>`:""}
+async function loadAtts(){const id=CUR&&CUR.id;if(!id)return;
+  for(const b of $$("#dBody .att")){const f=b.dataset.f;
+    if(!ATT_CACHE[f]){const r=await api("file",{id,fileId:f});if(!CUR||CUR.id!==id)return;
+      if(!r||!r.ok){b.querySelector(".ld").textContent="讀取失敗";continue}
+      ATT_CACHE[f]={url:"data:"+r.mime+";base64,"+r.data,name:r.name}}
+    b.style.backgroundImage=`url(${ATT_CACHE[f].url})`;const l=b.querySelector(".ld");if(l)l.remove()}}
+function viewAtt(f){const a=ATT_CACHE[f];if(!a)return toast("照片還在載入，請稍候");
+  const d=document.createElement("div");d.id="lb";d.innerHTML=`<img src="${a.url}" alt=""><div class="bar"><a href="${a.url}" download="${esc(a.name)}">下載</a><button type="button">關閉</button></div>`;
+  d.onclick=e=>{if(e.target===d||e.target.tagName==="BUTTON")d.remove()};document.body.appendChild(d)}
+const CMS_LEVELS=["第2級","第3級","第4級","第5級","第6級","第7級","第8級"];
+function syncSvc(){
+  const a=CUR&&CUR.assess1966, cms=document.querySelector('#dBody [data-k="cmsLevel"]'), sv=document.querySelector('#dBody select[name="serviceType"]');
+  if(cms)cms.style.display=a==="有"?"":"none";
+  if(!sv)return;
+  const list=a==="沒有"?SERVICE_TYPES.filter(x=>!/GA05|SC05/.test(x)):SERVICE_TYPES;
+  if(CUR.serviceType&&!list.includes(CUR.serviceType)){CUR.serviceType="";toast("沒有 1966 長照評估，不能選喘息／短照，已清除服務類型")}
+  sv.innerHTML='<option value="">—</option>'+list.map(x=>`<option>${x}</option>`).join("");sv.value=CUR.serviceType||"";
+}
+const OBS_LV=["順利","留意","高風險","建議不收"];
+const OBS_TAGS=["要求過多","情緒易激動","容易起衝突","對費用多有爭議","家屬意見不一致","不信任機構","承諾與事實不符","難以配合規定","過度干涉照護","其他"];
+function obsBadge(r){return r&&["留意","高風險","建議不收"].includes(r.obsLevel)?`<span class="ob ${r.obsLevel}">${r.obsLevel}</span>`:""}
+function setObsLevel(v){CUR.obsLevel=CUR.obsLevel===v?"":v;$$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));mark()}
 async function openRow(id){
   if(id===null){CUR={status:"待聯絡",channel:"電話詢問",handler:me(),visitDate:"",conditions:""};ORIG=Object.assign({},CUR);paint([],[]);openDr();return}
   $("#dTitle").textContent="讀取中…";$("#dBody").innerHTML='<div class="load"><span class="spin d"></span></div>';openDr();
@@ -482,24 +543,43 @@ function paint(notes,hist){
   <div class="sec"><h3>長者／入住人資料</h3><div class="grid">
     ${inp("elderName","姓名",{req:1})}${sel("gender","性別",["男","女"])}
     ${inp("age","年齡",{type:"number",mode:"numeric"})}${inp("hospital","看診醫院")}
+    ${sel("curPlace","目前在哪裡",["家中","醫院","其他機構"])}${inp("curPlaceNote","醫院或機構名稱（在家中可不填）")}
   </div></div>
   <div class="sec"><h3>身體狀況與計價</h3>
-    <div class="cks" id="condBox">${PRICE.addons.map(a=>`<label class="ck"><input type="checkbox" value="${esc(a.key)}"><span>${esc(a.key)}${a.price?` <i>+${Number(a.price).toLocaleString()}</i>`:""}</span></label>`).join("")}</div>
+    <div class="cks" id="condBox">${addonChips(PRICE.addons,"ck",CUR.conditions,"")}</div>
     <div class="grid" style="margin-top:10px">${inp("condNote","其他／備註",{w:1,ph:"例：其他管路、其他狀況…"})}${inp("woundNote","傷口說明（位置、大小、處置）",{w:1})}
-    ${sel("roomType","預入住房型",PRICE.rooms.map(r=>r.name))}${inp("bedNo","預入住床號")}</div>
+    <div class="fl w" data-k="roomType"><label>可接受房型（可複選）</label><div class="cks" id="roomBox">${PRICE.rooms.map(r=>`<label class="ck"><input type="checkbox" value="${esc(r.name)}"><span>${esc(r.name)} <i>${Number(r.price).toLocaleString()}</i></span></label>`).join("")}</div></div>${inp("bedNo","預入住床號")}</div>
     <div class="tot"><div>計價費用合計<br><small style="color:var(--sub)" id="estTxt"></small></div><div style="display:flex;gap:8px;align-items:center"><input class="f" id="totalIn" type="number" inputmode="numeric" placeholder="自動計算"><button type="button" class="btn btn-o btn-sm" onclick="recalc(true)">重新計算</button></div></div>
     <div style="font-size:12px;color:var(--sub);margin-top:6px">${esc(PRICE.note)}　可手動修改合計金額（例如有折扣或日計費）。</div>
   </div>
-  <div class="sec"><h3>入住原因與疾病史</h3><div class="grid">
-    ${ta("reason","入住原因（照護需求、前次住院原因與治療過程、家屬期望與其他注意事項）")}
-    ${ta("history","疾病史（慢性病、診斷、過去病史）")}
+  ${attList(CUR).length?`<div class="sec"><h3>家屬上傳的檢驗資料<small style="font-weight:400;color:#7a6f5a;font-size:12.5px;margin-left:8px">點照片可放大、下載</small></h3><div class="atts">${attList(CUR).map((x,i)=>`<button type="button" class="att" data-f="${esc(x.f)}" onclick="viewAtt('${esc(x.f)}')"><span class="ld">載入中…</span><b>${esc(x.c)} ${i+1}</b></button>`).join("")}</div></div>`:""}
+  <div class="sec obs"><h3>參訪觀察<small>🔒 內部評估：家屬看不到，也不會放進給護理師的入住通知</small></h3>
+    <div class="lvs" id="lvBox">${OBS_LV.map(x=>`<button type="button" class="lv" data-v="${x}" onclick="setObsLevel('${x}')">${x}</button>`).join("")}</div>
+    <div class="cks" id="obsBox">${OBS_TAGS.map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div>
+    <div class="grid" style="margin-top:10px">${ta("obsNote","觀察說明（具體說明家屬的言行，供收案評估與各單位提前留意）",{ph:"例：參訪時多次質疑收費，要求指定專人照顧…"})}</div>
+  </div>
+  <div class="sec"><h3>入住原因</h3><div class="grid">
+    ${ta("rsnCare","照護需求（為什麼需要入住、主要需要哪些照顧）")}
+    ${ta("rsnHosp","前次住院原因與治療過程")}
+    ${ta("rsnExpect","家屬期望")}
+    ${ta("rsnOther","其他注意事項")}
+    ${ta("reason","原有說明（家屬在預約頁填的原文或舊資料，會一併帶入通知）")}
+  </div></div>
+  <div class="sec"><h3>疾病史</h3><div class="grid">
+    ${ta("hxChronic","慢性病（高血壓、糖尿病、心臟病…）")}
+    ${ta("hxDiag","主要診斷")}
+    ${ta("hxSurg","手術與住院史")}
+    ${ta("hxAllergy","過敏史（藥物、食物）")}
+    ${ta("hxCog","失智／精神／情緒狀況")}
+    ${ta("hxInfect","感染或隔離（MRSA、疥瘡、肺結核等）")}
+    ${ta("history","原有說明（家屬在預約頁填的原文或舊資料，會一併帶入通知）")}
   </div></div>
   <div class="sec"><details class="fold" ${isNew?"":"open"}><summary>照護細項（訪談時詢問）</summary><div class="in2"><div class="grid">
     ${sel("identity","入住身份",["一般","中低收入戶","低收入戶"])}${sel("mobility","移動能力",["可自行行走","需輔具","輪椅","臥床"])}
-    ${sel("diet","餐食",["一般","軟食","碎食","流質","其他"])}${sel("excretion","排泄",["自理","尿布","尿管","尿布＋尿管","其他"])}
-    ${sel("feeding","進食方式",["自行口食","鼻胃管灌食","其他"])}${sel("oxygen","氧氣",["不需要","需要"])}
+    ${sel("dietType","餐食：葷素",["葷食","素食"])}${sel("dietStaple","餐食：主食",["白飯","稀飯"])}${sel("dietVeg","餐食：菜的處理",["菜盤","剪碎","攪碎"])}${sel("dietSize","餐食：碗的大小",["大碗","中碗","小碗"])}${inp("diet","餐食補充（其他說明）")}${sel("excretion","排泄",["自理","尿布","尿管","尿布＋尿管","其他"])}
+    ${sel("feeding","進食方式",["自行口食","鼻胃管灌食","其他"])}
     ${sel("dnr","DNR 意願",["已簽署","討論中","未簽署"])}${sel("communication","溝通狀況",["正常","聽力不佳","表達或理解困難"])}
-    ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}
+    ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}${sel("fallRisk","跌倒風險",["無","有"])}
     <div class="fl w"><label>安全看視</label><div class="cks" id="safeBox">${["曾跌倒","會拔管","躁動","走失風險"].map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div></div>
     ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
     ${inp("expectedStay","預計入住時間（家屬說明或備註）",{w:1})}
@@ -521,6 +601,7 @@ function paint(notes,hist){
     ${inp("outNote","退住說明",{w:1,ph:"例：由機構派車送回家"})}
   </div></div>
   <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
+    ${sel("assess1966","是否已做 1966 長照評估",["有","沒有"])}${sel("cmsLevel","CMS 等級",CMS_LEVELS)}
     ${sel("serviceType","預備服務類型",SERVICE_TYPES,{w:1})}
     ${inp("stayStart","預入住開始日",{type:"date"})}${inp("stayEnd","預入住結束日（長期入住可不填）",{type:"date"})}
     <div class="fl w"><div id="stayDays" style="font-size:13.5px;color:var(--g);font-weight:700;min-height:20px"></div></div>
@@ -538,20 +619,30 @@ function paint(notes,hist){
   <div class="sec"><details class="fold"><summary>修改歷程（${hist.length}）</summary><div class="in2 hs">${hist.length?hist.map(h=>`<div>${esc(fmtT(h.time))} <b>${esc(h.by)}</b>：${esc(h.field)} ${h.oldV!==""?`<del>${esc(h.oldV)}</del> → `:""}<ins>${esc(h.newV)}</ins></div>`).join(""):"尚無修改"}</div></details></div>`}`;
   // 填值
   $$("#dBody [name]").forEach(el=>{el.value=CUR[el.name]==null?"":CUR[el.name];el.addEventListener("input",onEdit);el.addEventListener("change",onEdit)});
-  const cs=(CUR.conditions||"").split("、").filter(Boolean);$$("#condBox input").forEach(i=>{i.checked=cs.includes(i.value);i.onchange=()=>{CUR.conditions=$$("#condBox input:checked").map(x=>x.value).join("、");recalc();mark()}});
+  const cs=(CUR.conditions||"").split("、").filter(Boolean);
+  const condVals=()=>$$("#condBox input:checked,#condBox select").map(x=>x.value).filter(Boolean).join("、");
+  const condChg=()=>{CUR.conditions=condVals();recalc();mark()};
+  $$("#condBox input").forEach(i=>{i.checked=cs.includes(i.value);i.onchange=condChg});
+  $$("#condBox select").forEach(sl=>{const o=[...sl.options].find(x=>x.value&&cs.includes(x.value));sl.value=o?o.value:"";sl.onchange=condChg});
   const ss=(CUR.safety||"").split("、").filter(Boolean);$$("#safeBox input").forEach(i=>{i.checked=ss.includes(i.value);i.onchange=()=>{CUR.safety=$$("#safeBox input:checked").map(x=>x.value).join("、");mark()}});
+  const os=(CUR.obsTags||"").split("、").filter(Boolean);$$("#obsBox input").forEach(i=>{i.checked=os.includes(i.value);i.onchange=()=>{CUR.obsTags=$$("#obsBox input:checked").map(x=>x.value).join("、");mark()}});
+  $$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));
+  const rs=(CUR.roomType||"").split("、").filter(Boolean);$$("#roomBox input").forEach(i=>{i.checked=rs.includes(i.value);i.onchange=()=>{CUR.roomType=$$("#roomBox input:checked").map(x=>x.value).join("、");recalc();mark()}});
+  syncDiet();syncSvc();
   TOTAL_MANUAL=!!CUR.total&&String(CUR.total)!==String(calcEst()||"");$("#totalIn").value=CUR.total||"";
   $("#totalIn").oninput=e=>{TOTAL_MANUAL=true;CUR.total=e.target.value;mark()};
-  recalc();updateStayDays();mark();
+  recalc();updateStayDays();mark();loadAtts();
 }
 function noteHtml(n){return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}</div><p>${esc(n.content)}</p></div>`}
-function onEdit(e){const el=e.target;if(!el.name)return;CUR[el.name]=el.value;if(el.name==="roomType")recalc();if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
+function syncDiet(){const t=CUR&&CUR.feeding==="鼻胃管灌食";["dietType","dietStaple","dietVeg","dietSize","diet"].forEach(k=>{const e=document.querySelector(`#dBody [data-k="${k}"]`);if(e)e.style.display=t?"none":""})}
+function onEdit(e){const el=e.target;if(!el.name)return;CUR[el.name]=el.value;if(el.name==="feeding")syncDiet();if(el.name==="assess1966"){syncSvc();mark()}if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
 function stayDays(c){const s=c.stayStart,e=c.stayEnd;if(!s||!e)return 0;const d=Math.round((new Date(e+"T00:00:00")-new Date(s+"T00:00:00"))/864e5);return d<0?-1:d+1}   // 含頭尾兩天
 function updateStayDays(){const el=$("#stayDays");if(!el)return;const n=stayDays(CUR);el.style.color=n<0?"var(--red)":"var(--g)";el.textContent=n<0?"⚠ 結束日早於開始日":(n>0?`共 ${n} 天`:"")}
-function calcEst(){const room=PRICE.rooms.find(r=>r.name===CUR.roomType);if(!room)return null;const cs=(CUR.conditions||"").split("、").filter(Boolean);return room.price+cs.reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0)}
+function roomRange(){const ps=(CUR.roomType||"").split("、").map(n=>PRICE.rooms.find(r=>r.name===n)).filter(Boolean).map(r=>r.price);if(!ps.length)return null;const cs=(CUR.conditions||"").split("、").filter(Boolean),add=cs.reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0);return [Math.min(...ps)+add,Math.max(...ps)+add]}
+function calcEst(){const r=roomRange();return r?r[0]:null}
 function recalc(force){
   const e=calcEst();CUR.estimate=e||"";
-  $("#estTxt").textContent=e?`依房型與勾選項目試算：${money(e)}／月`:"請選擇房型後自動試算";
+  {const rg=roomRange();$("#estTxt").textContent=rg?(rg[0]===rg[1]?`依房型與勾選項目試算：${money(rg[0])}／月`:`可接受房型的範圍：${money(rg[0])}～${money(rg[1])}／月（合計先以最低價帶入，可手動修改）`):"請選擇房型後自動試算"}
   if(force||!TOTAL_MANUAL){TOTAL_MANUAL=false;CUR.total=e||"";$("#totalIn").value=e||""}
   mark();
 }
@@ -644,46 +735,31 @@ function buildNotice(c){
   const wound=v("woundNote")||((c.conditions||"").includes("傷口")?"有":"");
   const inPlace=inCar?[v("pickupAddr"),v("pickupMode")].filter(Boolean).join("，"):"", outPlace=outCar?[v("outAddr"),v("outMode")].filter(Boolean).join("，"):"";
   const place=[inPlace&&`入住 ${inPlace}`,outPlace&&`退住 ${outPlace}`].filter(Boolean).join("；")||((c.transport||c.outTransport)&&!inCar&&!outCar?"不需接送":"");
-  [["elderName"],["identity"],["reason"],["serviceType"],["bedNo"],["nurse"],["transport"],["history"],["mobility"],["diet"],["excretion"],["feeding"],["oxygen"],["dnr"],["medication"],["communication"],["routine"],["choking"],["chkExam"],["chkContract"],["chkFee"]].forEach(([k])=>need(k));
+  [["elderName"],["identity"],["serviceType"],["bedNo"],["nurse"],["transport"],["mobility"],["excretion"],["feeding"],["dnr"],["medication"],["communication"],["routine"],["choking"],["assess1966","是否已做1966長照評估"],["chkExam"],["chkContract"],["chkFee"]].forEach(([k])=>need(k));
+  const grp=(items,legacy)=>{const a=items.map(([k,l])=>v(k)&&[l,v(k)]).filter(Boolean);const o=v(legacy);if(o)a.push([a.length?"其他":"",o]);return a};
+  const reasonG=grp([["rsnCare","照護需求"],["rsnHosp","前次住院與治療過程"],["rsnExpect","家屬期望"],["rsnOther","其他注意事項"]],"reason");
+  const histG=grp([["hxChronic","慢性病"],["hxDiag","主要診斷"],["hxSurg","手術與住院史"],["hxAllergy","過敏史"],["hxCog","失智／精神／情緒"],["hxInfect","感染或隔離"]],"history");
+  if(!reasonG.length)miss.push("入住原因");
+  if(!histG.length)miss.push("疾病史");
+  const placeTxt=[v("curPlace"),v("curPlaceNote")&&(v("curPlace")?`（${v("curPlaceNote")}）`:v("curPlaceNote"))].filter(Boolean).join("");
+  const multi=g=>g.length===1&&!g[0][0]?g[0][1]:"\n"+g.map(([l,t])=>"　‧"+(l?l+"：":"")+t).join("\n");
+  const L=(label,val)=>val?label+":"+val:"";
+  const tube=v("feeding")==="鼻胃管灌食";
+  const dietTxt=tube?"":[v("diet"),v("dietType"),v("dietStaple"),v("dietVeg"),v("dietSize")].filter(Boolean).join("／");
+  if(!tube&&!dietTxt)miss.push("餐食");
   if(!contact)miss.push("主要聯絡人");
   if(!period)miss.push("預入住期間（日期區間）");
   if(inCar&&!v("pickupAddr"))miss.push("入住接送地點");
   if(outCar&&!v("outAddr"))miss.push("退住接送地點");
   if(v("stayEnd")&&!v("outTransport"))miss.push("退住交通");
-  const text=[
-"【新住民入住通知】","",
-"【基本資料】",
-"姓名:"+v("elderName"),
-"入住身份:"+v("identity"),
-"入住原因:"+v("reason"),
-"主要聯絡人:"+contact,"",
-"【機構資訊】",
-"預入住期間:"+period,
-"入住床號:"+v("bedNo"),
-"主責護理:"+v("nurse"),
-"入住交通:"+transportLine,
-"接送地點:"+place,"",
-"【個案狀態】",
-"疾病史:"+v("history"),"",
-"移動能力:"+v("mobility"),"",
-"餐食:"+v("diet"),"",
-"排泄:"+v("excretion"),"",
-"進食方式:"+v("feeding"),
-"管路:"+tubes,
-"氧氣:"+v("oxygen"),
-"傷口:"+wound,
-"DNR:"+v("dnr"),"",
-"【照護注意事項】",
-"用藥:"+v("medication"),
-"溝通:"+v("communication"),
-"日常起居:"+v("routine"),
-"安全看視:"+v("safety"),
-"嗆咳風險:"+v("choking"),"",
-"【新入住檢核】",
-"體檢報告(控床):"+v("chkExam"),
-"入住合約(行政):"+v("chkContract"),
-"入住費用說明(行政):"+v("chkFee")
-  ].join("\n");
+  const secs=[
+    ["【基本資料】",[L("姓名",v("elderName")),L("入住身份",v("identity")),L("目前所在",placeTxt),reasonG.length?"入住原因:"+multi(reasonG):"",L("主要聯絡人",contact)]],
+    ["【機構資訊】",[L("預入住期間",period),L("入住床號",v("bedNo")),L("主責護理",v("nurse")),L("入住交通",transportLine),L("接送地點",place)]],
+    ["【個案狀態】",[histG.length?"疾病史:"+multi(histG):"",L("移動能力",v("mobility")),L("餐食",dietTxt),L("排泄",v("excretion")),L("進食方式",v("feeding")),L("管路",tubes),L("氧氣",(()=>{const o=(c.conditions||"").split("、").find(x=>x==="氧氣"||x.startsWith("氧氣（"));return o?(o.includes("（")?"需要"+o.slice(2):"需要"):(v("oxygen")==="需要"?"需要":v("oxygen"))})()),L("傷口",wound),L("DNR",v("dnr"))]],
+    ["【照護注意事項】",[L("用藥",v("medication")),L("溝通",v("communication")),L("日常起居",v("routine")),L("安全看視",v("safety")),L("嗆咳風險",v("choking")),L("跌倒風險",v("fallRisk"))]],
+    ["【新入住檢核】",[L("1966長照評估",v("assess1966")==="有"?"有"+(v("cmsLevel")?`（CMS ${v("cmsLevel")}）`:""):v("assess1966")),L("體檢報告(控床)",v("chkExam")),L("入住合約(行政)",v("chkContract")),L("入住費用說明(行政)",v("chkFee"))]]
+  ];
+  const text=["【新住民入住通知】"].concat(secs.map(([h,ls])=>{const a=ls.filter(Boolean);return a.length?"\n"+h+"\n"+a.join("\n"):""}).filter(Boolean)).join("\n");
   return {text,miss};
 }
 function openNotice(){
