@@ -97,6 +97,13 @@
   }
 
   /* ---------- 分頁：滑動選取膠囊 ---------- */
+  function ours(m){
+    var t = m.target;
+    if(t && t.classList && (t.classList.contains("mo-pill") || t.classList.contains("mo-rip") || t.id === "mo-bar")) return true;
+    if(m.type === "attributes" && t && t.classList && /mo-/.test(m.oldValue || "") ) return false;
+    var nodes = [].slice.call(m.addedNodes || []).concat([].slice.call(m.removedNodes || []));
+    return nodes.length > 0 && nodes.every(function(n){ return n.nodeType === 1 && (n.classList.contains("mo-pill") || n.classList.contains("mo-rip") || n.id === "mo-bar" || n.parentNode && n.parentNode.classList && n.parentNode.classList.contains("mo-rip")); });
+  }
   var ON = ["on","active","sel","selected","is-active","cur"];
   function onClass(el){ for(var i=0;i<ON.length;i++) if(el.classList.contains(ON[i])) return ON[i]; return null; }
   function scanSeg(){
@@ -115,6 +122,8 @@
       // 同樣 class 的兄弟容器（例如月曆每週一列）不處理
       var sib = [].slice.call(box.parentElement ? box.parentElement.children : []).filter(function(s){ return s !== box && s.className === box.className && box.className; });
       if(sib.length) return;
+      // 選中色是用行內樣式動態上色的（每個狀態不同顏色），不處理
+      if(/background/i.test(ons[0].getAttribute("style") || "")) return;
       // 選中按鈕要有自己的底色，才有東西可滑
       var oc = getComputedStyle(ons[0]);
       var hasBg = (oc.backgroundColor && oc.backgroundColor !== "rgba(0, 0, 0, 0)" && oc.backgroundColor !== "transparent") || (oc.backgroundImage && oc.backgroundImage !== "none");
@@ -137,8 +146,14 @@
     if(getComputedStyle(box).position === "static") box.style.position = "relative";
     box.classList.add("mo-seg");
     kids.forEach(function(k){ k.classList.add("mo-b"); });
+    var obs, ro, onResize;
+    var release = function(){
+      try{ obs.disconnect(); }catch(e){} try{ if(ro) ro.disconnect(); }catch(e){}
+      window.removeEventListener("resize", onResize);
+      box.__moSeg = false; box.classList.remove("mo-seg");
+    };
     var move = function(){
-      if(!box.contains(pill)){ box.__moSeg = false; box.classList.remove("mo-seg"); return; }   // 頁面重畫了分頁：放掉，之後重新掃描
+      if(!box.contains(pill)){ release(); return; }   // 頁面重畫了分頁：乾淨放掉，之後重新掃描
       var cur = null;
       [].slice.call(box.children).forEach(function(k){ if(!k.classList.contains("mo-pill") && onClass(k)) cur = k; });
       if(!cur || cur.offsetParent === null){ pill.style.opacity = "0"; return; }
@@ -149,10 +164,14 @@
     };
     move();
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ if(!reduce) pill.style.transition = ""; }); });
-    var obs = new MutationObserver(safe(move));
+    onResize = safe(move);
+    obs = new MutationObserver(safe(function(muts){
+      if(muts.every(function(m){ return ours(m); })) return;   // 只是我們自己的膠囊／水波變動，不理
+      move();
+    }));
     obs.observe(box, {attributes:true, attributeFilter:["class"], subtree:true, childList:true});
-    window.addEventListener("resize", safe(move));
-    if(window.ResizeObserver) new ResizeObserver(safe(move)).observe(box);
+    window.addEventListener("resize", onResize);
+    if(window.ResizeObserver){ ro = new ResizeObserver(onResize); ro.observe(box); }
   }
 
   /* ---------- 入口卡片：依序浮現 ---------- */
@@ -172,7 +191,10 @@
     if(reduce) return;
     safe(scanSeg)();
     // 頁面後來才長出來的分頁（資料載入後才畫）：偶爾再掃一次
-    var t, mo = new MutationObserver(function(){ clearTimeout(t); t = setTimeout(safe(scanSeg), 300); });
+    var t, mo = new MutationObserver(function(muts){
+      if(muts.every(ours)) return;
+      clearTimeout(t); t = setTimeout(safe(scanSeg), 300);
+    });
     mo.observe(document.body, {childList:true, subtree:true});
   }
   if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
