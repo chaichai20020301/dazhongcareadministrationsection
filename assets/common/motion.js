@@ -180,11 +180,12 @@
     if(!cards.length) return;
     document.body.classList.add("mo-portal");
     var obs = new MutationObserver(safe(function(){
-      var i = 0; [].forEach.call(cards, function(c){ if(c.offsetParent !== null){ c.style.setProperty("--mo-i", i++); } });
+      var i = 0; [].forEach.call(cards, function(c){ if(c.offsetParent !== null){ setI(c, i++); } });
     }));
     cards.forEach(function(c){ obs.observe(c, {attributes:true, attributeFilter:["style","class","hidden"]}); });
-    var i = 0; [].forEach.call(cards, function(c){ if(c.offsetParent !== null) c.style.setProperty("--mo-i", i++); });
+    var i = 0; [].forEach.call(cards, function(c){ if(c.offsetParent !== null) setI(c, i++); });
   }
+  function setI(c, n){ if(c.style.getPropertyValue("--mo-i") !== String(n)) c.style.setProperty("--mo-i", n); }   // 值沒變就不寫，避免觀察者互相觸發
 
   function init(){
     safe(portal)();
