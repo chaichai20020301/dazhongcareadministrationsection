@@ -2,11 +2,11 @@
 :root{--mo-spring:cubic-bezier(.34,1.45,.5,1)}
 
 /* 1. 按下回饋＋滑鼠移上去微微浮起 */
-button:not(:disabled),[role=button],a.btn,.btn{-webkit-tap-highlight-color:transparent;transition:transform .18s var(--mo-spring),box-shadow .2s,background-color .2s,color .2s,opacity .2s}
-button:not(:disabled):active,[role=button]:active,a.btn:active,.btn:active{transform:scale(.95)}
+button:not(:disabled),[role=button],a.btn,.btn{-webkit-tap-highlight-color:transparent;transition:scale .18s var(--mo-spring),translate .18s var(--mo-spring),box-shadow .2s,background-color .2s,color .2s,opacity .2s}
+button:not(:disabled):active,[role=button]:active,a.btn:active,.btn:active{scale:.95}
 @media (hover:hover){
-  button:not(:disabled):not(.on):not(.active):hover,a.btn:hover,.btn:hover{transform:translateY(-1px)}
-  button:not(:disabled):not(.on):not(.active):hover:active,a.btn:hover:active,.btn:hover:active{transform:scale(.95)}
+  button:not(:disabled):not(.on):not(.active):hover,a.btn:hover,.btn:hover{translate:0 -1px}
+  button:not(:disabled):not(.on):not(.active):hover:active,a.btn:hover:active,.btn:hover:active{translate:0 0;scale:.95}
 }
 
 /* 2. 水波 */
@@ -23,7 +23,7 @@ button:not(:disabled):active,[role=button]:active,a.btn:active,.btn:active{trans
 .mo-fail{animation:mo-shake .4s}
 @keyframes mo-spin{to{transform:rotate(360deg)}}
 @keyframes mo-pop{from{transform:rotate(45deg) scale(0)}to{transform:rotate(45deg) scale(1)}}
-@keyframes mo-shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes mo-shake{20%,60%{translate:-5px 0}40%,80%{translate:5px 0}}
 
 /* 4. 頂端載入細線 */
 #mo-bar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:2147483000;pointer-events:none;
@@ -35,14 +35,14 @@ button:not(:disabled):active,[role=button]:active,a.btn:active,.btn:active{trans
 /* 5. 分頁：滑動的選取膠囊 */
 .mo-seg{position:relative}
 .mo-seg>.mo-pill{position:absolute;left:0;top:0;z-index:0;pointer-events:none;transition:transform .5s var(--mo-spring),width .5s var(--mo-spring),height .5s var(--mo-spring),opacity .2s}
-.mo-seg>.mo-b{position:relative;z-index:1;transition:color .2s .12s,transform .18s var(--mo-spring);background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important}
+.mo-seg>.mo-b{position:relative;z-index:1;transition:color .2s .12s,scale .18s var(--mo-spring),translate .18s var(--mo-spring);background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important}
 
 /* 6. 入口卡片：依序浮現＋選到時浮起 */
-body.mo-portal .grid>.card{animation:mo-rise .55s var(--mo-spring) both;animation-delay:calc(var(--mo-i,0)*60ms)}
+body.mo-portal .grid>.card{animation:mo-rise .55s var(--mo-spring) backwards;animation-delay:calc(var(--mo-i,0)*60ms)}
 @keyframes mo-rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
-@media (hover:hover){body.mo-portal .grid>.card{transition:transform .3s var(--mo-spring),box-shadow .3s}
-  body.mo-portal .grid>.card:hover{transform:translateY(-4px)}}
-body.mo-portal .grid>.card:active{transform:scale(.97)}
+@media (hover:hover){body.mo-portal .grid>.card{transition:translate .3s var(--mo-spring),box-shadow .3s}
+  body.mo-portal .grid>.card:hover{translate:0 -4px}}
+body.mo-portal .grid>.card:active{scale:.97}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
