@@ -1,0 +1,49 @@
+/* ===== 共用按鈕動效（只改外觀，不碰頁面邏輯）===== */
+:root{--mo-spring:cubic-bezier(.34,1.45,.5,1)}
+
+/* 1. 按下回饋＋滑鼠移上去微微浮起 */
+button:not(:disabled),[role=button],a.btn,.btn{-webkit-tap-highlight-color:transparent;transition:transform .18s var(--mo-spring),box-shadow .2s,background-color .2s,color .2s,opacity .2s}
+button:not(:disabled):active,[role=button]:active,a.btn:active,.btn:active{transform:scale(.95)}
+@media (hover:hover){
+  button:not(:disabled):not(.on):not(.active):hover,a.btn:hover,.btn:hover{transform:translateY(-1px)}
+  button:not(:disabled):not(.on):not(.active):hover:active,a.btn:hover:active,.btn:hover:active{transform:scale(.95)}
+}
+
+/* 2. 水波 */
+.mo-rip{position:absolute;inset:0;overflow:hidden;border-radius:inherit;pointer-events:none}
+.mo-rip i{position:absolute;border-radius:50%;background:currentColor;opacity:.22;transform:scale(0);animation:mo-ripple .6s ease-out forwards}
+@keyframes mo-ripple{to{transform:scale(1);opacity:0}}
+
+/* 3. 送出：轉圈 → 打勾 / 失敗搖一下 */
+.mo-busy,.mo-done{pointer-events:none;color:transparent!important}
+.mo-busy>*,.mo-done>*:not(.mo-rip){opacity:0!important}
+.mo-busy::after,.mo-done::after{content:"";position:absolute;left:50%;top:50%;box-sizing:border-box}
+.mo-busy::after{width:1.15em;height:1.15em;margin:-.58em 0 0 -.58em;border:2px solid var(--mo-fg,#fff);border-right-color:transparent;border-radius:50%;animation:mo-spin .7s linear infinite}
+.mo-done::after{width:.5em;height:.95em;margin:-.62em 0 0 -.22em;border:solid var(--mo-fg,#fff);border-width:0 2.6px 2.6px 0;transform:rotate(45deg);animation:mo-pop .4s var(--mo-spring)}
+.mo-fail{animation:mo-shake .4s}
+@keyframes mo-spin{to{transform:rotate(360deg)}}
+@keyframes mo-pop{from{transform:rotate(45deg) scale(0)}to{transform:rotate(45deg) scale(1)}}
+@keyframes mo-shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+/* 4. 頂端載入細線 */
+#mo-bar{position:fixed;left:0;top:0;height:3px;width:100%;z-index:2147483000;pointer-events:none;
+  background:linear-gradient(90deg,#14563F,#6fb08d,#B65B16);transform-origin:left;transform:scaleX(0);opacity:0;
+  transition:transform .4s ease-out,opacity .3s .15s}
+#mo-bar.on{opacity:1;transform:scaleX(.7);transition:transform 8s cubic-bezier(.1,.6,.2,1),opacity .1s}
+#mo-bar.end{opacity:0;transform:scaleX(1)}
+
+/* 5. 分頁：滑動的選取膠囊 */
+.mo-seg{position:relative}
+.mo-seg>.mo-pill{position:absolute;left:0;top:0;z-index:0;pointer-events:none;transition:transform .5s var(--mo-spring),width .5s var(--mo-spring),height .5s var(--mo-spring),opacity .2s}
+.mo-seg>.mo-b{position:relative;z-index:1;transition:color .2s .12s,transform .18s var(--mo-spring);background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important}
+
+/* 6. 入口卡片：依序浮現＋選到時浮起 */
+body.mo-portal .grid>.card{animation:mo-rise .55s var(--mo-spring) both;animation-delay:calc(var(--mo-i,0)*60ms)}
+@keyframes mo-rise{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+@media (hover:hover){body.mo-portal .grid>.card{transition:transform .3s var(--mo-spring),box-shadow .3s}
+  body.mo-portal .grid>.card:hover{transform:translateY(-4px)}}
+body.mo-portal .grid>.card:active{transform:scale(.97)}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-delay:0s!important;transition-duration:.01ms!important}
+}
