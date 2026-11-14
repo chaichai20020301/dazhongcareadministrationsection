@@ -550,7 +550,7 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
   class Component extends DCLogic {
     componentDidMount() {
       const P = this.props;
-      const SCRIPT_URL = P.scriptUrl || "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
+      const SCRIPT_URL = P.scriptUrl || "https://script.google.com/macros/s/AKfycbzMxFb3j1Ld869bOCKBxcX2DrkbrnQed3KFoP7sNJA7Nh9OtlqphKBi1mkK3D-IsbZs/exec";
       let staffPwd = "";   // 過渡期：舊通行碼（handover_code）
       let authToken = "";  // 入口認證 token（token 模式）
       // 統一員工 API：token 模式走 POST(body 帶 token)，過渡期走 GET(?pwd=)；unauthorized→回入口，forbidden→權限不足
@@ -1457,7 +1457,7 @@ input:focus,select:focus,textarea:focus{border-color:#14563F!important;box-shado
     renderVals() { return {}; }
   }
   var app = new Component();
-  var SCRIPT_URL_GATE = "https://script.google.com/macros/s/AKfycbxstYtZTFyuC0ChLh1KtJSRj4sH7w0xUHPaecI9xTvbeVDiqo73xOau7FNwyw0aTKag/exec";
+  var SCRIPT_URL_GATE = "https://script.google.com/macros/s/AKfycbzMxFb3j1Ld869bOCKBxcX2DrkbrnQed3KFoP7sNJA7Nh9OtlqphKBi1mkK3D-IsbZs/exec";
   function gateNotice(msg){
     document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#FAF8EF;font-family:\'Noto Sans TC\',system-ui,sans-serif"><div style="max-width:380px;width:100%;background:#FFFDF8;border:1px solid #E3E5D8;border-radius:8px;padding:30px;text-align:center;box-shadow:0 6px 26px rgba(79,140,58,.1)"><div style="font:700 18px/1.8 \'Noto Serif TC\';color:#A63124">'+msg+'</div><a href="../index.html" style="display:inline-block;margin-top:18px;padding:12px 24px;background:#14563F;color:#fff;border-radius:20px;font:700 14px \'Noto Sans TC\';text-decoration:none">返回入口網站</a></div></div>';
   }
