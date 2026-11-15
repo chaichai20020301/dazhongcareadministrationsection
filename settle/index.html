@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>結帳管理 · 線東大眾護理之家</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--green:#14563F;--green-d:#0E4231;--ink:#092F25;--muted:#4D695A;--paper:#FAF8EF;--card:#FFFDF8;--line:#E3E5D8;--red:#A63124;--orange:#B65B16;--teal:#27675F;--teal-d:#1D5049;
+  --g-soft:#EAF3DC;--g-line:#B5CDA2;--o-soft:#FFF0D7;--o-line:#EDC58D;--r-soft:#FBE9E5;--r-line:#E6C9C4;--t-soft:#E6F1EE;--t-line:#AACAC2}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+body{padding-top:64px}
+body::after{content:"";position:fixed;right:0;bottom:70px;width:100px;height:100px;background:url(../kiosk/img/n-c-br.webp) right bottom/contain no-repeat;pointer-events:none;z-index:0}
+main{position:relative;z-index:1;max-width:1320px;margin:0 auto;padding:16px 24px 130px}
+[hidden]{display:none!important}
+.v-topbar{position:fixed;top:0;left:0;right:0;height:64px;z-index:100;display:flex;align-items:center;gap:14px;padding:0 20px;background:rgba(250,248,239,.96);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid #E6E7D9}
+.v-back{flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:var(--teal);color:#fff!important;border-radius:999px;font:700 14px/1 'Noto Sans TC',system-ui,sans-serif;text-decoration:none}
+.v-tb-logo{height:40px;width:auto;flex:none}
+.v-tb-title{font:900 19px 'Noto Serif TC',serif;color:var(--teal-d);border-left:1px solid #B3BDB0;padding-left:14px;white-space:nowrap}
+.v-user{display:none;margin-left:auto;align-items:center;gap:8px;padding:4px 14px 4px 5px;background:rgba(255,255,255,.75);border:1px solid #DEDFD1;border-radius:999px;font:500 13.5px 'Noto Sans TC';white-space:nowrap}
+.v-user b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--teal);color:#fff;font-size:14px}
+.ico{display:inline-block;flex:none;width:1.15em;height:1.15em;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat;vertical-align:-.2em;margin-right:5px}
+.ico.r{margin:0 0 0 5px}.ico.only{margin:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;padding:10px 20px;font-weight:700;font-size:14.5px;cursor:pointer;white-space:nowrap}
+.btn.main{background:var(--teal);color:#fff;box-shadow:0 3px 8px rgba(39,103,95,.25)}.btn.main:hover{background:var(--teal-d)}
+.btn.sec{background:var(--card);color:var(--teal-d);border:1.5px solid var(--t-line)}.btn.sec:hover{background:var(--t-soft)}
+.btn.warn{background:var(--card);color:var(--red);border:1.5px solid var(--r-line)}
+.btn.sm{padding:6px 13px;font-size:13px}
+.btn:disabled{opacity:.45;cursor:default;box-shadow:none}
+.banner{position:relative;overflow:hidden;isolation:isolate;display:flex;align-items:center;min-height:96px;margin-bottom:14px;padding:16px 24px 16px 100px;background:#EAF2EE;border-radius:22px;box-shadow:0 6px 15px rgba(39,103,95,.12)}
+.banner img{position:absolute;left:0;top:0;height:100%;opacity:.85;pointer-events:none;z-index:-1}
+h1{margin:0 0 4px;font:900 26px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
+.sub{margin:0;font-size:13.5px;color:var(--muted);line-height:1.6}
+.msg{min-height:20px;margin:4px 2px 6px;font-size:13.5px;font-weight:700}.msg.ok{color:var(--green)}.msg.err{color:var(--red)}
+
+/* 日期列 */
+.datebar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;padding:10px 14px;background:var(--card);border:1.5px solid var(--t-line);border-radius:18px}
+.datebar .big{flex:1 1 150px;font:900 20px 'Noto Serif TC',serif;color:var(--teal-d);min-width:0}
+.datebar .big small{display:block;font:500 12.5px 'Noto Sans TC';color:var(--muted);margin-top:2px}
+.datebar .sp{flex:1 1 0;min-width:0}
+@media (max-width:640px){.datebar .sp{display:none}.datebar .big{font-size:18px}}
+.datebar input[type=date]{padding:8px 10px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:15px;background:#fff;color:var(--ink)}
+.tag{display:inline-block;padding:1px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--t-soft);color:var(--teal-d);margin-left:6px}
+.tag.org{background:var(--o-soft);color:#8A4A12}.tag.gray{background:#EEF0EA;color:#5a6a60}
+
+/* 版面 */
+.cols{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+@media (min-width:1100px){.cols{grid-template-columns:1fr 1fr}}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--card);border:1.5px solid var(--t-line);border-radius:20px;padding:14px 16px 12px;box-shadow:0 3px 10px rgba(39,103,95,.06)}
+.card.warnc{border-color:var(--o-line)}
+.card h2{margin:0 0 8px;font:900 18px 'Noto Serif TC',serif;color:var(--teal-d);display:flex;align-items:center;gap:6px}
+.card h3{margin:12px 0 6px;font:700 14px 'Noto Sans TC';color:var(--muted)}
+.card h2 .hint{font:500 12px 'Noto Sans TC';color:var(--muted);margin-left:auto}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1fr 130px 36px;gap:8px;align-items:center}
+.row input{width:100%;padding:9px 11px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:#fff;color:var(--ink);min-width:0}
+.row input:focus{outline:none;border-color:var(--teal)}
+.row input.amt{text-align:right;font-variant-numeric:tabular-nums}
+.row input.bad{border-color:var(--red);background:var(--r-soft)}
+.row .del{width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:#8a9a90;cursor:pointer;display:grid;place-items:center}
+.row .del:hover{background:var(--r-soft);color:var(--red)}
+.row.fixed{grid-template-columns:1fr 130px 36px;padding:6px 0 8px;border-bottom:1px dashed var(--line);margin-bottom:4px}
+.fixed .lab{font-weight:700;font-size:15px;display:flex;align-items:center;flex-wrap:wrap;gap:4px}
+.fixed .val{text-align:right;font-weight:900;font-size:17px;font-variant-numeric:tabular-nums}
+.addrow{margin-top:8px}
+.sumline{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:10px;padding-top:8px;border-top:2px solid var(--t-line);font-weight:700}
+.sumline b{font:900 18px 'Noto Serif TC',serif;font-variant-numeric:tabular-nums}
+.sumline.sub2{border-top:1px dashed var(--line);margin-top:4px;padding-top:4px;font-weight:500;color:var(--muted)}
+.sumline.sub2 b{font:700 15px 'Noto Sans TC'}
+.neg{color:var(--red)}
+.big2{margin-top:10px;padding:10px 14px;border-radius:14px;background:var(--t-soft);display:flex;justify-content:space-between;align-items:baseline;font-weight:700}
+.big2 b{font:900 22px 'Noto Serif TC',serif;font-variant-numeric:tabular-nums}
+.big2.low{background:var(--o-soft);color:#8A4A12}
+.alert{margin-top:8px;padding:9px 13px;border-radius:12px;background:var(--o-soft);border:1.5px solid var(--o-line);color:#8A4A12;font-weight:700;font-size:14px}
+.link{border:0;background:none;color:var(--teal);font-weight:700;font-size:13px;cursor:pointer;text-decoration:underline;padding:2px 4px}
+.inl{display:inline-flex;align-items:center;gap:6px}
+.inl input{width:120px;padding:6px 9px;border:1.5px solid #D3D8C8;border-radius:10px;font-size:15px;text-align:right}
+
+/* 底部列 */
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:90;background:rgba(255,253,248,.97);border-top:1.5px solid var(--t-line);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.bar>div{max-width:1320px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.bar .bal{font-weight:700;font-size:14px;color:var(--muted)}
+.bar .bal b{display:block;font:900 22px/1.1 'Noto Serif TC',serif;color:var(--teal-d);font-variant-numeric:tabular-nums}
+.bar .bal.low b{color:var(--orange)}
+.bar .st{flex:1;font-size:13.5px;font-weight:700;color:var(--muted);min-width:120px}
+.bar .st.dirty{color:var(--orange)}.bar .st.ok{color:var(--green)}.bar .st.err{color:var(--red)}
+
+.empty{text-align:center;padding:30px 10px;color:var(--muted);font-size:14.5px;line-height:1.8}
+.modal{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(9,47,37,.45)}
+.box{background:var(--card);border-radius:22px;width:100%;max-width:460px;max-height:92vh;overflow:auto;padding:20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.box h2{margin:0 0 10px;font:900 20px 'Noto Serif TC',serif}
+.box p{margin:0 0 12px;font-size:14.5px;line-height:1.7;color:var(--muted)}
+.foot{display:flex;gap:10px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+
+@media (max-width:640px){
+  main{padding:12px 12px 150px}body{padding-top:56px}.v-topbar{height:56px;padding:0 12px;gap:10px}
+  .v-tb-logo,.v-user span{display:none}.v-user{padding:3px}.v-tb-title{font-size:17px}body::after{display:none}
+  .banner{padding:12px 14px 12px 56px;min-height:0}h1{font-size:21px}.sub{display:none}
+  .card{padding:12px 12px 10px}
+  .row{grid-template-columns:1fr 104px 32px}.row.fixed{grid-template-columns:1fr 104px 32px}
+  .bar>div{padding:8px 12px;gap:10px}.bar .btn{flex:none}
+  .modal{align-items:flex-end;padding:0}.box{border-radius:22px 22px 0 0;max-width:none}
+  .foot .btn{flex:1}
+  .datebar{gap:8px}
+}
+textarea.notes{width:100%;min-height:96px;padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;background:#fff;color:var(--ink);resize:vertical;line-height:1.6}
+textarea.notes:focus{outline:none;border-color:var(--teal)}
+.locked .addrow,.locked .del,.locked #openEdit{display:none!important}
+.locked .row input,.locked textarea.notes{background:#F4F3EA;border-color:#E3E5D8;color:#3a4f44}
+.tag.red{background:var(--r-soft);color:var(--red)}.tag.ok{background:var(--g-soft);color:var(--green-d)}
+.warnbox{margin-bottom:14px;padding:11px 15px;border-radius:14px;background:var(--o-soft);border:1.5px solid var(--o-line);color:#8A4A12;font-weight:700;font-size:14px;line-height:1.7}
+.empty2{text-align:center;padding:34px 18px;background:var(--card);border:1.5px dashed var(--t-line);border-radius:20px;color:var(--muted);line-height:1.9;font-size:15px}
+.empty2 b{color:var(--ink)}
+.empty2 .btn{margin-top:12px}
+.box ul{margin:6px 0 12px;padding-left:20px;font-size:14.5px;line-height:1.7;color:var(--ink)}
+.box textarea{width:100%;min-height:72px;padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;resize:vertical}
+@media print{.v-topbar,.bar,.datebar .btn{display:none}}
+</style>
+</head>
+<body>
+<div class="v-topbar"><a class="v-back" href="../index.html">&larr; 入口網站</a><img class="v-tb-logo" src="../portal-img/logo.png" alt="線東大眾護理之家"><span class="v-tb-title">結帳管理</span><span class="v-user" id="v-user"><b></b><span></span></span></div>
+<main>
+  <div class="banner"><img src="../kiosk/img/n-g-l.webp" alt="">
+    <div><h1>結帳管理</h1><p class="sub">每天的現金收支、零用金、未結單據、住民匯款都記在這裡。存入銀行與零用金餘額會自動算，昨日餘額自動接上。</p></div></div>
+  <div class="msg" id="msg"></div>
+
+  <div id="app" hidden>
+    <div class="datebar">
+      <button class="btn sec sm" id="dPrev" title="前一天"><span class="ico only" style="--ico:url(../assets/common/icon-chevron.webp);transform:rotate(90deg)"></span></button>
+      <div class="big" id="dText"></div>
+      <button class="btn sec sm" id="dNext" title="後一天"><span class="ico only" style="--ico:url(../assets/common/icon-chevron.webp);transform:rotate(-90deg)"></span></button>
+      <input type="date" id="dPick" aria-label="選日期">
+      <button class="btn sec sm" id="dToday">今天</button>
+      <span class="sp"></span>
+      <button class="btn sec sm" id="btnRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
+    </div>
+
+    <div class="warnbox" id="warnBox" hidden></div>
+    <div class="empty2" id="emptyDay" hidden></div>
+    <div class="cols" id="dayBody">
+      <div class="col">
+        <section class="card" id="cCash">
+          <h2>現金收支 <span class="hint">當日收到的現金</span></h2>
+          <h3 style="margin-top:0">收入</h3>
+          <div class="rows" id="rows-cashIn"></div>
+          <button class="btn sec sm addrow" data-add="cashIn"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增收入</button>
+          <div class="sumline"><span>收入合計</span><b id="t-cashIn"></b></div>
+
+          <h3>支出</h3>
+          <div class="row fixed"><div class="lab">現金存入銀行 <span class="tag gray">自動（試算表公式）</span></div>
+            <div class="val" id="depVal"></div><span></span></div>
+          <div class="rows" id="rows-cashOut"></div>
+          <button class="btn sec sm addrow" data-add="cashOut"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增其他支出</button>
+          <div class="sumline"><span>支出合計</span><b id="t-cashOut"></b></div>
+          <div class="sumline sub2"><span>今日現金結餘（轉入零用金）</span><b id="t-transfer"></b></div>
+        </section>
+
+        <section class="card" id="cPetty">
+          <h2>零用金 <span class="hint">門市小額支出</span></h2>
+          <div class="sumline sub2" style="border:0;margin:0 0 4px;padding:0"><span>昨日可用餘額 <button class="link" id="openEdit" hidden>修改</button></span><b id="t-open"></b></div>
+          <div id="openNote" class="alert" hidden></div>
+          <h3>收入</h3>
+          <div class="row fixed"><div class="lab">入零用金 <span class="tag gray">自動</span></div><div class="val" id="v-transfer"></div><span></span></div>
+          <div class="rows" id="rows-pettyIn"></div>
+          <button class="btn sec sm addrow" data-add="pettyIn"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增收入（資源回收、撥補…）</button>
+          <h3>支出</h3>
+          <div class="rows" id="rows-pettyOut"></div>
+          <button class="btn sec sm addrow" data-add="pettyOut"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增支出</button>
+          <div class="sumline"><span>收入合計 (A)</span><b id="t-pettyIn"></b></div>
+          <div class="sumline sub2"><span>支出合計 (B)</span><b id="t-pettyOut"></b></div>
+          <div class="sumline sub2"><span>今日收支 (A－B)</span><b id="t-net"></b></div>
+          <div class="big2" id="endBox"><span>零用金餘額</span><b id="t-end"></b></div>
+          <div class="alert" id="lowMsg" hidden></div>
+        </section>
+      </div>
+
+      <div class="col">
+        <section class="card">
+          <h2>未結單據 <span class="hint">已買、還沒付款的單據</span></h2>
+          <div class="rows" id="rows-bill"></div>
+          <button class="btn sec sm addrow" data-add="bill"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增單據</button>
+          <div class="sumline"><span>合計</span><b id="t-bill"></b></div>
+        </section>
+        <section class="card">
+          <h2>住民匯款明細 <span class="hint">新光銀行三民分行（退款可填負數）</span></h2>
+          <div class="rows" id="rows-remit"></div>
+          <button class="btn sec sm addrow" data-add="remit"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增匯款</button>
+          <div class="sumline"><span>合計</span><b id="t-remit"></b></div>
+          <h3>備註（還沒結束的特殊事項）</h3>
+          <textarea class="notes" id="notes" maxlength="1000" placeholder="自由填寫，會寫進日報表右下角的備註欄"></textarea>
+        </section>
+      </div>
+    </div>
+  </div>
+  <div id="denied" class="empty" hidden>只有主管、行政可以使用結帳管理。</div>
+</main>
+
+<div class="bar" id="bar" hidden><div>
+  <div class="bal" id="barBal">零用金餘額<b id="b-end"></b></div>
+  <div class="st" id="st"></div>
+  <button class="btn sec" id="btnPrint" hidden><span class="ico" style="--ico:url(../assets/common/icon-print.webp)"></span>列印</button>
+  <button class="btn sec" id="btnReopen" hidden><span class="ico" style="--ico:url(../assets/common/icon-lock.webp)"></span>解鎖</button>
+  <button class="btn sec" id="btnClose" hidden><span class="ico" style="--ico:url(../assets/common/icon-lock.webp)"></span>結帳</button>
+  <button class="btn main" id="btnSave" disabled><span class="ico" style="--ico:url(../assets/common/icon-check.webp)"></span>儲存</button>
+</div></div>
+<div id="modalHost"></div>
+<datalist id="dl-cashIn"></datalist><datalist id="dl-pettyIn"></datalist><datalist id="dl-pettyOut"></datalist><datalist id="dl-bill"></datalist>
+
+<script>
+var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwya0kB7XgSN-_Hum-mZoKK7Ps6bf0AETvfmCOVOAm2qaG1PI1FKMklz92u6b4vXCYa/exec";   // 結帳管理後端（Apps Script /exec 網址）
+var $ = function(id){ return document.getElementById(id); };
+var ROLE_NAME = { manager:"主管", admin:"行政", nurseadmin:"護理行政", nurse:"護理", care:"照服" };
+var WD = ["日","一","二","三","四","五","六"];
+var BLOCKS = ["cashIn","cashOut","pettyIn","pettyOut","bill","remit"];
+var PLACE = { cashIn:"誰：什麼費用（例：王小明：11月照護費）", cashOut:"支出內容", pettyIn:"例：資源回收、零用金撥補", pettyOut:"例：王小明：彰基皮膚部", bill:"廠商（品項）", remit:"誰：什麼費用" };
+var ERR = { forbidden:"這個動作你的身份不能使用。", invalid:"資料格式不對，請檢查金額與日期。", busy:"系統忙碌中，請稍後再試。", "unknown action":"後端還沒更新成新版本，請通知管理員。",
+  no_file:"找不到這個月的日報表檔案，也沒辦法自動建立（只能提前開下個月）。", no_template:"這個月的檔案裡沒有任何一天可以當範本，請通知管理員。", exists:"這一天已經開過了。",
+  layout:"日報表的版面跟系統預期的不一樣，請通知管理員（不會動到你的資料）。", locked:"這一天已經結帳，不能再修改。主管可以解鎖。", not_found:"找不到這一天的分頁。",
+  "bad request":"後端發生錯誤，請把括號裡的文字告訴管理員。", pdf_failed:"產生列印檔失敗，請稍後再試。", not_closed:"這一天不是已結帳狀態。" };
+var S = { date:"", day:null, rows:{}, notes:"", open:0, openTouched:false, editOpen:false, dirty:false, settings:{pettyWarn:15000}, role:"", saving:false, locked:false, today:"" };
+
+function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
+function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function kick(){ try{ localStorage.removeItem("portal_token"); localStorage.removeItem("portal_exp"); }catch(e){} location.replace("../index.html"); }
+function say(t, ok){ var e=$("msg"); e.textContent=t||""; e.className="msg "+(ok?"ok":"err"); if(ok) setTimeout(function(){ if(e.textContent===t) e.textContent=""; }, 4000); }
+function errText(j){ var t=ERR[j && j.error]||"操作失敗，請稍後再試。"; return (j&&j.detail&&(j.error==="layout"||j.error==="bad request"))? t+"（"+j.detail+"）" : t; }
+function api(action, args, ms){
+  var t = token(); if(!t){ kick(); return Promise.reject(new Error("unauthorized")); }
+  if(!SCRIPT_URL){ return Promise.reject(new Error("nourl")); }
+  var p = { action:action, token:t }; for(var k in (args||{})) p[k] = args[k];
+  var ctl = new AbortController(), timer = setTimeout(function(){ ctl.abort(); }, ms||60000);
+  return fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p),signal:ctl.signal}).then(function(r){ return r.json(); })
+    .then(function(j){ clearTimeout(timer); if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; })
+    .catch(function(e){ clearTimeout(timer); throw e; });
+}
+function netFail(e){ if(e.message==="unauthorized") return; say(e.message==="nourl" ? "結帳管理後端還沒設定網址，請通知管理員。" : (e.name==="AbortError" ? "等太久了，請檢查網路後再試一次。" : "連線失敗，請檢查網路後再試一次。")); }
+
+/* ===== 數字與日期 ===== */
+function fmt(n){ n=Math.round(Number(n)||0); return (n<0?"-":"")+Math.abs(n).toLocaleString("en-US"); }
+function num(s){ var t=String(s==null?"":s).replace(/[,，\s]/g,"").replace(/[＋]/g,"+").replace(/[－−]/g,"-"); if(t==="") return 0; return /^[+-]?\d+(\.\d+)?$/.test(t) ? Number(t) : NaN; }
+function pad(n){ return (n<10?"0":"")+n; }
+function ds(d){ return d.getFullYear()+"/"+pad(d.getMonth()+1)+"/"+pad(d.getDate()); }
+function parseD(s){ var p=s.split("/").map(Number); return new Date(p[0],p[1]-1,p[2]); }
+function addDays(s,n){ var d=parseD(s); d.setDate(d.getDate()+n); return ds(d); }
+function dateText(s){ var d=parseD(s); return "民國"+(d.getFullYear()-1911)+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日（"+WD[d.getDay()]+"）"; }
+
+/* ===== 計算（跟試算表公式、後端 calc_ 同一套規則）===== */
+function calc(){
+  var s={}; BLOCKS.forEach(function(b){ s[b]=0; S.rows[b].forEach(function(r){ var a=num(r.amount); if(a===a) s[b]+=a; }); });
+  var rest=s.cashIn-s.cashOut, deposit = rest>1000 ? Math.floor(rest/1000)*1000 : 0;
+  var cashOut=s.cashOut+deposit, transfer=s.cashIn-cashOut, pin=transfer+s.pettyIn, net=pin-s.pettyOut, end=S.open+net;
+  return { cashIn:s.cashIn, cashOut:cashOut, deposit:deposit, transfer:transfer, pettyIn:pin, pettyOut:s.pettyOut, net:net, end:end, low:end<S.settings.pettyWarn, bill:s.bill, remit:s.remit };
+}
+
+/* ===== 畫面 ===== */
+function rowHTML(b, r, i){
+  var ro = S.locked ? " readonly" : "";
+  return '<div class="row" data-b="'+b+'" data-i="'+i+'"><input class="tx" type="text" list="dl-'+b+'" maxlength="80" placeholder="'+(S.locked?"":esc(PLACE[b]))+'" value="'+esc(r.text)+'" autocomplete="off"'+ro+'>'
+    +'<input class="amt" type="text" inputmode="decimal" placeholder="'+(S.locked?"":"金額")+'" value="'+esc(r.amount)+'" autocomplete="off"'+ro+'>'
+    +'<button class="del" title="刪除這一列" aria-label="刪除這一列"><span class="ico only" style="--ico:url(../assets/common/icon-trash.webp)"></span></button></div>';
+}
+function paintRows(b){
+  var h=""; S.rows[b].forEach(function(r,i){ h+=rowHTML(b,r,i); });
+  $("rows-"+b).innerHTML = h || (S.locked ? '<div class="sub">（沒有）</div>' : "");
+}
+function paintAll(){ BLOCKS.forEach(paintRows); paintTotals(); }
+function paintTotals(){
+  var c=calc(), d=S.day;
+  $("t-cashIn").textContent=fmt(c.cashIn); $("t-cashOut").textContent=fmt(c.cashOut); $("t-transfer").textContent=fmt(c.transfer);
+  $("depVal").textContent=fmt(c.deposit); $("v-transfer").textContent=fmt(c.transfer);
+  if(!S.editOpen) $("t-open").textContent=fmt(S.open);
+  $("t-pettyIn").textContent=fmt(c.pettyIn); $("t-pettyOut").textContent=fmt(c.pettyOut);
+  var n=$("t-net"); n.textContent=fmt(c.net); n.className=c.net<0?"neg":"";
+  $("t-end").textContent=fmt(c.end); $("b-end").textContent=fmt(c.end);
+  $("endBox").className="big2"+(c.low?" low":""); $("barBal").className="bal"+(c.low?" low":"");
+  var lm=$("lowMsg"); lm.hidden=!c.low; if(c.low) lm.textContent="零用金不足 "+fmt(S.settings.pettyWarn)+"，請申請零用金。";
+  $("t-bill").textContent=fmt(c.bill); $("t-remit").textContent=fmt(c.remit);
+  var oe=$("openEdit"); oe.hidden=!(d && d.canSetOpen) || S.locked; oe.textContent=S.editOpen?"完成":"修改";
+  if(S.editOpen && !$("openIn")){ $("t-open").innerHTML='<span class="inl"><input id="openIn" type="text" inputmode="numeric" value="'+esc(S.open)+'"></span>'; }
+}
+function paintHead(){
+  var d=S.day, tag="";
+  if(!d.exists) tag='<span class="tag org">還沒開</span>';
+  else if(d.status!=="draft") tag='<span class="tag ok">已結帳</span>';
+  $("dText").innerHTML=esc(dateText(S.date))+tag+'<small>'+(d.exists ? esc(d.tab?("試算表分頁「"+d.tab+"」"):"") : "這天的日報表還沒開")+'</small>';
+  $("dPick").value=S.date.replace(/\//g,"-");
+}
+function paintBar(){
+  var d=S.day, ex=d&&d.exists;
+  $("btnSave").hidden=!ex||S.locked; $("btnClose").hidden=!ex||S.locked; $("btnPrint").hidden=!ex; $("btnReopen").hidden=!(ex&&S.locked&&d.canReopen);
+  $("btnClose").disabled=S.dirty||S.saving; $("btnClose").title=S.dirty?"請先儲存":"";
+  $("bar").hidden=!ex;
+}
+function setDirty(v){
+  S.dirty=!!v; var st=$("st"), b=$("btnSave"), d=S.day;
+  b.disabled=!S.dirty||S.saving; $("btnClose").disabled=S.dirty||S.saving; $("btnClose").title=S.dirty?"請先儲存":"";
+  if(!d||!d.exists){ st.textContent=""; st.className="st"; return; }
+  if(S.locked){ st.textContent="已結帳，不能再修改"; st.className="st ok"; }
+  else if(S.dirty){ st.textContent="有尚未儲存的修改"; st.className="st dirty"; }
+  else { st.textContent="與試算表同步"; st.className="st"; }
+}
+
+/* ===== 載入 ===== */
+function applyDay(day){
+  S.day=day; S.date=day.date; S.locked=day.exists && day.status!=="draft";
+  S.editOpen=false; S.openTouched=false; S.dirty=false;
+  paintHead();
+  var wb=$("warnBox"); var w=(day.warnings||[]); wb.hidden=!w.length; wb.innerHTML=w.map(esc).join("<br>");
+  $("app").classList.toggle("locked", S.locked);
+  if(!day.exists){
+    $("dayBody").hidden=true; var e=$("emptyDay"); e.hidden=false;
+    var prev = day.prevEnd!=null ? '昨日可用餘額會自動接上前一天（'+esc(day.prevDate)+'）的零用金餘額 <b>'+fmt(day.prevEnd)+'</b>。' : '前面還沒有任何一天，開好後請自己填昨日可用餘額。';
+    e.innerHTML='<div><b>'+esc(dateText(day.date))+'</b> 的日報表還沒開。</div><div>'+prev+'</div>'
+      +(day.fileFound?'':'<div>這個月的日報表檔案也還沒有，按下去會一起自動建立（複製上個月的檔案）。</div>')
+      +'<button class="btn main" id="btnCreate">開新的一天</button>';
+    $("btnCreate").onclick=createDay;
+    S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=[]; });
+    paintBar(); setDirty(false); return;
+  }
+  $("emptyDay").hidden=true; $("dayBody").hidden=false;
+  S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=(day.items[b]||[]).map(function(it){ return {text:it.text, amount:(it.amount===0&&!it.text)?"":String(it.amount)}; }); if(!S.locked) S.rows[b].push({text:"",amount:""}); });
+  S.notes=day.notes||""; $("notes").value=S.notes; $("notes").readOnly=S.locked;
+  S.open=day.open;
+  paintAll(); paintBar(); setDirty(false);
+}
+function load(date){
+  say("");
+  return api("day.get",{date:date}).then(function(j){
+    if(!j||!j.ok){ say(errText(j)); return; }
+    $("app").hidden=false; applyDay(j.day);
+  }).catch(netFail);
+}
+function go(date){
+  if(!date||date===S.date) return;
+  if(S.dirty){ ask("這天有尚未儲存的修改","離開的話，剛剛打的內容會不見。","放棄修改並離開","留在這裡",function(){ S.dirty=false; load(date); }); return; }
+  load(date);
+}
+function ask(title,text,yes,no,onYes,extraHTML){
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box"><h2>'+esc(title)+'</h2><p>'+esc(text)+'</p>'+(extraHTML||"")+'<div class="foot"><button class="btn sec" id="mNo">'+esc(no)+'</button><button class="btn main" id="mYes">'+esc(yes)+'</button></div></div></div>';
+  $("mNo").onclick=function(){ h.innerHTML=""; }; $("mYes").onclick=function(){ onYes(); };
+}
+function closeModal(){ $("modalHost").innerHTML=""; }
+
+/* ===== 開新的一天 ===== */
+function createDay(){
+  var b=$("btnCreate"); b.disabled=true; b.textContent="正在開新的一天…（需要幾秒，月初還要複製檔案）";
+  api("day.create",{date:S.date},120000).then(function(j){
+    if(j&&(j.ok||j.error==="exists")){ if(j.day) applyDay(j.day); say("已開好這一天。",true); return; }
+    b.disabled=false; b.textContent="開新的一天"; say(errText(j));
+  }).catch(function(e){ b.disabled=false; b.textContent="開新的一天"; netFail(e); });
+}
+
+/* ===== 儲存 ===== */
+function collect(){
+  var items={}, bad=false;
+  BLOCKS.forEach(function(b){
+    items[b]=[];
+    S.rows[b].forEach(function(r,i){
+      var t=String(r.text||"").trim(), a=String(r.amount||"").trim();
+      if(!t&&!a) return;
+      var n=num(a);
+      if(n!==n){ bad=true; var el=document.querySelector('.row[data-b="'+b+'"][data-i="'+i+'"] .amt'); if(el) el.classList.add("bad"); return; }
+      items[b].push({text:t,amount:a===""?"":n});
+    });
+  });
+  return bad ? null : items;
+}
+function save(forceVer){
+  if(S.saving||S.locked) return;
+  if(S.editOpen) finishOpen();
+  var items=collect();
+  if(!items){ say("有金額的格式不對（紅色欄位），請只填數字。"); return; }
+  var args={date:S.date,ver:forceVer||S.day.ver,items:items,notes:$("notes").value};
+  if(S.openTouched) args.open=S.open;
+  S.saving=true; $("btnSave").disabled=true; $("btnClose").disabled=true; $("st").textContent="寫入試算表中…"; $("st").className="st";
+  api("day.save",args).then(function(j){
+    S.saving=false;
+    if(j&&j.ok){ applyDay(j.day); say("已寫入試算表。",true); return; }
+    if(j&&j.error==="conflict"){ setDirty(true); conflict(j.day); return; }
+    if(j&&j.error==="locked"){ applyDay(j.day); say(errText(j)); return; }
+    setDirty(true); say(errText(j));
+  }).catch(function(e){ S.saving=false; setDirty(true); netFail(e); });
+}
+function conflict(latest){
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box"><h2>這天的內容剛剛被改過</h2><p>試算表上這一天在你開啟之後有變動（可能是別人從系統或直接在試算表改的）。要看最新的內容，還是用你現在打的蓋過去？</p><div class="foot"><button class="btn sec" id="mNew">載入最新版（我的修改會不見）</button><button class="btn warn" id="mOver">用我的覆蓋</button></div></div></div>';
+  $("mNew").onclick=function(){ closeModal(); applyDay(latest); };
+  $("mOver").onclick=function(){ closeModal(); save(latest.ver); };
+}
+function finishOpen(){
+  var el=$("openIn"); if(el){ var n=num(el.value); if(n===n){ S.open=Math.round(n); S.openTouched=true; setDirty(true); } }
+  S.editOpen=false; paintTotals();
+}
+
+/* ===== 列印、結帳、解鎖 ===== */
+function printDay(){
+  var b=$("btnPrint"); b.disabled=true; say("正在產生列印檔…",true);
+  api("day.pdf",{date:S.date},90000).then(function(j){
+    b.disabled=false;
+    if(!j||!j.ok){ say(errText(j)); return; }
+    var bin=atob(j.data), arr=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    var url=URL.createObjectURL(new Blob([arr],{type:"application/pdf"}));
+    var h=$("modalHost");
+    h.innerHTML='<div class="modal"><div class="box"><h2>列印檔準備好了</h2><p>按下「開啟」會在新分頁打開 PDF，再用瀏覽器的列印送去印表機。這是試算表原本的版面。</p><div class="foot"><button class="btn sec" id="mNo">關閉</button><a class="btn main" id="mYes" href="'+url+'" target="_blank" rel="noopener" style="text-decoration:none">開啟 PDF</a></div></div></div>';
+    $("mNo").onclick=closeModal; $("mYes").onclick=function(){ setTimeout(closeModal,300); };
+  }).catch(function(e){ b.disabled=false; netFail(e); });
+}
+function closeDay(){
+  if(S.dirty){ say("請先儲存，再結帳。"); return; }
+  var b=$("btnClose"); b.disabled=true;
+  api("day.close",{date:S.date,ver:S.day.ver,dry:true}).then(function(j){
+    b.disabled=false;
+    if(!j||!j.ok){ if(j&&j.day) applyDay(j.day); say(errText(j)); return; }
+    var list=j.problems.length ? '<p style="margin-bottom:4px;color:#8A4A12;font-weight:700">結帳前請先確認：</p><ul>'+j.problems.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join("")+'</ul>' : "";
+    ask("要結帳 "+dateText(S.date)+" 嗎？","結帳後這一天就鎖起來，不能再從系統修改，要改需要主管解鎖。通常是印出來給主管簽核後再結帳。","結帳（鎖定）","先不要",function(){
+      $("mYes").disabled=true;
+      api("day.close",{date:S.date,ver:S.day.ver,confirm:true}).then(function(r){
+        closeModal();
+        if(r&&r.ok){ applyDay(r.day); say("已結帳。",true); return; }
+        if(r&&r.day) applyDay(r.day); say(errText(r));
+      }).catch(function(e){ closeModal(); netFail(e); });
+    }, list);
+  }).catch(function(e){ b.disabled=false; netFail(e); });
+}
+function reopenDay(){
+  ask("解鎖 "+dateText(S.date),"解鎖後這一天可以再從系統修改。請寫下解鎖的原因（會留紀錄）。","解鎖","取消",function(){
+    var why=$("why").value.trim(); if(!why){ $("why").focus(); return; }
+    $("mYes").disabled=true;
+    api("day.reopen",{date:S.date,reason:why}).then(function(r){
+      closeModal();
+      if(r&&r.ok){ applyDay(r.day); say("已解鎖。",true); return; }
+      say(errText(r));
+    }).catch(function(e){ closeModal(); netFail(e); });
+  },'<textarea id="why" maxlength="100" placeholder="例：金額打錯了"></textarea>');
+}
+
+/* ===== 事件 ===== */
+function addRow(b){
+  if(S.locked) return;
+  S.rows[b].push({text:"",amount:""}); paintRows(b);
+  var rs=$("rows-"+b).querySelectorAll(".row"), last=rs[rs.length-1]; if(last) last.querySelector(".tx").focus();
+}
+function bind(){
+  document.addEventListener("input",function(ev){
+    var t=ev.target;
+    if(t.id==="notes"){ if(!S.locked){ setDirty(true); } return; }
+    var row=t.closest&&t.closest(".row[data-b]"); if(!row||S.locked) return;
+    var b=row.dataset.b, i=+row.dataset.i, r=S.rows[b][i]; if(!r) return;
+    if(t.classList.contains("tx")) r.text=t.value; else if(t.classList.contains("amt")){ r.amount=t.value; t.classList.remove("bad"); }
+    setDirty(true); paintTotals();
+  });
+  document.addEventListener("keydown",function(ev){
+    var t=ev.target; if(ev.key!=="Enter"||!t.closest) return;
+    if(t.id==="openIn"){ ev.preventDefault(); finishOpen(); return; }
+    var row=t.closest(".row[data-b]"); if(!row||S.locked) return;
+    ev.preventDefault();
+    if(t.classList.contains("tx")){ row.querySelector(".amt").focus(); return; }
+    var b=row.dataset.b, i=+row.dataset.i;
+    if(i===S.rows[b].length-1){ addRow(b); } else { var nx=row.nextElementSibling; if(nx) nx.querySelector(".tx").focus(); }
+  });
+  document.addEventListener("click",function(ev){
+    var t=ev.target.closest&&ev.target.closest("button"); if(!t) return;
+    if(t.dataset.add){ addRow(t.dataset.add); return; }
+    if(t.classList.contains("del")&&!S.locked){
+      var row=t.closest(".row"), b=row.dataset.b, i=+row.dataset.i;
+      S.rows[b].splice(i,1); if(!S.rows[b].length) S.rows[b].push({text:"",amount:""});
+      paintRows(b); setDirty(true); paintTotals(); return;
+    }
+  });
+  $("openEdit").onclick=function(){
+    if(S.editOpen){ finishOpen(); return; }
+    S.editOpen=true; paintTotals(); var e=$("openIn"); if(e){ e.focus(); e.select(); }
+  };
+  $("btnSave").onclick=function(){ save(); };
+  $("btnPrint").onclick=printDay; $("btnClose").onclick=closeDay; $("btnReopen").onclick=reopenDay;
+  $("btnRef").onclick=function(){ if(S.dirty){ ask("有尚未儲存的修改","重新整理會讓剛剛打的內容消失。","放棄並重新整理","留在這裡",function(){ closeModal(); S.dirty=false; load(S.date); }); } else load(S.date); };
+  $("dPrev").onclick=function(){ go(addDays(S.date,-1)); };
+  $("dNext").onclick=function(){ go(addDays(S.date,1)); };
+  $("dToday").onclick=function(){ go(S.today); };
+  $("dPick").onchange=function(){ if(this.value) go(this.value.replace(/-/g,"/")); };
+  window.addEventListener("beforeunload",function(e){ if(S.dirty){ e.preventDefault(); e.returnValue=""; } });
+}
+
+/* ===== 開機 ===== */
+(function boot(){
+  if(!token()){ kick(); return; }
+  var n=ls("handover_name"), r=ls("portal_role"), e=$("v-user");
+  S.role=r;
+  if(n){ e.children[0].textContent=n.trim().charAt(0); e.children[1].textContent=n+(ROLE_NAME[r]?" · "+ROLE_NAME[r]:""); e.style.display="flex"; }
+  bind();
+  api("bootstrap").then(function(j){
+    if(!j||!j.ok){ if(j&&j.error==="forbidden"){ $("denied").hidden=false; return; } say(errText(j)); return; }
+    S.settings=j.settings; S.today=j.today; S.role=j.role;
+    return load(j.today).then(function(){
+      api("hist").then(function(h){ if(h&&h.ok) ["cashIn","pettyIn","pettyOut","bill"].forEach(function(b){ $("dl-"+b).innerHTML=(h.hist[b]||[]).map(function(t){ return '<option value="'+esc(t)+'">'; }).join(""); }); }).catch(function(){});
+    });
+  }).catch(netFail);
+})();
+</script>
+</body>
+</html>
