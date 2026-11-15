@@ -49,8 +49,7 @@ h1{margin:0 0 4px;font:900 26px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
 .tag.org{background:var(--o-soft);color:#8A4A12}.tag.gray{background:#EEF0EA;color:#5a6a60}
 
 /* 版面 */
-.cols{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
-@media (min-width:1100px){.cols{grid-template-columns:1fr 1fr}}
+.cols{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;max-width:900px;margin:0 auto}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
 .card{background:var(--card);border:1.5px solid var(--t-line);border-radius:20px;padding:14px 16px 12px;box-shadow:0 3px 10px rgba(39,103,95,.06)}
 .card.warnc{border-color:var(--o-line)}
@@ -146,7 +145,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
     <div class="cols" id="dayBody">
       <div class="col">
         <section class="card" id="cCash">
-          <h2>現金收支 <span class="hint">當日收到的現金</span></h2>
+          <h2>現金收支</h2>
           <h3 style="margin-top:0">收入</h3>
           <div class="rows" id="rows-cashIn"></div>
           <button class="btn sec sm addrow" data-add="cashIn"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增收入</button>
@@ -162,7 +161,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
         </section>
 
         <section class="card" id="cPetty">
-          <h2>零用金 <span class="hint">門市小額支出</span></h2>
+          <h2>零用金</h2>
           <div class="sumline sub2" style="border:0;margin:0 0 4px;padding:0"><span>昨日可用餘額 <button class="link" id="openEdit" hidden>修改</button></span><b id="t-open"></b></div>
           <div id="openNote" class="alert" hidden></div>
           <h3>收入</h3>
@@ -182,13 +181,13 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
 
       <div class="col">
         <section class="card">
-          <h2>未結單據 <span class="hint">已買、還沒付款的單據</span></h2>
+          <h2>未結單據</h2>
           <div class="rows" id="rows-bill"></div>
           <button class="btn sec sm addrow" data-add="bill"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增單據</button>
           <div class="sumline"><span>合計</span><b id="t-bill"></b></div>
         </section>
         <section class="card">
-          <h2>住民匯款明細 <span class="hint">新光銀行三民分行（退款可填負數）</span></h2>
+          <h2>住民匯款明細 <span class="hint">退款可填負數</span></h2>
           <div class="rows" id="rows-remit"></div>
           <button class="btn sec sm addrow" data-add="remit"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增匯款</button>
           <div class="sumline"><span>合計</span><b id="t-remit"></b></div>
