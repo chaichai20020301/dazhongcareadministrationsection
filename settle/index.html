@@ -49,8 +49,13 @@ h1{margin:0 0 4px;font:900 26px/1.25 'Noto Serif TC',serif;letter-spacing:.03em}
 .tag.org{background:var(--o-soft);color:#8A4A12}.tag.gray{background:#EEF0EA;color:#5a6a60}
 
 /* 版面 */
-.cols{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;max-width:900px;margin:0 auto}
+.cols{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
 .col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.split{display:grid;grid-template-columns:1fr;gap:4px 28px;align-items:start}
+.half{min-width:0}
+@media (max-width:819px){.h3s{margin-top:12px}}
+@media (min-width:820px){.h3s{margin-top:0!important}}
+@media (min-width:820px){.split{grid-template-columns:1fr 1fr}.split .half:first-child{padding-right:0}.split .half+.half{border-left:1.5px dashed var(--t-line);padding-left:28px;margin-left:-14px}}
 .card{background:var(--card);border:1.5px solid var(--t-line);border-radius:20px;padding:14px 16px 12px;box-shadow:0 3px 10px rgba(39,103,95,.06)}
 .card.warnc{border-color:var(--o-line)}
 .card h2{margin:0 0 8px;font:900 18px 'Noto Serif TC',serif;color:var(--teal-d);display:flex;align-items:center;gap:6px}
@@ -146,17 +151,20 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
       <div class="col">
         <section class="card" id="cCash">
           <h2>現金收支</h2>
+          <div class="split"><div class="half">
           <h3 style="margin-top:0">收入</h3>
           <div class="rows" id="rows-cashIn"></div>
           <button class="btn sec sm addrow" data-add="cashIn"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增收入</button>
           <div class="sumline"><span>收入合計</span><b id="t-cashIn"></b></div>
 
-          <h3>支出</h3>
+          </div><div class="half">
+          <h3 class="h3s">支出</h3>
           <div class="row fixed"><div class="lab">現金存入銀行 <span class="tag gray">自動（試算表公式）</span></div>
             <div class="val" id="depVal"></div><span></span></div>
           <div class="rows" id="rows-cashOut"></div>
           <button class="btn sec sm addrow" data-add="cashOut"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增其他支出</button>
           <div class="sumline"><span>支出合計</span><b id="t-cashOut"></b></div>
+          </div></div>
           <div class="sumline sub2"><span>今日現金結餘（轉入零用金）</span><b id="t-transfer"></b></div>
         </section>
 
@@ -164,13 +172,16 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
           <h2>零用金</h2>
           <div class="sumline sub2" style="border:0;margin:0 0 4px;padding:0"><span>昨日可用餘額 <button class="link" id="openEdit" hidden>修改</button></span><b id="t-open"></b></div>
           <div id="openNote" class="alert" hidden></div>
-          <h3>收入</h3>
+          <div class="split"><div class="half">
+          <h3 style="margin-top:0">收入</h3>
           <div class="row fixed"><div class="lab">入零用金 <span class="tag gray">自動</span></div><div class="val" id="v-transfer"></div><span></span></div>
           <div class="rows" id="rows-pettyIn"></div>
           <button class="btn sec sm addrow" data-add="pettyIn"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增收入（資源回收、撥補…）</button>
-          <h3>支出</h3>
+          </div><div class="half">
+          <h3 class="h3s">支出</h3>
           <div class="rows" id="rows-pettyOut"></div>
           <button class="btn sec sm addrow" data-add="pettyOut"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增支出</button>
+          </div></div>
           <div class="sumline"><span>收入合計 (A)</span><b id="t-pettyIn"></b></div>
           <div class="sumline sub2"><span>支出合計 (B)</span><b id="t-pettyOut"></b></div>
           <div class="sumline sub2"><span>今日收支 (A－B)</span><b id="t-net"></b></div>
