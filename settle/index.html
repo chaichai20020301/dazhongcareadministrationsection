@@ -198,6 +198,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
       </div>
     </div>
   </div>
+  <div id="loading" class="empty">讀取中，請稍候…<br><small id="loadHint"></small></div>
   <div id="denied" class="empty" hidden>只有主管、行政可以使用結帳管理。</div>
 </main>
 
@@ -240,7 +241,8 @@ function api(action, args, ms){
     .then(function(j){ clearTimeout(timer); if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; })
     .catch(function(e){ clearTimeout(timer); throw e; });
 }
-function netFail(e){ if(e.message==="unauthorized") return; say(e.message==="nourl" ? "結帳管理後端還沒設定網址，請通知管理員。" : (e.name==="AbortError" ? "等太久了，請檢查網路後再試一次。" : "連線失敗，請檢查網路後再試一次。")); }
+function stopLoad(){ var l=$("loading"); if(l) l.hidden=true; }
+function netFail(e){ stopLoad(); if(e.message==="unauthorized") return; say(e.message==="nourl" ? "結帳管理後端還沒設定網址，請通知管理員。" : (e.name==="AbortError" ? "等太久了，請檢查網路後再試一次。" : "連線失敗，請檢查網路後再試一次。")); }
 
 /* ===== 數字與日期 ===== */
 function fmt(n){ n=Math.round(Number(n)||0); return (n<0?"-":"")+Math.abs(n).toLocaleString("en-US"); }
@@ -333,8 +335,8 @@ function applyDay(day){
 function load(date){
   say("");
   return api("day.get",{date:date}).then(function(j){
-    if(!j||!j.ok){ say(errText(j)); return; }
-    $("app").hidden=false; applyDay(j.day);
+    if(!j||!j.ok){ stopLoad(); say(errText(j)); return; }
+    stopLoad(); $("app").hidden=false; applyDay(j.day);
   }).catch(netFail);
 }
 function go(date){
@@ -496,8 +498,9 @@ function bind(){
   S.role=r;
   if(n){ e.children[0].textContent=n.trim().charAt(0); e.children[1].textContent=n+(ROLE_NAME[r]?" · "+ROLE_NAME[r]:""); e.style.display="flex"; }
   bind();
+  setTimeout(function(){ var l=$("loading"); if(l&&!l.hidden) $("loadHint").textContent="後端回應比較慢（第一次開啟可能要 10 秒以上）。若一直沒有畫面，請重新整理頁面，仍不行請通知管理員。"; },12000);
   api("bootstrap").then(function(j){
-    if(!j||!j.ok){ if(j&&j.error==="forbidden"){ $("denied").hidden=false; return; } say(errText(j)); return; }
+    if(!j||!j.ok){ stopLoad(); if(j&&j.error==="forbidden"){ $("denied").hidden=false; return; } say(errText(j)); return; }
     S.settings=j.settings; S.today=j.today; S.role=j.role;
     return load(j.today).then(function(){
       api("hist").then(function(h){ if(h&&h.ok) ["cashIn","pettyIn","pettyOut","bill"].forEach(function(b){ $("dl-"+b).innerHTML=(h.hist[b]||[]).map(function(t){ return '<option value="'+esc(t)+'">'; }).join(""); }); }).catch(function(){});
