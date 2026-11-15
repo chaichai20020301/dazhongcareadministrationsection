@@ -125,6 +125,68 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
 .box ul{margin:6px 0 12px;padding-left:20px;font-size:14.5px;line-height:1.7;color:var(--ink)}
 .box textarea{width:100%;min-height:72px;padding:10px 12px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:16px;resize:vertical}
 @media print{.v-topbar,.bar,.datebar .btn{display:none}}
+/* 現金存入銀行：專案開關與存款單 */
+.depbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 8px;padding:8px 10px;background:var(--t-soft);border-radius:14px}
+.depbar .sw{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--teal-d);cursor:pointer}
+.depbar .sw input{width:18px;height:18px;accent-color:var(--teal)}
+.depname{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 220px;min-width:0}
+.depname #depName{flex:1 1 180px}
+.deplines{flex-basis:100%;display:flex;flex-direction:column;gap:2px;font-size:13.5px}
+.deplines label{display:flex;align-items:center;gap:8px;padding:3px 2px;cursor:pointer}
+.deplines label span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.deplines label b{font-variant-numeric:tabular-nums}
+.page{page-break-after:always}.page:last-child{page-break-after:auto}
+.sec-h{margin:14px 0 2px;padding-top:10px;border-top:1px dashed #D3D8C8;font-weight:900;font-size:15px}
+.depname input{flex:1;min-width:0;padding:7px 10px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:14px;background:#fff}
+.depbar #depMsg{flex-basis:100%;margin:0;font-size:12.5px}
+.depbar #depMsg:empty{display:none}
+.depbar #depMsg.warnmsg{color:#fff;font-weight:900;font-size:14.5px;line-height:1.7;background:var(--red);padding:10px 14px;border-radius:12px;box-shadow:0 0 0 3px rgba(166,49,36,.25)}
+.depbar.off{opacity:.6;pointer-events:none}
+.box.wide{max-width:560px}
+.dn-row{display:grid;grid-template-columns:84px 1fr 110px;gap:8px;align-items:center;margin:5px 0;font-size:14.5px}
+.dn-row input{padding:7px 10px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:15px;text-align:right;min-width:0}
+.dn-row .am{text-align:right;font-weight:700}
+.dn-sum{display:flex;justify-content:space-between;margin-top:8px;padding:8px 12px;border-radius:12px;background:var(--t-soft);font-weight:700}
+.dn-sum.bad{background:#FBE9E5;color:var(--red)}
+.pl-row{display:grid;grid-template-columns:22px 1fr 90px;gap:8px;align-items:center;margin:4px 0;font-size:14px}
+.pl-row input[type=text]{padding:6px 9px;border:1.5px solid #D3D8C8;border-radius:10px;font-size:14px;min-width:0}
+.box label.lb{display:block;margin:10px 0 3px;font-size:13px;font-weight:700;color:var(--muted)}
+.box input.fld{width:100%;padding:8px 10px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:14.5px}
+/* 代保管與零用金申請 */
+.cust{margin-top:12px;padding:10px 12px;border:1.5px dashed var(--t-line);border-radius:14px}
+.cust-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cust-h h3{margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cust-h .hint{font:500 12px 'Noto Sans TC';color:var(--muted);margin-left:0}
+.cu-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.cu-row .who{min-width:0}.cu-row .who small{display:block;color:var(--muted);font-size:12px}
+.cu-row b{font-variant-numeric:tabular-nums}
+.pettyact{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.pettyact .sub{margin:0;font-size:12.5px}
+.sl2 .meta{display:flex;justify-content:space-between;gap:10px;font-size:15px;font-weight:700;margin-top:4px}
+.sl2 .meta span:last-child{font-weight:500;font-size:14px;text-align:right}
+/* 存款單列印（A4，上下兩聯） */
+#slipArea{display:none}
+.slip{position:relative;width:176mm;margin:0 auto 6mm;padding:0 8mm 0 0;font-family:'Noto Sans TC',sans-serif;color:#000;page-break-inside:avoid}
+.slip h3{margin:0;text-align:center;font:700 17px/1.5 'Noto Sans TC';color:#000}
+.slip .sdate{display:flex;justify-content:space-between;align-items:stretch;margin:6px 0 0;font-size:15px;font-weight:700}
+.slip .sdate .pj{border:1px solid #000;border-bottom:0;padding:3px 8px;width:50%;box-sizing:border-box}
+.slip table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:14px}
+.slip th,.slip td{border:1px solid #000;padding:2px 6px;height:6.4mm;vertical-align:middle;overflow:hidden;white-space:nowrap}
+.slip th{text-align:center;font-weight:700;font-size:15px}
+.slip td.am{text-align:right;font-weight:700;font-size:15px}
+.slip tr.tot td{font-weight:700;font-size:15px}
+.slip .sg{display:flex;margin-top:4px;font-size:14px;font-weight:700}
+.slip .sg span{flex:1 1 0;white-space:nowrap}
+.slip .side{position:absolute;right:0;top:30mm;width:7mm;text-align:center;font-size:13px;font-weight:700;line-height:1.5}
+.cutline{border-top:1px dashed #666;margin:2mm 0 6mm}
+@media print{
+  @page{size:A4;margin:10mm}
+  body.ps>*:not(#slipArea){display:none!important}
+  body.ps #slipArea{display:block!important}
+  body.ps{background:#fff!important}
+  body.ps::after,body.ps::before{display:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -161,6 +223,16 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
           <h3 class="h3s">支出</h3>
           <div class="row fixed"><div class="lab">現金存入銀行 <span class="tag gray">自動（試算表公式）</span></div>
             <div class="val" id="depVal"></div><span></span></div>
+          <div class="depbar" id="depBar">
+            <label class="sw"><input type="checkbox" id="depProj"> 專案存款（勾選的專案款全額存入）</label>
+            <div class="depname" id="depNameBox" hidden>
+              <input type="text" id="depName" maxlength="40" placeholder="專案名稱，例如：照服員課程學費" autocomplete="off">
+              <button class="btn sec sm" id="depApply" type="button">套用</button>
+              <div class="deplines" id="depLines"></div>
+            </div>
+            <button class="btn sec sm" id="btnSlip" type="button"><span class="ico" style="--ico:url(../assets/common/icon-print.webp)"></span>產生存款單</button>
+            <div class="sub" id="depMsg"></div>
+          </div>
           <div class="rows" id="rows-cashOut"></div>
           <button class="btn sec sm addrow" data-add="cashOut"><span class="ico" style="--ico:url(../assets/common/icon-plus.webp)"></span>新增其他支出</button>
           <div class="sumline"><span>支出合計</span><b id="t-cashOut"></b></div>
@@ -186,7 +258,14 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
           <div class="sumline sub2"><span>支出合計 (B)</span><b id="t-pettyOut"></b></div>
           <div class="sumline sub2"><span>今日收支 (A－B)</span><b id="t-net"></b></div>
           <div class="big2" id="endBox"><span>零用金餘額</span><b id="t-end"></b></div>
+          <div class="cust" id="custBox">
+            <div class="cust-h"><h3>代保管（住民壓款）<span class="hint">已含在上面的零用金餘額裡</span></h3><button class="btn sec sm" id="custAdd" type="button">＋ 新增</button></div>
+            <div id="custList"></div>
+            <div class="sumline sub2"><span>代保管合計</span><b id="t-cust"></b></div>
+            <div class="sumline"><span>實際可用（餘額－代保管）</span><b id="t-avail"></b></div>
+          </div>
           <div class="alert" id="lowMsg" hidden></div>
+          <div class="pettyact"><button class="btn main" id="btnPetty" type="button">申請零用金</button><span class="sub">實際可用低於 <span id="warnAmt"></span> 時系統會提醒；也可以隨時自己按。</span></div>
         </section>
       </div>
 
@@ -221,6 +300,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
   <button class="btn main" id="btnSave" disabled><span class="ico" style="--ico:url(../assets/common/icon-check.webp)"></span>儲存</button>
 </div></div>
 <div id="modalHost"></div>
+<div id="slipArea"></div>
 <datalist id="dl-cashIn"></datalist><datalist id="dl-pettyIn"></datalist><datalist id="dl-pettyOut"></datalist><datalist id="dl-bill"></datalist>
 
 <script>
@@ -233,8 +313,9 @@ var PLACE = { cashIn:"誰：什麼費用（例：王小明：11月照護費）",
 var ERR = { forbidden:"這個動作你的身份不能使用。", invalid:"資料格式不對，請檢查金額與日期。", busy:"系統忙碌中，請稍後再試。", "unknown action":"後端還沒更新成新版本，請通知管理員。",
   no_file:"找不到這個月的日報表檔案，也沒辦法自動建立（只能提前開下個月）。", no_template:"這個月的檔案裡沒有任何一天可以當範本，請通知管理員。", exists:"這一天已經開過了。",
   layout:"日報表的版面跟系統預期的不一樣，請通知管理員（不會動到你的資料）。", locked:"這一天已經結帳，不能再修改。主管可以解鎖。", not_found:"找不到這一天的分頁。",
-  "bad request":"後端發生錯誤，請把括號裡的文字告訴管理員。", pdf_failed:"產生列印檔失敗，請稍後再試。", not_closed:"這一天不是已結帳狀態。" };
-var S = { date:"", day:null, rows:{}, notes:"", open:0, openTouched:false, editOpen:false, dirty:false, settings:{pettyWarn:15000}, role:"", saving:false, locked:false, today:"" };
+  "bad request":"後端發生錯誤，請把括號裡的文字告訴管理員。", pdf_failed:"產生列印檔失敗，請稍後再試。", not_closed:"這一天不是已結帳狀態。",
+  need_name:"請先填專案名稱。", dep_other:"這一天「現金存入銀行」那格不是標準公式，系統不去改它，請直接在試算表處理。", dep_mismatch:"存款金額或面額跟試算表對不起來，請重新整理後再試。", need_lines:"請至少勾選一筆專案款。" };
+var S = { date:"", day:null, rows:{}, notes:"", open:0, openTouched:false, editOpen:false, dirty:false, settings:{pettyWarn:15000,pettyLevel:30000}, role:"", saving:false, locked:false, today:"" };
 
 function ls(k){ try{ return localStorage.getItem(k)||""; }catch(e){ return ""; } }
 function token(){ var t=ls("portal_token"), exp=parseInt(ls("portal_exp")||"0",10); return (t && exp>Math.floor(Date.now()/1000)) ? t : ""; }
@@ -264,11 +345,19 @@ function addDays(s,n){ var d=parseD(s); d.setDate(d.getDate()+n); return ds(d); 
 function dateText(s){ var d=parseD(s); return "民國"+(d.getFullYear()-1911)+"年"+(d.getMonth()+1)+"月"+d.getDate()+"日（"+WD[d.getDay()]+"）"; }
 
 /* ===== 計算（跟試算表公式、後端 calc_ 同一套規則）===== */
+function remindAt(){ return (Number(S.settings.pettyWarn)||15000)+1000; }   /* 實際可用的千位掉到 pettyWarn 以下就提醒 */
+function custTotal(){ var t=0; (S.cust||[]).forEach(function(c){ t+=Number(c.amount)||0; }); return t; }
 function calc(){
   var s={}; BLOCKS.forEach(function(b){ s[b]=0; S.rows[b].forEach(function(r){ var a=num(r.amount); if(a===a) s[b]+=a; }); });
-  var rest=s.cashIn-s.cashOut, deposit = rest>1000 ? Math.floor(rest/1000)*1000 : 0;
+  var rest=s.cashIn-s.cashOut, proj=!!(S.day&&S.day.depMode==="project"), P=0, norm=0, deposit=0;
+  if(rest>0){   /* 專案存款：勾選的專案款全額存入，其餘照一般規則（超過 1000 才存、取整千） */
+    if(proj){ P=Math.min(Math.max(Number(S.day.depP)||0,0),rest); norm=(rest-P)>1000 ? Math.floor((rest-P)/1000)*1000 : 0; }
+    else norm = rest>1000 ? Math.floor(rest/1000)*1000 : 0;
+    deposit=P+norm;
+  }
   var cashOut=s.cashOut+deposit, transfer=s.cashIn-cashOut, pin=transfer+s.pettyIn, net=pin-s.pettyOut, end=S.open+net;
-  return { cashIn:s.cashIn, cashOut:cashOut, deposit:deposit, transfer:transfer, pettyIn:pin, pettyOut:s.pettyOut, net:net, end:end, low:end<S.settings.pettyWarn, bill:s.bill, remit:s.remit };
+  var cust=custTotal(), avail=end-cust;
+  return { cashIn:s.cashIn, cashOut:cashOut, deposit:deposit, depProj:P, depNormal:norm, transfer:transfer, pettyIn:pin, pettyOut:s.pettyOut, net:net, end:end, cust:cust, avail:avail, low:avail<remindAt(), bill:s.bill, remit:s.remit };
 }
 
 /* ===== 畫面 ===== */
@@ -292,8 +381,10 @@ function paintTotals(){
   var n=$("t-net"); n.textContent=fmt(c.net); n.className=c.net<0?"neg":"";
   $("t-end").textContent=fmt(c.end); $("b-end").textContent=fmt(c.end);
   $("endBox").className="big2"+(c.low?" low":""); $("barBal").className="bal"+(c.low?" low":"");
-  var lm=$("lowMsg"); lm.hidden=!c.low; if(c.low) lm.textContent="零用金不足 "+fmt(S.settings.pettyWarn)+"，請申請零用金。";
+  var lm=$("lowMsg"); lm.hidden=!c.low; if(c.low) lm.textContent=(c.cust>0 ? "實際可用 "+fmt(c.avail)+"（餘額 "+fmt(c.end)+"，其中代保管 "+fmt(c.cust)+"），" : "零用金 "+fmt(c.end)+"，")+"已碰到 "+fmt(S.settings.pettyWarn)+" 的線，請申請零用金。";
   $("t-bill").textContent=fmt(c.bill); $("t-remit").textContent=fmt(c.remit);
+  $("t-cust").textContent=fmt(c.cust); $("t-avail").textContent=fmt(c.avail); $("warnAmt").textContent=fmt(remindAt());
+  $("custBox").hidden=false;
   var oe=$("openEdit"); oe.hidden=!(d && d.canSetOpen) || S.locked; oe.textContent=S.editOpen?"完成":"修改";
   if(S.editOpen && !$("openIn")){ $("t-open").innerHTML='<span class="inl"><input id="openIn" type="text" inputmode="numeric" value="'+esc(S.open)+'"></span>'; }
 }
@@ -333,14 +424,14 @@ function applyDay(day){
       +(day.fileFound?'':'<div>這個月的日報表檔案也還沒有，按下去會一起自動建立（複製上個月的檔案）。</div>')
       +'<button class="btn main" id="btnCreate">開新的一天</button>';
     $("btnCreate").onclick=createDay;
-    S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=[]; });
-    paintBar(); setDirty(false); return;
+    S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=[]; }); S.cust=[];
+    paintBar(); setDirty(false); paintDep(); return;
   }
   $("emptyDay").hidden=true; $("dayBody").hidden=false;
   S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=(day.items[b]||[]).map(function(it){ return {text:it.text, amount:(it.amount===0&&!it.text)?"":String(it.amount)}; }); if(!S.locked) S.rows[b].push({text:"",amount:""}); });
   S.notes=day.notes||""; $("notes").value=S.notes; $("notes").readOnly=S.locked;
-  S.open=day.open;
-  paintAll(); paintBar(); setDirty(false);
+  S.open=day.open; S.cust=day.custody||[];
+  paintCust(); paintAll(); paintBar(); setDirty(false); paintDep();
 }
 function load(date){
   say("");
@@ -454,6 +545,301 @@ function reopenDay(){
   },'<textarea id="why" maxlength="100" placeholder="例：金額打錯了"></textarea>');
 }
 
+/* ===== 專案存款與存款單 ===== */
+var DENOMS=[[1000,"仟元"],[500,"伍佰元"],[200,"貳佰元"],[100,"壹佰元"],[50,"伍拾元"],[10,"拾元"],[5,"伍元"],[1,"壹元"]];
+var DENOM_DEFAULT=[1000,500,100];
+function depPicked(){   /* 勾選的專案款 */
+  var out=[]; document.querySelectorAll("#depLines input[type=checkbox]").forEach(function(cb){ if(cb.checked){ var r=S.rows.cashIn[+cb.dataset.i]; if(r) out.push({text:r.text.trim(), amount:Math.round(num(r.amount))}); } });
+  return out;
+}
+function renderDepLines(){
+  var d=S.day, saved=(d&&d.depLines)||[], pool=saved.map(function(l){ return {t:String(l.text),a:Number(l.amount),used:false}; }), h="", n=0;
+  S.rows.cashIn.forEach(function(r,i){
+    var a=num(r.amount); if(!r.text.trim()||!(a>0)) return; n++;
+    var on=true;
+    if(d&&d.depMode==="project"&&saved.length){ on=false; for(var k=0;k<pool.length;k++){ if(!pool[k].used&&pool[k].t===r.text.trim()&&pool[k].a===Math.round(a)){ pool[k].used=true; on=true; break; } } }
+    h+='<label><input type="checkbox" data-i="'+i+'"'+(on?" checked":"")+(S.locked?" disabled":"")+'><span>'+esc(r.text.trim())+'</span><b>'+fmt(a)+'</b></label>';
+  });
+  $("depLines").innerHTML = n ? '<div class="sub" style="margin:2px 0">勾選哪幾筆是專案款（沒勾的照一般規則，只存千位）：</div>'+h : '<div class="sub">今天沒有現金收入明細可以挑。</div>';
+}
+function paintDep(){
+  var d=S.day, ex=!!(d&&d.exists), bar=$("depBar"); if(!bar) return;
+  var proj=ex&&d.depMode==="project", other=ex&&d.depMode==="other";
+  bar.classList.toggle("off", !ex);
+  $("depProj").checked=proj; $("depProj").disabled=S.locked||other;
+  var nb=$("depNameBox"); nb.hidden=!(proj||S.depWant);
+  if(!nb.hidden){ if(proj && document.activeElement!==$("depName")) $("depName").value=d.depProject||""; if(!bar.contains(document.activeElement)||!$("depLines").innerHTML) renderDepLines(); }
+  $("depName").readOnly=S.locked; $("depApply").hidden=S.locked;
+  var c=ex?calc():null;
+  var sel=proj?Math.round(Number(d.depP)||0):0, short=proj&&c&&sel>Math.round(c.depProj);
+  $("depMsg").textContent = other ? "這天「現金存入銀行」那格不是標準公式，系統不會去改，請直接在試算表處理。" : (proj&&c ? (short ? "【嚴重警告】專案款不足！勾選 "+fmt(sel)+"，現金只剩 "+fmt(c.depProj)+"，短少 "+fmt(sel-Math.round(c.depProj))+" 元。" : "專案款 "+fmt(c.depProj)+"（全額）＋一般存款 "+fmt(c.depNormal)+" ＝ 現金存入銀行 "+fmt(c.deposit)+(c.depNormal>0?"。要印兩張存款單。":"。只要印專案存款單一張。")) : "");
+  $("depMsg").className="sub"+(short?" warnmsg":"");
+  var amt=ex?c.deposit:0; $("btnSlip").disabled=!ex||!(amt>0);
+  $("btnSlip").title=(ex&&!(amt>0))?"今天沒有要存入銀行的金額":"";
+}
+function depSet(mode,name,lines){
+  if(S.dirty){ say("請先儲存這天的修改，再改存款方式。"); paintDep(); return; }
+  if(mode==="project"&&!name){ say("請先填專案名稱。"); return; }
+  if(mode==="project"&&!(lines&&lines.length)){ say("請至少勾選一筆專案款。"); return; }
+  say("正在更新…",true);
+  api("deposit.set",{date:S.date,mode:mode,name:name,lines:lines||[]}).then(function(j){
+    if(j&&j.ok){ S.depWant=false; $("depLines").innerHTML=""; applyDay(j.day); say(mode==="project"?"已設定專案存款。":"已改回一般存款。",true); return; }
+    if(j&&j.day) applyDay(j.day); say(errText(j)); paintDep();
+  }).catch(function(e){ paintDep(); netFail(e); });
+}
+function greedy(amount){
+  var left=Math.round(amount), c={}; [1000,500,100,50,10,5,1].forEach(function(u){ c[u]=Math.floor(left/u); left-=c[u]*u; }); return c;
+}
+function twoD(n){ return (n<10?"0":"")+n; }
+function openSlip(){
+  if(S.dirty){ say("請先儲存這天的修改，再產生存款單。"); return; }
+  var d=S.day, c=calc(), proj=d.depMode==="project";
+  if(!(c.deposit>0)){ say("今天沒有要存入銀行的金額。"); return; }
+  var dt=parseD(S.date), md=twoD(dt.getMonth()+1)+"/"+twoD(dt.getDate()), parts=[];
+  if(proj&&c.depProj>0) parts.push({kind:"project", amount:Math.round(c.depProj), sum:md+"專案存款", lines:(d.depLines||[]).map(function(l){ return {text:String(l.text).split(/[：:]/)[0].trim()+"："+fmt(l.amount), on:true}; })});
+  if(c.depNormal>0) parts.push({kind:"normal", amount:Math.round(c.depNormal), sum:md+"現金存入銀行"});
+  parts.forEach(function(p,i){ p.i=i; p.counts=greedy(p.amount); p.show={}; DENOM_DEFAULT.forEach(function(u){ p.show[u]=true; }); DENOMS.forEach(function(x){ if(p.counts[x[0]]>0) p.show[x[0]]=true; }); });
+  function denomHTML(p){
+    var h=""; DENOMS.forEach(function(x){ if(!p.show[x[0]]) return;
+      h+='<div class="dn-row"><span>'+x[1]+'</span><input type="text" inputmode="numeric" data-u="'+x[0]+'" value="'+(p.counts[x[0]]||0)+'" aria-label="'+x[1]+'張數"><span class="am" id="dnAm'+p.i+'_'+x[0]+'">'+fmt((p.counts[x[0]]||0)*x[0])+'元</span></div>'; });
+    var more=DENOMS.filter(function(x){ return !p.show[x[0]]; });
+    if(more.length) h+='<div style="margin-top:6px"><select data-more="'+p.i+'"><option value="">＋ 加其他幣值…</option>'+more.map(function(x){ return '<option value="'+x[0]+'">'+x[1]+'</option>'; }).join("")+'</select></div>';
+    return h;
+  }
+  function sumOf(p){ var t=0; DENOMS.forEach(function(x){ t+=(p.counts[x[0]]||0)*x[0]; }); return t; }
+  var body="";
+  parts.forEach(function(p){
+    body+='<div class="sec-h">'+(p.kind==="project"?"專案存款單：":"一般存款單")+(p.kind==="project"?esc(d.depProject||""):"")+'　金額 '+fmt(p.amount)+' 元</div>'
+      +'<label class="lb">摘要</label><input class="fld" id="slSum'+p.i+'" maxlength="40" value="'+esc(p.sum)+'">';
+    if(p.kind==="project"){ body+='<label class="lb">備註欄要列出的繳款（取消勾選就不列，可改文字）</label>'+p.lines.map(function(l,k){ return '<div class="pl-row"><input type="checkbox" data-p="'+p.i+'_'+k+'" checked><input type="text" data-pt="'+p.i+'_'+k+'" value="'+esc(l.text)+'" maxlength="40"><span></span></div>'; }).join(""); }
+    body+='<label class="lb">面額（填張數）</label><div id="dnBox'+p.i+'">'+denomHTML(p)+'</div><div class="dn-sum" id="dnSum'+p.i+'"></div>';
+  });
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box wide"><h2>產生存款單</h2>'
+    +'<p>今天存入銀行共 <b>'+fmt(c.deposit)+'</b> 元，'+(parts.length>1?'要印 <b>兩張</b>（專案存款單、一般存款單）':'印一張')+'。依實際的鈔票填張數，系統會核對總額。</p>'
+    +((proj&&Math.round(Number(d.depP)||0)>Math.round(c.depProj))?'<p style="color:#fff;background:var(--red);font-weight:900;padding:10px 14px;border-radius:12px;line-height:1.7">【嚴重警告】專案款不足！短少 '+fmt(Math.round(Number(d.depP))-Math.round(c.depProj))+' 元，專案存款單只能開 '+fmt(c.depProj)+'。</p>':"")
+    +'<label class="lb">日期</label><input class="fld" id="slDate" value="'+S.date.replace(/\//g,"")+'" maxlength="8">'
+    +body+'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn sec" id="mPdf">下載 PDF</button><button class="btn main" id="mYes">列印存款單</button></div></div></div>';
+  function refresh(){
+    var all=true;
+    parts.forEach(function(p){ var t=sumOf(p), ok=(t===p.amount); if(!ok) all=false; var e=$("dnSum"+p.i); e.className="dn-sum"+(ok?"":" bad");
+      e.innerHTML='<span>面額合計 '+fmt(t)+' 元</span><span>'+(ok?"與存入金額相符":"差 "+fmt(p.amount-t)+" 元")+'</span>';
+      DENOMS.forEach(function(x){ var a=$("dnAm"+p.i+"_"+x[0]); if(a) a.textContent=fmt((p.counts[x[0]]||0)*x[0])+"元"; }); });
+    $("mYes").disabled=!all;
+  }
+  parts.forEach(function(p){
+    $("dnBox"+p.i).addEventListener("input",function(ev){ var u=ev.target.dataset&&ev.target.dataset.u; if(!u) return; var n=num(ev.target.value); p.counts[u]=(n===n&&n>=0)?Math.floor(n):0; refresh(); });
+    $("dnBox"+p.i).addEventListener("change",function(ev){ if(ev.target.dataset&&ev.target.dataset.more!==undefined&&ev.target.value){ p.show[ev.target.value]=true; $("dnBox"+p.i).innerHTML=denomHTML(p); refresh(); } });
+  });
+  refresh(); $("mNo").onclick=closeModal;
+  function go(kind){
+    var ds8=($("slDate").value||"").replace(/\D/g,""); if(ds8.length!==8){ say("日期請填 8 位數，例如 "+S.date.replace(/\//g,"")); return; }
+    var pages=[], slips=[];
+    parts.forEach(function(p){
+      var lines=[]; if(p.kind==="project"){ p.lines.forEach(function(l,k){ var cb=h.querySelector('[data-p="'+p.i+'_'+k+'"]'), tx=h.querySelector('[data-pt="'+p.i+'_'+k+'"]'); if(cb&&cb.checked&&tx.value.trim()) lines.push(tx.value.trim()); }); }
+      var denoms=DENOMS.filter(function(x){ return p.show[x[0]]; }).map(function(x){ return {unit:x[0],count:p.counts[x[0]]||0}; });
+      slips.push({kind:p.kind,amount:p.amount,denoms:denoms});
+      pages.push({date8:ds8, summary:$("slSum"+p.i).value, amount:p.amount, proj:p.kind==="project", project:d.depProject||"", lines:lines, denoms:denoms});
+    });
+    var pageHTML=pages.map(function(o){ return '<div class="page">'+slipHTML(o,"存款聯")+'<div class="cutline"></div>'+slipHTML(o,"會計聯")+'</div>'; });
+    var bs=[$("mYes"),$("mPdf")]; bs.forEach(function(b){ b.disabled=true; }); (kind==="pdf"?$("mPdf"):$("mYes")).textContent="處理中…";
+    api("deposit.slip",{date:S.date,slips:slips}).then(function(j){
+      if(!j||!j.ok){ closeModal(); if(j&&j.day) applyDay(j.day); say(errText(j)); return; }
+      if(kind==="pdf") return slipsPdf(pageHTML,"銀行存款_"+ds8+".pdf").then(function(){ closeModal(); say("已下載 PDF（"+pages.length+" 頁）。",true); });
+      closeModal();
+      printHTML(pageHTML.join(""), "已送出列印（"+pages.length+" 張）。如果沒有跳出列印視窗，請檢查瀏覽器是否擋住。");
+    }).catch(function(e){
+      bs.forEach(function(b){ b.disabled=false; }); $("mYes").textContent="列印存款單"; $("mPdf").textContent="下載 PDF";
+      if(e&&e.message==="pdf"){ say("產生 PDF 失敗，請檢查網路後再試（需要連網載入 PDF 套件），或改用「列印存款單」再選另存 PDF。"); return; }
+      netFail(e);
+    });
+  }
+  $("mYes").onclick=function(){ go("print"); };
+  $("mPdf").onclick=function(){ go("pdf"); };
+}
+/* ===== 直接下載存款單 PDF（把排好版的存款單轉成圖放進 A4，一頁一張，上聯＋下聯）===== */
+var H2C_URL="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", JSPDF_URL="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+function loadScript(url,ready){
+  return new Promise(function(ok,bad){
+    if(ready()){ ok(); return; }
+    var sc=document.createElement("script"); sc.src=url; sc.onload=function(){ ready()?ok():bad(new Error("pdf")); }; sc.onerror=function(){ bad(new Error("pdf")); };
+    document.head.appendChild(sc);
+  });
+}
+function slipsPdf(pageHTMLs,fileName){
+  return Promise.all([loadScript(H2C_URL,function(){ return !!window.html2canvas; }), loadScript(JSPDF_URL,function(){ return !!(window.jspdf&&window.jspdf.jsPDF); })]).then(function(){
+    var host=document.createElement("div");
+    host.style.cssText="position:fixed;left:-10000px;top:0;width:210mm;padding:10mm;box-sizing:border-box;background:#fff";
+    host.innerHTML=pageHTMLs.join(""); document.body.appendChild(host);
+    var els=[].slice.call(host.querySelectorAll(".page")), pdf=new window.jspdf.jsPDF({unit:"mm",format:"a4"}), chain=Promise.resolve();
+    els.forEach(function(el,i){
+      chain=chain.then(function(){ return window.html2canvas(el,{scale:2,backgroundColor:"#ffffff"}); }).then(function(cv){
+        if(i>0) pdf.addPage();
+        var w=190, h=w*cv.height/cv.width; pdf.addImage(cv.toDataURL("image/jpeg",0.95),"JPEG",10,10,w,Math.min(h,277));
+      });
+    });
+    return chain.then(function(){ host.remove(); pdf.save(fileName); }, function(){ host.remove(); throw new Error("pdf"); });
+  });
+}
+function slipHTML(o,label){
+  var remarks=[], i;
+  if(o.proj){ o.lines.forEach(function(t){ remarks.push(esc(t)); }); while(remarks.length<3) remarks.push(""); }
+  else { remarks.push("","",""); }
+  var show={}; DENOM_DEFAULT.forEach(function(u){ show[u]=true; }); o.denoms.forEach(function(d){ if(d.count>0) show[d.unit]=true; });
+  var cnt={}; o.denoms.forEach(function(d){ cnt[d.unit]=d.count; });
+  DENOMS.forEach(function(x){ if(show[x[0]]) remarks.push(esc(x[1])+"："+fmt((cnt[x[0]]||0)*x[0])+"元"); });
+  remarks.push("合計："+fmt(o.amount)+"元");
+  var n=Math.max(10,remarks.length), rows="";
+  for(i=0;i<n;i++){ rows+='<tr><td>'+(i===0?esc(o.summary):"")+'</td><td class="am">'+(i===0?fmt(o.amount):"")+'</td><td>'+(remarks[i]||"")+'</td></tr>'; }
+  return '<div class="slip"><h3>線東大眾護理之家<br>銀行存款</h3>'
+    +'<div class="sdate"><span>日期:'+esc(o.date8)+'</span>'+(o.proj?'<span class="pj">專案：'+esc(o.project)+'</span>':"")+'</div>'
+    +'<table><colgroup><col style="width:36%"><col style="width:14%"><col style="width:50%"></colgroup><thead><tr><th>摘要</th><th>金額</th><th>備註</th></tr></thead><tbody>'+rows
+    +'<tr class="tot"><td style="text-align:center">合計</td><td class="am">'+fmt(o.amount)+'</td><td></td></tr></tbody></table>'
+    +'<div class="sg"><span>經手人：</span><span>主管：</span><span>經理：</span></div>'
+    +'<div class="side">'+label.split("").join("<br>")+'</div></div>';
+}
+function printHTML(html,msg){
+  $("slipArea").innerHTML=html;
+  document.body.classList.add("ps");
+  var done=function(){ document.body.classList.remove("ps"); window.removeEventListener("afterprint",done); };
+  window.addEventListener("afterprint",done);
+  setTimeout(function(){ window.print(); },60);
+  say(msg,true);
+}
+
+/* ===== 代保管（住民壓款）===== */
+function paintCust(){
+  var l=S.cust||[], h="";
+  l.forEach(function(c){ h+='<div class="cu-row"><div class="who">'+esc(c.name)+'　'+esc(c.purpose)+'<small>收到 '+esc(c.received)+'</small></div><b>'+fmt(c.amount)+'</b>'
+    +(S.locked?'<span></span>':'<button class="btn sec sm" data-cu="'+esc(c.id)+'" type="button">結案</button>')+'</div>'; });
+  $("custList").innerHTML=h||'<div class="sub">目前沒有代保管的款項。</div>';
+  $("custAdd").hidden=false;
+}
+function setCust(j){ if(j&&j.custody){ S.cust=j.custody; if(S.day) S.day.custody=j.custody; } paintCust(); paintTotals(); }
+function custAdd(){
+  var h=$("modalHost"), today=S.date;
+  h.innerHTML='<div class="modal"><div class="box"><h2>新增代保管</h2><p>住民放在我們這裡保管的錢（例如手術費）。這筆錢已經在日報表的零用金餘額裡，這裡只是記下來，用來算「實際可用」。</p>'
+    +'<label class="lb">住民姓名</label><input class="fld" id="cuName" maxlength="20" autocomplete="off">'
+    +'<label class="lb">用途</label><input class="fld" id="cuPurpose" maxlength="30" placeholder="例如：白內障手術費" autocomplete="off">'
+    +'<label class="lb">金額</label><input class="fld" id="cuAmt" inputmode="numeric" autocomplete="off">'
+    +'<label class="lb">收到日期</label><input class="fld" id="cuDate" value="'+esc(today)+'" maxlength="10">'
+    +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn main" id="mYes">新增</button></div></div></div>';
+  $("mNo").onclick=closeModal; $("cuName").focus();
+  $("mYes").onclick=function(){
+    var a=num($("cuAmt").value), nm=$("cuName").value.trim(), pu=$("cuPurpose").value.trim(), dt=$("cuDate").value.trim().replace(/-/g,"/");
+    if(!nm||!pu){ say("請填住民姓名和用途。"); return; }
+    if(!(a===a&&a>0)){ say("金額請填大於 0 的數字。"); return; }
+    if(!/^\d{4}\/\d{2}\/\d{2}$/.test(dt)){ say("收到日期請填像 "+S.date+" 的格式。"); return; }
+    var b=$("mYes"); b.disabled=true; b.textContent="新增中…";
+    api("custody.add",{date:S.date,name:nm,purpose:pu,amount:Math.round(a),received:dt}).then(function(j){
+      closeModal(); if(j&&j.ok){ setCust(j); say("已新增代保管。",true); } else say(errText(j));
+    }).catch(function(e){ b.disabled=false; b.textContent="新增"; netFail(e); });
+  };
+}
+function custClose(id){
+  var c=(S.cust||[]).filter(function(x){ return x.id===id; })[0]; if(!c) return;
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box"><h2>結案</h2><p>'+esc(c.name)+'　'+esc(c.purpose)+'　'+fmt(c.amount)+' 元</p>'
+    +'<label class="lb">這筆錢後來怎麼處理？</label><select class="fld" id="cuHow"><option value="paid">已支付（付掉了）</option><option value="returned">已退還住民</option><option value="void">登記錯了，作廢</option></select>'
+    +'<label class="lb">結案日期</label><input class="fld" id="cuOn" value="'+esc(S.date)+'" maxlength="10">'
+    +'<p style="margin-top:10px">結案後，這筆就不再從「實際可用」扣掉。</p>'
+    +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn main" id="mYes">結案</button></div></div></div>';
+  $("mNo").onclick=closeModal;
+  $("mYes").onclick=function(){
+    var on=$("cuOn").value.trim().replace(/-/g,"/"); if(!/^\d{4}\/\d{2}\/\d{2}$/.test(on)){ say("結案日期請填像 "+S.date+" 的格式。"); return; }
+    var b=$("mYes"); b.disabled=true;
+    api("custody.close",{date:S.date,id:id,how:$("cuHow").value,on:on}).then(function(j){
+      closeModal(); if(j&&j.ok){ setCust(j); say("已結案。",true); } else say(errText(j));
+    }).catch(function(e){ b.disabled=false; netFail(e); });
+  };
+}
+
+/* ===== 申請零用金（列印領款聯＋會計聯）===== */
+function minguo(s){ var p=s.split("/").map(Number); return (p[0]-1911)+"."+twoD(p[1])+"."+twoD(p[2]); }
+function openPetty(){
+  if(S.dirty){ say("請先儲存這天的修改，再申請零用金。"); return; }
+  var c=calc(), bal=Math.round(c.end), lv=Number(S.settings.pettyLevel)||30000;
+  var sug=(lv-c.avail)>0 ? Math.ceil((lv-c.avail)/1000)*1000 : 0;   /* 補回水位，無條件進位到千位 */
+  var note=(S.cust||[]).map(function(x){ return "內含"+x.name+x.purpose+"："+Math.round(x.amount); }).join("、");
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box"><h2>申請零用金</h2><p>'+(c.low?'零用金實際可用 '+fmt(c.avail)+'，已碰到 '+fmt(S.settings.pettyWarn)+' 的線。':'目前實際可用 '+fmt(c.avail)+'。')+'按「列印」會產生領款聯和會計聯，簽名欄留白。</p>'
+    +'<label class="lb">申請日期</label><input class="fld" id="peDate" value="'+esc(minguo(S.date))+'" maxlength="12">'
+    +'<label class="lb">零用金結存金額（日報表餘額，已含代保管）</label><input class="fld" id="peBal" inputmode="numeric" value="'+bal+'">'
+    +'<label class="lb">結存備註</label><input class="fld" id="peNote" maxlength="120" value="'+esc(note)+'" placeholder="例如：內含某某手術費：20000">'
+    +'<label class="lb">摘要</label><input class="fld" id="peSum" maxlength="30" value="零用金申請">'
+    +'<label class="lb">申請金額</label><input class="fld" id="peAmt" inputmode="numeric" value="'+(sug||"")+'" placeholder="自己填"><div class="sub" style="margin-top:4px">'+(sug?'建議：補回水位 '+fmt(lv)+'，約 '+fmt(sug)+'（可以自己改）。':'實際可用已在水位 '+fmt(lv)+' 以上，請自己填。')+'</div>'
+    +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn sec" id="mXls">下載 Excel</button><button class="btn main" id="mYes">列印申請單</button></div></div></div>';
+  $("mNo").onclick=closeModal; $("peAmt").focus();
+  function go(kind){
+    var a=num($("peAmt").value), bl=num($("peBal").value);
+    if(!(a===a&&a>0)){ say("請填申請金額（大於 0 的數字）。"); return; }
+    if(!(bl===bl)){ say("結存金額請填數字。"); return; }
+    var o={ date:$("peDate").value.trim(), bal:Math.round(bl), note:$("peNote").value.trim(), sum:$("peSum").value.trim(), amt:Math.round(a) };
+    var bs=[$("mYes"),$("mXls")]; bs.forEach(function(b){ b.disabled=true; }); (kind==="xls"?$("mXls"):$("mYes")).textContent="處理中…";
+    api("petty.slip",{date:S.date,amount:o.amt,balance:o.bal,note:o.note}).then(function(j){
+      if(!j||!j.ok){ closeModal(); say(errText(j)); return; }
+      if(kind==="xls"){
+        return pettyXlsx(o).then(function(){ closeModal(); say("已下載 Excel。",true); });
+      }
+      closeModal();
+      printHTML(pettyHTML(o,"領款聯")+'<div class="cutline"></div>'+pettyHTML(o,"會計聯"), "已送出列印。如果沒有跳出列印視窗，請檢查瀏覽器是否擋住。");
+    }).catch(function(e){
+      bs.forEach(function(b){ b.disabled=false; }); $("mYes").textContent="列印申請單"; $("mXls").textContent="下載 Excel";
+      if(e&&e.message==="xlsx"){ say("產生 Excel 失敗，請檢查網路後再試（需要連網載入 Excel 套件）。"); return; }
+      netFail(e);
+    });
+  }
+  $("mYes").onclick=function(){ go("print"); };
+  $("mXls").onclick=function(){ go("xls"); };
+}
+/* ===== 產生 Excel：用機構原本的「零用金申請」範本填值（版面、字型、紙張都跟原本一樣）===== */
+var EXCELJS_URL="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js";
+function loadExcelJS(){
+  return new Promise(function(ok,bad){
+    if(window.ExcelJS){ ok(window.ExcelJS); return; }
+    var sc=document.createElement("script"); sc.src=EXCELJS_URL; sc.onload=function(){ ok(window.ExcelJS); }; sc.onerror=function(){ bad(new Error("xlsx")); };
+    document.head.appendChild(sc);
+  });
+}
+/* 把資料填進範本，回傳 xlsx 內容（ArrayBuffer）。範本放在 petty-template.xlsx，沒有任何真實資料。 */
+function buildPettyXlsx(ExcelJS, templateBuf, o){
+  var wb=new ExcelJS.Workbook();
+  return wb.xlsx.load(templateBuf).then(function(){
+    var ws=wb.getWorksheet("零用金")||wb.worksheets[0];
+    var a3=" 申請日期:"+o.date, a4=" 零用金結存金額:"+Math.round(o.bal);
+    ws.getCell("A3").value=a3; ws.getCell("A4").value=a4;
+    ws.getCell("B4").value=o.note||null; ws.getCell("A6").value=o.sum||"零用金申請"; ws.getCell("B6").value=Math.round(o.amt);
+    /* 下半張「會計聯」是用公式抄上半張，這裡一併補上算好的結果，免得有些程式不重算就顯示舊值 */
+    var link={A22:"A1",A23:"A2",A24:"A3",A25:"A4",B25:"B4",A27:"A6",B27:"B6",C33:"C12"};
+    Object.keys(link).forEach(function(k){
+      var v=ws.getCell(link[k]).value; if(v&&typeof v==="object"&&v.formula) v=v.result;
+      ws.getCell(k).value={formula:link[k], result:(v==null?"":v)};
+    });
+    wb.calcProperties={fullCalcOnLoad:true};
+    return wb.xlsx.writeBuffer();
+  });
+}
+function pettyXlsx(o){
+  return loadExcelJS().then(function(ExcelJS){
+    return fetch("petty-template.xlsx",{cache:"no-cache"}).then(function(r){ if(!r.ok) throw new Error("xlsx"); return r.arrayBuffer(); })
+      .then(function(buf){ return buildPettyXlsx(ExcelJS,buf,o); });
+  }).then(function(out){
+    var blob=new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="零用金申請"+String(o.date).replace(/[\\/:*?"<>|\s]/g,"")+".xlsx";
+    document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  }).catch(function(e){ throw (e&&e.message==="xlsx"?e:new Error("xlsx")); });
+}
+function pettyHTML(o,label){
+  var rows="", i;
+  for(i=0;i<10;i++){ rows+='<tr><td>'+(i===0?esc(o.sum):"")+'</td><td class="am">'+(i===0?fmt(o.amt):"")+'</td><td></td></tr>'; }
+  return '<div class="slip sl2"><h3>線東大眾護理之家<br>零用金申請</h3>'
+    +'<div class="meta"><span>申請日期:'+esc(o.date)+'</span></div>'
+    +'<div class="meta"><span>零用金結存金額:'+Math.round(o.bal)+'</span><span>'+esc(o.note)+'</span></div>'
+    +'<table><colgroup><col style="width:36%"><col style="width:14%"><col style="width:50%"></colgroup><thead><tr><th>摘要</th><th>金額</th><th>備註</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<div class="sg"><span>經手人：</span><span>行政主管：</span><span>經理：</span></div>'
+    +'<div class="side">'+label.split("").join("<br>")+'</div></div>';
+}
+
 /* ===== 事件 ===== */
 function addRow(b){
   if(S.locked) return;
@@ -481,6 +867,7 @@ function bind(){
   document.addEventListener("click",function(ev){
     var t=ev.target.closest&&ev.target.closest("button"); if(!t) return;
     if(t.dataset.add){ addRow(t.dataset.add); return; }
+    if(t.dataset.cu){ custClose(t.dataset.cu); return; }
     if(t.classList.contains("del")&&!S.locked){
       var row=t.closest(".row"), b=row.dataset.b, i=+row.dataset.i;
       S.rows[b].splice(i,1); if(!S.rows[b].length) S.rows[b].push({text:"",amount:""});
@@ -491,6 +878,15 @@ function bind(){
     if(S.editOpen){ finishOpen(); return; }
     S.editOpen=true; paintTotals(); var e=$("openIn"); if(e){ e.focus(); e.select(); }
   };
+  $("depProj").onchange=function(){
+    if(this.checked){ if(S.dirty){ this.checked=false; say("請先儲存這天的修改，再改存款方式。"); return; } S.depWant=true; $("depNameBox").hidden=false; renderDepLines(); $("depName").focus(); }
+    else { S.depWant=false; if(S.day&&S.day.depMode==="project") depSet("normal","",[]); else $("depNameBox").hidden=true; }
+  };
+  $("depApply").onclick=function(){ depSet("project",$("depName").value.trim(),depPicked()); };
+  $("depName").addEventListener("keydown",function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); depSet("project",this.value.trim(),depPicked()); } });
+  $("btnSlip").onclick=openSlip;
+  $("custAdd").onclick=function(){ if(S.locked){ say("這天已結帳，不能新增。"); return; } custAdd(); };
+  $("btnPetty").onclick=openPetty;
   $("btnSave").onclick=function(){ save(); };
   $("btnPrint").onclick=printDay; $("btnClose").onclick=closeDay; $("btnReopen").onclick=reopenDay;
   $("btnRef").onclick=function(){ if(S.dirty){ ask("有尚未儲存的修改","重新整理會讓剛剛打的內容消失。","放棄並重新整理","留在這裡",function(){ closeModal(); S.dirty=false; load(S.date); }); } else load(S.date); };
