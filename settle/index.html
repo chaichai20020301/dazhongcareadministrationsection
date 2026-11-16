@@ -925,8 +925,13 @@ function bind(){
     if(t.classList.contains("tx")) r.text=t.value; else if(t.classList.contains("amt")){ r.amount=t.value; t.classList.remove("bad"); }
     setDirty(true); paintTotals();
   });
+  /* 中文輸入法：選字時按的 Enter 只是「確定選字」，不能當成換欄（否則還沒確定的字會跑進金額欄） */
+  var imeBusy=false, imeTimer=null;
+  document.addEventListener("compositionstart",function(){ imeBusy=true; clearTimeout(imeTimer); });
+  document.addEventListener("compositionend",function(){ clearTimeout(imeTimer); imeTimer=setTimeout(function(){ imeBusy=false; },80); });
   document.addEventListener("keydown",function(ev){
     var t=ev.target; if(ev.key!=="Enter"||!t.closest) return;
+    if(ev.isComposing||ev.keyCode===229||imeBusy) return;
     if(t.id==="openIn"){ ev.preventDefault(); finishOpen(); return; }
     var row=t.closest(".row[data-b]"); if(!row||S.locked) return;
     ev.preventDefault();
@@ -953,7 +958,7 @@ function bind(){
     else { S.depWant=false; if(S.day&&S.day.depMode==="project") depSet("normal","",[]); else $("depNameBox").hidden=true; }
   };
   $("depApply").onclick=function(){ depSet("project",$("depName").value.trim(),depPicked()); };
-  $("depName").addEventListener("keydown",function(ev){ if(ev.key==="Enter"){ ev.preventDefault(); depSet("project",this.value.trim(),depPicked()); } });
+  $("depName").addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&!ev.isComposing&&ev.keyCode!==229){ ev.preventDefault(); depSet("project",this.value.trim(),depPicked()); } });
   $("btnSlip").onclick=openSlip;
   $("custAdd").onclick=function(){ if(S.locked){ say("這天已結帳，不能新增。"); return; } custAdd(); };
   $("btnPetty").onclick=openPetty;
