@@ -152,6 +152,10 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
 .pl-row input[type=text]{padding:6px 9px;border:1.5px solid #D3D8C8;border-radius:10px;font-size:14px;min-width:0}
 .box label.lb{display:block;margin:10px 0 3px;font-size:13px;font-weight:700;color:var(--muted)}
 .box input.fld{width:100%;padding:8px 10px;border:1.5px solid #D3D8C8;border-radius:12px;font-size:14.5px}
+/* 多人同步提示 */
+.syncnote{margin-bottom:10px;padding:8px 14px;border-radius:12px;background:var(--t-soft);border:1.5px solid var(--t-line);color:var(--teal-d);font-size:13.5px;font-weight:700}
+.syncnote.warn{background:var(--o-soft);border-color:var(--o-line);color:#8A4A12}
+.syncnote.bad{background:var(--red);border-color:var(--red);color:#fff}
 /* 代保管與零用金申請 */
 .cust{margin-top:12px;padding:10px 12px;border:1.5px dashed var(--t-line);border-radius:14px}
 .cust-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -207,6 +211,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
       <button class="btn sec sm" id="btnRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
     </div>
 
+    <div class="syncnote" id="syncNote" hidden></div>
     <div class="warnbox" id="warnBox" hidden></div>
     <div class="empty2" id="emptyDay" hidden></div>
     <div class="cols" id="dayBody">
@@ -329,7 +334,7 @@ function api(action, args, ms){
   var p = { action:action, token:t }; for(var k in (args||{})) p[k] = args[k];
   var ctl = new AbortController(), timer = setTimeout(function(){ ctl.abort(); }, ms||60000);
   return fetch(SCRIPT_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(p),signal:ctl.signal}).then(function(r){ return r.json(); })
-    .then(function(j){ clearTimeout(timer); if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } return j; })
+    .then(function(j){ clearTimeout(timer); if(j && j.error==="unauthorized"){ kick(); throw new Error("unauthorized"); } if(j&&j.rev&&action!=="day.poll") S.rev=j.rev; return j; })
     .catch(function(e){ clearTimeout(timer); throw e; });
 }
 function stopLoad(){ var l=$("loading"); if(l) l.hidden=true; }
@@ -424,13 +429,13 @@ function applyDay(day){
       +(day.fileFound?'':'<div>這個月的日報表檔案也還沒有，按下去會一起自動建立（複製上個月的檔案）。</div>')
       +'<button class="btn main" id="btnCreate">開新的一天</button>';
     $("btnCreate").onclick=createDay;
-    S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=[]; }); S.cust=[];
+    S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=[]; }); S.cust=[]; S.base=null;
     paintBar(); setDirty(false); paintDep(); return;
   }
   $("emptyDay").hidden=true; $("dayBody").hidden=false;
   S.rows={}; BLOCKS.forEach(function(b){ S.rows[b]=(day.items[b]||[]).map(function(it){ return {text:it.text, amount:(it.amount===0&&!it.text)?"":String(it.amount)}; }); if(!S.locked) S.rows[b].push({text:"",amount:""}); });
   S.notes=day.notes||""; $("notes").value=S.notes; $("notes").readOnly=S.locked;
-  S.open=day.open; S.cust=day.custody||[];
+  S.open=day.open; S.cust=day.custody||[]; S.base={rows:rowsOf(day),notes:day.notes||"",open:day.open};
   paintCust(); paintAll(); paintBar(); setDirty(false); paintDep();
 }
 function load(date){
@@ -493,6 +498,7 @@ function save(forceVer){
   }).catch(function(e){ S.saving=false; setDirty(true); netFail(e); });
 }
 function conflict(latest){
+  if(S.base&&latest&&latest.exists&&latest.status==="draft"){ mergeIn(latest); showSync("存檔前發現別人也改了這天，已把別人新增的內容加進來，請確認後再按一次儲存。","warn",12000); return; }
   var h=$("modalHost");
   h.innerHTML='<div class="modal"><div class="box"><h2>這天的內容剛剛被改過</h2><p>試算表上這一天在你開啟之後有變動（可能是別人從系統或直接在試算表改的）。要看最新的內容，還是用你現在打的蓋過去？</p><div class="foot"><button class="btn sec" id="mNew">載入最新版（我的修改會不見）</button><button class="btn warn" id="mOver">用我的覆蓋</button></div></div></div>';
   $("mNew").onclick=function(){ closeModal(); applyDay(latest); };
@@ -839,6 +845,70 @@ function pettyHTML(o,label){
     +'<div class="sg"><span>經手人：</span><span>行政主管：</span><span>經理：</span></div>'
     +'<div class="side">'+label.split("").join("<br>")+'</div></div>';
 }
+
+/* ===== 多人同時使用：每 5 秒問一次「這天有沒有被改過」===== */
+var POLL_MS=5000, pollBusy=false, syncTimer=null;
+function rowsOf(day){ var r={}; BLOCKS.forEach(function(b){ r[b]=(day.items[b]||[]).map(function(it){ return {text:it.text, amount:(it.amount===0&&!it.text)?"":String(it.amount)}; }); }); return r; }
+function rkey(r){ var a=num(r.amount); return String(r.text||"").trim()+"\u0001"+(a===a?a:String(r.amount)); }
+function rblank(r){ return !String(r.text||"").trim() && !String(r.amount||"").trim(); }
+/* 三方合併一個清單：base＝我上次看到的、mine＝我現在的、theirs＝最新的。
+   別人新增的加進來；別人刪掉或改掉、而我沒動過的那幾筆，跟著更新；我改過的保留我的。 */
+function merge3(base,mine,theirs){
+  var cb={}, ct={}, rem={}, addc={}, out=[], added=0, removed=0;
+  base.forEach(function(r){ if(!rblank(r)){ var k=rkey(r); cb[k]=(cb[k]||0)+1; } });
+  theirs.forEach(function(r){ if(!rblank(r)){ var k=rkey(r); ct[k]=(ct[k]||0)+1; } });
+  Object.keys(cb).forEach(function(k){ var d=cb[k]-(ct[k]||0); if(d>0) rem[k]=d; });
+  Object.keys(ct).forEach(function(k){ var d=ct[k]-(cb[k]||0); if(d>0) addc[k]=d; });
+  mine.forEach(function(r){ if(rblank(r)) return; var k=rkey(r); if(rem[k]>0){ rem[k]--; removed++; return; } out.push(r); });
+  theirs.forEach(function(r){ if(rblank(r)) return; var k=rkey(r); if(addc[k]>0){ addc[k]--; out.push({text:r.text,amount:r.amount}); added++; } });
+  return {rows:out, added:added, removed:removed};
+}
+function showSync(msg,kind,ms){
+  var e=$("syncNote"); if(!e) return; e.textContent=msg; e.className="syncnote"+(kind?" "+kind:""); e.hidden=false;
+  clearTimeout(syncTimer); if(ms!==0) syncTimer=setTimeout(function(){ e.hidden=true; },ms||6000);
+}
+function hhmm(){ var d=new Date(); return twoD(d.getHours())+":"+twoD(d.getMinutes()); }
+function focusKeep(){   /* 記住游標在哪一格，重畫之後放回去 */
+  var a=document.activeElement, row=a&&a.closest&&a.closest(".row[data-b]"); if(!row) return null;
+  var b=row.dataset.b, obj=S.rows[b]&&S.rows[b][+row.dataset.i]; if(!obj) return null;
+  return {b:b,obj:obj,cls:a.classList.contains("amt")?"amt":"tx",s:a.selectionStart,e:a.selectionEnd};
+}
+function focusBack(f){
+  if(!f) return; var i=(S.rows[f.b]||[]).indexOf(f.obj); if(i<0) return;
+  var el=document.querySelector('.row[data-b="'+f.b+'"][data-i="'+i+'"] .'+f.cls); if(!el) return;
+  el.focus(); try{ el.setSelectionRange(f.s,f.e); }catch(x){}
+}
+/* 我有未存的修改時：只把別人新增（或我沒動過的）那幾筆合進來，不蓋掉我打的 */
+function mergeIn(day){
+  var f=focusKeep(), theirs=rowsOf(day), added=0, removed=0;
+  BLOCKS.forEach(function(b){
+    var m=merge3((S.base&&S.base.rows[b])||[], S.rows[b]||[], theirs[b]);
+    added+=m.added; removed+=m.removed; S.rows[b]=m.rows; if(!S.locked) S.rows[b].push({text:"",amount:""});
+  });
+  if(($("notes").value||"")===((S.base&&S.base.notes)||"")) $("notes").value=day.notes||"";
+  if(!S.openTouched) S.open=day.open;
+  S.day=day; S.base={rows:theirs,notes:day.notes||"",open:day.open}; S.cust=day.custody||[];
+  paintCust(); paintAll(); paintHead(); paintBar(); setDirty(true); paintDep(); focusBack(f);
+  showSync("別人剛更新了這天（"+hhmm()+"）：已把別人新增的 "+added+" 筆加進來"+(removed?"、同步 "+removed+" 筆被改掉或刪掉的":"")+"，你打的內容沒有動。","warn",10000);
+}
+function syncIn(day){
+  if(!day||day.date!==S.date||S.saving) return;
+  if(!S.dirty&&!S.editOpen){ var y=window.scrollY; applyDay(day); window.scrollTo(0,y); showSync("已同步最新內容（"+hhmm()+"）。",""); return; }
+  if(!S.base||!S.day||!S.day.exists||!day.exists||day.status!=="draft"){
+    showSync("這天剛被別人更新（開新的一天、結帳或解鎖）。你尚未儲存的修改可能無法存入，請先複製你打的內容，再按「重新整理」。","bad",0); return;
+  }
+  mergeIn(day);
+}
+function pollTick(){
+  if(document.hidden||pollBusy||S.saving||S.editOpen||!S.day||!S.date) return;
+  if($("modalHost").firstChild) return;                  /* 有視窗開著時先不動 */
+  var date=S.date; pollBusy=true;
+  api("day.poll",{date:date},15000).then(function(j){
+    if(!j||!j.ok||!j.rev||j.rev===S.rev||date!==S.date) return;
+    return api("day.get",{date:date},30000).then(function(g){ if(g&&g.ok&&date===S.date) syncIn(g.day); });
+  }).catch(function(){}).then(function(){ pollBusy=false; });
+}
+setInterval(pollTick,POLL_MS);
 
 /* ===== 事件 ===== */
 function addRow(b){
