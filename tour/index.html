@@ -289,6 +289,18 @@ tr.row:hover{background:#F3F6EC}
 .so.go{border-style:dashed}
 .so.no{color:#8a4b44}
 .so.no.on{color:#fff}
+.gvm{position:fixed;inset:0;z-index:99998;background:rgba(30,40,34,.5);display:flex;align-items:center;justify-content:center;padding:16px}
+.gvm .card{background:#fffdf7;border-radius:16px;max-width:460px;width:100%;padding:20px 22px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.gvm h3{margin:0 0 4px;font-size:18px;color:#3a463e}
+.gvm p{margin:0 0 12px;color:var(--sub);font-size:13.5px}
+.gvm .rs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.gvm .rs button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:5px 12px;font-size:13.5px;cursor:pointer}
+.gvm .rs button:hover{border-color:var(--g)}
+.gvm textarea{width:100%;min-height:84px;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:14.5px;background:#fff;box-sizing:border-box}
+.gvm .ac{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.gvm .ac button{border-radius:99px;padding:8px 20px;font-size:14.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff}
+.gvm .ac .ok{background:#8a4b44;border-color:#8a4b44;color:#fff}
+.gvm .ac .ok:disabled{opacity:.4;cursor:not-allowed}
 </style>
 <link rel="stylesheet" href="../assets/common/motion.css?v=2"><script defer src="../assets/common/motion.js?v=2"></script>
 </head>
@@ -705,16 +717,35 @@ function renderGive(){const b=$("#giveBox");if(!b||!CUR)return;
   b.className="givebox on";
   b.innerHTML=`<span>放棄時的階段：<b>${esc(CUR.giveUpStage||"未記錄")}</b></span><label style="display:flex;gap:6px;align-items:center;flex:1">原因<input id="giveWhy" placeholder="選填，例如：家屬選擇其他機構、費用考量…" value="${esc(CUR.giveUpReason||"")}"></label>`;
   $("#giveWhy").oninput=e=>{CUR.giveUpReason=e.target.value;mark()}}
-function setStatus(s){
+const GIVE_WHY=["選擇其他機構","費用考量","距離或交通不便","長輩病情改變或已往生","床位或房型不合","家屬無法聯絡"];
+function askGiveUp(init,stage){
+  return new Promise(res=>{
+    const d=document.createElement("div");d.className="gvm";
+    d.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h3>放棄原因</h3><p>${stage?`目前在「${esc(stage)}」階段。`:""}資料會保留，不會被刪除，之後仍可改回其他狀態。請填寫為什麼放棄：</p>
+      <div class="rs">${GIVE_WHY.map(x=>`<button type="button">${x}</button>`).join("")}</div>
+      <textarea id="gvT" placeholder="必填，可點上面的選項再補充說明">${esc(init||"")}</textarea>
+      <div class="ac"><button type="button" class="cn">取消</button><button type="button" class="ok">確定放棄</button></div></div>`;
+    document.body.appendChild(d);
+    const t=d.querySelector("#gvT"),ok=d.querySelector(".ok"),chk=()=>{ok.disabled=!t.value.trim()};
+    d.querySelectorAll(".rs button").forEach(b=>b.onclick=()=>{const v=t.value.trim();t.value=v?(v.includes(b.textContent)?v:v+"、"+b.textContent):b.textContent;chk();t.focus()});
+    t.oninput=chk;chk();setTimeout(()=>t.focus(),50);
+    const done=v=>{d.remove();res(v)};
+    ok.onclick=()=>done(t.value.trim());d.querySelector(".cn").onclick=()=>done(null);
+    d.onclick=e=>{if(e.target===d)done(null)};
+  });
+}
+async function setStatus(s){
   if(CUR.status===s)return;
-  if(s==="放棄"&&!confirm("確定要將這筆標記為「放棄」嗎？\n（資料會保留，不會被刪除，之後仍可改回其他狀態）"))return;
-  if(s==="放棄"){CUR.giveUpStage=OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||"")}
+  let why=null;
+  if(s==="放棄"){why=await askGiveUp(CUR.giveUpReason,OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||""));if(why===null)return}
+  if(s==="放棄"){CUR.giveUpStage=OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||"");CUR.giveUpReason=why}
   else if(CUR.status==="放棄"){CUR.giveUpStage="";CUR.giveUpReason=""}
   CUR.status=s;
   VIEWSTAGE=null;renderStatus();
   renderGive();mark();
 }
 async function save(){
+  if(CUR&&CUR.status==="放棄"&&ORIG.status!=="放棄"&&!String(CUR.giveUpReason||"").trim()){toast("請填寫放棄原因");const w=$("#giveWhy");if(w)w.focus();return}
   if(!needWho())return;
   const bad=[];["visitorName","elderName"].forEach(k=>{const f=$(`.fl[data-k=${k}]`);const b=!String(CUR[k]||"").trim();f&&f.classList.toggle("bad",b);if(b)bad.push(k)});
   if(!String(CUR.mobile||"").trim()&&!String(CUR.phone||"").trim()){bad.push("mobile");$(`.fl[data-k=mobile]`).classList.add("bad")}
