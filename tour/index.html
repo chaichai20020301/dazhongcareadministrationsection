@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700;900&family=Noto+Serif+TC:wght@500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#FAF8EF;--card:#FFFDF8;--ink:#092F25;--sub:#4D695A;--line:#E3E5D8;--g:#14563F;--g2:#8DBF6E;--g3:#EAF3DC;--teal:#27675F;--warm:#B65B16;--red:#A63124;
- --s-wait:#B65B16;--s-hold:#9A6B2E;--s-talk:#27675F;--s-bed:#2C6E8A;--s-in:#14563F;--s-can:#8A938C}
+ --s-wait:#B65B16;--s-hold:#9A6B2E;--s-nurse:#6F5A8E;--s-talk:#27675F;--s-bed:#2C6E8A;--s-in:#14563F;--s-can:#8A938C}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Noto Sans TC',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6}
 button,input,select,textarea{font-family:inherit;font-size:15px;color:inherit}
@@ -266,6 +266,9 @@ tr.row:hover{background:#F3F6EC}
 #lb .bar{display:flex;gap:10px}
 #lb .bar a,#lb .bar button{color:#fff;border:1.5px solid #fff;background:transparent;border-radius:99px;padding:7px 18px;font-size:14px;text-decoration:none;cursor:pointer}
 .vg select{border:1.5px solid #cbbf9c;border-radius:99px;padding:5px 12px;background:#fff;font-size:14px;max-width:180px}
+.givebox{display:none;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-top:8px;padding:8px 12px;border-radius:10px;background:#f1f2ee;color:#5b645d;font-size:13.5px}
+.givebox.on{display:flex}
+.givebox input{flex:1;min-width:180px;border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;background:#fff;font-size:13.5px}
 </style>
 <link rel="stylesheet" href="../assets/common/motion.css?v=2"><script defer src="../assets/common/motion.js?v=2"></script>
 </head>
@@ -305,6 +308,7 @@ tr.row:hover{background:#F3F6EC}
   <div class="dh">
     <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
     <div class="stbar" id="stbar"></div>
+    <div class="givebox" id="giveBox"></div>
   </div>
   <div class="db" id="dBody"></div>
   <div class="df"><span class="st" id="dSt"></span><button class="btn btn-o" onclick="closeDr()">關閉</button><button class="btn btn-g" id="saveBtn" onclick="save()">儲存</button></div>
@@ -325,16 +329,16 @@ tr.row:hover{background:#F3F6EC}
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxPqXAUY2AE59y3f7bun1JAvplPBK40fgSrGxdnFlN-oiDObjBra7RWberdCQz8Eerl/exec";
 /* ===================================================== */
 
-const STATUSES=["待聯絡","控床聯絡","家屬討論中","已安排床位","已入住","放棄"];
+const STATUSES=["初步參訪","控床聯絡","護理聯絡","家屬討論中","已安排床位","已入住","放棄"];
 // 舊狀態對應（資料若還留著舊狀態，畫面上會自動以新狀態顯示）
-const LEGACY_ST={"已確認":"控床聯絡","已參訪":"家屬討論中","取消":"放棄","作廢":"放棄"};
-const SC={"待聯絡":"--s-wait","控床聯絡":"--s-hold","家屬討論中":"--s-talk","已安排床位":"--s-bed","已入住":"--s-in","放棄":"--s-can"};
+const LEGACY_ST={"待聯絡":"初步參訪","已確認":"控床聯絡","已參訪":"家屬討論中","取消":"放棄","作廢":"放棄"};
+const SC={"初步參訪":"--s-wait","控床聯絡":"--s-hold","護理聯絡":"--s-nurse","家屬討論中":"--s-talk","已安排床位":"--s-bed","已入住":"--s-in","放棄":"--s-can"};
 const CHANNELS=["家屬線上","電話詢問","實地參訪","網路詢問"];
 const NOTE_TYPES=["電話","實地","LINE","其他"];
 const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
-const OPEN_ST=["待聯絡","控床聯絡","家屬討論中","已安排床位"];
+const OPEN_ST=["初步參訪","控床聯絡","護理聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
-const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"可接受房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日",inTime:"入住時間",inNote:"入住說明",outTransport:"退住交通",outAddr:"退住接送地址",outMode:"退住接送方式",outTime:"退住時間",outNote:"退住說明",obsLevel:"參訪觀察評級",obsTags:"參訪觀察標籤",obsNote:"參訪觀察備註",rsnCare:"入住原因：照護需求",rsnHosp:"入住原因：前次住院與治療過程",rsnExpect:"入住原因：家屬期望",rsnOther:"入住原因：其他注意事項",hxChronic:"疾病史：慢性病",hxDiag:"疾病史：主要診斷",hxSurg:"疾病史：手術與住院史",hxAllergy:"疾病史：過敏史",hxCog:"疾病史：失智／精神／情緒",hxInfect:"疾病史：感染或隔離",curPlace:"目前所在",curPlaceNote:"目前所在名稱",dietType:"餐食：葷素",dietStaple:"餐食：主食",dietVeg:"餐食：菜的處理",dietSize:"餐食：碗的大小",fallRisk:"跌倒風險",assess1966:"1966長照評估",cmsLevel:"CMS等級"};
+const LABEL={status:"狀態",channel:"詢問方式",wantDate:"希望參訪日",wantSlot:"希望時段",visitDate:"實際參訪日",visitorName:"參訪人姓名",relation:"與長者關係",mobile:"手機",phone:"住家電話",email:"Email",address:"地址",elderName:"長者姓名",gender:"性別",age:"年齡",hospital:"看診醫院",conditions:"身體狀況",condNote:"其他狀況",roomType:"可接受房型",estimate:"系統試算",total:"計價費用合計",bedNo:"預入住床號",reason:"入住原因與病史",identity:"入住身份",mobility:"移動能力",feeding:"進食方式",oxygen:"氧氣",dnr:"DNR",communication:"溝通",medication:"用藥",safety:"安全看視",expectedStay:"預計入住時間",transport:"入住交通",pickupAddr:"接送地址",pickupMode:"接送方式",infoSource:"資料來源",infoSourceNote:"來源備註",handler:"承辦人",history:"疾病史",diet:"餐食",excretion:"排泄",choking:"嗆咳風險",woundNote:"傷口說明",nurse:"主責護理",routine:"日常起居",chkExam:"體檢報告(控床)",chkContract:"入住合約(行政)",chkFee:"入住費用說明(行政)",serviceType:"預備服務類型",serviceCode:"服務代碼／說明",stayStart:"預入住開始日",stayEnd:"預入住結束日",inTime:"入住時間",inNote:"入住說明",outTransport:"退住交通",outAddr:"退住接送地址",outMode:"退住接送方式",outTime:"退住時間",outNote:"退住說明",obsLevel:"參訪觀察評級",obsTags:"參訪觀察標籤",obsNote:"參訪觀察備註",rsnCare:"入住原因：照護需求",rsnHosp:"入住原因：前次住院與治療過程",rsnExpect:"入住原因：家屬期望",rsnOther:"入住原因：其他注意事項",hxChronic:"疾病史：慢性病",hxDiag:"疾病史：主要診斷",hxSurg:"疾病史：手術與住院史",hxAllergy:"疾病史：過敏史",hxCog:"疾病史：失智／精神／情緒",hxInfect:"疾病史：感染或隔離",curPlace:"目前所在",curPlaceNote:"目前所在名稱",dietType:"餐食：葷素",dietStaple:"餐食：主食",dietVeg:"餐食：菜的處理",dietSize:"餐食：碗的大小",fallRisk:"跌倒風險",assess1966:"1966長照評估",cmsLevel:"CMS等級",giveUpStage:"放棄階段",giveUpReason:"放棄原因"};
 let PRICE={rooms:[{name:"單人房",price:40000},{name:"2 人房",price:38000},{name:"3 人房",price:35000},{name:"4 人房",price:32000},{name:"5 人房",price:29000}],
   addons:[{key:"尿布（機構提供）",price:3000},{key:"尿布（自備）",price:0},{key:"鼻胃管",price:2000},{key:"導尿管",price:2000},{key:"氣切",price:2400},{key:"人工造廔口",price:3000},{key:"氧氣（機構提供）",price:0},{key:"氧氣（自備）",price:0},{key:"氣墊床（機構提供）",price:0},{key:"氣墊床（自備）",price:0},{key:"傷口",price:0},{key:"其他",price:0}],
   daily:1850,note:"短期照護 $1850／日。新入住前 30 天當月未住滿 30 天者，以日計費。"};
@@ -434,7 +438,7 @@ function quickOK(r){
   if(!fQuick)return true;const t=today(),[ws,we]=weekRange();
   if(fQuick==="today")return vDate(r)===t&&OPEN_ST.includes(r.status);
   if(fQuick==="week")return vDate(r)>=ws&&vDate(r)<=we&&OPEN_ST.includes(r.status);
-  if(fQuick==="wait")return r.status==="待聯絡";
+  if(fQuick==="wait")return r.status==="初步參訪";
   if(fQuick==="follow")return FOLLOW[r.id]&&FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status);
   return true;
 }
@@ -452,14 +456,14 @@ function filtered(){
 }
 function draw(){
   const t=today(),[ws,we]=weekRange(),op=ROWS.filter(r=>OPEN_ST.includes(r.status));
-  const k=[["today","今日參訪",op.filter(r=>vDate(r)===t).length],["week","本週參訪",op.filter(r=>vDate(r)>=ws&&vDate(r)<=we).length],["wait","待聯絡",ROWS.filter(r=>r.status==="待聯絡").length],["follow","今日需追蹤",op.filter(r=>FOLLOW[r.id]&&FOLLOW[r.id]<=t).length]];
+  const k=[["today","今日參訪",op.filter(r=>vDate(r)===t).length],["week","本週參訪",op.filter(r=>vDate(r)>=ws&&vDate(r)<=we).length],["wait","初步參訪",ROWS.filter(r=>r.status==="初步參訪").length],["follow","今日需追蹤",op.filter(r=>FOLLOW[r.id]&&FOLLOW[r.id]<=t).length]];
   $("#kpis").innerHTML=k.map(x=>`<button class="kpi${fQuick===x[0]?" on":""}" onclick="quick('${x[0]}')"><b>${x[2]}</b><span>${x[1]}</span></button>`).join("");
   const cnt=s=>s==="全部"?ROWS.length:s==="進行中"?op.length:ROWS.filter(r=>r.status===s).length;
   $("#schips").innerHTML=["進行中","全部"].concat(STATUSES).map(s=>`<button class="ch${fStatus===s?" on":""}" onclick="setStatusF('${s}')">${s}<em>${cnt(s)}</em></button>`).join("");
   const a=filtered();
   const arrow=c=>sortK===c?(sortD>0?" ▲":" ▼"):"";
   if(!a.length){$("#tbl").innerHTML='<div class="empty">沒有符合條件的紀錄<br><small>可以調整上方篩選，或按「新增紀錄」</small></div>';$("#cards").innerHTML="";return}
-  $("#tbl").innerHTML=`<table><thead><tr><th onclick="sortBy('createdAt')">建立${arrow("createdAt")}</th><th>狀態</th><th>長者</th><th>聯絡人</th><th onclick="sortBy('date')">參訪日${arrow("date")}</th><th>房型</th><th>試算／合計</th><th>來源</th><th>下次追蹤</th><th>承辦</th></tr></thead><tbody>${a.map((r,i)=>`<tr class="row" style="animation-delay:${Math.min(i,12)*25}ms" onclick="openRow('${r.id}')"><td>${esc(fmtT(r.createdAt))}<br><span class="tag">${esc(r.id)}</span></td><td>${pill(r.status)}</td><td><b>${esc(r.elderName)}</b> ${obsBadge(r)} ${attBadge(r)}<br><small>${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></td><td>${esc(r.visitorName)}<br><small>${esc(r.mobile||r.phone)}</small></td><td>${esc(vDate(r))}<br><small>${esc(r.wantSlot||"")}</small></td><td>${esc(r.roomType||"—")}</td><td>${r.total?money(r.total):(r.estimate?"<small>試算</small> "+money(r.estimate):"—")}</td><td>${esc(r.channel||"")}</td><td>${FOLLOW[r.id]?`<span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:"—"}</td><td>${esc(r.handler||"")}</td></tr>`).join("")}</tbody></table>`;
+  $("#tbl").innerHTML=`<table><thead><tr><th onclick="sortBy('createdAt')">建立${arrow("createdAt")}</th><th>狀態</th><th>長者</th><th>聯絡人</th><th onclick="sortBy('date')">參訪日${arrow("date")}</th><th>房型</th><th>試算／合計</th><th>來源</th><th>下次追蹤</th><th>承辦</th></tr></thead><tbody>${a.map((r,i)=>`<tr class="row" style="animation-delay:${Math.min(i,12)*25}ms" onclick="openRow('${r.id}')"><td>${esc(fmtT(r.createdAt))}<br><span class="tag">${esc(r.id)}</span></td><td>${pill(r.status)}${r.status==="放棄"&&r.giveUpStage?`<br><small style="color:var(--sub)">於${esc(r.giveUpStage)}</small>`:""}</td><td><b>${esc(r.elderName)}</b> ${obsBadge(r)} ${attBadge(r)}<br><small>${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></td><td>${esc(r.visitorName)}<br><small>${esc(r.mobile||r.phone)}</small></td><td>${esc(vDate(r))}<br><small>${esc(r.wantSlot||"")}</small></td><td>${esc(r.roomType||"—")}</td><td>${r.total?money(r.total):(r.estimate?"<small>試算</small> "+money(r.estimate):"—")}</td><td>${esc(r.channel||"")}</td><td>${FOLLOW[r.id]?`<span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:"—"}</td><td>${esc(r.handler||"")}</td></tr>`).join("")}</tbody></table>`;
   $("#cards").innerHTML=a.map((r,i)=>`<div class="rc" style="animation-delay:${Math.min(i,10)*25}ms" onclick="openRow('${r.id}')"><div class="h"><b>${esc(r.elderName)} ${obsBadge(r)} ${attBadge(r)} <small style="font-weight:400;color:var(--sub)">${esc([r.gender,r.age?r.age+"歲":""].filter(Boolean).join(" "))}</small></b>${pill(r.status)}</div><div class="m">👤 ${esc(r.visitorName)}（${esc(r.relation||"")}）　📞 ${esc(r.mobile||r.phone)}</div><div class="m">📅 ${esc(vDate(r)||"未定")} ${esc(r.wantSlot||"")}　🏠 ${esc(r.roomType||"—")}${FOLLOW[r.id]?`　🔔 <span class="${FOLLOW[r.id]<=t&&OPEN_ST.includes(r.status)?"warn":""}">${esc(FOLLOW[r.id])}</span>`:""}</div><div class="m"><span class="tag">${esc(r.channel||"")}</span> <span class="tag">${esc(r.id)}</span></div></div>`).join("");
 }
 function quick(k){fQuick=fQuick===k?"":k;if(fQuick)fStatus="進行中";draw()}
@@ -521,7 +525,7 @@ const OBS_TAGS=["要求過多","情緒易激動","容易起衝突","對費用多
 function obsBadge(r){return r&&["留意","高風險","建議不收"].includes(r.obsLevel)?`<span class="ob ${r.obsLevel}">${r.obsLevel}</span>`:""}
 function setObsLevel(v){CUR.obsLevel=CUR.obsLevel===v?"":v;$$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));mark()}
 async function openRow(id){
-  if(id===null){CUR={status:"待聯絡",channel:"電話詢問",handler:me(),visitDate:"",conditions:""};ORIG=Object.assign({},CUR);paint([],[]);openDr();return}
+  if(id===null){CUR={status:"初步參訪",channel:"電話詢問",handler:me(),visitDate:"",conditions:""};ORIG=Object.assign({},CUR);paint([],[]);openDr();return}
   $("#dTitle").textContent="讀取中…";$("#dBody").innerHTML='<div class="load"><span class="spin d"></span></div>';openDr();
   const r=await api("get",{id});if(!r.ok||!r.row){closeDr();return toast("讀取失敗")}
   CUR=Object.assign({},r.row);ORIG=Object.assign({},r.row);paint(r.notes||[],r.hist||[]);
@@ -535,6 +539,7 @@ function paint(notes,hist){
   const isNew=!CUR.id;
   $("#dTitle").innerHTML=isNew?"新增參訪紀錄":`${esc(CUR.elderName||"（未填）")}<small>${esc(CUR.id)}</small>`;
   $("#stbar").innerHTML=STATUSES.map(s=>`<button type="button" class="sb${CUR.status===s?" on":""}" style="${CUR.status===s?`background:var(${SC[s]})`:""}" onclick="setStatus('${s}')">${s}</button>`).join("");
+  renderGive();
   $("#dBody").innerHTML=`
   <div class="sec"><h3>參訪人資料</h3><div class="grid">
     ${inp("visitorName","姓名",{req:1})}${sel("relation","與長者／入住人關係",["子女","配偶","孫輩","兄弟姊妹","其他親屬","朋友","本人","其他"])}
@@ -655,12 +660,19 @@ function mark(){
   const d=dirty();$("#dSt").textContent=d?"● 有尚未儲存的修改":(CUR.id?`最後更新：${fmtT(CUR.updatedAt)} ${CUR.updatedBy||""}`:"");$("#dSt").style.color=d?"var(--warm)":"var(--sub)";
   $("#saveBtn").disabled=!d;
 }
+function renderGive(){const b=$("#giveBox");if(!b||!CUR)return;
+  if(CUR.status!=="放棄"){b.className="givebox";b.innerHTML="";return}
+  b.className="givebox on";
+  b.innerHTML=`<span>放棄時的階段：<b>${esc(CUR.giveUpStage||"未記錄")}</b></span><label style="display:flex;gap:6px;align-items:center;flex:1">原因<input id="giveWhy" placeholder="選填，例如：家屬選擇其他機構、費用考量…" value="${esc(CUR.giveUpReason||"")}"></label>`;
+  $("#giveWhy").oninput=e=>{CUR.giveUpReason=e.target.value;mark()}}
 function setStatus(s){
   if(CUR.status===s)return;
   if(s==="放棄"&&!confirm("確定要將這筆標記為「放棄」嗎？\n（資料會保留，不會被刪除，之後仍可改回其他狀態）"))return;
+  if(s==="放棄"){CUR.giveUpStage=OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||"")}
+  else if(CUR.status==="放棄"){CUR.giveUpStage="";CUR.giveUpReason=""}
   CUR.status=s;
   $("#stbar").innerHTML=STATUSES.map(x=>`<button type="button" class="sb${CUR.status===x?" on":""}" style="${CUR.status===x?`background:var(${SC[x]})`:""}" onclick="setStatus('${x}')">${x}</button>`).join("");
-  mark();
+  renderGive();mark();
 }
 async function save(){
   if(!needWho())return;
@@ -795,16 +807,18 @@ function drawStats(){
   const monthRows=ROWS.filter(r=>ym(r.createdAt)===cm);
   const total=ROWS.length,moved=ROWS.filter(r=>r.status==="已入住").length,gave=ROWS.filter(r=>r.status==="放棄").length,bedded=ROWS.filter(r=>["已安排床位","已入住"].includes(r.status)).length;
   const byS={};STATUSES.forEach(s=>byS[s]=ROWS.filter(r=>r.status===s).length);
+  const byG={};ROWS.filter(r=>r.status==="放棄").forEach(r=>{const k=r.giveUpStage||"未記錄";byG[k]=(byG[k]||0)+1});
   const byC={};ROWS.forEach(r=>{const k=r.channel||"未填";byC[k]=(byC[k]||0)+1});
   const byI={};ROWS.forEach(r=>{const k=r.infoSource||"未填";byI[k]=(byI[k]||0)+1});
   const months=[];for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"))}
   const tr=months.map(m=>[m,ROWS.filter(r=>ym(r.createdAt)===m).length]),tmx=Math.max(1,...tr.map(x=>x[1]));
   const pc=(a,b)=>b?Math.round(a/b*100)+"%":"—";
   $("#v-stats").innerHTML=`
-  <div class="sum" style="margin-bottom:12px"><div class="kpi" style="cursor:default"><b>${monthRows.length}</b><span>本月新增預約</span></div><div class="kpi" style="cursor:default"><b>${byS["待聯絡"]}</b><span>目前待聯絡</span></div><div class="kpi" style="cursor:default"><b>${pc(bedded,total)}</b><span>已安排床位（含已入住）</span></div><div class="kpi" style="cursor:default"><b>${pc(moved,total)}</b><span>已入住</span></div></div>
+  <div class="sum" style="margin-bottom:12px"><div class="kpi" style="cursor:default"><b>${monthRows.length}</b><span>本月新增預約</span></div><div class="kpi" style="cursor:default"><b>${byS["初步參訪"]}</b><span>目前初步參訪</span></div><div class="kpi" style="cursor:default"><b>${pc(bedded,total)}</b><span>已安排床位（含已入住）</span></div><div class="kpi" style="cursor:default"><b>${pc(moved,total)}</b><span>已入住</span></div></div>
   <div class="sg">
     <div class="panel"><h3>各狀態數量</h3>${bars(byS,k=>`var(${SC[k]})`)}</div>
     <div class="panel"><h3>近 6 個月新增預約</h3><div class="trend">${tr.map(([m,v])=>`<div><b>${v}</b><i data-h="${v/tmx*100}" style="height:0"></i>${m.slice(5)}月</div>`).join("")}</div></div>
+    <div class="panel"><h3>放棄發生在哪個階段</h3>${Object.keys(byG).length?bars(byG,k=>`var(${SC[k]||"--s-can"})`):'<div style="color:var(--sub);font-size:13.5px">目前沒有放棄的預約</div>'}</div>
     <div class="panel"><h3>詢問方式</h3>${bars(byC,()=>"var(--g)")}</div>
     <div class="panel"><h3>資料來源</h3>${bars(byI,()=>"var(--warm)")}</div>
   </div>
@@ -816,7 +830,7 @@ function drawStats(){
 function seedDemo(){
   if(mLoad().rows.length&&!confirm("目前已有資料，要加入示範資料嗎？"))return;
   const db=mLoad(),d=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString().slice(0,10)},ts=n=>{const x=new Date();x.setDate(x.getDate()+n);return x.toISOString()};
-  const mk=(i,o)=>Object.assign({id:"T-DEMO-"+String(i).padStart(2,"0"),createdAt:ts(-i),updatedAt:ts(-i),updatedBy:"示範",status:"待聯絡",channel:"家屬線上",conditions:"",roomType:"",total:"",estimate:""},o);
+  const mk=(i,o)=>Object.assign({id:"T-DEMO-"+String(i).padStart(2,"0"),createdAt:ts(-i),updatedAt:ts(-i),updatedBy:"示範",status:"初步參訪",channel:"家屬線上",conditions:"",roomType:"",total:"",estimate:""},o);
   const demo=[
     mk(1,{visitorName:"陳美玲",relation:"子女",mobile:"0912-111-222",elderName:"陳阿嬤",gender:"女",age:86,wantDate:d(0),wantSlot:"上午",conditions:"尿布、鼻胃管",roomType:"2 人房",estimate:43000,total:43000,hospital:"彰化基督教醫院",reason:"出院後需要鼻胃管灌食與翻身照護，家中無人可照顧。"}),
     mk(2,{visitorName:"林志明",relation:"子女",mobile:"0922-333-444",elderName:"林伯伯",gender:"男",age:79,wantDate:d(2),wantSlot:"下午",status:"控床聯絡",channel:"電話詢問",conditions:"尿布",roomType:"3 人房",estimate:38000,total:38000,handler:"小華"}),
