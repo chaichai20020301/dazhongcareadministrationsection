@@ -269,6 +269,26 @@ tr.row:hover{background:#F3F6EC}
 .givebox{display:none;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-top:8px;padding:8px 12px;border-radius:10px;background:#f1f2ee;color:#5b645d;font-size:13.5px}
 .givebox.on{display:flex}
 .givebox input{flex:1;min-width:180px;border:1.5px solid var(--line);border-radius:8px;padding:5px 10px;background:#fff;font-size:13.5px}
+.stbar{display:block}
+.stgs{display:flex;align-items:center;flex-wrap:wrap;gap:4px 2px}
+.stg{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:5px 14px 5px 6px;font-size:14px;font-weight:700;color:var(--sub);cursor:pointer;transition:.15s}
+.stg i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#e8e6dc;color:#5b645d;font-size:12.5px}
+.stg.done i{background:#4f8a3c;color:#fff}
+.stg.cur{color:#fff;border-color:transparent;background:var(--stc,var(--g))}
+.stg.cur i{background:rgba(255,255,255,.3);color:#fff}
+.stg.gave{color:#fff;border-color:transparent;background:var(--s-can)}
+.stg.gave i{background:rgba(255,255,255,.3);color:#fff}
+.stg.view:not(.cur):not(.gave){border-color:var(--g);color:var(--g)}
+.stg.view{box-shadow:0 0 0 3px rgba(80,120,90,.18)}
+.stg-ar{color:#b3b8ac;font-size:18px;padding:0 2px}
+.sopts{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:10px;padding:10px 12px;border-radius:12px;background:#f3f4ee}
+.sopts .sl{font-size:13px;color:var(--sub);font-weight:700;margin-right:4px}
+.so{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 16px;font-size:14px;font-weight:700;cursor:pointer;color:#3a463e;transition:.15s}
+.so:hover{border-color:var(--g)}
+.so.on{color:#fff;border-color:transparent}
+.so.go{border-style:dashed}
+.so.no{color:#8a4b44}
+.so.no.on{color:#fff}
 </style>
 <link rel="stylesheet" href="../assets/common/motion.css?v=2"><script defer src="../assets/common/motion.js?v=2"></script>
 </head>
@@ -538,7 +558,7 @@ function closeDr(){
 function paint(notes,hist){
   const isNew=!CUR.id;
   $("#dTitle").innerHTML=isNew?"新增參訪紀錄":`${esc(CUR.elderName||"（未填）")}<small>${esc(CUR.id)}</small>`;
-  $("#stbar").innerHTML=STATUSES.map(s=>`<button type="button" class="sb${CUR.status===s?" on":""}" style="${CUR.status===s?`background:var(${SC[s]})`:""}" onclick="setStatus('${s}')">${s}</button>`).join("");
+  VIEWSTAGE=null;renderStatus();
   renderGive();
   $("#dBody").innerHTML=`
   <div class="sec"><h3>參訪人資料</h3><div class="grid">
@@ -660,6 +680,26 @@ function mark(){
   const d=dirty();$("#dSt").textContent=d?"● 有尚未儲存的修改":(CUR.id?`最後更新：${fmtT(CUR.updatedAt)} ${CUR.updatedBy||""}`:"");$("#dSt").style.color=d?"var(--warm)":"var(--sub)";
   $("#saveBtn").disabled=!d;
 }
+const STAGES=[{n:"初步參訪",st:["初步參訪"]},{n:"控床聯絡",st:["控床聯絡"]},{n:"護理聯絡",st:["護理聯絡"]},{n:"家屬確認",st:["家屬討論中","已安排床位"]},{n:"已入住",st:["已入住"]}];
+let VIEWSTAGE=null;
+const stageOf=x=>STAGES.findIndex(g=>g.st.includes(x));
+const curStage=()=>CUR.status==="放棄"?stageOf(CUR.giveUpStage||""):stageOf(CUR.status);
+const viewStage=()=>VIEWSTAGE!=null?VIEWSTAGE:Math.max(0,curStage());
+function pickStage(i){VIEWSTAGE=i;renderStatus()}
+function renderStatus(){
+  const box=$("#stbar");if(!box||!CUR)return;
+  const cur=curStage(),v=viewStage(),gave=CUR.status==="放棄",g=STAGES[v];
+  const steps=STAGES.map((x,i)=>{const k=gave&&i===cur?"gave":(!gave&&i===cur?"cur":(cur>=0&&i<cur?"done":""));
+    const sty=k==="cur"?` style="--stc:var(${SC[CUR.status]||"--g"})"`:"";
+    return `<button type="button" class="stg ${k}${i===v?" view":""}"${sty} onclick="pickStage(${i})"><i>${k==="done"?"✓":i+1}</i>${x.n}${k==="gave"?"（放棄）":""}</button>`}).join('<span class="stg-ar">›</span>');
+  const opt=(label,status,on,cls)=>`<button type="button" class="so${on?" on":""} ${cls||""}" style="${on?`background:var(${SC[status]||"--s-can"})`:""}" onclick="setStatus('${status}')">${label}</button>`;
+  const o=[];
+  if(v<=2){o.push(opt(`${g.n}（進行中）`,g.st[0],CUR.status===g.st[0]));o.push(opt(`完成，進入「${STAGES[v+1].n}」`,STAGES[v+1].st[0],false,"go"))}
+  else if(v===3){g.st.forEach(x=>o.push(opt(x,x,CUR.status===x)))}
+  else o.push(opt("已入住","已入住",CUR.status==="已入住"));
+  if(v<=3)o.push(opt("放棄","放棄",gave&&v===cur,"no"));
+  box.innerHTML=`<div class="stgs">${steps}</div><div class="sopts"><span class="sl">階段 ${v+1}：${g.n}</span>${o.join("")}</div>`;
+}
 function renderGive(){const b=$("#giveBox");if(!b||!CUR)return;
   if(CUR.status!=="放棄"){b.className="givebox";b.innerHTML="";return}
   b.className="givebox on";
@@ -671,7 +711,7 @@ function setStatus(s){
   if(s==="放棄"){CUR.giveUpStage=OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||"")}
   else if(CUR.status==="放棄"){CUR.giveUpStage="";CUR.giveUpReason=""}
   CUR.status=s;
-  $("#stbar").innerHTML=STATUSES.map(x=>`<button type="button" class="sb${CUR.status===x?" on":""}" style="${CUR.status===x?`background:var(${SC[x]})`:""}" onclick="setStatus('${x}')">${x}</button>`).join("");
+  VIEWSTAGE=null;renderStatus();
   renderGive();mark();
 }
 async function save(){
