@@ -300,6 +300,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
   <div class="bal" id="barBal">零用金餘額<b id="b-end"></b></div>
   <div class="st" id="st"></div>
   <button class="btn sec" id="btnPrint" hidden><span class="ico" style="--ico:url(../assets/common/icon-print.webp)"></span>列印</button>
+  <button class="btn sec" id="btnXlsx" hidden><span class="ico" style="--ico:url(../assets/common/icon-download.webp)"></span>下載 Excel</button>
   <button class="btn sec" id="btnReopen" hidden><span class="ico" style="--ico:url(../assets/common/icon-lock.webp)"></span>解鎖</button>
   <button class="btn sec" id="btnClose" hidden><span class="ico" style="--ico:url(../assets/common/icon-lock.webp)"></span>結帳</button>
   <button class="btn main" id="btnSave" disabled><span class="ico" style="--ico:url(../assets/common/icon-check.webp)"></span>儲存</button>
@@ -402,7 +403,7 @@ function paintHead(){
 }
 function paintBar(){
   var d=S.day, ex=d&&d.exists;
-  $("btnSave").hidden=!ex||S.locked; $("btnClose").hidden=!ex||S.locked; $("btnPrint").hidden=!ex; $("btnReopen").hidden=!(ex&&S.locked&&d.canReopen);
+  $("btnSave").hidden=!ex||S.locked; $("btnClose").hidden=!ex||S.locked; $("btnPrint").hidden=!ex; $("btnXlsx").hidden=!ex; $("btnReopen").hidden=!(ex&&S.locked&&d.canReopen);
   $("btnClose").disabled=S.dirty||S.saving; $("btnClose").title=S.dirty?"請先儲存":"";
   $("bar").hidden=!ex;
 }
@@ -522,6 +523,23 @@ function printDay(){
     $("mNo").onclick=closeModal; $("mYes").onclick=function(){ setTimeout(closeModal,300); };
   }).catch(function(e){ b.disabled=false; netFail(e); });
 }
+function offerXlsx(){
+  var h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box"><h2>已結帳，要下載今天的日報表嗎？</h2><p>會下載一份 Excel 檔（只有這一天，版面和試算表一樣）。之後也可以按下方的「下載 Excel」再拿。</p><div class="foot"><button class="btn sec" id="mNo">先不要</button><button class="btn main" id="mYes">下載 Excel</button></div></div></div>';
+  $("mNo").onclick=closeModal; $("mYes").onclick=function(){ closeModal(); saveXlsx(); };
+}
+function saveXlsx(done){   /* 把這天輸出成 Excel 檔下載 */
+  var b=$("btnXlsx"); if(b) b.disabled=true; say("正在產生 Excel…",true);
+  api("day.xlsx",{date:S.date},90000).then(function(j){
+    if(b) b.disabled=false;
+    if(!j||!j.ok){ say(errText(j)); return; }
+    var bin=atob(j.data), arr=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+    var url=URL.createObjectURL(new Blob([arr],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+    var a=document.createElement("a"); a.href=url; a.download=j.name||"現金日報表.xlsx"; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); },10000);
+    say("已下載 "+(j.name||"Excel 檔")+"。",true); if(done) done();
+  }).catch(function(e){ if(b) b.disabled=false; netFail(e); });
+}
 function closeDay(){
   if(S.dirty){ say("請先儲存，再結帳。"); return; }
   var b=$("btnClose"); b.disabled=true;
@@ -533,7 +551,7 @@ function closeDay(){
       $("mYes").disabled=true;
       api("day.close",{date:S.date,ver:S.day.ver,confirm:true}).then(function(r){
         closeModal();
-        if(r&&r.ok){ applyDay(r.day); say("已結帳。",true); return; }
+        if(r&&r.ok){ applyDay(r.day); say("已結帳。",true); offerXlsx(); return; }
         if(r&&r.day) applyDay(r.day); say(errText(r));
       }).catch(function(e){ closeModal(); netFail(e); });
     }, list);
@@ -963,7 +981,7 @@ function bind(){
   $("custAdd").onclick=function(){ if(S.locked){ say("這天已結帳，不能新增。"); return; } custAdd(); };
   $("btnPetty").onclick=openPetty;
   $("btnSave").onclick=function(){ save(); };
-  $("btnPrint").onclick=printDay; $("btnClose").onclick=closeDay; $("btnReopen").onclick=reopenDay;
+  $("btnPrint").onclick=printDay; $("btnXlsx").onclick=function(){ saveXlsx(); }; $("btnClose").onclick=closeDay; $("btnReopen").onclick=reopenDay;
   $("btnRef").onclick=function(){ if(S.dirty){ ask("有尚未儲存的修改","重新整理會讓剛剛打的內容消失。","放棄並重新整理","留在這裡",function(){ closeModal(); S.dirty=false; load(S.date); }); } else load(S.date); };
   $("dPrev").onclick=function(){ go(addDays(S.date,-1)); };
   $("dNext").onclick=function(){ go(addDays(S.date,1)); };
