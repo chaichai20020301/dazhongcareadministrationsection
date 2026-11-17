@@ -787,20 +787,24 @@ function openPetty(){
   var note=(S.cust||[]).map(function(x){ return "內含"+x.name+x.purpose+"："+Math.round(x.amount); }).join("、");
   var h=$("modalHost");
   h.innerHTML='<div class="modal"><div class="box"><h2>申請零用金</h2><p>'+(c.low?'零用金實際可用 '+fmt(c.avail)+'，已碰到 '+fmt(S.settings.pettyWarn)+' 的線。':'目前實際可用 '+fmt(c.avail)+'。')+'按「列印」會產生領款聯和會計聯，簽名欄留白。</p>'
+    +'<label style="display:flex;align-items:center;gap:6px;margin:6px 0 2px;font-weight:700;cursor:pointer"><input type="checkbox" id="peProj"> 專案零用金申請（不用填結存，改填專案名稱）</label>'
+    +'<div id="peProjBox" hidden><label class="lb">專案名稱</label><input class="fld" id="peProjName" maxlength="40" placeholder="例如：115年環境改善專案" autocomplete="off"></div>'
     +'<label class="lb">申請日期</label><input class="fld" id="peDate" value="'+esc(minguo(S.date))+'" maxlength="12">'
-    +'<label class="lb">零用金結存金額（日報表餘額，已含代保管）</label><input class="fld" id="peBal" inputmode="numeric" value="'+bal+'">'
-    +'<label class="lb">結存備註</label><input class="fld" id="peNote" maxlength="120" value="'+esc(note)+'" placeholder="例如：內含某某手術費：20000">'
+    +'<div id="peBalBox"><label class="lb">零用金結存金額（日報表餘額，已含代保管）</label><input class="fld" id="peBal" inputmode="numeric" value="'+bal+'">'
+    +'<label class="lb">結存備註</label><input class="fld" id="peNote" maxlength="120" value="'+esc(note)+'" placeholder="例如：內含某某手術費：20000"></div>'
     +'<label class="lb">摘要</label><input class="fld" id="peSum" maxlength="30" value="零用金申請">'
     +'<label class="lb">申請金額</label><input class="fld" id="peAmt" inputmode="numeric" value="'+(sug||"")+'" placeholder="自己填"><div class="sub" style="margin-top:4px">'+(sug?'建議：補回水位 '+fmt(lv)+'，約 '+fmt(sug)+'（可以自己改）。':'實際可用已在水位 '+fmt(lv)+' 以上，請自己填。')+'</div>'
     +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn sec" id="mXls">下載 Excel</button><button class="btn main" id="mYes">列印申請單</button></div></div></div>';
   $("mNo").onclick=closeModal; $("peAmt").focus();
+  $("peProj").onchange=function(){ var on=this.checked; $("peProjBox").hidden=!on; $("peBalBox").hidden=on; var sm=$("peSum"); if(on&&sm.value==="零用金申請") sm.value="專案零用金申請"; else if(!on&&sm.value==="專案零用金申請") sm.value="零用金申請"; if(on) $("peProjName").focus(); };
   function go(kind){
-    var a=num($("peAmt").value), bl=num($("peBal").value);
+    var proj=$("peProj").checked, a=num($("peAmt").value), bl=proj?0:num($("peBal").value), pn=$("peProjName").value.trim();
     if(!(a===a&&a>0)){ say("請填申請金額（大於 0 的數字）。"); return; }
-    if(!(bl===bl)){ say("結存金額請填數字。"); return; }
-    var o={ date:$("peDate").value.trim(), bal:Math.round(bl), note:$("peNote").value.trim(), sum:$("peSum").value.trim(), amt:Math.round(a) };
+    if(proj&&!pn){ say("請填專案名稱。"); return; }
+    if(!proj&&!(bl===bl)){ say("結存金額請填數字。"); return; }
+    var o={ proj:proj, pname:pn, date:$("peDate").value.trim(), bal:Math.round(bl), note:proj?"":$("peNote").value.trim(), sum:$("peSum").value.trim(), amt:Math.round(a) };
     var bs=[$("mYes"),$("mXls")]; bs.forEach(function(b){ b.disabled=true; }); (kind==="xls"?$("mXls"):$("mYes")).textContent="處理中…";
-    api("petty.slip",{date:S.date,amount:o.amt,balance:o.bal,note:o.note}).then(function(j){
+    api("petty.slip",o.proj?{date:S.date,amount:o.amt,project:o.pname}:{date:S.date,amount:o.amt,balance:o.bal,note:o.note}).then(function(j){
       if(!j||!j.ok){ closeModal(); say(errText(j)); return; }
       if(kind==="xls"){
         return pettyXlsx(o).then(function(){ closeModal(); say("已下載 Excel。",true); });
@@ -830,8 +834,9 @@ function buildPettyXlsx(ExcelJS, templateBuf, o){
   var wb=new ExcelJS.Workbook();
   return wb.xlsx.load(templateBuf).then(function(){
     var ws=wb.getWorksheet("零用金")||wb.worksheets[0];
-    var a3=" 申請日期:"+o.date, a4=" 零用金結存金額:"+Math.round(o.bal);
+    var a3=" 申請日期:"+o.date, a4=o.proj?(" 專案名稱:"+o.pname):(" 零用金結存金額:"+Math.round(o.bal));
     ws.getCell("A3").value=a3; ws.getCell("A4").value=a4;
+    if(o.proj){ ws.getCell("A2").value="專案零用金申請"; try{ ws.unMergeCells("B4:C4"); }catch(x){} try{ ws.unMergeCells("B25:C25"); }catch(x){} }   /* 專案名稱可能很長，解開合併讓字往右延伸 */
     ws.getCell("B4").value=o.note||null; ws.getCell("A6").value=o.sum||"零用金申請"; ws.getCell("B6").value=Math.round(o.amt);
     /* 下半張「會計聯」是用公式抄上半張，這裡一併補上算好的結果，免得有些程式不重算就顯示舊值 */
     var link={A22:"A1",A23:"A2",A24:"A3",A25:"A4",B25:"B4",A27:"A6",B27:"B6",C33:"C12"};
@@ -849,16 +854,16 @@ function pettyXlsx(o){
       .then(function(buf){ return buildPettyXlsx(ExcelJS,buf,o); });
   }).then(function(out){
     var blob=new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="零用金申請"+String(o.date).replace(/[\\/:*?"<>|\s]/g,"")+".xlsx";
+    var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=(o.proj?"專案零用金申請":"零用金申請")+String(o.date).replace(/[\\/:*?"<>|\s]/g,"")+".xlsx";
     document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); },1500);
   }).catch(function(e){ throw (e&&e.message==="xlsx"?e:new Error("xlsx")); });
 }
 function pettyHTML(o,label){
   var rows="", i;
   for(i=0;i<10;i++){ rows+='<tr><td>'+(i===0?esc(o.sum):"")+'</td><td class="am">'+(i===0?fmt(o.amt):"")+'</td><td></td></tr>'; }
-  return '<div class="slip sl2"><h3>線東大眾護理之家<br>零用金申請</h3>'
+  return '<div class="slip sl2"><h3>線東大眾護理之家<br>'+(o.proj?"專案零用金申請":"零用金申請")+'</h3>'
     +'<div class="meta"><span>申請日期:'+esc(o.date)+'</span></div>'
-    +'<div class="meta"><span>零用金結存金額:'+Math.round(o.bal)+'</span><span>'+esc(o.note)+'</span></div>'
+    +(o.proj?'<div class="meta"><span>專案名稱:'+esc(o.pname)+'</span></div>':'<div class="meta"><span>零用金結存金額:'+Math.round(o.bal)+'</span><span>'+esc(o.note)+'</span></div>')
     +'<table><colgroup><col style="width:36%"><col style="width:14%"><col style="width:50%"></colgroup><thead><tr><th>摘要</th><th>金額</th><th>備註</th></tr></thead><tbody>'+rows+'</tbody></table>'
     +'<div class="sg"><span>經手人：</span><span>行政主管：</span><span>經理：</span></div>'
     +'<div class="side">'+label.split("").join("<br>")+'</div></div>';
