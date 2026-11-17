@@ -264,7 +264,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
           <div class="sumline sub2"><span>今日收支 (A－B)</span><b id="t-net"></b></div>
           <div class="big2" id="endBox"><span>零用金餘額</span><b id="t-end"></b></div>
           <div class="cust" id="custBox">
-            <div class="cust-h"><h3>代保管（住民壓款）<span class="hint">已含在上面的零用金餘額裡</span></h3><button class="btn sec sm" id="custAdd" type="button">＋ 新增</button></div>
+            <div class="cust-h"><h3>代保管（住民壓款、司機零用金等）<span class="hint">已含在上面的零用金餘額裡</span></h3><button class="btn sec sm" id="custAdd" type="button">＋ 新增</button></div>
             <div id="custList"></div>
             <div class="sumline sub2"><span>代保管合計</span><b id="t-cust"></b></div>
             <div class="sumline"><span>實際可用（餘額－代保管）</span><b id="t-avail"></b></div>
@@ -742,16 +742,16 @@ function paintCust(){
 function setCust(j){ if(j&&j.custody){ S.cust=j.custody; if(S.day) S.day.custody=j.custody; } paintCust(); paintTotals(); }
 function custAdd(){
   var h=$("modalHost"), today=S.date;
-  h.innerHTML='<div class="modal"><div class="box"><h2>新增代保管</h2><p>住民放在我們這裡保管的錢（例如手術費）。這筆錢已經在日報表的零用金餘額裡，這裡只是記下來，用來算「實際可用」。</p>'
-    +'<label class="lb">住民姓名</label><input class="fld" id="cuName" maxlength="20" autocomplete="off">'
-    +'<label class="lb">用途</label><input class="fld" id="cuPurpose" maxlength="30" placeholder="例如：白內障手術費" autocomplete="off">'
+  h.innerHTML='<div class="modal"><div class="box"><h2>新增代保管</h2><p>放在我們這裡保管、或交給別人（例如司機）保管的錢，例如住民的手術費、司機隨身的零用金。這筆錢已經在日報表的零用金餘額裡，這裡只是記下來，用來算「實際可用」。</p>'
+    +'<label class="lb">姓名（住民或保管人，例如司機）</label><input class="fld" id="cuName" maxlength="20" autocomplete="off">'
+    +'<label class="lb">用途</label><input class="fld" id="cuPurpose" maxlength="30" placeholder="例如：白內障手術費、司機零用金" autocomplete="off">'
     +'<label class="lb">金額</label><input class="fld" id="cuAmt" inputmode="numeric" autocomplete="off">'
     +'<label class="lb">收到日期</label><input class="fld" id="cuDate" value="'+esc(today)+'" maxlength="10">'
     +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn main" id="mYes">新增</button></div></div></div>';
   $("mNo").onclick=closeModal; $("cuName").focus();
   $("mYes").onclick=function(){
     var a=num($("cuAmt").value), nm=$("cuName").value.trim(), pu=$("cuPurpose").value.trim(), dt=$("cuDate").value.trim().replace(/-/g,"/");
-    if(!nm||!pu){ say("請填住民姓名和用途。"); return; }
+    if(!nm||!pu){ say("請填姓名和用途。"); return; }
     if(!(a===a&&a>0)){ say("金額請填大於 0 的數字。"); return; }
     if(!/^\d{4}\/\d{2}\/\d{2}$/.test(dt)){ say("收到日期請填像 "+S.date+" 的格式。"); return; }
     var b=$("mYes"); b.disabled=true; b.textContent="新增中…";
@@ -764,7 +764,7 @@ function custClose(id){
   var c=(S.cust||[]).filter(function(x){ return x.id===id; })[0]; if(!c) return;
   var h=$("modalHost");
   h.innerHTML='<div class="modal"><div class="box"><h2>結案</h2><p>'+esc(c.name)+'　'+esc(c.purpose)+'　'+fmt(c.amount)+' 元</p>'
-    +'<label class="lb">這筆錢後來怎麼處理？</label><select class="fld" id="cuHow"><option value="paid">已支付（付掉了）</option><option value="returned">已退還住民</option><option value="void">登記錯了，作廢</option></select>'
+    +'<label class="lb">這筆錢後來怎麼處理？</label><select class="fld" id="cuHow"><option value="paid">已支付（付掉了）</option><option value="returned">已退還（住民或收回）</option><option value="void">登記錯了，作廢</option></select>'
     +'<label class="lb">結案日期</label><input class="fld" id="cuOn" value="'+esc(S.date)+'" maxlength="10">'
     +'<p style="margin-top:10px">結案後，這筆就不再從「實際可用」扣掉。</p>'
     +'<div class="foot"><button class="btn sec" id="mNo">取消</button><button class="btn main" id="mYes">結案</button></div></div></div>';
