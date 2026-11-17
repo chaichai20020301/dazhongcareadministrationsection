@@ -525,7 +525,7 @@ function printDay(){
 }
 function offerXlsx(){
   var h=$("modalHost");
-  h.innerHTML='<div class="modal"><div class="box"><h2>已結帳，要下載今天的日報表嗎？</h2><p>會下載一份 Excel 檔（只有這一天，版面和試算表一樣）。之後也可以按下方的「下載 Excel」再拿。</p><div class="foot"><button class="btn sec" id="mNo">先不要</button><button class="btn main" id="mYes">下載 Excel</button></div></div></div>';
+  h.innerHTML='<div class="modal"><div class="box"><h2>已結帳，要下載這個月的日報表嗎？</h2><p>會下載一份 Excel 檔（包含這個月所有日期的分頁，版面和試算表一樣）。之後也可以按下方的「下載 Excel」再拿。</p><div class="foot"><button class="btn sec" id="mNo">先不要</button><button class="btn main" id="mYes">下載 Excel</button></div></div></div>';
   $("mNo").onclick=closeModal; $("mYes").onclick=function(){ closeModal(); saveXlsx(); };
 }
 function saveXlsx(done){   /* 把這天輸出成 Excel 檔下載 */
