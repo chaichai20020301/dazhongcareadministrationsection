@@ -321,6 +321,7 @@ tr.row:hover{background:#F3F6EC}
 .say .tip{color:#8a7a52;font-size:12.5px}
 .say-off .say{display:none}
 .sayend{grid-column:1/-1}
+.so.msg{background:#f1f7ee;border-color:#c9d8c4;color:#2f6b4f}
 </style>
 <link rel="stylesheet" href="../assets/common/motion.css?v=2"><script defer src="../assets/common/motion.js?v=2"></script>
 </head>
@@ -368,10 +369,11 @@ tr.row:hover{background:#F3F6EC}
 </aside>
 <div id="nm" class="nm" onclick="if(event.target===this)closeNotice()">
   <div class="nm-box">
-    <div class="nm-h"><h3><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>新住民入住通知</h3><button class="x" onclick="closeNotice()" aria-label="關閉">✕</button></div>
+    <div class="nm-h"><h3><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i><span id="nmTitle">新住民入住通知</span></h3><button class="x" onclick="closeNotice()" aria-label="關閉">✕</button></div>
     <div id="nmMiss" class="nm-miss"></div>
+    <select id="nmSel" style="display:none;margin:0 0 8px;padding:7px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;font-size:14px;max-width:100%" onchange="remindPick()"></select>
     <textarea id="nmText" spellcheck="false"></textarea>
-    <div class="nm-f"><span>可以直接在上面修改文字，再按「複製」。</span><button class="btn btn-o" onclick="closeNotice()">關閉</button><button class="btn btn-g" onclick="copyNotice()">複製通知內容</button></div>
+    <div class="nm-f"><span id="nmHint">可以直接在上面修改文字，再按「複製」。</span><button class="btn btn-o" onclick="closeNotice()">關閉</button><button class="btn btn-g" id="nmCopy" onclick="copyNotice()">複製通知內容</button></div>
   </div>
 </div>
 <div id="toast"></div>
@@ -738,7 +740,94 @@ function renderStatus(){
   else if(v===3){g.st.forEach(x=>o.push(opt(x,x,CUR.status===x)))}
   else o.push(opt("已入住","已入住",CUR.status==="已入住"));
   if(v<=3)o.push(opt("放棄","放棄",gave&&v===cur,"no"));
-  box.innerHTML=`<div class="stgs">${steps}</div><div class="sopts"><span class="sl">階段 ${v+1}：${g.n}</span>${o.join("")}</div>`;
+  const msgs=(!gave&&cur>=0&&cur<=3)?`<button type="button" class="so msg" onclick="openMsg('ask')" title="依還沒問到的必問欄位，產生追問家屬的訊息">❓ 追問家屬</button><button type="button" class="so msg" onclick="openMsg('remind')" title="依目前階段產生提醒家屬的訊息">🔔 提醒家屬</button>`:"";
+  box.innerHTML=`<div class="stgs">${steps}</div><div class="sopts"><span class="sl">階段 ${v+1}：${g.n}</span>${o.join("")}${msgs}</div>`;
+}
+/* ---------- 給家屬的訊息（追問／提醒）：產生文字，複製後貼到 LINE ---------- */
+let NM_KIND="notice";
+function setNm(kind,title,hint,btn){NM_KIND=kind;$("#nmSel").style.display=kind==="remind"?"":"none";$("#nmTitle").textContent=title;$("#nmHint").textContent=hint;$("#nmCopy").textContent=btn}
+const ASK_Q={
+  curPlace:()=>"長輩目前是在家中、醫院，還是其他機構呢？",
+  curPlaceNote:c=>c.curPlace==="家中"?"方便告訴我們長輩家裡的地址嗎？":c.curPlace==="醫院"?"請問是哪一間醫院呢？":"請問是哪一間機構呢？",
+  roomType:()=>"我們有單人房到五人房，費用不同，請問您比較可以接受哪幾種房型呢？（可以不只選一種）",
+  mobility:()=>"長輩目前的行動能力如何？可以自己走路、需要輔具、坐輪椅，還是臥床？"
+};
+const PREP_KEY="入住前要準備的物品（簽約、文件、藥物、衣物、用品）";
+const PREP_MSG=`親愛的家屬您好，
+
+為了讓長輩在入住期間能有舒適的照顧體驗，並確保當日簽約與交接順利，我們將入住所需準備的物品進行了統整。請您協助準備以下項目：
+
+📝 【辦理簽約必備文件】（重要）
+辦理入住手續時，請簽約人務必到場，並攜帶以下物品以完成合約簽署：
+
+雙方證件： 簽約人與住民（長輩）的雙證件（含身分證）、長輩的健保卡
+
+雙方印章： 簽約人與住民（長輩）的印章
+
+特殊證明： 長輩的「身心障礙證明（手冊）」或「重大傷病卡」（若有請一併攜帶）
+
+退住若需退款時之匯款帳戶存摺影本。
+
+🏥 【出院及醫療相關文件】
+為了讓護理團隊更了解長輩的身體狀況，請務必提供以下資料：
+
+體檢報告： X光體檢報告（需符合機構規定之體檢項目）
+
+病歷摘要： 出院病歷摘要
+
+💊 【藥物與護理】
+常規藥物： 目前正在服用的所有藥物
+
+用藥明細： 完整藥袋或處方箋（需供護理人員確認正確的用法與用量）
+
+回診資訊： 近日回診預約單
+
+👕 【衣物與穿著】
+換洗衣物： 建議準備 4 至 5 套（建議以寬鬆舒適的棉質衣物為主）
+
+保暖衣物： 保暖外套或背心 1 件
+
+足部穿著： 防滑鞋子、室內拖鞋、襪子
+
+🎒 【住民入住日常用品】
+盥洗用具： 長輩平時習慣使用的物品（如：牙刷、牙膏、漱口杯、假牙清潔組）
+
+身體清潔： 毛巾、沐浴乳、乳液、刮鬍刀
+
+日常消耗品： 紙尿褲、看護墊、濕紙巾
+
+🦯 【輔具】（若長輩有使用習慣）
+輪椅、助行器、拐杖、眼鏡、助聽器`;
+const REMIND_MSG={
+  "初步參訪":"感謝您的詢問與參訪。如果方便的話，歡迎直接來機構參觀環境，我們再詳細說明簽約和入住的流程；也可以先準備長輩的體檢報告，我這邊可以傳一份體檢表給您參考。有任何問題都歡迎再聯絡我，謝謝您！",
+  "控床聯絡":"長輩的床位我們正在安排中。為了接下來能順利安排入住，想提醒您先準備體檢報告，上面有需要做的檢查項目，體檢表我可以再傳給您。報告備齊後跟我說，我們就能安排入住日期與簽約。謝謝您！",
+  "護理聯絡":"為了讓護理同仁事先了解長輩的狀況、準備好照護，麻煩您提供長輩目前服用的藥物（藥袋或處方箋拍照傳給我即可），以及近期的就醫資料或病歷摘要。謝謝您！",
+  "家屬討論中":"想關心一下您和家人討論得如何了？如果對費用、房型或照護安排還有任何疑問，都歡迎直接問我。決定好之後跟我說，我們就能安排簽約與入住日期。謝謝您！",
+  "已安排床位":"長輩的床位已經為您安排好了，想提醒您確認預計的入住日期，並安排簽約。若入住前還有需要準備的資料或想了解的事，歡迎隨時聯絡我，謝謝您！"
+};
+const MSG_ROLE={"控床聯絡":"控床人員","護理聯絡":"護理人員"};   // 其餘階段都是「行政同仁」
+function msgHello(){const n=String(CUR.visitorName||"").trim();return `${n?n+" ":""}您好，我是線東大眾護理之家的${MSG_ROLE[CUR.status]||"行政同仁"}。`}
+function remindText(k){return k===PREP_KEY?PREP_MSG:msgHello()+"\n"+REMIND_MSG[k]}
+function remindPick(){$("#nmText").value=remindText($("#nmSel").value)}
+function openMsg(kind){
+  if(!CUR)return;
+  let text="",hint="";
+  if(kind==="ask"){
+    const t=Math.min(Math.max(0,curStage())+1,4),m=missingFor(t);
+    if(!m.length)return toast("必問的資料都已經問齊了 ✓");
+    text=[msgHello(),"為了更準確地跟您說明適合的照護安排，想再跟您確認幾個資料：",...m.map((r,i)=>`${i+1}. ${(ASK_Q[r.k]||(()=>r.l+"？"))(CUR)}`),"方便的話請回覆我，謝謝您！"].join("\n");
+    hint="這是依「還沒問到的必問欄位」自動產生的追問，可以直接修改，再按「複製」貼到 LINE。";
+    setNm("ask","追問家屬的訊息",hint,"複製訊息");
+  }else{
+    if(!REMIND_MSG[CUR.status])return toast("這個階段沒有提醒訊息");
+    const sel=$("#nmSel");
+    sel.innerHTML=[PREP_KEY,...Object.keys(REMIND_MSG)].map(k=>`<option value="${esc(k)}">${k===PREP_KEY?"📋 "+esc(k):"依階段：「"+esc(k)+"」的提醒"}</option>`).join("");
+    sel.value=CUR.status==="已安排床位"?PREP_KEY:CUR.status;
+    text=remindText(sel.value);
+    hint="可以在上面選別的提醒範本，也能直接修改文字，再按「複製」貼到 LINE。";
+    setNm("remind","提醒家屬的訊息",hint,"複製訊息");
+  }
+  $("#nmText").value=text;$("#nmMiss").classList.remove("on");$("#nm").classList.add("on");
 }
 function renderGive(){const b=$("#giveBox");if(!b||!CUR)return;
   if(CUR.status!=="放棄"){b.className="givebox";b.innerHTML="";return}
@@ -977,6 +1066,7 @@ function buildNotice(c){
 }
 function openNotice(){
   if(!CUR)return;
+  setNm("notice","新住民入住通知","可以直接在上面修改文字，再按「複製」。","複製通知內容");
   const {text,miss}=buildNotice(CUR);
   $("#nmText").value=text;
   const m=$("#nmMiss");
@@ -988,7 +1078,7 @@ function closeNotice(){$("#nm").classList.remove("on")}
 async function copyNotice(){
   const t=$("#nmText");
   try{await navigator.clipboard.writeText(t.value)}catch(e){t.focus();t.select();try{document.execCommand("copy")}catch(_){return toast("複製失敗，請手動選取文字複製")}}
-  toast("已複製，可以貼到護理師群組了 ✓");
+  toast(NM_KIND==="notice"?"已複製，可以貼到護理師群組了 ✓":"已複製，可以貼到 LINE 傳給家屬了 ✓");
 }
 addEventListener("keydown",e=>{if(e.key==="Escape"&&$("#nm").classList.contains("on")){closeNotice();e.stopImmediatePropagation()}},true);
 
