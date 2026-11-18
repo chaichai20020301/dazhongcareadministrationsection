@@ -693,7 +693,7 @@ function paint(notes,hist){
   const os=(CUR.obsTags||"").split("、").filter(Boolean);$$("#obsBox input").forEach(i=>{i.checked=os.includes(i.value);i.onchange=()=>{CUR.obsTags=$$("#obsBox input:checked").map(x=>x.value).join("、");mark()}});
   $$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));
   const rs=(CUR.roomType||"").split("、").filter(Boolean);$$("#roomBox input").forEach(i=>{i.checked=rs.includes(i.value);i.onchange=()=>{CUR.roomType=$$("#roomBox input:checked").map(x=>x.value).join("、");recalc();mark()}});
-  syncDiet();syncSvc();syncPlace();syncObs();
+  syncDiet();syncSvc();syncPlace();syncObs();markReq();
   TOTAL_MANUAL=!!CUR.total&&String(CUR.total)!==String(calcEst()||"");$("#totalIn").value=CUR.total||"";
   $("#totalIn").oninput=e=>{TOTAL_MANUAL=true;CUR.total=e.target.value;mark()};
   recalc();updateStayDays();mark();injectSay();loadAtts();
@@ -786,10 +786,20 @@ function askMissing(m,targetName){
     d.onclick=e=>{if(e.target===d)done(false)};
   });
 }
+/* 必問欄位（REQ 裡列的）在標題後面加紅色星號；有條件的（例如家中地址）只在條件成立時才顯示 */
+function markReq(){
+  if(!CUR)return;
+  Object.values(REQ).forEach(a=>a.forEach(r=>{
+    const f=document.querySelector(`#dBody .fl[data-k="${r.k}"]`),l=f&&f.querySelector("label");if(!l)return;
+    const need=!r.if||r.if(CUR);let em=l.querySelector("em.rq");
+    if(need&&!em){em=document.createElement("em");em.className="rq";em.textContent=" *";l.appendChild(em)}
+    else if(!need&&em)em.remove();
+  }));
+}
 function syncPlace(){
   const f=document.querySelector('#dBody .fl[data-k="curPlaceNote"]');if(!f||!CUR)return;
   const l=f.querySelector("label"),c=CUR.curPlace;
-  l.textContent=c==="家中"?"家中地址（必填）":c==="醫院"?"醫院名稱":c==="其他機構"?"機構名稱":"醫院、機構名稱或家中地址";
+  l.textContent=c==="家中"?"家中地址":c==="醫院"?"醫院名稱":c==="其他機構"?"機構名稱":"醫院、機構名稱或家中地址";markReq();
 }
 function syncObs(){
   const box=$("#obsBox");if(!box||!CUR)return;
