@@ -301,6 +301,26 @@ tr.row:hover{background:#F3F6EC}
 .gvm .ac button{border-radius:99px;padding:8px 20px;font-size:14.5px;font-weight:700;cursor:pointer;border:1.5px solid var(--line);background:#fff}
 .gvm .ac .ok{background:#8a4b44;border-color:#8a4b44;color:#fff}
 .gvm .ac .ok:disabled{opacity:.4;cursor:not-allowed}
+.reqhint{display:none;margin-top:8px;padding:8px 12px;border-radius:10px;background:#fff4de;border:1.5px solid #ecd29a;color:#7a5522;font-size:13.5px;cursor:pointer}
+.reqhint.on{display:block}
+.fl.bad .cks{outline:1.5px solid var(--red);border-radius:12px;padding:4px;background:#fff6f4}
+.reqhint b{color:#8a4b1c}
+.gvm .ml{margin:0 0 12px;padding-left:20px;color:#3a463e;font-size:14.5px;line-height:1.7}
+.gvm .ac .st{background:#2f6b4f;border-color:#2f6b4f;color:#fff}
+.grp{grid-column:1/-1;display:flex;align-items:center;gap:10px;margin:6px 0 -2px;color:var(--g)}
+.grp b{font-size:14.5px;letter-spacing:.08em;white-space:nowrap}
+.grp span{font-size:12.5px;color:var(--sub);white-space:nowrap}
+.grp::after{content:"";flex:1;height:1px;background:var(--line)}
+.say{background:#fff8e6;border:1.5px dashed #e6cf9a;border-radius:10px;padding:8px 12px;margin:0 0 10px;font-size:13.5px;color:#6a5522;line-height:1.75}
+.say>summary{list-style:none;cursor:pointer;font-weight:700;color:#8a5a14;display:flex;align-items:center;gap:6px;user-select:none}
+.say>summary::-webkit-details-marker{display:none}
+.say>summary::after{content:"▾ 收合";margin-left:auto;font-size:12px;font-weight:400;color:#a08a55}
+.say:not([open])>summary::after{content:"▸ 展開";}
+.say[open]>summary{margin-bottom:4px}
+.say p{margin:3px 0}
+.say .tip{color:#8a7a52;font-size:12.5px}
+.say-off .say{display:none}
+.sayend{grid-column:1/-1}
 </style>
 <link rel="stylesheet" href="../assets/common/motion.css?v=2"><script defer src="../assets/common/motion.js?v=2"></script>
 </head>
@@ -338,9 +358,10 @@ tr.row:hover{background:#F3F6EC}
 <div id="mask" onclick="closeDr()"></div>
 <aside id="dr" aria-hidden="true">
   <div class="dh">
-    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
+    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" id="sayBtn" onclick="toggleSay()" title="一次展開或收合所有區段的問法提示">💬 話稿：全部收合</button><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
     <div class="stbar" id="stbar"></div>
     <div class="givebox" id="giveBox"></div>
+    <div class="reqhint" id="reqHint" onclick="focusMissing(missingFor(Math.max(0,curStage())))"></div>
   </div>
   <div class="db" id="dBody"></div>
   <div class="df"><span class="st" id="dSt"></span><button class="btn btn-o" onclick="closeDr()">關閉</button><button class="btn btn-g" id="saveBtn" onclick="save()">儲存</button></div>
@@ -555,8 +576,9 @@ function syncSvc(){
 const OBS_LV=["順利","留意","高風險","建議不收"];
 const OBS_TAGS=["要求過多","情緒易激動","容易起衝突","對費用多有爭議","家屬意見不一致","不信任機構","承諾與事實不符","難以配合規定","過度干涉照護","其他"];
 function obsBadge(r){return r&&["留意","高風險","建議不收"].includes(r.obsLevel)?`<span class="ob ${r.obsLevel}">${r.obsLevel}</span>`:""}
-function setObsLevel(v){CUR.obsLevel=CUR.obsLevel===v?"":v;$$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));mark()}
+function setObsLevel(v){CUR.obsLevel=CUR.obsLevel===v?"":v;if(CUR.obsLevel==="順利"){CUR.obsTags="";$$("#obsBox input").forEach(i=>i.checked=false)}syncObs();$$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));mark()}
 async function openRow(id){
+  initSay();
   if(id===null){CUR={status:"初步參訪",channel:"電話詢問",handler:me(),visitDate:"",conditions:""};ORIG=Object.assign({},CUR);paint([],[]);openDr();return}
   $("#dTitle").textContent="讀取中…";$("#dBody").innerHTML='<div class="load"><span class="spin d"></span></div>';openDr();
   const r=await api("get",{id});if(!r.ok||!r.row){closeDr();return toast("讀取失敗")}
@@ -573,6 +595,7 @@ function paint(notes,hist){
   VIEWSTAGE=null;renderStatus();
   renderGive();
   $("#dBody").innerHTML=`
+  <div class="grp"><b>① 初步參訪時詢問</b><span>第一次接觸就要問清楚</span></div>
   <div class="sec"><h3>參訪人資料</h3><div class="grid">
     ${inp("visitorName","姓名",{req:1})}${sel("relation","與長者／入住人關係",["子女","配偶","孫輩","兄弟姊妹","其他親屬","朋友","本人","其他"])}
     ${inp("mobile","手機",{req:1,mode:"tel"})}${inp("phone","住家電話",{mode:"tel"})}
@@ -582,19 +605,14 @@ function paint(notes,hist){
     ${inp("elderName","姓名",{req:1})}${sel("gender","性別",["男","女"])}
     ${inp("age","年齡",{type:"number",mode:"numeric"})}${inp("hospital","看診醫院")}
     ${sel("curPlace","目前在哪裡",["家中","醫院","其他機構"])}${inp("curPlaceNote","醫院或機構名稱（在家中可不填）")}
+    ${sel("mobility","移動能力",["可自行行走","需輔具","輪椅","臥床"])}
   </div></div>
   <div class="sec"><h3>身體狀況與計價</h3>
     <div class="cks" id="condBox">${addonChips(PRICE.addons,"ck",CUR.conditions,"")}</div>
     <div class="grid" style="margin-top:10px">${inp("condNote","其他／備註",{w:1,ph:"例：其他管路、其他狀況…"})}${inp("woundNote","傷口說明（位置、大小、處置）",{w:1})}
-    <div class="fl w" data-k="roomType"><label>可接受房型（可複選）</label><div class="cks" id="roomBox">${PRICE.rooms.map(r=>`<label class="ck"><input type="checkbox" value="${esc(r.name)}"><span>${esc(r.name)} <i>${Number(r.price).toLocaleString()}</i></span></label>`).join("")}</div></div>${inp("bedNo","預入住床號")}</div>
+    <div class="fl w" data-k="roomType"><label>可接受房型（可複選）</label><div class="cks" id="roomBox">${PRICE.rooms.map(r=>`<label class="ck"><input type="checkbox" value="${esc(r.name)}"><span>${esc(r.name)} <i>${Number(r.price).toLocaleString()}</i></span></label>`).join("")}</div></div></div>
     <div class="tot"><div>計價費用合計<br><small style="color:var(--sub)" id="estTxt"></small></div><div style="display:flex;gap:8px;align-items:center"><input class="f" id="totalIn" type="number" inputmode="numeric" placeholder="自動計算"><button type="button" class="btn btn-o btn-sm" onclick="recalc(true)">重新計算</button></div></div>
     <div style="font-size:12px;color:var(--sub);margin-top:6px">${esc(PRICE.note)}　可手動修改合計金額（例如有折扣或日計費）。</div>
-  </div>
-  ${attList(CUR).length?`<div class="sec"><h3>家屬上傳的檢驗資料<small style="font-weight:400;color:#7a6f5a;font-size:12.5px;margin-left:8px">點照片可放大、下載</small></h3><div class="atts">${attList(CUR).map((x,i)=>`<button type="button" class="att" data-f="${esc(x.f)}" onclick="viewAtt('${esc(x.f)}')"><span class="ld">載入中…</span><b>${esc(x.c)} ${i+1}</b></button>`).join("")}</div></div>`:""}
-  <div class="sec obs"><h3>參訪觀察<small>🔒 內部評估：家屬看不到，也不會放進給護理師的入住通知</small></h3>
-    <div class="lvs" id="lvBox">${OBS_LV.map(x=>`<button type="button" class="lv" data-v="${x}" onclick="setObsLevel('${x}')">${x}</button>`).join("")}</div>
-    <div class="cks" id="obsBox">${OBS_TAGS.map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div>
-    <div class="grid" style="margin-top:10px">${ta("obsNote","觀察說明（具體說明家屬的言行，供收案評估與各單位提前留意）",{ph:"例：參訪時多次質疑收費，要求指定專人照顧…"})}</div>
   </div>
   <div class="sec"><h3>入住原因</h3><div class="grid">
     ${ta("rsnCare","照護需求（為什麼需要入住、主要需要哪些照顧）")}
@@ -603,30 +621,29 @@ function paint(notes,hist){
     ${ta("rsnOther","其他注意事項")}
     ${ta("reason","原有說明（家屬在預約頁填的原文或舊資料，會一併帶入通知）")}
   </div></div>
-  <div class="sec"><h3>疾病史</h3><div class="grid">
-    ${ta("hxChronic","慢性病（高血壓、糖尿病、心臟病…）")}
-    ${ta("hxDiag","主要診斷")}
-    ${ta("hxSurg","手術與住院史")}
-    ${ta("hxAllergy","過敏史（藥物、食物）")}
-    ${ta("hxCog","失智／精神／情緒狀況")}
-    ${ta("hxInfect","感染或隔離（MRSA、疥瘡、肺結核等）")}
-    ${ta("history","原有說明（家屬在預約頁填的原文或舊資料，會一併帶入通知）")}
-  </div></div>
-  <div class="sec"><details class="fold" ${isNew?"":"open"}><summary>照護細項（訪談時詢問）</summary><div class="in2"><div class="grid">
-    ${sel("identity","入住身份",["一般","中低收入戶","低收入戶"])}${sel("mobility","移動能力",["可自行行走","需輔具","輪椅","臥床"])}
-    ${sel("dietType","餐食：葷素",["葷食","素食"])}${sel("dietStaple","餐食：主食",["白飯","稀飯"])}${sel("dietVeg","餐食：菜的處理",["菜盤","剪碎","攪碎"])}${sel("dietSize","餐食：碗的大小",["大碗","中碗","小碗"])}${inp("diet","餐食補充（其他說明）")}${sel("excretion","排泄",["自理","尿布","尿管","尿布＋尿管","其他"])}
-    ${sel("feeding","進食方式",["自行口食","鼻胃管灌食","其他"])}
-    ${sel("dnr","DNR 意願",["已簽署","討論中","未簽署"])}${sel("communication","溝通狀況",["正常","聽力不佳","表達或理解困難"])}
-    ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}${sel("fallRisk","跌倒風險",["無","有"])}
-    <div class="fl w"><label>安全看視</label><div class="cks" id="safeBox">${["曾跌倒","會拔管","躁動","走失風險"].map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div></div>
-    ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
-    ${inp("expectedStay","預計入住時間（家屬說明或備註）",{w:1})}
-  </div></div></details></div>
   <div class="sec"><h3>預約與來源</h3><div class="grid">
     ${sel("channel","詢問方式",CHANNELS)}${inp("handler","承辦人（電詢服務人／帶參訪人）")}
     ${inp("wantDate","希望參訪日",{type:"date"})}${sel("wantSlot","希望時段",["上午","下午","都可以"])}
     ${inp("visitDate","實際參訪日",{type:"date"})}${sel("infoSource","資料來源",["醫院轉介","朋友介紹","網路搜尋","其他"])}
     ${inp("infoSourceNote","來源備註（哪間醫院／誰介紹）",{w:1})}
+    ${inp("expectedStay","預計入住時間（家屬說明或備註）",{w:1})}
+  </div></div>
+  ${attList(CUR).length?`<div class="sec"><h3>家屬上傳的檢驗資料<small style="font-weight:400;color:#7a6f5a;font-size:12.5px;margin-left:8px">點照片可放大、下載</small></h3><div class="atts">${attList(CUR).map((x,i)=>`<button type="button" class="att" data-f="${esc(x.f)}" onclick="viewAtt('${esc(x.f)}')"><span class="ld">載入中…</span><b>${esc(x.c)} ${i+1}</b></button>`).join("")}</div></div>`:""}
+  <div class="sec obs"><h3>參訪觀察<small>🔒 內部評估：家屬看不到，也不會放進給護理師的入住通知</small></h3>
+    <div class="lvs" id="lvBox">${OBS_LV.map(x=>`<button type="button" class="lv" data-v="${x}" onclick="setObsLevel('${x}')">${x}</button>`).join("")}</div>
+    <div class="cks" id="obsBox">${OBS_TAGS.map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div>
+    <div class="grid" style="margin-top:10px">${ta("obsNote","觀察說明（具體說明家屬的言行，供收案評估與各單位提前留意）",{ph:"例：參訪時多次質疑收費，要求指定專人照顧…"})}</div>
+  </div>
+  <div class="grp"><b>② 控床與入住安排</b><span>控床、簽約、入住日期與接送</span></div>
+  <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
+    ${sel("identity","入住身份",["一般","中低收入戶","低收入戶"])}${inp("bedNo","預入住床號")}
+    ${sel("assess1966","是否已做 1966 長照評估",["有","沒有"])}${sel("cmsLevel","CMS 等級",CMS_LEVELS)}
+    ${sel("serviceType","預備服務類型",SERVICE_TYPES,{w:1})}
+    ${inp("stayStart","預入住開始日",{type:"date"})}${inp("stayEnd","預入住結束日（長期入住可不填）",{type:"date"})}
+    <div class="fl w"><div id="stayDays" style="font-size:13.5px;color:var(--g);font-weight:700;min-height:20px"></div></div>
+    ${inp("nurse","主責護理（護理師姓名）",{w:1})}
+    ${sel("chkExam","體檢報告（控床）",["未繳","已繳","待補"])}${sel("chkContract","入住合約（行政）",["未簽","已簽"])}
+    ${sel("chkFee","入住費用說明（行政）",["未說明","已說明"])}
   </div></div>
   <div class="sec"><h3>入住與退住安排</h3><div class="grid">
     <div class="fl w"><div class="subh">入住</div></div>
@@ -638,15 +655,25 @@ function paint(notes,hist){
     ${inp("outAddr","退住接送地址（派車才需要）")}${sel("outMode","退住接送方式",["可坐輪椅","需躺床（臥式）"])}
     ${inp("outNote","退住說明",{w:1,ph:"例：由機構派車送回家"})}
   </div></div>
-  <div class="sec"><h3>機構安排與新入住檢核</h3><div class="grid">
-    ${sel("assess1966","是否已做 1966 長照評估",["有","沒有"])}${sel("cmsLevel","CMS 等級",CMS_LEVELS)}
-    ${sel("serviceType","預備服務類型",SERVICE_TYPES,{w:1})}
-    ${inp("stayStart","預入住開始日",{type:"date"})}${inp("stayEnd","預入住結束日（長期入住可不填）",{type:"date"})}
-    <div class="fl w"><div id="stayDays" style="font-size:13.5px;color:var(--g);font-weight:700;min-height:20px"></div></div>
-    ${inp("nurse","主責護理（護理師姓名）",{w:1})}
-    ${sel("chkExam","體檢報告（控床）",["未繳","已繳","待補"])}${sel("chkContract","入住合約（行政）",["未簽","已簽"])}
-    ${sel("chkFee","入住費用說明（行政）",["未說明","已說明"])}
+  <div class="grp"><b>③ 護理聯絡時詢問</b><span>偏護理的問題集中在這裡</span></div>
+  <div class="sec"><h3>疾病史</h3><div class="grid">
+    ${ta("hxChronic","慢性病（高血壓、糖尿病、心臟病…）")}
+    ${ta("hxDiag","主要診斷")}
+    ${ta("hxSurg","手術與住院史")}
+    ${ta("hxAllergy","過敏史（藥物、食物）")}
+    ${ta("hxCog","失智／精神／情緒狀況")}
+    ${ta("hxInfect","感染或隔離（MRSA、疥瘡、肺結核等）")}
+    ${ta("history","原有說明（家屬在預約頁填的原文或舊資料，會一併帶入通知）")}
   </div></div>
+  <div class="sec"><details class="fold" open><summary>照護細項（訪談時詢問）</summary><div class="in2"><div class="grid">
+    
+    ${sel("dietType","餐食：葷素",["葷食","素食"])}${sel("dietStaple","餐食：主食",["白飯","稀飯"])}${sel("dietVeg","餐食：菜的處理",["菜盤","剪碎","攪碎"])}${sel("dietSize","餐食：碗的大小",["大碗","中碗","小碗"])}${inp("diet","餐食補充（其他說明）")}${sel("excretion","排泄",["自理","尿布","尿管","尿布＋尿管","其他"])}
+    ${sel("feeding","進食方式",["自行口食","鼻胃管灌食","其他"])}
+    ${sel("dnr","DNR 意願",["已簽署","討論中","未簽署"])}${sel("communication","溝通狀況",["正常","聽力不佳","表達或理解困難"])}
+    ${sel("choking","嗆咳風險",["無","偶爾","容易嗆咳"])}${sel("fallRisk","跌倒風險",["無","有"])}
+    <div class="fl w"><label>安全看視</label><div class="cks" id="safeBox">${["曾跌倒","會拔管","躁動","走失風險"].map(x=>`<label class="ck"><input type="checkbox" value="${x}"><span>${x}</span></label>`).join("")}</div></div>
+    ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
+  </div></div></details></div>
   ${isNew?`<div class="sec" style="background:var(--g3);border-color:#cfe2c4;font-size:14px">💡 先儲存後，就可以在這裡新增「訪談紀錄」並設定下次追蹤日期。</div>`:`
   <div class="sec"><h3>訪談與追蹤紀錄</h3>
     <div class="note-in"><select id="nType" class="f">${NOTE_TYPES.map(x=>`<option>${x}</option>`).join("")}</select><input id="nFollow" class="f" type="date" title="下次追蹤日期"></div>
@@ -666,14 +693,14 @@ function paint(notes,hist){
   const os=(CUR.obsTags||"").split("、").filter(Boolean);$$("#obsBox input").forEach(i=>{i.checked=os.includes(i.value);i.onchange=()=>{CUR.obsTags=$$("#obsBox input:checked").map(x=>x.value).join("、");mark()}});
   $$("#lvBox .lv").forEach(b=>b.classList.toggle("on",b.dataset.v===CUR.obsLevel));
   const rs=(CUR.roomType||"").split("、").filter(Boolean);$$("#roomBox input").forEach(i=>{i.checked=rs.includes(i.value);i.onchange=()=>{CUR.roomType=$$("#roomBox input:checked").map(x=>x.value).join("、");recalc();mark()}});
-  syncDiet();syncSvc();
+  syncDiet();syncSvc();syncPlace();syncObs();
   TOTAL_MANUAL=!!CUR.total&&String(CUR.total)!==String(calcEst()||"");$("#totalIn").value=CUR.total||"";
   $("#totalIn").oninput=e=>{TOTAL_MANUAL=true;CUR.total=e.target.value;mark()};
-  recalc();updateStayDays();mark();loadAtts();
+  recalc();updateStayDays();mark();injectSay();loadAtts();
 }
 function noteHtml(n){return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}</div><p>${esc(n.content)}</p></div>`}
 function syncDiet(){const t=CUR&&CUR.feeding==="鼻胃管灌食";["dietType","dietStaple","dietVeg","dietSize","diet"].forEach(k=>{const e=document.querySelector(`#dBody [data-k="${k}"]`);if(e)e.style.display=t?"none":""})}
-function onEdit(e){const el=e.target;if(!el.name)return;CUR[el.name]=el.value;if(el.name==="feeding")syncDiet();if(el.name==="assess1966"){syncSvc();mark()}if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
+function onEdit(e){const el=e.target;if(!el.name)return;CUR[el.name]=el.value;if(el.name==="feeding")syncDiet();if(el.name==="curPlace")syncPlace();if(el.name==="assess1966"){syncSvc();mark()}if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
 function stayDays(c){const s=c.stayStart,e=c.stayEnd;if(!s||!e)return 0;const d=Math.round((new Date(e+"T00:00:00")-new Date(s+"T00:00:00"))/864e5);return d<0?-1:d+1}   // 含頭尾兩天
 function updateStayDays(){const el=$("#stayDays");if(!el)return;const n=stayDays(CUR);el.style.color=n<0?"var(--red)":"var(--g)";el.textContent=n<0?"⚠ 結束日早於開始日":(n>0?`共 ${n} 天`:"")}
 function roomRange(){const ps=(CUR.roomType||"").split("、").map(n=>PRICE.rooms.find(r=>r.name===n)).filter(Boolean).map(r=>r.price);if(!ps.length)return null;const cs=(CUR.conditions||"").split("、").filter(Boolean),add=cs.reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0);return [Math.min(...ps)+add,Math.max(...ps)+add]}
@@ -688,6 +715,7 @@ const KEYS=()=>Object.keys(LABEL);
 function dirty(){return !!CUR&&KEYS().some(k=>String(CUR[k]==null?"":CUR[k])!==String(ORIG[k]==null?"":ORIG[k]))}
 function mark(){
   if(!CUR)return;
+  renderReq();$$("#dBody .fl.bad").forEach(f=>{const k=f.dataset.k;if(String(CUR[k]==null?"":CUR[k]).trim())f.classList.remove("bad")});
   $$("#dBody .fl[data-k]").forEach(f=>{const k=f.dataset.k;f.classList.toggle("chg",String(CUR[k]==null?"":CUR[k])!==String(ORIG[k]==null?"":ORIG[k]))});
   const d=dirty();$("#dSt").textContent=d?"● 有尚未儲存的修改":(CUR.id?`最後更新：${fmtT(CUR.updatedAt)} ${CUR.updatedBy||""}`:"");$("#dSt").style.color=d?"var(--warm)":"var(--sub)";
   $("#saveBtn").disabled=!d;
@@ -717,6 +745,93 @@ function renderGive(){const b=$("#giveBox");if(!b||!CUR)return;
   b.className="givebox on";
   b.innerHTML=`<span>放棄時的階段：<b>${esc(CUR.giveUpStage||"未記錄")}</b></span><label style="display:flex;gap:6px;align-items:center;flex:1">原因<input id="giveWhy" placeholder="選填，例如：家屬選擇其他機構、費用考量…" value="${esc(CUR.giveUpReason||"")}"></label>`;
   $("#giveWhy").oninput=e=>{CUR.giveUpReason=e.target.value;mark()}}
+/* ---------- 各階段的「必問欄位」（要增減，改這裡就好） ----------
+ * REQ[n] ＝ 要離開第 n 階段（0 初步參訪、1 控床聯絡、2 護理聯絡、3 家屬確認）之前，一定要問過的欄位。
+ * k＝欄位代號，l＝提醒時顯示的名稱，if＝只有符合條件才必問（選填）。 */
+const REQ={
+  0:[{k:"curPlace",l:"長者目前在哪裡"},{k:"curPlaceNote",l:"家中地址",if:c=>c.curPlace==="家中"},{k:"roomType",l:"可接受房型"},{k:"mobility",l:"移動能力"}],
+  1:[],2:[],3:[]
+};
+function missingFor(t){
+  const out=[];
+  for(let n=0;n<t&&n<4;n++)(REQ[n]||[]).forEach(r=>{
+    if(r.if&&!r.if(CUR))return;
+    if(!String(CUR[r.k]==null?"":CUR[r.k]).trim()&&!out.some(x=>x.k===r.k))out.push(r)});
+  return out;
+}
+function renderReq(){
+  const b=$("#reqHint");if(!b||!CUR)return;
+  const t=CUR.status==="放棄"?0:Math.max(0,curStage()),m=t>0?missingFor(t):[];
+  if(!m.length){b.className="reqhint";b.innerHTML="";return}
+  b.className="reqhint on";b.innerHTML=`⚠ 還沒詢問：<b>${m.map(x=>esc(x.l)).join("、")}</b>（點這裡去補填）`;
+}
+function focusMissing(m){
+  $$("#dBody .fl.bad").forEach(f=>f.classList.remove("bad"));
+  let first=null;
+  m.forEach(r=>{const f=document.querySelector(`#dBody .fl[data-k="${r.k}"]`);if(f){f.classList.add("bad");if(!first)first=f}});
+  if(!first)return;
+  const det=first.closest("details");if(det)det.open=true;
+  first.scrollIntoView({behavior:"smooth",block:"center"});
+  const i=first.querySelector("input:not([type=checkbox]),select,textarea");if(i)setTimeout(()=>i.focus({preventScroll:true}),350);
+}
+function askMissing(m,targetName){
+  return new Promise(res=>{
+    const d=document.createElement("div");d.className="gvm";
+    d.innerHTML=`<div class="card" role="dialog" aria-modal="true"><h3>還有欄位沒詢問</h3><p>要進入「${esc(targetName)}」之前，這些必問的問題還沒填：</p>
+      <ul class="ml">${m.map(x=>`<li>${esc(x.l)}</li>`).join("")}</ul>
+      <div class="ac"><button type="button" class="cn">先切換，之後補</button><button type="button" class="ok st">回去補填</button></div></div>`;
+    document.body.appendChild(d);
+    const done=v=>{d.remove();res(v)};
+    d.querySelector(".st").onclick=()=>done(false);d.querySelector(".cn").onclick=()=>done(true);
+    d.onclick=e=>{if(e.target===d)done(false)};
+  });
+}
+function syncPlace(){
+  const f=document.querySelector('#dBody .fl[data-k="curPlaceNote"]');if(!f||!CUR)return;
+  const l=f.querySelector("label"),c=CUR.curPlace;
+  l.textContent=c==="家中"?"家中地址（必填）":c==="醫院"?"醫院名稱":c==="其他機構"?"機構名稱":"醫院、機構名稱或家中地址";
+}
+function syncObs(){
+  const box=$("#obsBox");if(!box||!CUR)return;
+  const show=["留意","高風險","建議不收"].includes(CUR.obsLevel);
+  box.style.display=show?"":"none";
+}
+/* ---------- 話稿提示：每個區段「怎麼問」，給沒有經驗的同仁參考（取自「參訪話稿與問題清單」） ---------- */
+const SAY={
+ "參訪人資料":[["主要聯絡人","請問之後主要聯絡的家屬是您嗎？方便留下您的姓名、與長輩的關係，以及聯絡電話嗎？"]],
+ "長者／入住人資料":[["基本資料","請問長輩的姓名、年齡、性別方便告訴我嗎？"],["目前在哪裡","請問長輩現在是在家中、醫院，還是其他機構呢？","（在家中的話）方便告訴我長輩家裡的地址嗎？"],["看診醫院","長輩平常在哪間醫院看診呢？"],["移動能力","長輩目前的行動能力大概是什麼狀況？可以自己走路，還是需要輔具或輪椅？需要人協助移位嗎？"]],
+ "身體狀況與計價":[["管路、氧氣、傷口","長輩目前有沒有鼻胃管、尿管、氣切或其他管路？有需要用氧氣嗎？身上有沒有傷口或褥瘡需要照護？"],["尿布、氧氣、氣墊床","這幾項是由我們機構提供，還是家屬自備呢？兩種費用不太一樣。"],["房型","我們有單人房到五人房，費用不同，您比較可以接受哪幾種房型呢？可以不只選一種喔。"]],
+ "入住原因":[["入住原因","請問這次想讓長輩入住的主要原因是什麼？"],["前次住院","長輩之前有住院嗎？是因為什麼原因、怎麼治療的呢？"],["家屬期望","您對我們有什麼期望，或特別擔心的地方嗎？"]],
+ "預約與來源":[["怎麼知道我們","請問您是怎麼知道我們的呢？"],["參訪時間","您希望哪一天來參觀呢？上午或下午比較方便？"],["預計入住","請問您希望長輩大約什麼時候入住？預計住多久？"]],
+ "參訪觀察":[["這一區是自己記的，不用問家屬","參訪時多留意家屬的態度、情緒，對費用與規定的反應，以及家屬之間意見是否一致；等家屬離開後再補記，具體寫下看到的言行。"]],
+ "機構安排與新入住檢核":[["入住身份","請問長輩目前有申請長照補助嗎？有身心障礙手冊或重大傷病卡嗎？（依回覆判斷：一般／中低收／低收）"],["1966 長照評估","請問長輩有做過 1966 長照評估嗎？有的話，CMS 等級是第幾級呢？"],["預入住期間","請問希望長輩大約什麼時候入住？預計住多久？"]],
+ "入住與退住安排":[["入住交通","入住當天，長輩是需要我們機構派車去接，還是家屬自行送過來呢？"],["接送地點（要派車才問）","請問接送的地址是哪裡？長輩搭車時可以坐輪椅，還是需要躺床（臥式）接送？"]],
+ "疾病史":[["疾病史","長輩目前有哪些慢性病或診斷？以前有動過手術或住院嗎？有沒有過敏、失智或情緒方面的狀況？"]],
+ "照護細項（訪談時詢問）":[["進食方式","長輩目前是自己用口吃飯，還是有用鼻胃管或其他管路灌食？"],["餐食（能自己吃才問）","長輩吃葷還是素？主食是白飯還是稀飯？菜是整盤、剪碎還是攪碎？碗是大、中還是小碗？吃東西或喝水容易嗆到嗎？"],["排泄","長輩目前大小便能自理嗎？有使用尿布或尿管嗎？"],["DNR","家裡有沒有討論過，如果長輩發生緊急狀況，急救的意願是什麼？有簽署 DNR 嗎？"],["用藥","長輩目前有在服用哪些藥物嗎？有帶藥袋或處方箋嗎？"],["溝通","長輩在溝通表達上有沒有什麼狀況？聽力或語言理解有問題嗎？"],["日常起居","長輩平常的生活作息有什麼習慣，或需要特別注意的地方嗎？例如睡眠、活動習慣。"],["安全與跌倒","長輩有跌倒過嗎？有沒有需要特別注意安全的狀況，例如會自己拔管、躁動或走失？"]]
+};
+const SAY_OPEN=[["實地參訪","您好，我是這裡的行政人員＿＿，今天感謝您特地來參訪。我們先帶您簡單介紹一下環境，然後再坐下來聊聊長輩的狀況，看看我們能怎麼協助您，這樣可以嗎？","參訪結束回到會談區後：「我們先了解一下長輩目前的狀況，這樣我才能更準確地跟您說明費用跟照護安排。」"],["電話參訪","您好，這裡是線東大眾護理之家，我是行政人員＿＿，請問您是要詢問入住的相關事宜嗎？","確認後：「好的，我來為您介紹。為了讓我更了解長輩的狀況，方便我們說明適合的照護安排，我想先請問您幾個問題，可以嗎？」"]];
+const SAY_END=[["實地參訪","好的，感謝您今天提供這麼多資訊。根據您說的狀況，長輩入住費用大概是＿＿元。接下來麻煩您準備體檢報告，我這邊有一張體檢表給您參考，上面有需要做的項目。體檢報告備齊之後，我們就可以安排入住日期、進行簽約。您有任何問題都可以直接跟我聯絡，我的名字是＿＿，這是我們的聯絡方式。","送客後把這張參訪單填完整，並在「訪談與追蹤紀錄」記下家屬回覆的日期與狀況。"],["電話參訪","好的，謝謝您提供這些資訊。根據您說的狀況，長輩入住費用大概是＿＿元。如果您方便的話，歡迎直接來機構參觀環境，我們再詳細說明簽約和入住的流程；也可以先準備體檢報告，我等一下用 LINE 傳一份體檢表給您參考。有任何問題都歡迎再打電話或傳訊息給我們。","掛電話後把內容填進這張參訪單，並記錄後續追蹤日期與狀況。"]];
+let SAY_OPEN_ON=true;
+const sayBox=(title,items)=>`<details class="say"${SAY_OPEN_ON?" open":""}><summary>💬 ${title}</summary>${items.map(it=>{const [h,...q]=it;return `<p><b>${esc(h)}</b>${q.map(x=>`<br>「${esc(x)}」`).join("")}</p>`}).join("")}</details>`;
+function sayRich(title,list){return `<details class="say"${SAY_OPEN_ON?" open":""}><summary>💬 ${title}</summary>${list.map(([h,say,tip])=>`<p><b>${esc(h)}</b><br>「${esc(say)}」${tip?`<br><span class="tip">${esc(tip)}</span>`:""}</p>`).join("")}</details>`}
+function injectSay(){
+  const body=$("#dBody");if(!body)return;
+  body.querySelectorAll(".say,.sayend").forEach(e=>e.remove());
+  body.querySelectorAll(".sec").forEach(sec=>{
+    const h=sec.querySelector("h3,summary");if(!h)return;
+    const key=h.textContent.replace(/\s+/g," ").trim().replace(/🔒.*$/,"").replace(/点.*$/,"").trim();
+    const hit=Object.keys(SAY).find(k=>key.startsWith(k));if(!hit)return;
+    const box=document.createElement("div");box.innerHTML=sayBox("怎麼問",SAY[hit]);
+    const host=sec.querySelector("details>.in2")||sec;
+    host.insertBefore(box.firstChild,host.querySelector(".grid,.cks,.lvs,.atts")||h.nextSibling);
+  });
+  const g1=body.querySelector(".grp");if(g1){const d=document.createElement("div");d.className="sayend";d.innerHTML=sayRich("開場白",SAY_OPEN);g1.after(d)}
+  const care=[...body.querySelectorAll(".sec")].find(e=>e.querySelector("details.fold summary")&&/照護細項/.test(e.textContent));
+  if(care){const d=document.createElement("div");d.className="sayend";d.innerHTML=sayRich("問完之後怎麼說（結尾說明）",SAY_END);care.after(d)}
+}
+function setSay(on){SAY_OPEN_ON=on;document.querySelectorAll("#dBody details.say").forEach(d=>d.open=on);try{localStorage.setItem("tour_say",on?"1":"0")}catch(e){}const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
+function toggleSay(){setSay(!SAY_OPEN_ON)}
+function initSay(){let on=true;try{on=localStorage.getItem("tour_say")!=="0"}catch(e){}SAY_OPEN_ON=on;const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
 const GIVE_WHY=["選擇其他機構","費用考量","距離或交通不便","長輩病情改變或已往生","床位或房型不合","家屬無法聯絡"];
 function askGiveUp(init,stage){
   return new Promise(res=>{
@@ -736,6 +851,10 @@ function askGiveUp(init,stage){
 }
 async function setStatus(s){
   if(CUR.status===s)return;
+  if(s!=="放棄"){
+    const t=stageOf(s),m=t>Math.max(0,curStage())?missingFor(t):[];
+    if(m.length){const go=await askMissing(m,s);if(!go){focusMissing(m);return}}
+  }
   let why=null;
   if(s==="放棄"){why=await askGiveUp(CUR.giveUpReason,OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||""));if(why===null)return}
   if(s==="放棄"){CUR.giveUpStage=OPEN_ST.includes(CUR.status)?CUR.status:(CUR.giveUpStage||"");CUR.giveUpReason=why}
