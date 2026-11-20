@@ -359,7 +359,7 @@ tr.row:hover{background:#F3F6EC}
 <div id="mask" onclick="closeDr()"></div>
 <aside id="dr" aria-hidden="true">
   <div class="dh">
-    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" id="sayBtn" onclick="toggleSay()" title="一次展開或收合所有區段的問法提示">💬 話稿：全部收合</button><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
+    <div class="r1"><h2 id="dTitle"></h2><button class="btn btn-o btn-sm" id="sayBtn" onclick="toggleSay()" title="一次展開或收合所有區段的問法提示">💬 話稿：全部展開</button><button class="btn btn-o btn-sm" onclick="openNotice()" title="依這筆資料產生給護理師的入住通知"><i class="v-ico" style="--ico:url(../assets/tour/icon-notice.webp)"></i>入住通知</button><button class="x" onclick="closeDr()" aria-label="關閉">✕</button></div>
     <div class="stbar" id="stbar"></div>
     <div class="givebox" id="giveBox"></div>
     <div class="reqhint" id="reqHint" onclick="focusMissing(missingFor(Math.max(0,curStage())))"></div>
@@ -910,7 +910,7 @@ const SAY={
 };
 const SAY_OPEN=[["實地參訪","您好，我是這裡的行政人員＿＿，今天感謝您特地來參訪。我們先帶您簡單介紹一下環境，然後再坐下來聊聊長輩的狀況，看看我們能怎麼協助您，這樣可以嗎？","參訪結束回到會談區後：「我們先了解一下長輩目前的狀況，這樣我才能更準確地跟您說明費用跟照護安排。」"],["電話參訪","您好，這裡是線東大眾護理之家，我是行政人員＿＿，請問您是要詢問入住的相關事宜嗎？","確認後：「好的，我來為您介紹。為了讓我更了解長輩的狀況，方便我們說明適合的照護安排，我想先請問您幾個問題，可以嗎？」"]];
 const SAY_END=[["實地參訪","好的，感謝您今天提供這麼多資訊。根據您說的狀況，長輩入住費用大概是＿＿元。接下來麻煩您準備體檢報告，我這邊有一張體檢表給您參考，上面有需要做的項目。體檢報告備齊之後，我們就可以安排入住日期、進行簽約。您有任何問題都可以直接跟我聯絡，我的名字是＿＿，這是我們的聯絡方式。","送客後把這張參訪單填完整，並在「訪談與追蹤紀錄」記下家屬回覆的日期與狀況。"],["電話參訪","好的，謝謝您提供這些資訊。根據您說的狀況，長輩入住費用大概是＿＿元。如果您方便的話，歡迎直接來機構參觀環境，我們再詳細說明簽約和入住的流程；也可以先準備體檢報告，我等一下用 LINE 傳一份體檢表給您參考。有任何問題都歡迎再打電話或傳訊息給我們。","掛電話後把內容填進這張參訪單，並記錄後續追蹤日期與狀況。"]];
-let SAY_OPEN_ON=true;
+let SAY_OPEN_ON=false;
 const sayBox=(title,items)=>`<details class="say"${SAY_OPEN_ON?" open":""}><summary>💬 ${title}</summary>${items.map(it=>{const [h,...q]=it;return `<p><b>${esc(h)}</b>${q.map(x=>`<br>「${esc(x)}」`).join("")}</p>`}).join("")}</details>`;
 function sayRich(title,list){return `<details class="say"${SAY_OPEN_ON?" open":""}><summary>💬 ${title}</summary>${list.map(([h,say,tip])=>`<p><b>${esc(h)}</b><br>「${esc(say)}」${tip?`<br><span class="tip">${esc(tip)}</span>`:""}</p>`).join("")}</details>`}
 function injectSay(){
@@ -928,9 +928,9 @@ function injectSay(){
   const care=[...body.querySelectorAll(".sec")].find(e=>e.querySelector("details.fold summary")&&/照護細項/.test(e.textContent));
   if(care){const d=document.createElement("div");d.className="sayend";d.innerHTML=sayRich("問完之後怎麼說（結尾說明）",SAY_END);care.after(d)}
 }
-function setSay(on){SAY_OPEN_ON=on;document.querySelectorAll("#dBody details.say").forEach(d=>d.open=on);try{localStorage.setItem("tour_say",on?"1":"0")}catch(e){}const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
+function setSay(on){SAY_OPEN_ON=on;document.querySelectorAll("#dBody details.say").forEach(d=>d.open=on);try{localStorage.setItem("tour_say2",on?"1":"0")}catch(e){}const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
 function toggleSay(){setSay(!SAY_OPEN_ON)}
-function initSay(){let on=true;try{on=localStorage.getItem("tour_say")!=="0"}catch(e){}SAY_OPEN_ON=on;const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
+function initSay(){let on=false;try{on=localStorage.getItem("tour_say2")==="1"}catch(e){}SAY_OPEN_ON=on;const b=$("#sayBtn");if(b)b.textContent=on?"💬 話稿：全部收合":"💬 話稿：全部展開"}
 const GIVE_WHY=["選擇其他機構","費用考量","距離或交通不便","長輩病情改變或已往生","床位或房型不合","家屬無法聯絡"];
 function askGiveUp(init,stage){
   return new Promise(res=>{
