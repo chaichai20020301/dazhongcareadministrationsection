@@ -104,6 +104,7 @@ tr.row:hover{background:#f3efe6}
 .fl label{display:block;font-size:12.5px;color:var(--sub);font-weight:700;margin-bottom:3px}
 .fl input,.fl select,.fl textarea{width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff}
 .fl textarea{min-height:90px;resize:vertical}
+.fl textarea.auto{min-height:40px;height:40px;resize:vertical;overflow:hidden;line-height:1.5}
 .fl.chg input,.fl.chg select,.fl.chg textarea{border-color:var(--warm);background:#fff9ef}
 .fl.bad input,.fl.bad select{border-color:var(--red);background:#fff6f4}
 .fl em{color:var(--red);font-style:normal}
@@ -116,7 +117,15 @@ tr.row:hover{background:#f3efe6}
 .tot{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--g3);border-radius:12px;padding:10px 14px;margin-top:12px;flex-wrap:wrap}
 .tot b{font:900 22px 'Noto Serif TC';color:var(--g)}
 .tot input{width:130px;font-weight:700;text-align:right}
-.note-in{display:grid;grid-template-columns:110px 1fr;gap:8px;margin-bottom:8px}
+.note-in{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.note-in label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--sub)}
+.note-in .full{grid-column:1/-1}
+.nreq .rq{color:#d33;font-style:normal}
+.nbox.need{outline:3px solid #f3b341;border-radius:12px;animation:rise .3s both}
+.nwarn{display:none;margin:0 0 8px;padding:8px 12px;border-radius:9px;background:#fff3df;color:#7a5522;font-size:13.5px}
+.nbox.need .nwarn{display:block}
+.ni .res{background:#e8f2da;color:#2d5a1b}.ni .res.bad{background:#fde7e4;color:#a3281d}
+.ni .todo{margin-top:4px;font-size:13.5px;color:#7a5522}
 .nt{position:relative;padding-left:20px;margin-top:12px}
 .nt::before{content:"";position:absolute;left:5px;top:6px;bottom:0;width:2px;background:var(--line)}
 .ni{position:relative;margin-bottom:12px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 12px;animation:rise .3s both}
@@ -390,6 +399,21 @@ const LEGACY_ST={"待聯絡":"初步參訪","已確認":"控床聯絡","已參�
 const SC={"初步參訪":"--s-wait","控床聯絡":"--s-hold","護理聯絡":"--s-nurse","家屬討論中":"--s-talk","已安排床位":"--s-bed","已入住":"--s-in","放棄":"--s-can"};
 const CHANNELS=["家屬線上","電話詢問","實地參訪","網路詢問"];
 const NOTE_TYPES=["電話","實地","LINE","其他"];
+const NOTE_RES=["已聯絡到家屬","未接／無人回應","已讀未回","家屬還在考慮","僅查看資料（未聯絡家屬）"];
+const NOTE_BAD=["未接／無人回應","已讀未回"];
+let NOTED=false;   // 這次打開個案，是否已經新增過訪談紀錄
+// 紀錄內容格式：第一行「對象：○○｜結果：○○」，其後是摘要，選填「待辦：○○」。舊紀錄沒有這行也能正常顯示。
+function noteParse(n){
+  const m=String(n.content||"").match(/^對象：(.*?)｜結果：(.*?)\n([\s\S]*)$/);
+  if(!m)return{who:"",res:"",body:String(n.content||""),todo:""};
+  let body=m[3],todo="";const t=body.match(/\n?待辦：([^\n]*)$/);if(t){todo=t[1];body=body.slice(0,t.index)}
+  return{who:m[1],res:m[2],body,todo};
+}
+function needNote(){
+  if(!CUR||!CUR.id||NOTED)return false;
+  const b=$("#nBox");if(b){b.classList.add("need");b.scrollIntoView({block:"center",behavior:"smooth"})}
+  toast("請先填寫這次的「訪談與追蹤進度」再離開",4000);return true;
+}
 const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
 const OPEN_ST=["初步參訪","控床聯絡","護理聯絡","家屬討論中","已安排床位"];
 // key,中文標籤（修改歷程使用）
@@ -539,7 +563,7 @@ function exportCsv(){
 let CUR=null,ORIG=null,TOTAL_MANUAL=false;
 const inp=(k,l,o={})=>`<div class="fl${o.w?" w":""}" data-k="${k}"><label>${l}${o.req?" <em>*</em>":""}</label><input name="${k}" type="${o.type||"text"}" ${o.ph?`placeholder="${o.ph}"`:""} ${o.mode?`inputmode="${o.mode}"`:""}></div>`;
 const sel=(k,l,opts,o={})=>`<div class="fl${o.w?" w":""}" data-k="${k}"><label>${l}${o.req?" <em>*</em>":""}</label><select name="${k}"><option value="">—</option>${opts.map(x=>`<option>${x}</option>`).join("")}</select></div>`;
-const ta=(k,l,o={})=>`<div class="fl w" data-k="${k}"><label>${l}</label><textarea name="${k}" ${o.ph?`placeholder="${o.ph}"`:""}></textarea></div>`;
+const ta=(k,l,o={})=>`<div class="fl w" data-k="${k}"><label>${l}</label><textarea name="${k}" ${/^(rsn|hx)/.test(k)?'class="auto" rows="1"':""} ${o.ph?`placeholder="${o.ph}"`:""}></textarea></div>`;
 
 function addonChips(list,cls,cur,nm){
   const E=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -584,10 +608,11 @@ async function openRow(id){
   if(id===null){CUR={status:"初步參訪",channel:"電話詢問",handler:me(),visitDate:"",conditions:""};ORIG=Object.assign({},CUR);paint([],[]);openDr();return}
   $("#dTitle").textContent="讀取中…";$("#dBody").innerHTML='<div class="load"><span class="spin d"></span></div>';openDr();
   const r=await api("get",{id});if(!r.ok||!r.row){closeDr();return toast("讀取失敗")}
-  CUR=Object.assign({},r.row);ORIG=Object.assign({},r.row);paint(r.notes||[],r.hist||[]);
+  CUR=Object.assign({},r.row);ORIG=Object.assign({},r.row);NOTED=false;paint(r.notes||[],r.hist||[]);
 }
 function openDr(){$("#dr").classList.add("on");$("#mask").classList.add("on");$("#dr").setAttribute("aria-hidden","false");document.body.style.overflow="hidden"}
 function closeDr(){
+  if(needNote())return;
   if(CUR&&dirty()&&!confirm("有尚未儲存的修改，確定要關閉嗎？"))return;
   $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";CUR=null;
 }
@@ -677,9 +702,16 @@ function paint(notes,hist){
     ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
   </div></div></details></div>
   ${isNew?`<div class="sec" style="background:var(--g3);border-color:#cfe2c4;font-size:14px">💡 先儲存後，就可以在這裡新增「訪談紀錄」並設定下次追蹤日期。</div>`:`
-  <div class="sec"><h3>訪談與追蹤紀錄</h3>
-    <div class="note-in"><select id="nType" class="f">${NOTE_TYPES.map(x=>`<option>${x}</option>`).join("")}</select><input id="nFollow" class="f" type="date" title="下次追蹤日期"></div>
-    <textarea id="nText" style="width:100%;min-height:70px;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff" placeholder="記錄這次與家屬聯繫的內容、家屬回覆、報價說明…（右上選擇下次追蹤日期）"></textarea>
+  <div class="sec nbox" id="nBox"><h3>訪談與追蹤進度 <small style="color:#d33;font-weight:400">每次打開個案都要填一筆，讓主管看得到進度</small></h3>
+    <div class="nwarn">⚠ 還沒填這次的訪談與追蹤進度。請填好下面標 * 的欄位，按「新增紀錄」後才能關閉或儲存。</div>
+    <div class="note-in nreq">
+      <label>聯絡方式<span class="rq"> *</span><select id="nType" class="f">${NOTE_TYPES.map(x=>`<option>${x}</option>`).join("")}</select></label>
+      <label>聯絡對象<span class="rq"> *</span><input id="nWho" class="f" placeholder="例如：陳小姐（女兒）" value="${esc(CUR.visitorName||"")}"></label>
+      <label class="full">聯絡結果<span class="rq"> *</span><select id="nRes" class="f"><option value="">請選擇…</option>${NOTE_RES.map(x=>`<option>${x}</option>`).join("")}</select></label>
+      <label class="full">內容摘要<span class="rq"> *</span><textarea id="nText" style="width:100%;min-height:70px;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:#fff" placeholder="談了什麼、家屬怎麼回覆。若沒有資料，請寫原因（例如：家屬說還在跟兄弟討論、電話兩次未接）"></textarea></label>
+      <label>下次追蹤日<input id="nFollow" class="f" type="date"></label>
+      <label>待辦事項<input id="nTodo" class="f" placeholder="例如：週五再打給家屬確認房型"></label>
+    </div>
     <button type="button" class="btn btn-g btn-sm" style="margin-top:8px" id="noteBtn" onclick="addNote()">＋ 新增紀錄</button>
     <div class="nt" id="notes">${notes.length?notes.map(noteHtml).join(""):'<div style="color:var(--sub);font-size:13.5px">尚無訪談紀錄</div>'}</div>
   </div>
@@ -698,11 +730,14 @@ function paint(notes,hist){
   syncDiet();syncSvc();syncPlace();syncObs();markReq();
   TOTAL_MANUAL=!!CUR.total&&String(CUR.total)!==String(calcEst()||"");$("#totalIn").value=CUR.total||"";
   $("#totalIn").oninput=e=>{TOTAL_MANUAL=true;CUR.total=e.target.value;mark()};
-  recalc();updateStayDays();mark();injectSay();loadAtts();
+  recalc();updateStayDays();mark();injectSay();loadAtts();autoGrowAll();
 }
-function noteHtml(n){return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}</div><p>${esc(n.content)}</p></div>`}
+function noteHtml(n){const p=noteParse(n);return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${p.who?`<span class="tag">對象：${esc(p.who)}</span>`:""}${p.res?`<span class="tag res${NOTE_BAD.includes(p.res)?" bad":""}">${esc(p.res)}</span>`:""}${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}</div><p>${esc(p.body)}</p>${p.todo?`<div class="todo">待辦：${esc(p.todo)}</div>`:""}</div>`}
 function syncDiet(){const t=CUR&&CUR.feeding==="鼻胃管灌食";["dietType","dietStaple","dietVeg","dietSize","diet"].forEach(k=>{const e=document.querySelector(`#dBody [data-k="${k}"]`);if(e)e.style.display=t?"none":""})}
-function onEdit(e){const el=e.target;if(!el.name)return;CUR[el.name]=el.value;if(el.name==="feeding")syncDiet();if(el.name==="curPlace")syncPlace();if(el.name==="assess1966"){syncSvc();mark()}if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
+function autoGrow(el){el.style.height="auto";el.style.height=Math.max(40,el.scrollHeight+2)+"px"}
+function autoGrowAll(){$$("#dBody textarea.auto").forEach(autoGrow)}
+document.addEventListener("toggle",e=>{if(e.target.tagName==="DETAILS"&&e.target.open)autoGrowAll()},true);
+function onEdit(e){const el=e.target;if(!el.name)return;if(el.classList&&el.classList.contains("auto"))autoGrow(el);CUR[el.name]=el.value;if(el.name==="feeding")syncDiet();if(el.name==="curPlace")syncPlace();if(el.name==="assess1966"){syncSvc();mark()}if(el.name==="stayStart"||el.name==="stayEnd")updateStayDays();mark()}
 function stayDays(c){const s=c.stayStart,e=c.stayEnd;if(!s||!e)return 0;const d=Math.round((new Date(e+"T00:00:00")-new Date(s+"T00:00:00"))/864e5);return d<0?-1:d+1}   // 含頭尾兩天
 function updateStayDays(){const el=$("#stayDays");if(!el)return;const n=stayDays(CUR);el.style.color=n<0?"var(--red)":"var(--g)";el.textContent=n<0?"⚠ 結束日早於開始日":(n>0?`共 ${n} 天`:"")}
 function roomRange(){const ps=(CUR.roomType||"").split("、").map(n=>PRICE.rooms.find(r=>r.name===n)).filter(Boolean).map(r=>r.price);if(!ps.length)return null;const cs=(CUR.conditions||"").split("、").filter(Boolean),add=cs.reduce((s,k)=>s+((PRICE.addons.find(a=>a.key===k)||{}).price||0),0);return [Math.min(...ps)+add,Math.max(...ps)+add]}
@@ -740,18 +775,43 @@ function renderStatus(){
   else if(v===3){g.st.forEach(x=>o.push(opt(x,x,CUR.status===x)))}
   else o.push(opt("已入住","已入住",CUR.status==="已入住"));
   if(v<=3)o.push(opt("放棄","放棄",gave&&v===cur,"no"));
-  const msgs=(!gave&&cur>=0&&cur<=3)?`<button type="button" class="so msg" onclick="openMsg('ask')" title="依還沒問到的必問欄位，產生追問家屬的訊息">❓ 追問家屬</button><button type="button" class="so msg" onclick="openMsg('remind')" title="依目前階段產生提醒家屬的訊息">🔔 提醒家屬</button>`:"";
+  const msgs=(!gave&&cur>=0&&cur<=3)?`<button type="button" class="so msg" onclick="openMsg('ask')" title="依所有還沒問到的欄位，產生追問家屬的訊息">❓ 追問家屬</button><button type="button" class="so msg" onclick="openMsg('remind')" title="產生入住前請家屬準備物品的提醒訊息">🔔 提醒家屬</button>`:"";
   box.innerHTML=`<div class="stgs">${steps}</div><div class="sopts"><span class="sl">階段 ${v+1}：${g.n}</span>${o.join("")}${msgs}</div>`;
 }
 /* ---------- 給家屬的訊息（追問／提醒）：產生文字，複製後貼到 LINE ---------- */
 let NM_KIND="notice";
-function setNm(kind,title,hint,btn){NM_KIND=kind;$("#nmSel").style.display=kind==="remind"?"":"none";$("#nmTitle").textContent=title;$("#nmHint").textContent=hint;$("#nmCopy").textContent=btn}
-const ASK_Q={
-  curPlace:()=>"長輩目前是在家中、醫院，還是其他機構呢？",
-  curPlaceNote:c=>c.curPlace==="家中"?"方便告訴我們長輩家裡的地址嗎？":c.curPlace==="醫院"?"請問是哪一間醫院呢？":"請問是哪一間機構呢？",
-  roomType:()=>"我們有單人房到五人房，費用不同，請問您比較可以接受哪幾種房型呢？（可以不只選一種）",
-  mobility:()=>"長輩目前的行動能力如何？可以自己走路、需要輔具、坐輪椅，還是臥床？"
-};
+function setNm(kind,title,hint,btn){NM_KIND=kind;$("#nmSel").style.display="none";$("#nmTitle").textContent=title;$("#nmHint").textContent=hint;$("#nmCopy").textContent=btn}
+/* 追問家屬：列出「所有還沒問到（欄位是空的）」的問題，不只必問。要增減問題改這裡；順序＝訊息裡的順序。
+ * k＝欄位代號，q＝問法（可用函式），if＝符合條件才問。 */
+const ASK_ALL=[
+  {k:"curPlace",q:"長輩目前是在家中、醫院，還是其他機構呢？"},
+  {k:"curPlaceNote",if:c=>!!c.curPlace,q:c=>c.curPlace==="家中"?"方便告訴我們長輩家裡的地址嗎？":c.curPlace==="醫院"?"請問是哪一間醫院呢？":"請問是哪一間機構呢？"},
+  {k:"roomType",q:"我們有單人房到五人房，費用不同，請問您比較可以接受哪幾種房型呢？（可以不只選一種）"},
+  {k:"mobility",q:"長輩目前的行動能力如何？可以自己走路、需要輔具、坐輪椅，還是臥床？"},
+  {k:"feeding",q:"長輩目前是自己用口進食，還是鼻胃管灌食呢？"},
+  {k:"dietType",if:c=>c.feeding!=="鼻胃管灌食",q:"餐食方面，長輩是吃葷還是吃素呢？"},
+  {k:"dietStaple",if:c=>c.feeding!=="鼻胃管灌食",q:"主食是吃白飯還是稀飯呢？"},
+  {k:"dietVeg",if:c=>c.feeding!=="鼻胃管灌食",q:"菜的部分，是用菜盤（整塊）、剪碎，還是攪碎呢？"},
+  {k:"dietSize",if:c=>c.feeding!=="鼻胃管灌食",q:"飯量大概是大碗、中碗還是小碗呢？"},
+  {k:"choking",q:"吃東西或喝水時，長輩會不會容易嗆到呢？"},
+  {k:"fallRisk",q:"長輩最近有跌倒過，或是有容易跌倒的情形嗎？"},
+  {k:"hxChronic",q:"長輩有哪些慢性病呢？（例如高血壓、糖尿病、心臟病）"},
+  {k:"hxDiag",q:"這次主要的診斷或病況是什麼呢？"},
+  {k:"hxSurg",q:"長輩有做過哪些手術，或是住院過嗎？"},
+  {k:"hxAllergy",q:"長輩有沒有藥物或食物過敏呢？"},
+  {k:"hxCog",q:"長輩有失智、情緒或精神方面的狀況嗎？"},
+  {k:"hxInfect",q:"長輩有沒有需要隔離的感染（例如 MRSA、疥瘡）呢？"},
+  {k:"rsnHosp",q:"長輩前一次住院的原因與治療過程大概是怎樣呢？"},
+  {k:"rsnCare",q:"目前家中在照顧上最需要協助的是哪些部分呢？"},
+  {k:"rsnExpect",q:"對於入住，您和家人有什麼期望或擔心的地方嗎？"},
+  {k:"assess1966",q:"請問長輩有做過 1966 長照評估嗎？"},
+  {k:"cmsLevel",if:c=>c.assess1966==="有",q:"有的話，CMS 等級是第幾級呢？"},
+  {k:"expectedStay",q:"預計大概什麼時候想讓長輩入住呢？"},
+  {k:"medication",q:"長輩目前有在服用哪些藥物呢？（藥袋拍照給我們也可以）"}
+];
+function unasked(c){
+  return ASK_ALL.filter(r=>(!r.if||r.if(c))&&!String(c[r.k]==null?"":c[r.k]).trim());
+}
 const PREP_KEY="入住前要準備的物品（簽約、文件、藥物、衣物、用品）";
 const PREP_MSG=`親愛的家屬您好，
 
@@ -798,33 +858,20 @@ const PREP_MSG=`親愛的家屬您好，
 
 🦯 【輔具】（若長輩有使用習慣）
 輪椅、助行器、拐杖、眼鏡、助聽器`;
-const REMIND_MSG={
-  "初步參訪":"感謝您的詢問與參訪。如果方便的話，歡迎直接來機構參觀環境，我們再詳細說明簽約和入住的流程；也可以先準備長輩的體檢報告，我這邊可以傳一份體檢表給您參考。有任何問題都歡迎再聯絡我，謝謝您！",
-  "控床聯絡":"長輩的床位我們正在安排中。為了接下來能順利安排入住，想提醒您先準備體檢報告，上面有需要做的檢查項目，體檢表我可以再傳給您。報告備齊後跟我說，我們就能安排入住日期與簽約。謝謝您！",
-  "護理聯絡":"為了讓護理同仁事先了解長輩的狀況、準備好照護，麻煩您提供長輩目前服用的藥物（藥袋或處方箋拍照傳給我即可），以及近期的就醫資料或病歷摘要。謝謝您！",
-  "家屬討論中":"想關心一下您和家人討論得如何了？如果對費用、房型或照護安排還有任何疑問，都歡迎直接問我。決定好之後跟我說，我們就能安排簽約與入住日期。謝謝您！",
-  "已安排床位":"長輩的床位已經為您安排好了，想提醒您確認預計的入住日期，並安排簽約。若入住前還有需要準備的資料或想了解的事，歡迎隨時聯絡我，謝謝您！"
-};
 const MSG_ROLE={"控床聯絡":"控床人員","護理聯絡":"護理人員"};   // 其餘階段都是「行政同仁」
 function msgHello(){const n=String(CUR.visitorName||"").trim();return `${n?n+" ":""}您好，我是線東大眾護理之家的${MSG_ROLE[CUR.status]||"行政同仁"}。`}
-function remindText(k){return k===PREP_KEY?PREP_MSG:msgHello()+"\n"+REMIND_MSG[k]}
-function remindPick(){$("#nmText").value=remindText($("#nmSel").value)}
 function openMsg(kind){
   if(!CUR)return;
   let text="",hint="";
   if(kind==="ask"){
-    const t=Math.min(Math.max(0,curStage())+1,4),m=missingFor(t);
-    if(!m.length)return toast("必問的資料都已經問齊了 ✓");
-    text=[msgHello(),"為了更準確地跟您說明適合的照護安排，想再跟您確認幾個資料：",...m.map((r,i)=>`${i+1}. ${(ASK_Q[r.k]||(()=>r.l+"？"))(CUR)}`),"方便的話請回覆我，謝謝您！"].join("\n");
-    hint="這是依「還沒問到的必問欄位」自動產生的追問，可以直接修改，再按「複製」貼到 LINE。";
+    const m=unasked(CUR);
+    if(!m.length)return toast("該問的資料都已經問齊了 ✓");
+    text=[msgHello(),"為了更準確地跟您說明適合的照護安排，想再跟您確認幾個資料：",...m.map((r,i)=>`${i+1}. ${typeof r.q==="function"?r.q(CUR):r.q}`),"方便的話請回覆我，謝謝您！"].join("\n");
+    hint="這是依「還沒問到（欄位還是空的）」的項目自動列出，共 "+m.length+" 題。太多的話可以直接刪掉不想一次問的題目，再按「複製」貼到 LINE。";
     setNm("ask","追問家屬的訊息",hint,"複製訊息");
   }else{
-    if(!REMIND_MSG[CUR.status])return toast("這個階段沒有提醒訊息");
-    const sel=$("#nmSel");
-    sel.innerHTML=[PREP_KEY,...Object.keys(REMIND_MSG)].map(k=>`<option value="${esc(k)}">${k===PREP_KEY?"📋 "+esc(k):"依階段：「"+esc(k)+"」的提醒"}</option>`).join("");
-    sel.value=CUR.status==="已安排床位"?PREP_KEY:CUR.status;
-    text=remindText(sel.value);
-    hint="可以在上面選別的提醒範本，也能直接修改文字，再按「複製」貼到 LINE。";
+    text=PREP_MSG;
+    hint="這是入住前要請家屬準備的物品清單範本，可以直接修改文字，再按「複製」貼到 LINE。";
     setNm("remind","提醒家屬的訊息",hint,"複製訊息");
   }
   $("#nmText").value=text;$("#nmMiss").classList.remove("on");$("#nm").classList.add("on");
@@ -963,6 +1010,7 @@ async function setStatus(s){
   renderGive();mark();
 }
 async function save(){
+  if(needNote())return;
   if(CUR&&CUR.status==="放棄"&&ORIG.status!=="放棄"&&!String(CUR.giveUpReason||"").trim()){toast("請填寫放棄原因");const w=$("#giveWhy");if(w)w.focus();return}
   if(!needWho())return;
   const bad=[];["visitorName","elderName"].forEach(k=>{const f=$(`.fl[data-k=${k}]`);const b=!String(CUR[k]||"").trim();f&&f.classList.toggle("bad",b);if(b)bad.push(k)});
@@ -986,7 +1034,7 @@ async function save(){
     draw();
     if(isNew){
       // 新增完成：直接停在這筆的詳情，方便接著補訪談紀錄
-      CUR=Object.assign({},row);ORIG=Object.assign({},row);
+      CUR=Object.assign({},row);ORIG=Object.assign({},row);NOTED=false;
       paint([],[{time:row.createdAt,pid:row.id,by:me(),field:"（新增）",oldV:"",newV:"建立預約"}]);
     }else{
       CUR=null;ORIG=null;
@@ -997,7 +1045,10 @@ async function save(){
   finally{ clearTimeout(slow);b.innerHTML="儲存";mark(); }
 }
 async function addNote(){
-  if(!needWho())return;const c=$("#nText").value.trim();if(!c)return toast("請輸入紀錄內容");
+  if(!needWho())return;
+  const who=$("#nWho").value.trim(),res=$("#nRes").value,sum=$("#nText").value.trim(),todo=$("#nTodo").value.trim();
+  if(!who)return toast("請填寫聯絡對象");if(!res)return toast("請選擇聯絡結果");if(!sum)return toast("請填寫內容摘要");
+  const c=`對象：${who}｜結果：${res}\n${sum}${todo?"\n待辦："+todo:""}`;
   const b=$("#noteBtn");b.disabled=true;
   const type=$("#nType").value,follow=$("#nFollow").value;
   const slow=setTimeout(()=>toast("Google 回應較慢，請稍候，資料正在儲存…",6000),5000);
@@ -1008,7 +1059,7 @@ async function addNote(){
     if(r.updatedAt){CUR.updatedAt=r.updatedAt;ORIG.updatedAt=r.updatedAt;CUR.updatedBy=me();ORIG.updatedBy=me()}
     const html=noteHtml({by:me(),time:r.updatedAt||new Date().toISOString(),type,content:c,followDate:follow}),box=$("#notes");
     if(box.querySelector(".ni"))box.insertAdjacentHTML("afterbegin",html);else box.innerHTML=html;
-    $("#nText").value="";$("#nFollow").value="";
+    $("#nText").value="";$("#nFollow").value="";$("#nTodo").value="";$("#nRes").value="";NOTED=true;$("#nBox").classList.remove("need");
     if(follow&&(!FOLLOW[CUR.id]||follow>FOLLOW[CUR.id]))FOLLOW[CUR.id]=follow;
     draw();mark();
   }catch(e){ if(!(e&&(e.denied||e.auth)))toast(e&&(e.message==="連線逾時"||e.transient)?"Google 沒有正常回應，紀錄不一定已新增。請先按「重新整理」確認，再決定要不要重新新增":"新增失敗",7000)}
