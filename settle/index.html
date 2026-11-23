@@ -208,6 +208,7 @@ textarea.notes:focus{outline:none;border-color:var(--teal)}
       <input type="date" id="dPick" aria-label="選日期">
       <button class="btn sec sm" id="dToday">今天</button>
       <span class="sp"></span>
+      <button class="btn sec sm" id="btnSearch"><span class="ico" style="--ico:url(../assets/common/icon-search.webp)"></span>搜尋費用</button>
       <button class="btn sec sm" id="btnRef"><span class="ico" style="--ico:url(../assets/common/icon-refresh.webp)"></span>重新整理</button>
     </div>
 
@@ -778,6 +779,50 @@ function custClose(id){
   };
 }
 
+/* ===== 搜尋費用：在一個月份裡找項目文字／金額，點一筆跳到那天 ===== */
+var BLOCK_NAME={ cashIn:"現金收入", cashOut:"現金支出", pettyIn:"零用金收入", pettyOut:"零用金支出", bill:"未結單據", remit:"住民匯款" };
+function openSearch(){
+  var ym=S.date.slice(0,7), h=$("modalHost");
+  h.innerHTML='<div class="modal"><div class="box" style="max-width:640px"><h2>搜尋費用</h2><p class="sub">在一個月份的日報表裡找項目文字或金額（現金、零用金、未結單據、住民匯款都會找）。</p>'
+    +'<label class="lb">月份</label><input class="fld" id="seMonth" type="month" value="'+esc(ym.replace("/","-"))+'">'
+    +'<label class="lb">項目文字（可以空白；打好幾個字用空格隔開，會都包含才算）</label><input class="fld" id="seQ" maxlength="60" placeholder="例如：手術費、王梅香、救護車" autocomplete="off">'
+    +'<label class="lb">金額（可以空白）</label><input class="fld" id="seAmt" inputmode="numeric" placeholder="例如：3500" autocomplete="off">'
+    +'<label class="lb">日期區間（可以空白，不填就是整個月）</label><div style="display:flex;gap:8px;align-items:center"><input class="fld" id="seFrom" type="date"><span>～</span><input class="fld" id="seTo" type="date"></div>'
+    +'<div class="foot"><button class="btn sec" id="mNo">關閉</button><button class="btn main" id="seGo">搜尋</button></div>'
+    +'<div id="seOut" style="margin-top:12px"></div></div></div>';
+  $("mNo").onclick=closeModal; $("seQ").focus();
+  function run(){
+    var mo=$("seMonth").value; if(!mo){ say("請選月份。"); return; }
+    var q=$("seQ").value.trim(), am=$("seAmt").value.trim();
+    if(!q&&!am){ say("請至少填項目文字或金額其中一個。"); return; }
+    var args={ month:mo.replace("-","/"), q:q, amount:am, from:$("seFrom").value.replace(/-/g,"/"), to:$("seTo").value.replace(/-/g,"/") };
+    var b=$("seGo"); b.disabled=true; b.textContent="搜尋中…"; $("seOut").innerHTML='<div class="sub">正在讀整個月的日報表，可能要十幾秒…</div>';
+    api("search",args,120000).then(function(j){
+      b.disabled=false; b.textContent="搜尋";
+      if(!j||!j.ok){ $("seOut").innerHTML=""; say(j&&j.error==="no_file"?"找不到這個月份的日報表檔案。":errText(j)); return; }
+      renderSearch(j);
+    }).catch(function(e){ b.disabled=false; b.textContent="搜尋"; $("seOut").innerHTML=""; netFail(e); });
+  }
+  $("seGo").onclick=run;
+  h.querySelector(".box").addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&!ev.isComposing&&ev.keyCode!==229&&ev.target.tagName==="INPUT"){ ev.preventDefault(); run(); } });
+}
+function renderSearch(j){
+  var r=j.results||[], o=$("seOut");
+  if(!r.length){ o.innerHTML='<div class="sub">在 '+j.days+' 天的日報表裡沒有找到。</div>'; return; }
+  var sum=0; r.forEach(function(x){ sum+=Number(x.amount)||0; });
+  var h='<div class="sub" style="margin-bottom:6px">找到 <b>'+r.length+'</b> 筆（金額加總 '+fmt(sum)+'）'+(j.capped?'，筆數太多只列前 500 筆，請把條件縮小':'')+'。點一筆就跳到那一天。</div>'
+    +'<div style="max-height:46vh;overflow:auto;border:1.5px solid var(--t-line);border-radius:12px">';
+  r.forEach(function(x,i){
+    h+='<div class="serow" data-d="'+esc(x.date)+'" style="display:flex;gap:10px;align-items:baseline;padding:8px 12px;border-top:'+(i?'1px dashed var(--t-line)':'0')+';cursor:pointer">'
+      +'<span style="flex:0 0 78px;font-weight:700">'+esc(x.date.slice(5))+'</span>'
+      +'<span style="flex:0 0 70px;font-size:12.5px;color:var(--muted)">'+esc(BLOCK_NAME[x.block]||x.block)+'</span>'
+      +'<span style="flex:1;min-width:0;word-break:break-all">'+esc(x.text||"（沒有文字）")+'</span>'
+      +'<b style="flex:0 0 auto">'+fmt(x.amount)+'</b></div>';
+  });
+  o.innerHTML=h+'</div>';
+  Array.prototype.forEach.call(o.querySelectorAll(".serow"),function(e){ e.onclick=function(){ var d=e.getAttribute("data-d"); closeModal(); go(d); }; });
+}
+
 /* ===== 申請零用金（列印領款聯＋會計聯）===== */
 function minguo(s){ var p=s.split("/").map(Number); return (p[0]-1911)+"."+twoD(p[1])+"."+twoD(p[2]); }
 function openPetty(){
@@ -984,7 +1029,7 @@ function bind(){
   $("depName").addEventListener("keydown",function(ev){ if(ev.key==="Enter"&&!ev.isComposing&&ev.keyCode!==229){ ev.preventDefault(); depSet("project",this.value.trim(),depPicked()); } });
   $("btnSlip").onclick=openSlip;
   $("custAdd").onclick=function(){ if(S.locked){ say("這天已結帳，不能新增。"); return; } custAdd(); };
-  $("btnPetty").onclick=openPetty;
+  $("btnPetty").onclick=openPetty; $("btnSearch").onclick=openSearch;
   $("btnSave").onclick=function(){ save(); };
   $("btnPrint").onclick=printDay; $("btnXlsx").onclick=function(){ saveXlsx(); }; $("btnClose").onclick=closeDay; $("btnReopen").onclick=reopenDay;
   $("btnRef").onclick=function(){ if(S.dirty){ ask("有尚未儲存的修改","重新整理會讓剛剛打的內容消失。","放棄並重新整理","留在這裡",function(){ closeModal(); S.dirty=false; load(S.date); }); } else load(S.date); };
