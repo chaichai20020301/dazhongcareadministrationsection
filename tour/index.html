@@ -121,6 +121,7 @@ tr.row:hover{background:#f3efe6}
 .note-in label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;color:var(--sub)}
 .note-in .full{grid-column:1/-1}
 .nreq .rq{color:#d33;font-style:normal}
+.ni .ndel{margin-left:auto;border:1px solid #e6b8b3;background:#fff;color:#b3261e;border-radius:8px;padding:1px 9px;font-size:12px;cursor:pointer}
 .nbox.need{outline:3px solid #f3b341;border-radius:12px;animation:rise .3s both}
 .nwarn{display:none;margin:0 0 8px;padding:8px 12px;border-radius:9px;background:#fff3df;color:#7a5522;font-size:13.5px}
 .nbox.need .nwarn{display:block}
@@ -374,7 +375,7 @@ tr.row:hover{background:#F3F6EC}
     <div class="reqhint" id="reqHint" onclick="focusMissing(missingFor(Math.max(0,curStage())))"></div>
   </div>
   <div class="db" id="dBody"></div>
-  <div class="df"><span class="st" id="dSt"></span><button class="btn btn-o" onclick="closeDr()">關閉</button><button class="btn btn-g" id="saveBtn" onclick="save()">儲存</button></div>
+  <div class="df"><span class="st" id="dSt"></span><button class="btn btn-o" id="delRowBtn" style="display:none;color:#b3261e;border-color:#e6b8b3" onclick="delRow()">刪除這筆</button><button class="btn btn-o" onclick="closeDr()">關閉</button><button class="btn btn-g" id="saveBtn" onclick="save()">儲存</button></div>
 </aside>
 <div id="nm" class="nm" onclick="if(event.target===this)closeNotice()">
   <div class="nm-box">
@@ -408,6 +409,33 @@ function needNote(){
   if(!CUR||!CUR.id||NOTED||CUR.status!=="初步參訪")return false;
   const b=$("#nBox");if(b){b.classList.add("need");b.scrollIntoView({block:"center",behavior:"smooth"})}
   toast("初步參訪階段請先記一筆「訪談與追蹤進度」再儲存",4000);return true;
+}
+const isMgr=()=>lsGet("portal_role")==="manager";   // 只決定畫面要不要顯示刪除鈕；真正的權限由後端依憑證判斷
+async function delNote(b){
+  if(!CUR||!CUR.id)return;
+  if(!confirm("確定要刪除這筆訪談紀錄嗎？\n刪除後會從試算表移除，無法復原。"))return;
+  b.disabled=true;
+  try{
+    const r=await api("note.delete",{pid:CUR.id,time:b.dataset.t,by:me()});
+    if(!r.ok){toast(r.error==="forbidden"?"只有主管可以刪除":"刪除失敗："+(r.error||""));b.disabled=false;return}
+    const ni=b.closest(".ni");if(ni)ni.remove();
+    const box=$("#notes");if(box&&!box.querySelector(".ni"))box.innerHTML='<div style="color:var(--sub);font-size:13.5px">尚無訪談紀錄</div>';
+    toast("已刪除這筆紀錄");reload(true);
+  }catch(e){b.disabled=false;if(!(e&&(e.denied||e.auth)))toast("刪除失敗，請稍後再試")}
+}
+async function delRow(){
+  if(!CUR||!CUR.id)return;
+  const nm=CUR.elderName||CUR.visitorName||CUR.id;
+  if(!confirm(`確定要刪除「${nm}」這筆參訪嗎？\n\n整筆資料和它的所有訪談紀錄都會從試算表移除，無法復原。\n（家屬上傳的照片不會自動刪，要到雲端硬碟處理）`))return;
+  if(prompt("為了避免誤刪，請輸入「刪除」兩個字確認：")!=="刪除")return toast("沒有輸入「刪除」，已取消");
+  try{
+    const r=await api("row.delete",{id:CUR.id,by:me()});
+    if(!r.ok){toast(r.error==="forbidden"?"只有主管可以刪除":"刪除失敗："+(r.error||""));return}
+    const i=ROWS.findIndex(x=>x.id===CUR.id);if(i>=0)ROWS.splice(i,1);
+    CUR=null;ORIG=null;
+    $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";
+    draw();toast("已刪除");reload(true);
+  }catch(e){if(!(e&&(e.denied||e.auth)))toast("刪除失敗，請稍後再試")}
 }
 function noteParse(n){
   const m=String(n.content||"").match(/^對象：(.*?)｜結果：(.*?)\n([\s\S]*)$/);
@@ -476,6 +504,8 @@ async function apiOnce(action,data){
     }
     if(action==="note"){db.notes.push({time:now,pid:data.pid,by:data.by,type:data.type,content:data.content,followDate:data.followDate||""});
       const r=db.rows.find(x=>x.id===data.pid);if(r){r.updatedAt=now;r.updatedBy=data.by}mSave(db);return{ok:true,updatedAt:now}}
+    if(action==="note.delete"){const i=db.notes.findIndex(n=>n.pid===data.pid&&n.time===data.time);if(i<0)return{ok:false,error:"找不到這筆紀錄（可能已被刪除）"};db.notes.splice(i,1);mSave(db);return{ok:true}}
+    if(action==="row.delete"){const i=db.rows.findIndex(r=>r.id===data.id);if(i<0)return{ok:false,error:"找不到這筆資料（可能已被刪除）"};db.rows.splice(i,1);db.notes=db.notes.filter(n=>n.pid!==data.id);mSave(db);return{ok:true}}
     return{ok:false,error:"unknown"};
   }
   const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),60000);   // Google 偶爾很慢，最多等 60 秒
@@ -729,9 +759,9 @@ function paint(notes,hist){
   syncDiet();syncSvc();syncPlace();syncObs();markReq();
   TOTAL_MANUAL=!!CUR.total&&String(CUR.total)!==String(calcEst()||"");$("#totalIn").value=CUR.total||"";
   $("#totalIn").oninput=e=>{TOTAL_MANUAL=true;CUR.total=e.target.value;mark()};
-  recalc();updateStayDays();mark();injectSay();loadAtts();autoGrowAll();
+  recalc();updateStayDays();mark();injectSay();loadAtts();autoGrowAll();$("#delRowBtn").style.display=(isMgr()&&CUR.id)?"":"none";
 }
-function noteHtml(n){const p=noteParse(n);return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${p.who?`<span class="tag">對象：${esc(p.who)}</span>`:""}${p.res?`<span class="tag res${NOTE_BAD.includes(p.res)?" bad":""}">${esc(p.res)}</span>`:""}${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}</div><p>${esc(p.body)}</p>${p.todo?`<div class="todo">待辦：${esc(p.todo)}</div>`:""}</div>`}
+function noteHtml(n){const p=noteParse(n);return `<div class="ni"><div class="m"><b>${esc(n.by)}</b><span>${esc(fmtT(n.time))}</span><span class="tag">${esc(n.type||"")}</span>${p.who?`<span class="tag">對象：${esc(p.who)}</span>`:""}${p.res?`<span class="tag res${NOTE_BAD.includes(p.res)?" bad":""}">${esc(p.res)}</span>`:""}${n.followDate?`<span class="tag" style="background:#fff3df;color:#7a5522">🔔 追蹤 ${esc(n.followDate)}</span>`:""}${isMgr()?`<button type="button" class="ndel" data-t="${esc(n.time)}" onclick="delNote(this)" title="刪除這筆紀錄（主管）">刪除</button>`:""}</div><p>${esc(p.body)}</p>${p.todo?`<div class="todo">待辦：${esc(p.todo)}</div>`:""}</div>`}
 function syncDiet(){const t=CUR&&CUR.feeding==="鼻胃管灌食";["dietType","dietStaple","dietVeg","dietSize","diet"].forEach(k=>{const e=document.querySelector(`#dBody [data-k="${k}"]`);if(e)e.style.display=t?"none":""})}
 function autoGrow(el){el.style.height="auto";el.style.height=Math.max(40,el.scrollHeight+2)+"px"}
 function autoGrowAll(){$$("#dBody textarea.auto").forEach(autoGrow)}
