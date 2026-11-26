@@ -403,16 +403,17 @@ const NOTE_RES=["已聯絡到家屬","未接／無人回應","已讀未回","家
 const NOTE_BAD=["未接／無人回應","已讀未回"];
 let NOTED=false;   // 這次打開個案，是否已經新增過訪談紀錄
 // 紀錄內容格式：第一行「對象：○○｜結果：○○」，其後是摘要，選填「待辦：○○」。舊紀錄沒有這行也能正常顯示。
+// 只有「初步參訪」階段的既有個案，儲存前要先記一筆訪談與追蹤進度；控床聯絡以後不強制
+function needNote(){
+  if(!CUR||!CUR.id||NOTED||CUR.status!=="初步參訪")return false;
+  const b=$("#nBox");if(b){b.classList.add("need");b.scrollIntoView({block:"center",behavior:"smooth"})}
+  toast("初步參訪階段請先記一筆「訪談與追蹤進度」再儲存",4000);return true;
+}
 function noteParse(n){
   const m=String(n.content||"").match(/^對象：(.*?)｜結果：(.*?)\n([\s\S]*)$/);
   if(!m)return{who:"",res:"",body:String(n.content||""),todo:""};
   let body=m[3],todo="";const t=body.match(/\n?待辦：([^\n]*)$/);if(t){todo=t[1];body=body.slice(0,t.index)}
   return{who:m[1],res:m[2],body,todo};
-}
-function needNote(){
-  if(!CUR||!CUR.id||NOTED)return false;
-  const b=$("#nBox");if(b){b.classList.add("need");b.scrollIntoView({block:"center",behavior:"smooth"})}
-  toast("請先填寫這次的「訪談與追蹤進度」再離開",4000);return true;
 }
 const SERVICE_TYPES=["喘息服務(GA05機構住宿式喘息服務)","短照服務(SC05機構住宿式短照服務)","自費入住"];
 const OPEN_ST=["初步參訪","控床聯絡","護理聯絡","家屬討論中","已安排床位"];
@@ -612,7 +613,6 @@ async function openRow(id){
 }
 function openDr(){$("#dr").classList.add("on");$("#mask").classList.add("on");$("#dr").setAttribute("aria-hidden","false");document.body.style.overflow="hidden"}
 function closeDr(){
-  if(needNote())return;
   if(CUR&&dirty()&&!confirm("有尚未儲存的修改，確定要關閉嗎？"))return;
   $("#dr").classList.remove("on");$("#mask").classList.remove("on");$("#dr").setAttribute("aria-hidden","true");document.body.style.overflow="";CUR=null;
 }
@@ -702,8 +702,7 @@ function paint(notes,hist){
     ${ta("medication","用藥")}${ta("routine","日常起居（睡眠、活動習慣等）")}
   </div></div></details></div>
   ${isNew?`<div class="sec" style="background:var(--g3);border-color:#cfe2c4;font-size:14px">💡 先儲存後，就可以在這裡新增「訪談紀錄」並設定下次追蹤日期。</div>`:`
-  <div class="sec nbox" id="nBox"><h3>訪談與追蹤進度 <small style="color:#d33;font-weight:400">每次打開個案都要填一筆，讓主管看得到進度</small></h3>
-    <div class="nwarn">⚠ 還沒填這次的訪談與追蹤進度。請填好下面標 * 的欄位，按「新增紀錄」後才能關閉或儲存。</div>
+  <div class="sec nbox" id="nBox"><div class="nwarn">⚠ 這筆還在初步參訪階段，請先填下面標 * 的欄位並按「新增紀錄」，才能儲存。</div><h3>訪談與追蹤進度 <small style="color:var(--sub);font-weight:400">初步參訪階段儲存前要先記一筆，讓主管看得到進度；進到控床聯絡之後不強制，有聯絡家屬時再記即可</small></h3>
     <div class="note-in nreq">
       <label>聯絡方式<span class="rq"> *</span><select id="nType" class="f">${NOTE_TYPES.map(x=>`<option>${x}</option>`).join("")}</select></label>
       <label>聯絡對象<span class="rq"> *</span><input id="nWho" class="f" placeholder="例如：陳小姐（女兒）" value="${esc(CUR.visitorName||"")}"></label>
